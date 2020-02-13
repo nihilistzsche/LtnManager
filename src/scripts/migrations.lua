@@ -1,9 +1,6 @@
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- MIGRATIONS
 
--- dependencies
-local event = require('lualib/event')
-
 -- table of migration functions
 local migrations = {}
 
@@ -19,8 +16,8 @@ local function compare_versions(v1, v2)
   return false
 end
 
--- handle migrations
-event.on_configuration_changed(function(e)
+-- run the migrations
+return function(e)
   local changes = e.mod_changes[script.mod_name]
   if changes then
     local old = changes.old_version
@@ -41,4 +38,4 @@ event.on_configuration_changed(function(e)
   -- generic migrations
   log('Applying generic migrations')
   -- add migrations here...
-end)
+end
