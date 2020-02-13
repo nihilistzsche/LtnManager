@@ -1,0 +1,11 @@
+{
+"name": "LtnManager",
+"version": "0.1.0",
+"title": "LTN Manager (Alpha)",
+"author": "raiguard",
+"contact": "",
+"homepage": "https://github.com/raiguard/Factorio-LtnManager",
+"description": "A GUI for managing your Logistics Train Network.",
+"factorio_version": "0.18",
+"dependencies": ["base >= 0.17.11", "LogisticTrainNetwork >= 1.10.7"]
+}
