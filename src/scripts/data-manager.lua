@@ -10,13 +10,58 @@ local event = require('lualib/event')
 local self = {}
 
 -- -----------------------------------------------------------------------------
+-- STATIONS
+
+
+
+-- -----------------------------------------------------------------------------
 -- HANDLERS
 
 local function on_stops_updated(e)
-  local breakpoint
+  -- organize stations into depots
+  local depots = {}
+  local stations = {}
+  local stations_by_delivery = {}
+  for id,t in pairs(e.logistic_train_stops) do
+    local entity = t.entity
+    local name = entity.backer_name
+    if t.isDepot then
+      local depot = depots[name]
+      if depot then
+        depot[#depot+1] = id
+      else
+        depots[name] = {id}
+      end
+    end
+    stations[id] = t
+    local deliveries = t.activeDeliveries
+    for i=1,#deliveries do
+      stations_by_delivery[deliveries[i]] = id
+    end
+  end
+  global.working = {
+    depots = depots,
+    stations = stations,
+    stations_by_delivery = stations_by_delivery
+  }
 end
 
 local function on_dispatcher_updated(e)
+  local items = {
+    available = {},
+    in_transit = {},
+    outstanding = {}
+  }
+  local working_data = global.working
+  -- sort deliveries
+  -- local depots = working_data.depots
+  local stations_by_delivery = working_data.stations_by_delivery
+  local stations = working_data.stations
+  for id,t in pairs(e.deliveries) do
+    local station = stations[stations_by_delivery[id]]
+    if not station.deliveries then station.deliveries = {} end
+    station.deliveries[id] = t
+  end
   local breakpoint
 end
 
