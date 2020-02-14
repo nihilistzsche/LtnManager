@@ -28,7 +28,7 @@ end
 event.on_init(function()
   global.data = {}
   global.flags = {
-    
+
   }
   global.players = {}
   for i,p in pairs(game.players) do
@@ -46,3 +46,13 @@ event.on_player_created(function(e)
 end)
 
 event.on_configuration_changed(migrations)
+
+event.on_gui_click(function(e)
+  local player = game.get_player(e.player_index)
+  local player_table = global.players[e.player_index]
+  if player_table.gui.main then
+    main_gui.destroy(player, player_table)
+  else
+    main_gui.create(player, player_table)
+  end
+end, {gui_filters='ltnm_button'})
