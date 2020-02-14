@@ -10,58 +10,82 @@ local event = require('lualib/event')
 local self = {}
 
 -- -----------------------------------------------------------------------------
--- STATIONS
+-- UTILITIES
 
-
+-- adds the contents of two material tables together
+-- t1 contains the items we are adding into the table, t2 will be returned
+local function add_materials(t1, t2)
+  for name,count in pairs(t1) do
+    local existing = t2[name]
+    if existing then
+      t2[name] = existing + count
+    else
+      t2[name] = count
+    end
+  end
+  return t2
+end
 
 -- -----------------------------------------------------------------------------
 -- HANDLERS
 
 local function on_stops_updated(e)
-  -- organize stations into depots
+  -- sort stations by depot
   local depots = {}
-  local stations = {}
-  local stations_by_delivery = {}
   for id,t in pairs(e.logistic_train_stops) do
-    local entity = t.entity
-    local name = entity.backer_name
     if t.isDepot then
+      local name = t.entity.backer_name
       local depot = depots[name]
       if depot then
-        depot[#depot+1] = id
+        depot.stations[#depot.stations+1] = id
       else
-        depots[name] = {id}
+        depots[name] = {trains={}, stations={id}}
       end
     end
-    stations[id] = t
-    local deliveries = t.activeDeliveries
-    for i=1,#deliveries do
-      stations_by_delivery[deliveries[i]] = id
-    end
   end
-  global.working = {
+  -- add to global
+  global.data = {
     depots = depots,
-    stations = stations,
-    stations_by_delivery = stations_by_delivery
+    stations = e.logistic_train_stops
   }
 end
 
 local function on_dispatcher_updated(e)
-  local items = {
-    available = {},
-    in_transit = {},
-    outstanding = {}
-  }
-  local working_data = global.working
-  -- sort deliveries
-  -- local depots = working_data.depots
-  local stations_by_delivery = working_data.stations_by_delivery
-  local stations = working_data.stations
-  for id,t in pairs(e.deliveries) do
-    local station = stations[stations_by_delivery[id]]
-    if not station.deliveries then station.deliveries = {} end
-    station.deliveries[id] = t
+  local data = global.data
+  local depots = data.depots
+  local stations = data.stations
+  -- assign inventories to each LTN network
+  local available = {}
+  for id,materials in pairs(e.provided_by_stop) do
+    local network_id = stations[id].network_id
+    available[network_id] = add_materials(materials, available[network_id] or {})
   end
+  local requested = {}
+  for id,materials in pairs(e.requests_by_stop) do
+    local network_id = stations[id].network_id
+    requested[network_id] = add_materials(materials, requested[network_id] or {})
+  end
+  local in_transit = {}
+  for id,t in pairs(e.deliveries) do
+    -- in transit inventory
+    in_transit[t.networkID] = add_materials(t.shipment, in_transit[t.networkID] or {})
+    -- assign to depot
+    local depot_name = t.train.schedule.records[1].station
+    local trains = depots[depot_name].trains
+    trains[#trains+1] = id
+  end
+  -- assign available trains to depot
+  for id,t in pairs(e.available_trains) do
+    local depot_name = t.train.schedule.records[1].station
+    local trains = depots[depot_name].trains
+    trains[#trains+1] = id
+  end
+  -- add to global
+  data.inventory = {
+    available = available,
+    requested = requested,
+    in_transit = in_transit
+  }
   local breakpoint
 end
 
