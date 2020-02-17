@@ -41,11 +41,11 @@ event.on_load(function()
   data_manager.setup_events()
 end)
 
+event.on_configuration_changed(migrations)
+
 event.on_player_created(function(e)
   setup_player(game.get_player(e.player_index), e.player_index)
 end)
-
-event.on_configuration_changed(migrations)
 
 event.on_gui_click(function(e)
   local player = game.get_player(e.player_index)
