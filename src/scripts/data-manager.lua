@@ -59,11 +59,13 @@ local function on_dispatcher_updated(e)
   for id,materials in pairs(e.provided_by_stop) do
     local network_id = stations[id].network_id
     available[network_id] = add_materials(materials, available[network_id] or {})
+    stations[id].available = materials
   end
   local requested = {}
   for id,materials in pairs(e.requests_by_stop) do
     local network_id = stations[id].network_id
     requested[network_id] = add_materials(materials, requested[network_id] or {})
+    stations[id].requests = materials
   end
   local in_transit = {}
   for id,t in pairs(e.deliveries) do
