@@ -5,6 +5,7 @@
 -- dependencies
 local event = require('lualib/event')
 local gui = require('lualib/gui')
+local util = require('scripts/util')
 
 -- self object
 local self = {}
@@ -110,29 +111,55 @@ function self.create(player, player_table)
       name_flow.add{type='sprite', sprite='ltnm_indicator_'..color}.style.left_margin = 2
       name_flow.add{type='label', caption=t.entity.backer_name}.style.left_margin = 2
       -- items
-      local materials_table = frame.add{type='table', column_count=5}
-      materials_table.style.left_padding = 4
-      materials_table.style.horizontal_spacing = 2
-      materials_table.style.vertical_spacing = 2
-      materials_table.style.width = 172
-      local i = 0
-      if t.available then
-        local materials = t.available
-        for name,count in pairs(materials) do
-          i = i + 1
-          materials_table.add{type='sprite-button', style='ltnm_row_slot_button_green', sprite=string.gsub(name, ',', '/'), number=count}
+      do
+        local table = frame.add{type='table', column_count=5}
+        table.style.left_padding = 4
+        table.style.horizontal_spacing = 2
+        table.style.vertical_spacing = 2
+        table.style.width = 172
+        local i = 0
+        if t.available then
+          local materials = t.available
+          for name,count in pairs(materials) do
+            i = i + 1
+            table.add{type='sprite-button', style='ltnm_row_slot_button_green', sprite=string.gsub(name, ',', '/'), number=count}
+          end
+        end
+        if t.requests then
+          local materials = t.requests
+          for name,count in pairs(materials) do
+            i = i + 1
+            table.add{type='sprite-button', style='ltnm_row_slot_button_red', sprite=string.gsub(name, ',', '/'), number=-count}
+          end
+        end
+        if i%5 ~= 0 or i == 0 then
+          for _=1,5-(i%5) do
+            table.add{type='sprite-button', style='ltnm_row_slot_button_dark_grey'}
+          end
         end
       end
-      if t.requests then
-        local materials = t.requests
-        for name,count in pairs(materials) do
-          i = i + 1
-          materials_table.add{type='sprite-button', style='ltnm_row_slot_button_red', sprite=string.gsub(name, ',', '/'), number=-count}
+      -- active deliveries
+      do
+        local deliveries = global.data.deliveries
+        local combined_shipment = {}
+        for _,delivery_id in ipairs(t.activeDeliveries) do
+          local delivery = deliveries[delivery_id]
+          combined_shipment = util.add_materials(delivery.shipment, combined_shipment)
         end
-      end
-      if i%5 ~= 0 or i == 0 then
-        for _=1,5-(i%5) do
-          materials_table.add{type='sprite-button', style='ltnm_row_slot_button_dark_grey'}
+        local table = frame.add{type='table', column_count=4}
+        table.style.left_padding = 4
+        table.style.horizontal_spacing = 2
+        table.style.vertical_spacing = 2
+        -- table.style.width = 172
+        local i = 0
+        for name,count in pairs(combined_shipment) do
+          i = i + 1
+          table.add{type='sprite-button', style='ltnm_row_slot_button_dark_grey', sprite=string.gsub(name, ',', '/'), number=count}
+        end
+        if i%4 ~= 0 or i == 0 then
+          for _=1,4-(i%4) do
+            table.add{type='sprite-button', style='ltnm_row_slot_button_dark_grey'}
+          end
         end
       end
     end

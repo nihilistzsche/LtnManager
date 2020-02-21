@@ -5,26 +5,10 @@
 
 -- dependencies
 local event = require('lualib/event')
+local util = require('scripts/util')
 
 -- self object
 local self = {}
-
--- -----------------------------------------------------------------------------
--- UTILITIES
-
--- adds the contents of two material tables together
--- t1 contains the items we are adding into the table, t2 will be returned
-local function add_materials(t1, t2)
-  for name,count in pairs(t1) do
-    local existing = t2[name]
-    if existing then
-      t2[name] = existing + count
-    else
-      t2[name] = count
-    end
-  end
-  return t2
-end
 
 -- -----------------------------------------------------------------------------
 -- HANDLERS
@@ -58,19 +42,19 @@ local function on_dispatcher_updated(e)
   local available = {}
   for id,materials in pairs(e.provided_by_stop) do
     local network_id = stations[id].network_id
-    available[network_id] = add_materials(materials, available[network_id] or {})
+    available[network_id] = util.add_materials(materials, available[network_id] or {})
     stations[id].available = materials
   end
   local requested = {}
   for id,materials in pairs(e.requests_by_stop) do
     local network_id = stations[id].network_id
-    requested[network_id] = add_materials(materials, requested[network_id] or {})
+    requested[network_id] = util.add_materials(materials, requested[network_id] or {})
     stations[id].requests = materials
   end
   local in_transit = {}
   for id,t in pairs(e.deliveries) do
     -- in transit inventory
-    in_transit[t.networkID] = add_materials(t.shipment, in_transit[t.networkID] or {})
+    in_transit[t.networkID] = util.add_materials(t.shipment, in_transit[t.networkID] or {})
     -- assign to depot
     local depot_name = t.train.schedule.records[1].station
     local trains = depots[depot_name].trains
@@ -86,8 +70,9 @@ local function on_dispatcher_updated(e)
   data.inventory = {
     available = available,
     requested = requested,
-    in_transit = in_transit
+    in_transit = in_transit,
   }
+  data.deliveries = e.deliveries
   local breakpoint
 end
 

@@ -1,20 +1,9 @@
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- SPRITES
 
-local icons_tileset = '__LtnManager__/graphics/gui/icons.png'
-
 -- indicator sprites
 local indicator_sprites = {}
 for i,t in ipairs(data.raw.lamp['small-lamp'].signal_to_color_mapping) do
-  -- indicator_sprites[i] = {
-  --   type = 'sprite',
-  --   name = 'ltnm_indicator_'..t.name,
-  --   filename = icons_tileset,
-  --   position = {0,0},
-  --   size = 28,
-  --   tint = t.color,
-  --   flags = {'icon'}
-  -- }
   indicator_sprites[i] = {
     type = 'sprite',
     name = 'ltnm_indicator_'..t.name,
