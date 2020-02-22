@@ -107,6 +107,12 @@ styles.ltnm_titlebar_flow = {
   top_margin = -3
 }
 
+styles.ltnm_station_labels_flow = {
+  type = 'horizontal_flow_style',
+  horizontal_spacing = 12,
+  vertical_align = 'center'
+}
+
 -- -----------------------------------------------------------------------------
 -- FRAME STYLES
 
@@ -179,7 +185,8 @@ styles.ltnm_station_row_frame = {
   horizontally_stretchable = 'on',
   horizontal_flow_style = {
     type = 'horizontal_flow_style',
-    vertical_align = 'center'
+    vertical_align = 'center',
+    horizontal_spacing = 12
   }
 }
 

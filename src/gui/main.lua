@@ -47,9 +47,17 @@ function self.create(player, player_table)
           {type='tab-and-content', tab={type='tab', caption={'ltnm-gui.stations'}}, content=
             {type='frame', style='ltnm_scroll_pane_frame', direction='vertical', children={
               -- toolbar
-              {type='frame', style='subheader_frame', direction='horizontal', children={
-                {template='pushers.horizontal'},
-                {type='sprite-button', style='tool_button', sprite='utility/search_icon'}
+              {type='frame', style='subheader_frame', direction='vertical', children={
+                {type='flow', direction='horizontal', children={
+                  {template='pushers.horizontal'},
+                  {type='sprite-button', style='tool_button', sprite='utility/search_icon'}
+                }},
+                {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
+                  {type='label', style={name='bold_label', left_margin=4,width=220}, caption={'ltnm-gui.station-name'}},
+                  {type='label', style={name='bold_label', width=168}, caption={'ltnm-gui.inventory'}},
+                  {type='label', style={name='bold_label', width=134}, caption={'ltnm-gui.deliveries'}},
+                  -- {type='label', style={name='bold_label', width=}, caption={'ltnm-gui.station-'}},
+                }}
               }},
               {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations_scroll_pane'}
             }}
@@ -113,10 +121,9 @@ function self.create(player, player_table)
       -- items
       do
         local table = frame.add{type='table', column_count=5}
-        table.style.left_padding = 4
         table.style.horizontal_spacing = 2
         table.style.vertical_spacing = 2
-        table.style.width = 172
+        table.style.width = 168
         local i = 0
         if t.available then
           local materials = t.available
@@ -147,10 +154,9 @@ function self.create(player, player_table)
           combined_shipment = util.add_materials(delivery.shipment, combined_shipment)
         end
         local table = frame.add{type='table', column_count=4}
-        table.style.left_padding = 4
         table.style.horizontal_spacing = 2
         table.style.vertical_spacing = 2
-        -- table.style.width = 172
+        table.style.width = 134
         local i = 0
         for name,count in pairs(combined_shipment) do
           i = i + 1
