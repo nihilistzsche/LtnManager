@@ -197,6 +197,7 @@ styles.ltnm_depots_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'scroll_pane_with_dark_background_under_subheader',
   vertically_stretchable = 'on',
+  horizontally_stretchable = 'on',
   background_graphical_set = {
     position = {282, 17},
     corner_size = 8,
@@ -211,7 +212,9 @@ styles.ltnm_icon_slot_table_scroll_pane = {
   parent = 'scroll_pane',
   padding = 0,
   margin = 0,
-  extra_padding_when_activated = 0
+  extra_padding_when_activated = 0,
+  width = 332,
+  height = 160
 }
 
 styles.ltnm_stations_scroll_pane = {
