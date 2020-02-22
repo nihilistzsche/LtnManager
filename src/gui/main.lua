@@ -38,60 +38,60 @@ gui.add_templates{
 
 function self.create(player, player_table)
   local gui_data = gui.create(player.gui.screen, 'main', player.index,
-    {type='frame', style='dialog_frame', direction='vertical', save_as='window', children={
-      -- titlebar
-      {type='flow', style='ltnm_titlebar_flow', direction='horizontal', children={
-        {type='label', style='frame_title', caption={'mod-name.LtnManager'}},
-        {type='empty-widget', style='ltnm_titlebar_drag_handle', save_as='drag_handle'}
-      }},
-      {type='frame', style='inside_deep_frame_for_tabs', children={
-        {type='tabbed-pane', style='ltnm_tabbed_pane', children={
-          -- depots tab
-          {type='tab-and-content', tab={type='tab', caption={'ltnm-gui.depots'}}, content=
-            {type='frame', style='ltnm_scroll_pane_frame', direction='vertical', children={
-              {type='scroll-pane', style='ltnm_depots_scroll_pane', direction='vertical', children={
-                {type='frame', style={name='ltnm_depot_frame', height=308, horizontally_stretchable=true}, direction='vertical', children={
-                  {type='label', style='caption_label', caption='Depot'}
-                }}
+    {type='frame', style='ltnm_empty_frame', direction='vertical', save_as='window', children={
+      {type='tabbed-pane', style='ltnm_tabbed_pane', children={
+        -- depots tab
+        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.depots'}}, content=
+          {type='frame', style='ltnm_dark_content_frame', direction='vertical', children={
+            {type='scroll-pane', style='ltnm_depots_scroll_pane', direction='vertical', children={
+              {type='frame', style={name='ltnm_depot_frame', height=308, horizontally_stretchable=true}, direction='vertical', children={
+                {type='label', style='caption_label', caption='Depot'}
               }}
             }}
-          },
-          -- stations tab
-          {type='tab-and-content', tab={type='tab', caption={'ltnm-gui.stations'}}, content=
-            {type='frame', style='ltnm_scroll_pane_frame', direction='vertical', children={
-              -- toolbar
-              {type='frame', style='subheader_frame', direction='vertical', children={
-                {type='flow', direction='horizontal', children={
-                  {template='pushers.horizontal'},
-                  {type='sprite-button', style='tool_button', sprite='utility/search_icon'}
-                }},
-                {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
-                  {type='label', style={name='bold_label', left_margin=4,width=220}, caption={'ltnm-gui.station-name'}},
-                  {type='label', style={name='bold_label', width=168}, caption={'ltnm-gui.inventory'}},
-                  {type='label', style={name='bold_label', width=134}, caption={'ltnm-gui.deliveries'}},
-                  -- {type='label', style={name='bold_label', width=}, caption={'ltnm-gui.station-'}},
-                }}
+          }}
+        },
+        -- stations tab
+        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.stations'}}, content=
+          {type='frame', style='ltnm_dark_content_frame', direction='vertical', children={
+            -- toolbar
+            {type='frame', style='subheader_frame', direction='vertical', children={
+              {type='flow', direction='horizontal', children={
+                {template='pushers.horizontal'},
+                {type='sprite-button', style='tool_button', sprite='utility/search_icon'}
               }},
-              {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations_scroll_pane'}
-            }}
-          },
-          -- inventory tab
-          {type='tab-and-content', tab={type='tab', caption={'ltnm-gui.inventory'}}, content=
-            {type='flow', direction='vertical', children={
+              {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
+                {type='label', style={name='bold_label', left_margin=4,width=220}, caption={'ltnm-gui.station-name'}},
+                {type='label', style={name='bold_label', width=168}, caption={'ltnm-gui.inventory'}},
+                {type='label', style={name='bold_label', width=134}, caption={'ltnm-gui.deliveries'}},
+                -- {type='label', style={name='bold_label', width=}, caption={'ltnm-gui.station-'}},
+              }}
+            }},
+            {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations_scroll_pane'}
+          }}
+        },
+        -- inventory tab
+        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.inventory'}}, content=
+          {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
+            -- toolbar
+            {type='frame', style='subheader_frame', direction='horizontal', children={
+              {type='empty-widget', style={height=24, horizontally_stretchable=true}}
+            }},
+            -- contents
+            {type='flow', style={padding=10}, direction='vertical', children={
               gui.call_template('inventory_slot_table_with_label', 'available'),
               gui.call_template('inventory_slot_table_with_label', 'requested'),
               gui.call_template('inventory_slot_table_with_label', 'in_transit')
             }}
-          },
-          -- history tab
-          {type='tab-and-content', tab={type='tab', caption={'ltnm-gui.history'}, mods={enabled=false}}, content=
-            {type='empty-widget'}
-          },
-          -- alerts tab
-          {type='tab-and-content', tab={type='tab', caption={'ltnm-gui.alerts'}, mods={enabled=false}}, content=
-            {type='empty-widget'}
-          }
-        }}
+          }}
+        },
+        -- history tab
+        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.history'}, mods={enabled=false}}, content=
+          {type='empty-widget'}
+        },
+        -- alerts tab
+        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.alerts'}, mods={enabled=false}}, content=
+          {type='empty-widget'}
+        }
       }}
     }}
   )
@@ -192,7 +192,7 @@ function self.create(player, player_table)
   --
 
   -- dragging and centering
-  gui_data.drag_handle.drag_target = gui_data.window
+  -- gui_data.drag_handle.drag_target = gui_data.window
   gui_data.window.force_auto_center()
 
   player_table.gui.main = gui_data

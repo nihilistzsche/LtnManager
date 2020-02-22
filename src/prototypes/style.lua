@@ -116,18 +116,22 @@ styles.ltnm_station_labels_flow = {
 -- -----------------------------------------------------------------------------
 -- FRAME STYLES
 
-styles.ltnm_scroll_pane_frame = {
+styles.ltnm_dark_content_frame = {
   type = 'frame_style',
   parent = 'inside_deep_frame',
   graphical_set = {
     base = {
-      position = {85,0},
-      corner_size = 8,
-      draw_type = 'outer',
-      center = {position={42,8}, size=1}
+      position = {17,0}, corner_size = 8,
+      center = {position={42,8}, size={1,1}},
+      draw_type = "outer"
     },
     shadow = default_inner_shadow
-  }
+  },
+}
+
+styles.ltnm_light_content_frame = {
+  type = 'frame_style',
+  parent = 'window_content_frame_packed'
 }
 
 styles.ltnm_depot_frame = {
@@ -190,6 +194,13 @@ styles.ltnm_station_row_frame = {
   }
 }
 
+styles.ltnm_empty_frame = {
+  type = 'frame_style',
+  graphical_set = {},
+  padding = 0,
+  margin = 0
+}
+
 -- -----------------------------------------------------------------------------
 -- SCROLL PANE STYLES
 
@@ -231,18 +242,50 @@ styles.ltnm_stations_scroll_pane = {
 -- -----------------------------------------------------------------------------
 -- TABBED PANE STYLES
 
+-- -----------------------------------------------------------------------------
+-- TABBED PANE STYLES
+
 styles.ltnm_tabbed_pane = {
   type = 'tabbed_pane_style',
-  parent = 'tabbed_pane',
+  vertical_spacing = 0,
+  padding = 0,
   tab_content_frame = {
     type = 'frame_style',
-    top_padding = 8,
-    right_padding = 12,
-    bottom_padding = 8,
-    left_padding = 12,
-    graphical_set = tabbed_pane_graphical_set
+    parent = 'dialog_frame',
+    top_padding = 8
+  },
+  tab_container = {
+    type = 'horizontal_flow_style',
+    left_padding = 0,
+    right_padding = 0,
+    horizontal_spacing = 0
   }
 }
+
+styles.ltnm_main_tab = {
+  type = "tab_style",
+  parent = "tab",
+  height = 32,
+  top_padding = 6,
+  bottom_padding = 6,
+  selected_graphical_set = {
+    base={position={448,103}, corner_size=8},
+    shadow = tab_glow(default_shadow_color, 0.5)
+  }
+}
+
+-- styles.ltnm_tabbed_pane = {
+--   type = 'tabbed_pane_style',
+--   parent = 'tabbed_pane',
+--   tab_content_frame = {
+--     type = 'frame_style',
+--     top_padding = 8,
+--     right_padding = 12,
+--     bottom_padding = 8,
+--     left_padding = 12,
+--     graphical_set = tabbed_pane_graphical_set
+--   }
+-- }
 
 -- -----------------------------------------------------------------------------
 -- TABLE STYLES
