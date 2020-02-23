@@ -85,16 +85,28 @@ function self.create(player, player_table)
           }}
         },
         -- history tab
-        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.history'}, mods={enabled=false}}, content=
+        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.history'}}, content=
           {type='empty-widget'}
         },
         -- alerts tab
-        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.alerts'}, mods={enabled=false}}, content=
+        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.alerts'}}, content=
           {type='empty-widget'}
+        },
+        -- frame header
+        {type='tab-and-content',
+          tab = {type='tab', style={name='ltnm_tabbed_pane_header', horizontally_stretchable=true, width=180}, mods={enabled=false}, children={
+            {type='flow', style={vertical_align='center'}, direction='horizontal', children={
+              {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, width=137, left_margin=0, right_margin=4}, save_as='drag_handle'},
+              {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black', clicked_sprite='utility/close_black'}
+            }}
+          }},
+          content = {type='empty-widget'}
         }
       }}
     }}
   )
+
+  gui_data.drag_handle.drag_target = gui_data.window
 
   --
   -- TEMPORARY DATA INSERTION

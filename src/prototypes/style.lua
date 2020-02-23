@@ -35,7 +35,7 @@ end
 --   bottom_outer_border_shift = -4,
 --   left_outer_border_shift = 4,
 --   right_outer_border_shift = -4,
---   draw_type = "outer"
+--   draw_type = 'outer'
 -- }
 
 local row_shadow = {
@@ -123,7 +123,7 @@ styles.ltnm_dark_content_frame = {
     base = {
       position = {17,0}, corner_size = 8,
       center = {position={42,8}, size={1,1}},
-      draw_type = "outer"
+      draw_type = 'outer'
     },
     shadow = default_inner_shadow
   },
@@ -263,14 +263,43 @@ styles.ltnm_tabbed_pane = {
 }
 
 styles.ltnm_main_tab = {
-  type = "tab_style",
-  parent = "tab",
+  type = 'tab_style',
+  parent = 'tab',
   height = 32,
   top_padding = 6,
   bottom_padding = 6,
   selected_graphical_set = {
     base={position={448,103}, corner_size=8},
     shadow = tab_glow(default_shadow_color, 0.5)
+  }
+}
+
+styles.ltnm_tabbed_pane_header = {
+  type = 'tab_style',
+  height = 32,
+  disabled_graphical_set = {
+    base = {
+      left_top = {position={0,0}, size={8,8}},
+      top = {position={8,0}, size={1,8}},
+      right_top = {position={9,0}, size={8,8}},
+      right = {position={9,8}, size={8,1}},
+      right_bottom = {position={9,8}, size={8,1}},
+      bottom = {position={8,8}, size={1,1}},
+      left_bottom = {position={26,9}, size={8,8}},
+      left = {position={0,8}, size={8,1}},
+      center = {position={8,8}, size={1,1}}
+    },
+    shadow = {
+      top = {position={208,128}, size={1,8}},
+      left_top = {position={200,128}, size={8,8}},
+      left = {position={250,105}, size={1,8}}, -- empty area
+      right_top = {position={209,128}, size={8,8}},
+      right = {position={209,136}, size={8,1}},
+      center = {position={208,136}, size={1,1}},
+      tint = default_shadow_color,
+      scale = 0.5,
+      draw_type = 'outer'
+    }
   }
 }
 
