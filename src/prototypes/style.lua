@@ -28,16 +28,6 @@ local function slot_button(y, glow_color, default_x)
   }
 end
 
--- local row_shadow = {
---   position = {378, 103},
---   corner_size = 16,
---   top_outer_border_shift = 4,
---   bottom_outer_border_shift = -4,
---   left_outer_border_shift = 4,
---   right_outer_border_shift = -4,
---   draw_type = 'outer'
--- }
-
 local row_shadow = {
   position = {351,109},
   corner_size = 10,
@@ -129,6 +119,20 @@ styles.ltnm_dark_content_frame = {
   },
 }
 
+styles.ltnm_dark_content_frame_in_light_frame = {
+  type = 'frame_style',
+  parent = 'inside_deep_frame',
+  graphical_set = {
+    base = {
+      position = {85,0},
+      corner_size = 8,
+      draw_type = 'outer',
+      center = {position={42,8}, size=1}
+    },
+    shadow = default_inner_shadow
+  }
+}
+
 styles.ltnm_light_content_frame = {
   type = 'frame_style',
   parent = 'window_content_frame_packed'
@@ -140,45 +144,6 @@ styles.ltnm_depot_frame = {
   left_padding = 4,
   right_padding = 4,
   horizontally_stretchable = 'on'
-}
-
-styles.ltnm_test_frame = {
-  type = 'frame_style',
-  margin = 4,
-  graphical_set = {
-    base = {
-      position = {386,0},
-      corner_size = 8,
-      draw_type = 'outer'
-    },
-    shadow = default_shadow
-  }
-}
-
-styles.ltnm_icon_slot_table_frame = {
-  type = 'frame_style',
-  padding = 0,
-  graphical_set = {
-    base = {
-      position = {85,0},
-      corner_size = 8,
-      draw_type = 'outer',
-      center = {position={42,8}, size=1}
-    },
-    shadow = default_inner_shadow
-  },
-  background_graphical_set = {
-    base = {
-      position = {282, 17},
-      corner_size = 8,
-      overall_tiling_horizontal_padding = 4,
-      overall_tiling_horizontal_size = 32,
-      overall_tiling_horizontal_spacing = 8,
-      overall_tiling_vertical_padding = 4,
-      overall_tiling_vertical_size = 32,
-      overall_tiling_vertical_spacing = 8
-    }
-  },
 }
 
 styles.ltnm_station_row_frame = {
@@ -204,9 +169,14 @@ styles.ltnm_empty_frame = {
 -- -----------------------------------------------------------------------------
 -- SCROLL PANE STYLES
 
+styles.ltnm_blank_scroll_pane = {
+  type = 'scroll_pane_style',
+  parent = 'scroll_pane_under_subheader'
+}
+
 styles.ltnm_depots_scroll_pane = {
   type = 'scroll_pane_style',
-  parent = 'scroll_pane_with_dark_background_under_subheader',
+  parent = 'ltnm_blank_scroll_pane',
   vertically_stretchable = 'on',
   horizontally_stretchable = 'on',
   background_graphical_set = {
@@ -220,24 +190,47 @@ styles.ltnm_depots_scroll_pane = {
 
 styles.ltnm_icon_slot_table_scroll_pane = {
   type = 'scroll_pane_style',
-  parent = 'scroll_pane',
+  parent = 'ltnm_blank_scroll_pane',
   padding = 0,
   margin = 0,
   extra_padding_when_activated = 0,
-  width = 332,
-  height = 160
+  height = 160,
+  background_graphical_set = {
+    base = {
+      position = {282, 17},
+      corner_size = 8,
+      overall_tiling_horizontal_padding = 4,
+      overall_tiling_horizontal_size = 32,
+      overall_tiling_horizontal_spacing = 8,
+      overall_tiling_vertical_padding = 4,
+      overall_tiling_vertical_size = 32,
+      overall_tiling_vertical_spacing = 8
+    }
+  }
 }
 
 styles.ltnm_stations_scroll_pane = {
   type = 'scroll_pane_style',
-  parent = 'scroll_pane_with_dark_background_under_subheader',
-  vertically_stretchable = 'on'
+  parent = 'ltnm_blank_scroll_pane',
+  vertically_stretchable = 'on',
+  background_graphical_set = {
+    position = {282, 17},
+    corner_size = 8,
+    overall_tiling_vertical_spacing = 12,
+    overall_tiling_vertical_size = 32,
+    overall_tiling_vertical_padding = 4
+  }
 }
 
 -- -----------------------------------------------------------------------------
 -- SPRITE STYLES
 
-
+styles.ltnm_inventory_selected_icon = {
+  type = 'image_style',
+  width = 28,
+  height = 28,
+  stretch_image_to_widget_size = true
+}
 
 -- -----------------------------------------------------------------------------
 -- TABBED PANE STYLES
@@ -252,7 +245,7 @@ styles.ltnm_tabbed_pane = {
   tab_content_frame = {
     type = 'frame_style',
     parent = 'dialog_frame',
-    top_padding = 8
+    top_padding = 4
   },
   tab_container = {
     type = 'horizontal_flow_style',
@@ -303,19 +296,6 @@ styles.ltnm_tabbed_pane_header = {
   }
 }
 
--- styles.ltnm_tabbed_pane = {
---   type = 'tabbed_pane_style',
---   parent = 'tabbed_pane',
---   tab_content_frame = {
---     type = 'frame_style',
---     top_padding = 8,
---     right_padding = 12,
---     bottom_padding = 8,
---     left_padding = 12,
---     graphical_set = tabbed_pane_graphical_set
---   }
--- }
-
 -- -----------------------------------------------------------------------------
 -- TABLE STYLES
 
@@ -323,5 +303,6 @@ styles.ltnm_icon_slot_table = {
   type = 'table_style',
   parent = 'slot_table',
   horizontal_spacing = 0,
-  vertical_spacing = 0
+  vertical_spacing = 0,
+  width = 240
 }

@@ -19,18 +19,21 @@ local self = {}
 gui.add_templates{
   pushers = {
     horizontal = {type='empty-widget', style={horizontally_stretchable=true}},
-    vertical = {type='empty-widget', style={vertically_stretchable=true}}
+    vertical = {type='empty-widget', style={vertically_stretchable=true}},
+    both = {type='empty-widget', style={horizontally_stretchable=true, vertically_stretchable=true}}
   },
   inventory_slot_table_with_label = function(name)
     return {type='flow', direction='vertical', children={
       {type='label', style='caption_label', caption={'ltnm-gui.'..string_gsub(name, '_', '-')}},
-      {type='frame', style='ltnm_icon_slot_table_frame', children={
+      {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
         {type='scroll-pane', style='ltnm_icon_slot_table_scroll_pane', vertical_scroll_policy='always', children={
-          {type='table', style='ltnm_icon_slot_table', column_count=8, save_as='inventory_'..name..'_table'}
+          {type='table', style='ltnm_icon_slot_table', column_count=6, save_as='inventory_'..name..'_table'}
         }}
       }}
     }}
-  end
+  end,
+  close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
+    clicked_sprite='utility/close_black', save_as='close_button'}
 }
 
 -- -----------------------------------------------------------------------------
@@ -61,7 +64,7 @@ function self.create(player, player_table)
               }},
               {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
                 {type='label', style={name='bold_label', left_margin=4,width=220}, caption={'ltnm-gui.station-name'}},
-                {type='label', style={name='bold_label', width=168}, caption={'ltnm-gui.inventory'}},
+                {type='label', style={name='bold_label', width=168}, caption={'ltnm-gui.provided-requested'}},
                 {type='label', style={name='bold_label', width=134}, caption={'ltnm-gui.deliveries'}},
                 -- {type='label', style={name='bold_label', width=}, caption={'ltnm-gui.station-'}},
               }}
@@ -74,13 +77,39 @@ function self.create(player, player_table)
           {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
             -- toolbar
             {type='frame', style='subheader_frame', direction='horizontal', children={
-              {type='empty-widget', style={height=24, horizontally_stretchable=true}}
+              {template='pushers.horizontal'},
+              {type='button', style='tool_button', caption='ID'}
             }},
             -- contents
-            {type='flow', style={padding=10}, direction='vertical', children={
-              gui.call_template('inventory_slot_table_with_label', 'available'),
-              gui.call_template('inventory_slot_table_with_label', 'requested'),
-              gui.call_template('inventory_slot_table_with_label', 'in_transit')
+            {type='flow', style={padding=10, horizontal_spacing=10}, direction='horizontal', children={
+              -- inventory tables
+              {type='flow', style={padding=0}, direction='vertical', children={
+                gui.call_template('inventory_slot_table_with_label', 'available'),
+                gui.call_template('inventory_slot_table_with_label', 'requested'),
+                gui.call_template('inventory_slot_table_with_label', 'in_transit')
+              }},
+              -- item information
+              {type='flow', direction='vertical', children={
+                {type='table', style='bordered_table', column_count=1, children={
+                  {type='flow', style={vertical_align='center'}, direction='horizontal', children={
+                    {type='sprite', style='ltnm_inventory_selected_icon', sprite='item/iron-ore'},
+                    {type='label', style='bold_label', caption='Iron ore'},
+                    {template='pushers.horizontal'}
+                  }}
+                }},
+                {type='label', style='caption_label', caption={'ltnm-gui.stations'}},
+                {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+                  {type='scroll-pane', style='ltnm_blank_scroll_pane', children={
+                    {template='pushers.both'}
+                  }}
+                }},
+                {type='label', style='caption_label', caption={'ltnm-gui.deliveries'}},
+                {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+                  {type='scroll-pane', style='ltnm_blank_scroll_pane', children={
+                    {template='pushers.both'}
+                  }}
+                }}
+              }}
             }}
           }}
         },
@@ -96,8 +125,9 @@ function self.create(player, player_table)
         {type='tab-and-content',
           tab = {type='tab', style={name='ltnm_tabbed_pane_header', horizontally_stretchable=true, width=180}, mods={enabled=false}, children={
             {type='flow', style={vertical_align='center'}, direction='horizontal', children={
-              {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, width=137, left_margin=0, right_margin=4}, save_as='drag_handle'},
-              {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black', clicked_sprite='utility/close_black'}
+              {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, width=137, left_margin=0, right_margin=4},
+                save_as='drag_handle'},
+              {template='close_button'}
             }}
           }},
           content = {type='empty-widget'}
@@ -105,8 +135,6 @@ function self.create(player, player_table)
       }}
     }}
   )
-
-  gui_data.drag_handle.drag_target = gui_data.window
 
   --
   -- TEMPORARY DATA INSERTION
@@ -126,7 +154,6 @@ function self.create(player, player_table)
         local name_flow = frame.add{type='flow', direction='horizontal'}
         name_flow.style.vertical_align = 'center'
         name_flow.style.width = 220
-        name_flow.style.vertically_stretchable = true
         name_flow.add{type='sprite', sprite='ltnm_indicator_'..color}.style.left_margin = 2
         name_flow.add{type='label', caption=t.entity.backer_name}.style.left_margin = 2
         -- items
@@ -195,7 +222,8 @@ function self.create(player, player_table)
     local table = gui_data['inventory_'..type..'_table']
     local add = table.add
     for name,count in pairs(combined_materials) do
-      add{type='sprite-button', style='ltnm_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
+      local active_text = name == 'item,iron-ore' and 'active_' or ''
+      add{type='sprite-button', style='ltnm_'..active_text..'slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
     end
   end
 
@@ -204,7 +232,7 @@ function self.create(player, player_table)
   --
 
   -- dragging and centering
-  -- gui_data.drag_handle.drag_target = gui_data.window
+  gui_data.drag_handle.drag_target = gui_data.window
   gui_data.window.force_auto_center()
 
   player_table.gui.main = gui_data
