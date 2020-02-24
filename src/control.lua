@@ -27,6 +27,7 @@ end
 
 event.on_init(function()
   global.data = {}
+  global.data.stations  = {}
   global.flags = {
 
   }

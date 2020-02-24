@@ -54,7 +54,7 @@ local function on_dispatcher_updated(e)
   local in_transit = {}
   for id,t in pairs(e.deliveries) do
     -- in transit inventory
-    in_transit[t.networkID] = util.add_materials(t.shipment, in_transit[t.networkID] or {})
+    in_transit[t.network_id] = util.add_materials(t.shipment, in_transit[t.network_id] or {})
     -- assign to depot
     local depot_name = t.train.schedule.records[1].station
     local trains = depots[depot_name].trains
