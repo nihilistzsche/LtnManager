@@ -155,9 +155,11 @@ function self.create(player, player_table)
         {type='tab-and-content',
           tab = {type='tab', style={name='ltnm_tabbed_pane_header', horizontally_stretchable=true, width=180}, mods={enabled=false}, children={
             {type='flow', style={vertical_align='center'}, direction='horizontal', children={
-              {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, width=137, left_margin=0, right_margin=4},
+              {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, width=135, left_margin=0, right_margin=4},
                 save_as='drag_handle'},
-              {template='close_button'}
+              {type='frame', style='ltnm_close_button_shadow_frame', children={
+                {template='close_button'}
+              }}
             }}
           }},
           content = {type='empty-widget'}

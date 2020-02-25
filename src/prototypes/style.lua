@@ -260,6 +260,25 @@ styles.ltnm_tabbed_pane = {
   tab_content_frame = {
     type = 'frame_style',
     parent = 'dialog_frame',
+    graphical_set = {
+      base = {
+        position = {0,0},
+        corner_size = 8,
+        top = {},
+        left_top = {},
+        right_top = {}
+      },
+      shadow = {
+        position = {200, 128},
+        corner_size = 8,
+        top = {},
+        left_top = {},
+        right_top = {},
+        tint = default_shadow_color,
+        scale = 0.5,
+        draw_type = 'outer'
+      }
+    },
     top_padding = 4
   },
   tab_container = {
@@ -270,15 +289,61 @@ styles.ltnm_tabbed_pane = {
   }
 }
 
+local empty_corner = {
+  position = {0, 815},
+  size = 1,
+  scale = 8
+}
+
+local function ltnm_tab_base(pos)
+  return {
+    position = pos,
+    corner_size = 8,
+    bottom = {},
+    left_bottom = {},
+    right_bottom = {}
+  }
+end
+
+local mock_frame_shadow = {
+  layers = {
+    {
+      position = {208,128},
+      size = {1, 8},
+      tint = hard_shadow_color,
+      scale = 0.5
+    },
+    {
+      position = {8, 0},
+      size = {1, 8},
+      shift = {0, 4}
+    }
+  }
+}
+
 styles.ltnm_main_tab = {
   type = 'tab_style',
   parent = 'tab',
   height = 32,
   top_padding = 6,
   bottom_padding = 6,
+  default_graphical_set = {
+    base = ltnm_tab_base{102, 0},
+    shadow = tab_glow(default_shadow_color, 0.5),
+    glow = {bottom=mock_frame_shadow}
+  },
   selected_graphical_set = {
-    base={position={448,103}, corner_size=8},
+    base = ltnm_tab_base{448, 103},
     shadow = tab_glow(default_shadow_color, 0.5)
+  },
+  hover_graphical_set = {
+    base = ltnm_tab_base{153, 0},
+    glow = tab_glow(default_shadow_color, 0.5)
+  },
+  disabled_graphical_set = {
+    base = ltnm_tab_base{119, 0},
+    shadow = tab_glow(default_shadow_color, 0.5),
+    glow = {bottom=mock_frame_shadow}
   }
 }
 
