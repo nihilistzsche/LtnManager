@@ -33,7 +33,17 @@ gui.add_templates{
     }}
   end,
   close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
-    clicked_sprite='utility/close_black', save_as='close_button'}
+    clicked_sprite='utility/close_black', save_as='close_button'},
+  demo_station_contents = function()
+    local elems = {}
+    for i=1,20 do
+      elems[#elems+1] = {type='sprite-button', style='ltnm_row_slot_button_green', sprite='item/poison-capsule', number=420000}
+    end
+    for i=21,24 do
+      elems[#elems+1] = {type='sprite-button', style='ltnm_row_slot_button_red', sprite='item/poison-capsule', number=-6900}
+    end
+    return elems
+  end
 }
 
 -- -----------------------------------------------------------------------------
@@ -58,12 +68,13 @@ function self.create(player, player_table)
           {type='frame', style='ltnm_dark_content_frame', direction='vertical', children={
             -- toolbar
             {type='frame', style='subheader_frame', direction='vertical', children={
-              {type='flow', direction='horizontal', children={
-                {template='pushers.horizontal'},
-                {type='sprite-button', style='tool_button', sprite='utility/search_icon'}
-              }},
+              -- {type='flow', direction='horizontal', children={
+              --   {template='pushers.horizontal'},
+              --   {type='sprite-button', style='tool_button', sprite='utility/search_icon'}
+              -- }},
               {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
-                {type='label', style={name='bold_label', left_margin=4,width=220}, caption={'ltnm-gui.station-name'}},
+                {type='empty-widget', style={height=28}},
+                {type='label', style={name='bold_label', left_margin=-8, width=220}, caption={'ltnm-gui.station-name'}},
                 {type='label', style={name='bold_label', width=168}, caption={'ltnm-gui.provided-requested'}},
                 {type='label', style={name='bold_label', width=134}, caption={'ltnm-gui.deliveries'}},
                 -- {type='label', style={name='bold_label', width=}, caption={'ltnm-gui.station-'}},
@@ -100,13 +111,32 @@ function self.create(player, player_table)
                 {type='label', style='caption_label', caption={'ltnm-gui.stations'}},
                 {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
                   {type='scroll-pane', style='ltnm_blank_scroll_pane', children={
-                    {template='pushers.both'}
+                    -- demoing frame GUI structure
+                    {type='frame', style='ltnm_station_items_frame', direction='vertical', children={
+                      -- labels / info
+                      {type='flow', direction='horizontal', children={
+                        {type='label', style='bold_label', caption='Lorem ipsum'},
+                        {template='pushers.horizontal'},
+                        {type='label', caption='[font=default-bold]ID: [/font]3'}
+                      }},
+                      -- provided / requested
+                      {type='table', style={horizontal_spacing=2, vertical_spacing=2}, column_count=8, children=gui.call_template('demo_station_contents')}
+                    }}
                   }}
                 }},
                 {type='label', style='caption_label', caption={'ltnm-gui.deliveries'}},
                 {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
                   {type='scroll-pane', style='ltnm_blank_scroll_pane', children={
-                    {template='pushers.both'}
+                    -- demoing frame GUI structure
+                    {type='frame', style='ltnm_station_items_frame', direction='vertical', children={
+                      -- labels / info
+                      {type='flow', direction='horizontal', children={
+                        {type='label', style='bold_label', caption='Lorem ipsum  ->  Dolor sit amet'},
+                        {template='pushers.horizontal'}
+                      }},
+                      -- provided / requested
+                      {type='table', style={horizontal_spacing=2, vertical_spacing=2}, column_count=8, children=gui.call_template('demo_station_contents')}
+                    }}
                   }}
                 }}
               }}
@@ -222,8 +252,7 @@ function self.create(player, player_table)
     local table = gui_data['inventory_'..type..'_table']
     local add = table.add
     for name,count in pairs(combined_materials) do
-      local active_text = name == 'item,iron-ore' and 'active_' or ''
-      add{type='sprite-button', style='ltnm_'..active_text..'slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
+      add{type='sprite-button', style='ltnm_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
     end
   end
 

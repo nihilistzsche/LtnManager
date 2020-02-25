@@ -166,12 +166,27 @@ styles.ltnm_empty_frame = {
   margin = 0
 }
 
+styles.ltnm_station_items_frame = {
+  type = 'frame_style',
+  parent = 'dark_frame',
+  padding = 4,
+  top_padding = 2,
+  vertical_flow_style = {
+    type = 'vertical_flow_style',
+    vertical_spacing = 4
+  }
+}
+
 -- -----------------------------------------------------------------------------
 -- SCROLL PANE STYLES
 
 styles.ltnm_blank_scroll_pane = {
-  type = 'scroll_pane_style',
-  parent = 'scroll_pane_under_subheader'
+  type = "scroll_pane_style",
+  extra_padding_when_activated = 0,
+  padding = 4,
+  graphical_set = {
+    shadow = default_inner_shadow
+  }
 }
 
 styles.ltnm_depots_scroll_pane = {
