@@ -177,6 +177,21 @@ styles.ltnm_station_items_frame = {
   }
 }
 
+-- a frame that mimicks the close button's shadow, so it will be drawn over the inactive tab that we're using as a frame
+styles.ltnm_close_button_shadow_frame = {
+  type = 'frame_style',
+  padding = 0,
+  margin = 0,
+  graphical_set = {
+    base = {position = {440, 24}, corner_size = 8, draw_type = 'outer'},
+  },
+  horizontal_flow_style = {
+    type = 'horizontal_flow_style',
+    padding = 0,
+    margin = 0
+  }
+}
+
 -- -----------------------------------------------------------------------------
 -- SCROLL PANE STYLES
 
@@ -338,7 +353,7 @@ styles.ltnm_main_tab = {
   },
   hover_graphical_set = {
     base = ltnm_tab_base{153, 0},
-    glow = tab_glow(default_shadow_color, 0.5)
+    glow = tab_glow(default_glow_color, 0.5)
   },
   disabled_graphical_set = {
     base = ltnm_tab_base{119, 0},
