@@ -168,10 +168,25 @@ function self.create(player, player_table)
     }}
   )
 
-  --
-  -- TEMPORARY DATA INSERTION
-  -- This will get separated out into a separate function later, this is just for prototyping GUI layouts
-  --
+  -- dragging and centering
+  gui_data.drag_handle.drag_target = gui_data.window
+  gui_data.window.force_auto_center()
+
+  player_table.gui.main = gui_data
+
+  -- set initial contents
+  self.update(player, player_table)
+end
+
+-- completely destroys the GUI
+function self.destroy(player, player_table)
+  gui.destroy(player_table.gui.main.window, 'main', player.index)
+  player_table.gui.main = nil
+end
+
+-- updates the contents of the GUI
+function self.update(player, player_table)
+  local gui_data = player_table.gui.main
 
   -- STATIONS
   do
@@ -258,20 +273,6 @@ function self.create(player, player_table)
     end
   end
 
-  --
-  --
-  --
-
-  -- dragging and centering
-  gui_data.drag_handle.drag_target = gui_data.window
-  gui_data.window.force_auto_center()
-
-  player_table.gui.main = gui_data
-end
-
-function self.destroy(player, player_table)
-  gui.destroy(player_table.gui.main.window, 'main', player.index)
-  player_table.gui.main = nil
 end
 
 return self
