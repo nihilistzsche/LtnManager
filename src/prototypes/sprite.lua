@@ -1,7 +1,7 @@
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- SPRITES
 
--- indicator sprites
+-- station status indicators
 local indicator_sprites = {}
 for i,t in ipairs(data.raw.lamp['small-lamp'].signal_to_color_mapping) do
   indicator_sprites[i] = {
@@ -16,5 +16,4 @@ for i,t in ipairs(data.raw.lamp['small-lamp'].signal_to_color_mapping) do
     flags = {'icon'}
   }
 end
-
 data:extend(indicator_sprites)

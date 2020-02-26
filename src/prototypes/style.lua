@@ -3,15 +3,20 @@
 
 local styles = data.raw['gui-style'].default
 
+-- ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;TEMPORARY;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
 -- -----------------------------------------------------------------------------
 -- BUTTON STYLES
 
 local slot_buttons_tileset = '__LtnManager__/graphics/gui/slot-buttons.png'
 
-local function slot_button(y, glow_color, default_x)
+local function slot_button(y, glow_color, default_x, size)
   return {
     type = 'button_style',
     parent = 'quick_bar_slot_button',
+    size = size or 40,
     default_graphical_set = {
       base = {border=4, position={(default_x or 0),y}, size=80, filename=slot_buttons_tileset},
       shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
@@ -38,10 +43,10 @@ local row_shadow = {
   draw_type = 'outer'
 }
 
-local function row_slot_button(y, glow_color, default_x)
+local function bordered_slot_button(y, glow_color, default_x, size)
   return {
     type = 'button_style',
-    size = 32,
+    size = size or 32,
     padding = -2,
     default_graphical_set = {
       base = {border=4, position={(default_x or 0),y}, size=80, filename=slot_buttons_tileset},
@@ -69,9 +74,11 @@ local slot_button_data = {
 
 for _,data in ipairs(slot_button_data) do
   styles['ltnm_slot_button_'..data.name] = slot_button(data.y, data.glow)
-  styles['ltnm_row_slot_button_'..data.name] = row_slot_button(data.y, data.glow)
+  styles['ltnm_small_slot_button_'..data.name] = slot_button(data.y, data.glow, nil, 36)
+  styles['ltnm_bordered_slot_button_'..data.name] = bordered_slot_button(data.y, data.glow)
   styles['ltnm_active_slot_button_'..data.name] = slot_button(data.y, data.glow, 82)
-  styles['ltnm_active_row_slot_button_'..data.name] = row_slot_button(data.y, data.glow, 82)
+  styles['ltnm_active_small_slot_button_'..data.name] = slot_button(data.y, data.glow, 82, 36)
+  styles['ltnm_active_bordered_slot_button_'..data.name] = bordered_slot_button(data.y, data.glow, 82)
 end
 
 -- -----------------------------------------------------------------------------
@@ -138,12 +145,25 @@ styles.ltnm_light_content_frame = {
   parent = 'window_content_frame_packed'
 }
 
+styles.ltnm_light_content_frame_in_light_frame = {
+  type = 'frame_style',
+  parent = 'window_content_frame_packed',
+  graphical_set = {
+    base = {
+      position = {85,0},
+      corner_size = 8,
+      draw_type = 'outer',
+      center = {position={76,8}, size=1}
+    },
+    shadow = default_inner_shadow
+  }
+}
+
 styles.ltnm_depot_frame = {
   type = 'frame_style',
   parent = 'dark_frame',
   left_padding = 4,
-  right_padding = 4,
-  horizontally_stretchable = 'on'
+  right_padding = 4
 }
 
 styles.ltnm_station_row_frame = {
@@ -239,6 +259,28 @@ styles.ltnm_icon_slot_table_scroll_pane = {
   }
 }
 
+styles.ltnm_small_icon_slot_table_scroll_pane = {
+  type = 'scroll_pane_style',
+  parent = 'ltnm_blank_scroll_pane',
+  padding = 0,
+  margin = 0,
+  extra_padding_when_activated = 0,
+  minimal_height = 36,
+  width = 396,
+  background_graphical_set = {
+    base = {
+      position = {282, 17},
+      corner_size = 8,
+      overall_tiling_horizontal_padding = 4,
+      overall_tiling_horizontal_size = 28,
+      overall_tiling_horizontal_spacing = 8,
+      overall_tiling_vertical_padding = 4,
+      overall_tiling_vertical_size = 28,
+      overall_tiling_vertical_spacing = 8
+    }
+  }
+}
+
 styles.ltnm_stations_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_blank_scroll_pane',
@@ -250,6 +292,12 @@ styles.ltnm_stations_scroll_pane = {
     overall_tiling_vertical_size = 32,
     overall_tiling_vertical_padding = 4
   }
+}
+
+styles.ltnm_trains_scroll_pane = {
+  type = 'scroll_pane_style',
+  parent = 'ltnm_blank_scroll_pane',
+  extra_right_padding_when_activated = -12
 }
 
 -- -----------------------------------------------------------------------------
@@ -265,9 +313,6 @@ styles.ltnm_inventory_selected_icon = {
 -- -----------------------------------------------------------------------------
 -- TABBED PANE STYLES
 
--- -----------------------------------------------------------------------------
--- TABBED PANE STYLES
-
 styles.ltnm_tabbed_pane = {
   type = 'tabbed_pane_style',
   vertical_spacing = 0,
@@ -275,6 +320,7 @@ styles.ltnm_tabbed_pane = {
   tab_content_frame = {
     type = 'frame_style',
     parent = 'dialog_frame',
+    maximal_height=900,
     graphical_set = {
       base = {
         position = {0,0},

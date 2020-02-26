@@ -37,12 +37,80 @@ gui.add_templates{
   demo_station_contents = function()
     local elems = {}
     for i=1,20 do
-      elems[#elems+1] = {type='sprite-button', style='ltnm_row_slot_button_green', sprite='item/poison-capsule', number=420000}
+      elems[#elems+1] = {type='sprite-button', style='ltnm_bordered_slot_button_green', sprite='item/poison-capsule', number=420000}
     end
     for i=21,24 do
-      elems[#elems+1] = {type='sprite-button', style='ltnm_row_slot_button_red', sprite='item/poison-capsule', number=-6900}
+      elems[#elems+1] = {type='sprite-button', style='ltnm_bordered_slot_button_red', sprite='item/poison-capsule', number=-6900}
     end
     return elems
+  end,
+  train_contents = function()
+    local elems = {}
+    for i=1,2 do
+      elems[#elems+1] = {type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite='item/poison-capsule', number=420000}
+    end
+    return elems
+  end,
+  depot_trains = function(player)
+    local children = {}
+    for i=1,7 do
+      children[#children+1] = {type='frame', style='ltnm_depot_frame', children={
+        {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+          {type='minimap', style={width=64, height=64}, position=player.position, zoom=1.5}
+        }},
+        {type='flow', style={left_margin=4}, direction='vertical', children={
+          {type='flow', children={
+            {type='label', style='caption_label', caption='Status:'},
+            {type='label', caption='Delivering'},
+            {template='pushers.horizontal'},
+            {type='label', style='caption_label', caption='Destination:'},
+            {type='label', caption='MAIN mixed in'},
+            {template='pushers.horizontal'},
+            {type='label', style='caption_label', caption='Runtime:'},
+            {type='label', caption='1:33'}
+          }},
+          {type='flow', style={vertical_align='center', top_margin=4, horizontal_spacing=8}, children={
+            {type='label', style='caption_label', caption='Contents:'},
+            {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+              {type='scroll-pane', style='ltnm_small_icon_slot_table_scroll_pane', children={
+                {type='flow', style={horizontal_spacing=0, padding=0, margin=0}, children=gui.call_template('train_contents')}
+              }}
+            }}
+          }}
+        }}
+      }}
+    end
+    return children
+  end,
+  depots = function(player)
+    local children = {}
+    for i=1,3 do
+      children[#children+1] = {type='frame', style='ltnm_depot_frame', direction='vertical', children={
+        -- top info pane
+        {type='flow', style={vertical_align='center', bottom_margin=4}, direction='horizontal', children={
+          {type='label', style='caption_label', caption='Depot'},
+          {template='pushers.horizontal'},
+          {type='label', style='bold_label', caption='Available trains:'},
+          {type='label', caption='1/5'},
+          {template='pushers.horizontal'},
+          {type='flow', style={horizontal_spacing=8}, children={
+            {type='flow', style={vertical_align='center'}, children={
+              {type='sprite', sprite='ltnm_indicator_signal-blue'},
+              {type='label', caption='2'}
+            }},
+            {type='flow', style={vertical_align='center'}, children={
+              {type='sprite', sprite='ltnm_indicator_signal-green'},
+              {type='label', caption='1'}
+            }}
+          }}
+        }},
+        -- trains list
+        {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+          {type='scroll-pane', style={name='ltnm_trains_scroll_pane', maximal_height=256}, children=gui.call_template('depot_trains', player)}
+        }}
+      }}
+    end
+    return children
   end
 }
 
@@ -56,11 +124,7 @@ function self.create(player, player_table)
         -- depots tab
         {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.depots'}}, content=
           {type='frame', style='ltnm_dark_content_frame', direction='vertical', children={
-            {type='scroll-pane', style='ltnm_depots_scroll_pane', direction='vertical', children={
-              {type='frame', style={name='ltnm_depot_frame', height=308, horizontally_stretchable=true}, direction='vertical', children={
-                {type='label', style='caption_label', caption='Depot'}
-              }}
-            }}
+            {type='scroll-pane', style='ltnm_blank_scroll_pane', direction='vertical', children=gui.call_template('depots', player)}
           }}
         },
         -- stations tab
@@ -68,16 +132,11 @@ function self.create(player, player_table)
           {type='frame', style='ltnm_dark_content_frame', direction='vertical', children={
             -- toolbar
             {type='frame', style='subheader_frame', direction='vertical', children={
-              -- {type='flow', direction='horizontal', children={
-              --   {template='pushers.horizontal'},
-              --   {type='sprite-button', style='tool_button', sprite='utility/search_icon'}
-              -- }},
               {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
                 {type='empty-widget', style={height=28}},
                 {type='label', style={name='bold_label', left_margin=-8, width=220}, caption={'ltnm-gui.station-name'}},
                 {type='label', style={name='bold_label', width=168}, caption={'ltnm-gui.provided-requested'}},
                 {type='label', style={name='bold_label', width=134}, caption={'ltnm-gui.deliveries'}},
-                -- {type='label', style={name='bold_label', width=}, caption={'ltnm-gui.station-'}},
               }}
             }},
             {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations_scroll_pane'}
@@ -153,9 +212,9 @@ function self.create(player, player_table)
         },
         -- frame header
         {type='tab-and-content',
-          tab = {type='tab', style={name='ltnm_tabbed_pane_header', horizontally_stretchable=true, width=180}, mods={enabled=false}, children={
+          tab = {type='tab', style={name='ltnm_tabbed_pane_header', horizontally_stretchable=true, width=199}, mods={enabled=false}, children={
             {type='flow', style={vertical_align='center'}, direction='horizontal', children={
-              {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, width=135, left_margin=0, right_margin=4},
+              {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, width=154, left_margin=0, right_margin=4},
                 save_as='drag_handle'},
               {type='frame', style='ltnm_close_button_shadow_frame', children={
                 {template='close_button'}
@@ -187,6 +246,13 @@ end
 -- updates the contents of the GUI
 function self.update(player, player_table)
   local gui_data = player_table.gui.main
+  local data = global.data
+
+  -- DEPOTS
+  do
+    local pane = gui_data.depots_scroll_pane
+
+  end
 
   -- STATIONS
   do
@@ -214,25 +280,25 @@ function self.update(player, player_table)
             local materials = t.available
             for name,count in pairs(materials) do
               i = i + 1
-              table.add{type='sprite-button', style='ltnm_row_slot_button_green', sprite=string_gsub(name, ',', '/'), number=count}
+              table.add{type='sprite-button', style='ltnm_bordered_slot_button_green', sprite=string_gsub(name, ',', '/'), number=count}
             end
           end
           if t.requests then
             local materials = t.requests
             for name,count in pairs(materials) do
               i = i + 1
-              table.add{type='sprite-button', style='ltnm_row_slot_button_red', sprite=string_gsub(name, ',', '/'), number=-count}
+              table.add{type='sprite-button', style='ltnm_bordered_slot_button_red', sprite=string_gsub(name, ',', '/'), number=-count}
             end
           end
           if i%5 ~= 0 or i == 0 then
             for _=1,5-(i%5) do
-              table.add{type='sprite-button', style='ltnm_row_slot_button_dark_grey'}
+              table.add{type='sprite-button', style='ltnm_bordered_slot_button_dark_grey'}
             end
           end
         end
         -- active deliveries
         do
-          local deliveries = global.data.deliveries
+          local deliveries = data.deliveries
           local combined_shipment = {}
           for _,delivery_id in ipairs(t.activeDeliveries) do
             local delivery = deliveries[delivery_id]
@@ -245,11 +311,11 @@ function self.update(player, player_table)
           local i = 0
           for name,count in pairs(combined_shipment) do
             i = i + 1
-            table.add{type='sprite-button', style='ltnm_row_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
+            table.add{type='sprite-button', style='ltnm_bordered_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
           end
           if i%4 ~= 0 or i == 0 then
             for _=1,4-(i%4) do
-              table.add{type='sprite-button', style='ltnm_row_slot_button_dark_grey'}
+              table.add{type='sprite-button', style='ltnm_bordered_slot_button_dark_grey'}
             end
           end
         end
@@ -258,7 +324,7 @@ function self.update(player, player_table)
   end
 
   -- INVENTORY
-  local inventory = global.data.inventory
+  local inventory = data.inventory
   for type,color in pairs{available='green', requested='red', in_transit='blue'} do
     -- combine materials
     local combined_materials = {}
