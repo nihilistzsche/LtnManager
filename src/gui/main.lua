@@ -75,7 +75,7 @@ gui.add_templates{
       }}
     }}
     -- unselected
-    for i=2,4 do
+    for i=2,3 do
       children[i] = {type='button', style={name='ltnm_depot_button', height=85, padding=4, horizontally_stretchable=true}, children={
         {type='flow', ignored_by_interaction=true, direction='vertical', children={
           {type='label', style={name='caption_label', font_color={28, 28, 28}}, caption='Depot'},
@@ -165,7 +165,7 @@ function self.create(player, player_table)
                 }}
               }},
               -- trains
-              {type='scroll-pane', style={name='ltnm_blank_scroll_pane', height=398}, horizontal_scroll_policy='never', children=gui.call_template('depot_trains', player)}
+              {type='scroll-pane', style={name='ltnm_blank_scroll_pane', vertically_stretchable=true}, children=gui.call_template('depot_trains', player)}
             }}
           }}
         },
@@ -386,67 +386,3 @@ function self.update(player, player_table)
 end
 
 return self
-
---[[
-  depot_trains = function(player)
-    local children = {}
-    for i=1,7 do
-      children[#children+1] = {type='frame', style='ltnm_depot_frame', children={
-        {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-          {type='minimap', style={width=64, height=64}, position=player.position, zoom=1.5}
-        }},
-        {type='flow', style={left_margin=4}, direction='vertical', children={
-          {type='flow', children={
-            {type='label', style='caption_label', caption='Status:'},
-            {type='label', caption='Delivering'},
-            {template='pushers.horizontal'},
-            {type='label', style='caption_label', caption='Destination:'},
-            {type='label', caption='MAIN mixed in'},
-            {template='pushers.horizontal'},
-            {type='label', style='caption_label', caption='Runtime:'},
-            {type='label', caption='1:33'}
-          }},
-          {type='flow', style={vertical_align='center', top_margin=4, horizontal_spacing=8}, children={
-            {type='label', style='caption_label', caption='Contents:'},
-            {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-              {type='scroll-pane', style='ltnm_small_icon_slot_table_scroll_pane', children={
-                {type='flow', style={horizontal_spacing=0, padding=0, margin=0}, children=gui.call_template('train_contents')}
-              }}
-            }}
-          }}
-        }}
-      }}
-    end
-    return children
-  end,
-  depots = function(player)
-    local children = {}
-    for i=1,3 do
-      children[#children+1] = {type='frame', style='ltnm_depot_frame', direction='vertical', children={
-        -- top info pane
-        {type='flow', style={vertical_align='center', bottom_margin=4}, direction='horizontal', children={
-          {type='label', style='caption_label', caption='Depot'},
-          {template='pushers.horizontal'},
-          {type='label', style='bold_label', caption='Available trains:'},
-          {type='label', caption='1/5'},
-          {template='pushers.horizontal'},
-          {type='flow', style={horizontal_spacing=8}, children={
-            {type='flow', style={vertical_align='center'}, children={
-              {type='sprite', sprite='ltnm_indicator_signal-blue'},
-              {type='label', caption='2'}
-            }},
-            {type='flow', style={vertical_align='center'}, children={
-              {type='sprite', sprite='ltnm_indicator_signal-green'},
-              {type='label', caption='1'}
-            }}
-          }}
-        }},
-        -- trains list
-        {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-          {type='scroll-pane', style={name='ltnm_trains_scroll_pane', maximal_height=256}, children=gui.call_template('depot_trains', player)}
-        }}
-      }}
-    end
-    return children
-  end
-]]
