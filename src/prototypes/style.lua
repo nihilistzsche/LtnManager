@@ -81,6 +81,22 @@ for _,data in ipairs(slot_button_data) do
   styles['ltnm_active_bordered_slot_button_'..data.name] = bordered_slot_button(data.y, data.glow, 82)
 end
 
+styles.ltnm_depot_button = {
+  type = "button_style",
+  parent = "button",
+  -- size = {120, 70}, --warning: width does not respect module size, but the current design requires it
+  padding = 4,
+  clicked_vertical_offset = 0,
+  clicked_graphical_set = {
+    base = {position = {34, 17}, corner_size = 8},
+    shadow = default_dirt
+  },
+  disabled_graphical_set = {
+    base = {position = {68, 0}, corner_size = 8},
+    shadow = default_dirt
+  }
+}
+
 -- -----------------------------------------------------------------------------
 -- EMPTY WIDGET STYLES
 
@@ -227,15 +243,17 @@ styles.ltnm_blank_scroll_pane = {
 styles.ltnm_depots_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_blank_scroll_pane',
-  vertically_stretchable = 'on',
+  padding = 0,
+  minimal_height = 85,
+  maximal_height = 170,
   horizontally_stretchable = 'on',
-  background_graphical_set = {
-    position = {282, 17},
-    corner_size = 8,
-    overall_tiling_vertical_spacing = 12,
-    overall_tiling_vertical_size = 300,
-    overall_tiling_vertical_padding = 4
-  }
+  -- background_graphical_set = {
+  --   position = {282, 17},
+  --   corner_size = 8,
+  --   overall_tiling_vertical_spacing = 12,
+  --   overall_tiling_vertical_size = 300,
+  --   overall_tiling_vertical_padding = 4
+  -- }
 }
 
 styles.ltnm_icon_slot_table_scroll_pane = {
@@ -265,8 +283,8 @@ styles.ltnm_small_icon_slot_table_scroll_pane = {
   padding = 0,
   margin = 0,
   extra_padding_when_activated = 0,
-  minimal_height = 36,
-  width = 396,
+  height = 72,
+  minimal_width = 144,
   background_graphical_set = {
     base = {
       position = {282, 17},
@@ -447,3 +465,16 @@ styles.ltnm_icon_slot_table = {
   vertical_spacing = 0,
   width = 240
 }
+
+styles.ltnm_depots_table = {
+  type = "table_style",
+  horizontal_spacing = 0,
+  vertical_spacing = 0,
+  padding = 0
+}
+
+-- styles.ltnm_depots_table = {
+--   type = 'table_style',
+--   parent = 'bordered_table',
+
+-- }
