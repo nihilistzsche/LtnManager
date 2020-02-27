@@ -142,129 +142,117 @@ local train_column_widths = {
 function self.create(player, player_table)
   local gui_data = gui.create(player.gui.screen, 'main', player.index,
     {type='frame', style='ltnm_empty_frame', direction='vertical', save_as='window', children={
-      {type='tabbed-pane', style='ltnm_tabbed_pane', children={
-        -- depots tab
-        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.depots'}}, content=
-          {type='flow', style={vertical_spacing=12}, direction='vertical', children={
-            -- buttons
-            {type='frame', style='ltnm_dark_content_frame', direction='vertical', children={
-              {type='scroll-pane', style='ltnm_depots_scroll_pane', horizontal_scroll_policy='never', children={
-                {type='table', style='ltnm_depots_table', column_count=3, children=gui.call_template('depot_buttons', player)}
+      {type='flow', style={horizontal_spacing=0}, direction='horizontal', children={
+        {type='button', style='ltnm_mock_frame_tab', mods={enabled=false}, caption={'ltnm-gui.depots'}},
+        {type='button', style='ltnm_mock_frame_tab', caption={'ltnm-gui.stations'}},
+        {type='button', style='ltnm_mock_frame_tab', caption={'ltnm-gui.inventory'}},
+        {type='button', style='ltnm_mock_frame_tab', caption={'ltnm-gui.history'}},
+        {type='button', style='ltnm_mock_frame_tab', caption={'ltnm-gui.alerts'}},
+        {type='frame', style='ltnm_main_frame_header', children={
+          {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
+            save_as='drag_handle'},
+          {template='close_button'}
+        }}
+      }},
+      {type='frame', style='ltnm_main_frame_content', children={
+        {type='flow', style={vertical_spacing=12}, direction='vertical', children={
+          -- buttons
+          {type='frame', style='ltnm_dark_content_frame', direction='vertical', children={
+            {type='scroll-pane', style='ltnm_depots_scroll_pane', horizontal_scroll_policy='never', children={
+              {type='table', style='ltnm_depots_table', column_count=3, children=gui.call_template('depot_buttons', player)}
+            }}
+          }},
+          -- trains
+          {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
+            -- toolbar
+            {type='frame', style='subheader_frame', children={
+              {type='flow', style={vertical_align='center', height=28, horizontal_spacing=12, left_margin=4}, children={
+                {type='label', style={name='bold_label', horizontal_align='center', width=72}, caption='Preview'},
+                {type='label', style={name='bold_label', width=156}, caption='Status'},
+                {type='label', style={name='bold_label', width=170}, caption='Destination'},
+                {type='label', style={name='bold_label'}, caption='Contents'},
+                {template='pushers.horizontal'}
               }}
             }},
             -- trains
-            {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
-              -- toolbar
-              {type='frame', style='subheader_frame', children={
-                {type='flow', style={vertical_align='center', height=28, horizontal_spacing=12, left_margin=4}, children={
-                  {type='label', style={name='bold_label', horizontal_align='center', width=72}, caption='Preview'},
-                  {type='label', style={name='bold_label', width=156}, caption='Status'},
-                  {type='label', style={name='bold_label', width=170}, caption='Destination'},
-                  {type='label', style={name='bold_label'}, caption='Contents'},
+            {type='scroll-pane', style={name='ltnm_blank_scroll_pane', vertically_stretchable=true}, children=gui.call_template('depot_trains', player)}
+          }}
+        }},
+        -- stations tab
+        {type='frame', style='ltnm_dark_content_frame', direction='vertical', mods={visible=false}, children={
+          -- toolbar
+          {type='frame', style='subheader_frame', direction='vertical', children={
+            {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
+              {type='empty-widget', style={height=28}},
+              {type='label', style={name='bold_label', left_margin=-8, width=220}, caption={'ltnm-gui.station-name'}},
+              {type='label', style={name='bold_label', width=168}, caption={'ltnm-gui.provided-requested'}},
+              {type='label', style={name='bold_label', width=134}, caption={'ltnm-gui.deliveries'}},
+            }}
+          }},
+          {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations_scroll_pane'}
+        }},
+        -- inventory tab
+        {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, children={
+          -- toolbar
+          {type='frame', style='subheader_frame', direction='horizontal', children={
+            {template='pushers.horizontal'},
+            {type='button', style='tool_button', caption='ID'}
+          }},
+          -- contents
+          {type='flow', style={padding=10, horizontal_spacing=10}, direction='horizontal', children={
+            -- inventory tables
+            {type='flow', style={padding=0}, direction='vertical', children={
+              gui.call_template('inventory_slot_table_with_label', 'available'),
+              gui.call_template('inventory_slot_table_with_label', 'requested'),
+              gui.call_template('inventory_slot_table_with_label', 'in_transit')
+            }},
+            -- item information
+            {type='flow', direction='vertical', children={
+              {type='table', style='bordered_table', column_count=1, children={
+                {type='flow', style={vertical_align='center'}, direction='horizontal', children={
+                  {type='sprite', style='ltnm_inventory_selected_icon', sprite='item/iron-ore'},
+                  {type='label', style='bold_label', caption='Iron ore'},
                   {template='pushers.horizontal'}
                 }}
               }},
-              -- trains
-              {type='scroll-pane', style={name='ltnm_blank_scroll_pane', vertically_stretchable=true}, children=gui.call_template('depot_trains', player)}
-            }}
-          }}
-        },
-        -- stations tab
-        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.stations'}}, content=
-          {type='frame', style='ltnm_dark_content_frame', direction='vertical', children={
-            -- toolbar
-            {type='frame', style='subheader_frame', direction='vertical', children={
-              {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
-                {type='empty-widget', style={height=28}},
-                {type='label', style={name='bold_label', left_margin=-8, width=220}, caption={'ltnm-gui.station-name'}},
-                {type='label', style={name='bold_label', width=168}, caption={'ltnm-gui.provided-requested'}},
-                {type='label', style={name='bold_label', width=134}, caption={'ltnm-gui.deliveries'}},
-              }}
-            }},
-            {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations_scroll_pane'}
-          }}
-        },
-        -- inventory tab
-        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.inventory'}}, content=
-          {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
-            -- toolbar
-            {type='frame', style='subheader_frame', direction='horizontal', children={
-              {template='pushers.horizontal'},
-              {type='button', style='tool_button', caption='ID'}
-            }},
-            -- contents
-            {type='flow', style={padding=10, horizontal_spacing=10}, direction='horizontal', children={
-              -- inventory tables
-              {type='flow', style={padding=0}, direction='vertical', children={
-                gui.call_template('inventory_slot_table_with_label', 'available'),
-                gui.call_template('inventory_slot_table_with_label', 'requested'),
-                gui.call_template('inventory_slot_table_with_label', 'in_transit')
+              {type='label', style='caption_label', caption={'ltnm-gui.stations'}},
+              {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+                {type='scroll-pane', style='ltnm_blank_scroll_pane', children={
+                  -- demoing frame GUI structure
+                  {type='frame', style='ltnm_station_items_frame', direction='vertical', children={
+                    -- labels / info
+                    {type='flow', direction='horizontal', children={
+                      {type='label', style='bold_label', caption='Lorem ipsum'},
+                      {template='pushers.horizontal'},
+                      {type='label', caption='[font=default-bold]ID: [/font]3'}
+                    }},
+                    -- provided / requested
+                    {type='table', style={horizontal_spacing=2, vertical_spacing=2}, column_count=8, children=gui.call_template('demo_station_contents')}
+                  }}
+                }}
               }},
-              -- item information
-              {type='flow', direction='vertical', children={
-                {type='table', style='bordered_table', column_count=1, children={
-                  {type='flow', style={vertical_align='center'}, direction='horizontal', children={
-                    {type='sprite', style='ltnm_inventory_selected_icon', sprite='item/iron-ore'},
-                    {type='label', style='bold_label', caption='Iron ore'},
-                    {template='pushers.horizontal'}
-                  }}
-                }},
-                {type='label', style='caption_label', caption={'ltnm-gui.stations'}},
-                {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-                  {type='scroll-pane', style='ltnm_blank_scroll_pane', children={
-                    -- demoing frame GUI structure
-                    {type='frame', style='ltnm_station_items_frame', direction='vertical', children={
-                      -- labels / info
-                      {type='flow', direction='horizontal', children={
-                        {type='label', style='bold_label', caption='Lorem ipsum'},
-                        {template='pushers.horizontal'},
-                        {type='label', caption='[font=default-bold]ID: [/font]3'}
-                      }},
-                      -- provided / requested
-                      {type='table', style={horizontal_spacing=2, vertical_spacing=2}, column_count=8, children=gui.call_template('demo_station_contents')}
-                    }}
-                  }}
-                }},
-                {type='label', style='caption_label', caption={'ltnm-gui.deliveries'}},
-                {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-                  {type='scroll-pane', style='ltnm_blank_scroll_pane', children={
-                    -- demoing frame GUI structure
-                    {type='frame', style='ltnm_station_items_frame', direction='vertical', children={
-                      -- labels / info
-                      {type='flow', direction='horizontal', children={
-                        {type='label', style='bold_label', caption='Lorem ipsum  ->  Dolor sit amet'},
-                        {template='pushers.horizontal'}
-                      }},
-                      -- provided / requested
-                      {type='table', style={horizontal_spacing=2, vertical_spacing=2}, column_count=8, children=gui.call_template('demo_station_contents')}
-                    }}
+              {type='label', style='caption_label', caption={'ltnm-gui.deliveries'}},
+              {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+                {type='scroll-pane', style='ltnm_blank_scroll_pane', children={
+                  -- demoing frame GUI structure
+                  {type='frame', style='ltnm_station_items_frame', direction='vertical', children={
+                    -- labels / info
+                    {type='flow', direction='horizontal', children={
+                      {type='label', style='bold_label', caption='Lorem ipsum  ->  Dolor sit amet'},
+                      {template='pushers.horizontal'}
+                    }},
+                    -- provided / requested
+                    {type='table', style={horizontal_spacing=2, vertical_spacing=2}, column_count=8, children=gui.call_template('demo_station_contents')}
                   }}
                 }}
               }}
             }}
           }}
-        },
+        }},
         -- history tab
-        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.history'}}, content=
-          {type='empty-widget'}
-        },
+        {type='empty-widget', mods={visible=false}},
         -- alerts tab
-        {type='tab-and-content', tab={type='tab', style='ltnm_main_tab', caption={'ltnm-gui.alerts'}}, content=
-          {type='empty-widget'}
-        },
-        -- frame header
-        {type='tab-and-content',
-          tab = {type='tab', style={name='ltnm_tabbed_pane_header', horizontally_stretchable=true, width=222}, mods={enabled=false}, children={
-            {type='flow', style={vertical_align='center'}, direction='horizontal', children={
-              {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, width=177, left_margin=0, right_margin=4},
-                save_as='drag_handle'},
-              {type='frame', style='ltnm_close_button_shadow_frame', children={
-                {template='close_button'}
-              }}
-            }}
-          }},
-          content = {type='empty-widget'}
-        }
+        {type='empty-widget', mods={visible=false}}
       }}
     }}
   )
