@@ -151,6 +151,8 @@ function self.create(player, player_table)
         {type='frame', style='ltnm_main_frame_header', children={
           {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
             save_as='drag_handle'},
+          {template='close_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black', clicked_sprite='ltnm_refresh_black',
+            save_as='refresh_button'},
           {template='close_button'}
         }}
       }},
