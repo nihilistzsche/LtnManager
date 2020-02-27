@@ -148,7 +148,8 @@ styles.ltnm_mock_frame_tab = {
 styles.ltnm_depot_button = {
   type = "button_style",
   parent = "button",
-  -- size = {120, 70}, --warning: width does not respect module size, but the current design requires it
+  width = 206,
+  height = 85,
   padding = 4,
   clicked_vertical_offset = 0,
   clicked_graphical_set = {
@@ -159,6 +160,13 @@ styles.ltnm_depot_button = {
     base = {position = {68, 0}, corner_size = 8},
     shadow = default_dirt
   }
+}
+
+-- make the button narrower to account for the scrollbar
+styles.ltnm_depot_button_for_scrollbar = {
+  type = 'button_style',
+  parent = 'ltnm_depot_button',
+  width = 202
 }
 
 -- -----------------------------------------------------------------------------
@@ -341,13 +349,32 @@ styles.ltnm_depots_scroll_pane = {
   minimal_height = 85,
   maximal_height = 170,
   horizontally_stretchable = 'on',
-  -- background_graphical_set = {
-  --   position = {282, 17},
-  --   corner_size = 8,
-  --   overall_tiling_vertical_spacing = 12,
-  --   overall_tiling_vertical_size = 300,
-  --   overall_tiling_vertical_padding = 4
-  -- }
+  background_graphical_set = {
+    position = {282, 17},
+    corner_size = 8,
+    overall_tiling_horizontal_padding = 4,
+    overall_tiling_horizontal_size = 198,
+    overall_tiling_horizontal_spacing = 8,
+    overall_tiling_vertical_padding = 4,
+    overall_tiling_vertical_size = 78,
+    overall_tiling_vertical_spacing = 8
+  }
+}
+
+-- adjust the rubber grid to fit the slightly narrower buttons when the scrollbar is active
+styles.ltnm_depots_scroll_pane_for_scrollbar = {
+  type = 'scroll_pane_style',
+  parent = 'ltnm_depots_scroll_pane',
+  background_graphical_set = {
+    position = {282, 17},
+    corner_size = 8,
+    overall_tiling_horizontal_padding = 4,
+    overall_tiling_horizontal_size = 194,
+    overall_tiling_horizontal_spacing = 8,
+    overall_tiling_vertical_padding = 4,
+    overall_tiling_vertical_size = 78,
+    overall_tiling_vertical_spacing = 8
+  }
 }
 
 styles.ltnm_icon_slot_table_scroll_pane = {

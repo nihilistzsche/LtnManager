@@ -3,11 +3,13 @@
 -- The main GUI for the mod
 
 -- dependencies
+local constants = require('scripts/constants')
 local event = require('lualib/event')
 local gui = require('lualib/gui')
 local util = require('scripts/util')
 
 -- locals
+local string_find = string.find
 local string_gsub = string.gsub
 
 -- self object
@@ -33,12 +35,12 @@ gui.add_templates{
     }}
   end,
   close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
-    clicked_sprite='utility/close_black', mouse_button_filter={'left'}, save_as='close_button'}
+    clicked_sprite='utility/close_black', mouse_button_filter={'left'}, save_as='titlebar.close_button'},
+  mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}}
 }
 
 -- TEMPORARY, FOR LAYOUT PROTOTYPING
-gui.add_templates
-{
+gui.add_templates{
   demo_station_contents = function()
     local elems = {}
     for i=1,20 do
@@ -145,28 +147,30 @@ local train_column_widths = {
 -- GUI MANAGEMENT
 
 function self.create(player, player_table)
-  local gui_data = gui.create(player.gui.screen, 'main', player.index,
+  local gui_data = gui.build(player.gui.screen, 'main', player.index,
     {type='frame', style='ltnm_empty_frame', direction='vertical', save_as='window', children={
+      -- TITLEBAR
       {type='flow', style={horizontal_spacing=0}, direction='horizontal', children={
-        {type='button', style='ltnm_mock_frame_tab', mods={enabled=false}, caption={'ltnm-gui.depots'}},
-        {type='button', style='ltnm_mock_frame_tab', caption={'ltnm-gui.stations'}},
-        {type='button', style='ltnm_mock_frame_tab', caption={'ltnm-gui.inventory'}},
-        {type='button', style='ltnm_mock_frame_tab', caption={'ltnm-gui.history'}},
-        {type='button', style='ltnm_mock_frame_tab', caption={'ltnm-gui.alerts'}},
+        {template='mock_frame_tab', mods={enabled=false}, caption={'ltnm-gui.depots'}, save_as='tabbed_pane.tabs.depots'},
+        {template='mock_frame_tab', caption={'ltnm-gui.stations'}, save_as='tabbed_pane.tabs.stations'},
+        {template='mock_frame_tab', caption={'ltnm-gui.inventory'}, save_as='tabbed_pane.tabs.inventory'},
+        {template='mock_frame_tab', caption={'ltnm-gui.history'}, save_as='tabbed_pane.tabs.history'},
+        {template='mock_frame_tab', caption={'ltnm-gui.alerts'}, save_as='tabbed_pane.tabs.alerts'},
         {type='frame', style='ltnm_main_frame_header', children={
           {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
-            save_as='drag_handle'},
+            save_as='titlebar.drag_handle'},
           {template='close_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black', clicked_sprite='ltnm_refresh_black',
-            save_as='refresh_button'},
+            save_as='titlebar.refresh_button'},
           {template='close_button'}
         }}
       }},
       {type='frame', style='ltnm_main_frame_content', children={
-        {type='flow', style={vertical_spacing=12}, direction='vertical', children={
+        -- DEPOTS
+        {type='flow', style={vertical_spacing=12}, direction='vertical', save_as='tabbed_pane.content.depots', children={
           -- buttons
           {type='frame', style='ltnm_dark_content_frame', direction='vertical', children={
             {type='scroll-pane', style='ltnm_depots_scroll_pane', horizontal_scroll_policy='never', children={
-              {type='table', style='ltnm_depots_table', column_count=3, children=gui.call_template('depot_buttons', player)}
+              {type='table', style='ltnm_depots_table', column_count=3, save_as='depots.buttons_table'}
             }}
           }},
           -- trains
@@ -182,11 +186,11 @@ function self.create(player, player_table)
               }}
             }},
             -- trains
-            {type='scroll-pane', style={name='ltnm_blank_scroll_pane', vertically_stretchable=true}, children=gui.call_template('depot_trains', player)}
+            {type='scroll-pane', style={name='ltnm_blank_scroll_pane', vertically_stretchable=true}, save_as='depots.trains_scrollpane'}
           }}
         }},
-        -- stations tab
-        {type='frame', style='ltnm_dark_content_frame', direction='vertical', mods={visible=false}, children={
+        -- STATIONS
+        {type='frame', style='ltnm_dark_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.content.stations', children={
           -- toolbar
           {type='frame', style='subheader_frame', direction='vertical', children={
             {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
@@ -198,8 +202,8 @@ function self.create(player, player_table)
           }},
           {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations_scroll_pane'}
         }},
-        -- inventory tab
-        {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, children={
+        -- INVENTORY
+        {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.content.inventory', children={
           -- toolbar
           {type='frame', style='subheader_frame', direction='horizontal', children={
             {template='pushers.horizontal'},
@@ -256,16 +260,16 @@ function self.create(player, player_table)
             }}
           }}
         }},
-        -- history tab
-        {type='empty-widget', mods={visible=false}},
-        -- alerts tab
-        {type='empty-widget', mods={visible=false}}
+        -- HISTORY
+        {type='empty-widget', mods={visible=false}, save_as='tabbed_pane.content.history'},
+        -- ALERTS
+        {type='empty-widget', mods={visible=false}, save_as='tabbed_pane.content.alerts'}
       }}
     }}
   )
 
   -- dragging and centering
-  gui_data.drag_handle.drag_target = gui_data.window
+  gui_data.titlebar.drag_handle.drag_target = gui_data.window
   gui_data.window.force_auto_center()
 
   player_table.gui.main = gui_data
@@ -276,19 +280,107 @@ end
 
 -- completely destroys the GUI
 function self.destroy(player, player_table)
-  gui.destroy(player_table.gui.main.window, 'main', player.index)
+  gui.deregister_all('main', player.index)
+  player_table.gui.main.window.destroy()
   player_table.gui.main = nil
 end
 
 -- updates the contents of the GUI
-function self.update(player, player_table)
+function self.update(player, player_table, state_changes)
   local gui_data = player_table.gui.main
   local data = global.data
 
+  -- if state_changes is not provided, update everything
+  state_changes = state_changes or {
+    depot_buttons = true,
+    selected_depot = true
+  }
+
   -- DEPOTS
   do
-    local pane = gui_data.depots_scroll_pane
+    -- buttons table
+    if state_changes.depot_buttons then
+      local buttons_table = gui_data.depots.buttons_table
+      buttons_table.clear()
 
+      local buttons_data = {}
+
+      local button_index = 0
+      -- build all buttons as if they're inactive
+      for name,t in pairs(data.depots) do
+        button_index = button_index + 1
+        local elems = gui.build(buttons_table,
+          {type='button', name='ltnm_depot_button_'..name, style='ltnm_depot_button', save_as='button', children={
+            {type='flow', ignored_by_interaction=true, direction='vertical', children={
+              {type='label', style={name='caption_label', font_color={28, 28, 28}}, caption=name, save_as='name_label'},
+              {type='flow', direction='horizontal', children={
+                {type='label', style={name='bold_label', font_color={28, 28, 28}}, caption={'', {'ltnm-gui.trains'}, ':'}, save_as='bold_labels.trains'},
+                {type='label', style={font_color={}}, caption='N/A', save_as='standard_labels.trains'}
+              }},
+              {type='flow', style={vertical_align='center', horizontal_spacing=6}, save_as='status_flow', children={
+                {type='label', style={name='bold_label', font_color={28, 28, 28}}, caption={'', {'ltnm-gui.status'}, ':'}, save_as='bold_labels.status'}
+              }}
+            }}
+          }}
+        )
+        local statuses = {}
+        for _,station_id in ipairs(t.stations) do
+          local station = data.stations[station_id]
+          local signal = station.lampControl.get_circuit_network(defines.wire_type.red).signals[1]
+          local signal_name = signal.signal.name
+          statuses[signal_name] = (statuses[signal_name] or 0) + signal.count
+        end
+        local status_flow = elems.status_flow
+        for status_name, status_count in pairs(statuses) do
+          local output = gui.build(status_flow,
+            {type='flow', style={vertical_align='center'}, children={
+              {type='sprite', sprite='ltnm_indicator_'..status_name},
+              {type='label', style={font_color={}}, caption=status_count, save_as='label'}
+            }}
+          )
+          elems.standard_labels[status_name] = output.label
+        end
+
+        -- add elems to button table
+        buttons_data[name] = elems
+      end
+
+      buttons_data.num_buttons = button_index
+      gui_data.depots.buttons = buttons_data
+    end
+    if state_changes.selected_depot then
+      local buttons_data = gui_data.depots.buttons
+      if buttons_data.num_buttons > 0 then
+        local new_selection = state_changes.selected_depot
+        if new_selection == true then
+          -- get the name of the first depot in the list
+          _,_,new_selection = string_find(gui_data.depots.buttons_table.children[1].name, '^ltnm_depot_button_(.*)$')
+        end
+        -- set previous selection to inactive style
+        local previous_selection = buttons_data.selected
+        if previous_selection then
+          local button_data = buttons_data[previous_selection]
+          button_data.button.enabled = true
+          button_data.name_label.style.font_color = constants.bold_dark_font_color
+          for _,elem in pairs(button_data.bold_labels) do
+            elem.style.font_color = constants.bold_dark_font_color
+          end
+          for _,elem in pairs(button_data.standard_labels) do
+            elem.style.font_color = constants.default_dark_font_color
+          end
+        end
+        -- set new selection to active style
+        local button_data = buttons_data[new_selection]
+        button_data.button.enabled = false
+        button_data.name_label.style.font_color = constants.heading_font_color
+        for _,elem in pairs(button_data.bold_labels) do
+          elem.style.font_color = constants.default_font_color
+        end
+        for _,elem in pairs(button_data.standard_labels) do
+          elem.style.font_color = constants.default_font_color
+        end
+      end
+    end
   end
 
   -- STATIONS
