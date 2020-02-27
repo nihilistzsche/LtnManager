@@ -33,7 +33,12 @@ gui.add_templates{
     }}
   end,
   close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
-    clicked_sprite='utility/close_black', save_as='close_button'},
+    clicked_sprite='utility/close_black', mouse_button_filter={'left'}, save_as='close_button'}
+}
+
+-- TEMPORARY, FOR LAYOUT PROTOTYPING
+gui.add_templates
+{
   demo_station_contents = function()
     local elems = {}
     for i=1,20 do
