@@ -1,7 +1,15 @@
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- RAILUALIB EVENT MODULE
+-- Multi-handler registration, conditional event handling, and GUI event filtering.
 
--- DOCUMENTATION: https://github.com/raiguard/SmallFactorioMods/wiki/Event-Module-Documentation
+-- Copyright (c) 2020 raiguard - https://github.com/raiguard
+-- Permission is hereby granted, free of charge, to those obtaining this software or a portion thereof, to copy the contents of this software into their own
+-- Factorio mod, and modify it to suit their needs. This is permissed under the condition that this notice and copyright information, as well as the link to
+-- the documentation, are not omitted, and that any changes from the original are documented.
+
+-- DOCUMENTATION: https://github.com/raiguard/Factorio-SmallMods/wiki/Event-Module-Documentation
+
+-- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 local util = require('__core__/lualib/util')
 
@@ -281,6 +289,13 @@ function event.generate_id(name)
     custom_id_registry[name] = script.generate_event_name()
   end
   return custom_id_registry[name]
+end
+
+-- updates the GUI filters for the given conditional event
+function event.update_gui_filters(name, player_index, filters)
+  local event_data = global.__lualib.event[name]
+  if not event_data then error('Cannot update GUI filters for a non-existent event!') end
+  event_data.gui_filters[player_index] = filters
 end
 
 -- -------------------------------------

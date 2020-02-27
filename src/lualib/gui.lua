@@ -35,7 +35,7 @@ local self = {}
 -- LOCAL UTILITIES
 
 local function get_subtable(s, t)
-  local o = table_deepcopy(t)
+  local o = t
   for _,key in pairs(string_split(s, '%.')) do
     o = o[key]
   end
@@ -116,7 +116,25 @@ local function recursive_load(parent, t, output, name, player_index)
       if type(t.save_as) == 'boolean' then
         t.save_as = t.handlers
       end
-      output[t.save_as] = elem
+      -- recursively create tables as needed
+      local out = {}
+      local prev = out
+      local nav
+      local keys = string_split(t.save_as, '%.')
+      local num_keys = #keys
+      for i=1,num_keys do
+        local key = keys[i]
+        nav = out[key]
+        if not nav then
+          if i < num_keys then
+            prev[key] = {}
+            prev = prev[key]
+          else
+            prev[key] = elem
+          end
+        end
+      end
+      output = table_merge{output, out}
     end
     -- register handlers
     if t.handlers then
@@ -170,18 +188,25 @@ end)
 -- -----------------------------------------------------------------------------
 -- OBJECT
 
--- builds a template without worrying about event handling
-function self.build_template(parent, template)
-  build_data = {}
-  return recursive_load(parent, template, {})
-end
-
-function self.create(parent, name, player_index, template)
+-- name and player_index are only required if we're registering events
+function self.build(parent, ...)
+  local arg = {...}
+  local template, name, player_index
+  if #arg == 1 then
+    template = arg[1]
+  elseif #arg == 3 then
+    name = arg[1]
+    player_index = arg[2]
+    template = arg[3]
+  else
+    error('Invalid arguments for gui.build!')
+  end
   build_data = {}
   return recursive_load(parent, template, {}, name, player_index)
 end
 
-function self.destroy(parent, gui_name, player_index)
+-- deregisters all handlers for the given GUI
+function self.deregister_all(gui_name, player_index)
   -- deregister handlers
   local gui_tables = global_data[gui_name]
   if gui_tables then
@@ -194,8 +219,6 @@ function self.destroy(parent, gui_name, player_index)
       global_data[gui_name] = nil
     end
   end
-  -- destroy GUI
-  parent.destroy()
 end
 
 function self.add_templates(...)
