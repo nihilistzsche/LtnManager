@@ -35,7 +35,7 @@ gui.add_templates{
     }}
   end,
   close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
-    clicked_sprite='utility/close_black', mouse_button_filter={'left'}, save_as='titlebar.close_button'},
+    clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='close_button', save_as='titlebar.close_button'},
   mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}}
 }
 
@@ -94,15 +94,37 @@ local train_column_widths = {
   contents = 156
 }
 
+local function update_active_tab(player, player_table, name)
+  local changes = {active_tab=name}
+  if name == 'depots' then
+    changes.depot_buttons = true
+    changes.selected_depot = player_table.gui.main.depots.selected or true
+  end
+  self.update(player, player_table, changes)
+end
+
 gui.add_handlers('main', {
+  close_button = {
+    on_gui_click = function(e)
+      self.destroy(game.get_player(e.player_index), global.players[e.player_index])
+    end
+  },
+  depot_button = {
+    on_gui_click = function(e)
+      local _,_,name = string_find(e.element.name, '^ltnm_depot_button_(.*)$')
+      self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
+    end
+  },
   frame_tab = {
     on_gui_click = function(e)
-      local _,_,name = string_find(e.element.caption[1], '^ltnm%-gui%.(.*)$')
-      local changes = {active_tab=name}
-      if name == 'depots' then
-        changes.depot_buttons = true
-      end
-      self.update(game.get_player(e.player_index), global.players[e.player_index], changes)
+      local name = e.default_tab or string_gsub(e.element.caption[1], 'ltnm%-gui%.', '')
+      update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
+    end
+  },
+  refresh_button = {
+    on_gui_click = function(e)
+      local player_table = global.players[e.player_index]
+      update_active_tab(game.get_player(e.player_index), global.players[e.player_index], player_table.gui.main.tabbed_pane.selected)
     end
   }
 })
@@ -124,7 +146,7 @@ function self.create(player, player_table)
           {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
             save_as='titlebar.drag_handle'},
           {template='close_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black', clicked_sprite='ltnm_refresh_black',
-            save_as='titlebar.refresh_button'},
+            tooltip={'ltnm-gui.refresh-current-tab'}, handlers='refresh_button', save_as='titlebar.refresh_button'},
           {template='close_button'}
         }}
       }},
@@ -239,7 +261,7 @@ function self.create(player, player_table)
   player_table.gui.main = gui_data
 
   -- set initial contents
-  self.update(player, player_table)
+  gui.call_handler('main.frame_tab.on_gui_click', {name=defines.events.on_gui_click, tick=game.tick, player_index=player.index, default_tab='depots'})
 end
 
 -- completely destroys the GUI
@@ -256,13 +278,6 @@ end
 function self.update(player, player_table, state_changes)
   local gui_data = player_table.gui.main
   local data = global.data
-
-  -- if state_changes is not provided, update everything
-  state_changes = state_changes or {
-    active_tab = gui_data.selected_tab or 'inventory',
-    depot_buttons = true,
-    selected_depot = gui_data.depots.selected or true -- set the first depot in the table to be active, if one was not selected before
-  }
 
   -- ACTIVE TAB
   if state_changes.active_tab then
@@ -282,17 +297,18 @@ function self.update(player, player_table, state_changes)
   -- DEPOT BUTTONS
   if state_changes.depot_buttons then
     local buttons_table = gui_data.depots.buttons_table
+    -- delete old buttons and deregister handler
     buttons_table.clear()
+    gui.deregister_handlers('main', 'depot_button', player.index)
 
     local buttons_data = {}
-    local button_elems = {} -- the actual button elements, for use in the GUI filters
 
     local button_index = 0
     -- build all buttons as if they're inactive
     for name,t in pairs(data.depots) do
       button_index = button_index + 1
-      local elems = gui.build(buttons_table,
-        {type='button', name='ltnm_depot_button_'..name, style='ltnm_depot_button', save_as='button', children={
+      local elems = gui.build(buttons_table, 'main', player.index,
+        {type='button', name='ltnm_depot_button_'..name, style='ltnm_depot_button', handlers='depot_button', save_as='button', children={
           {type='flow', ignored_by_interaction=true, direction='vertical', children={
             {type='label', style={name='caption_label', font_color={28, 28, 28}}, caption=name, save_as='name_label'},
             {type='flow', direction='horizontal', children={
@@ -325,29 +341,29 @@ function self.update(player, player_table, state_changes)
 
       -- add elems to button table
       buttons_data[name] = elems
-      button_elems[#button_elems+1] = elems.button
     end
 
-    -- TODO: update GUI filters
-    -- event.update_gui_filters('gui.main.depot_buttons.on_click')
-
-    buttons_data.num_buttons = button_index
+    gui_data.depots.amount = button_index
     gui_data.depots.buttons = buttons_data
+
+    -- set selected depot button
+    state_changes.selected_depot = state_changes.selected_depot or gui_data.depots.selected
   end
 
   -- SELECTED DEPOT
   if state_changes.selected_depot then
-    local buttons_data = gui_data.depots.buttons
-    if buttons_data.num_buttons > 0 then
+    local depot_data = gui_data.depots
+
+    if depot_data.amount > 0 then
       local new_selection = state_changes.selected_depot
       if new_selection == true then
         -- get the name of the first depot in the list
         _,_,new_selection = string_find(gui_data.depots.buttons_table.children[1].name, '^ltnm_depot_button_(.*)$')
       end
       -- set previous selection to inactive style
-      local previous_selection = buttons_data.selected
+      local previous_selection = depot_data.selected
       if previous_selection then
-        local button_data = buttons_data[previous_selection]
+        local button_data = depot_data.buttons[previous_selection]
         button_data.button.enabled = true
         button_data.name_label.style.font_color = constants.bold_dark_font_color
         for _,elem in pairs(button_data.bold_labels) do
@@ -358,7 +374,7 @@ function self.update(player, player_table, state_changes)
         end
       end
       -- set new selection to active style
-      local button_data = buttons_data[new_selection]
+      local button_data = depot_data.buttons[new_selection]
       button_data.button.enabled = false
       button_data.name_label.style.font_color = constants.heading_font_color
       for _,elem in pairs(button_data.bold_labels) do
@@ -367,6 +383,8 @@ function self.update(player, player_table, state_changes)
       for _,elem in pairs(button_data.standard_labels) do
         elem.style.font_color = constants.default_font_color
       end
+      -- update selection in global
+      depot_data.selected = new_selection
     end
   end
 
