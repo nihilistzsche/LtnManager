@@ -57,41 +57,7 @@ gui.add_templates{
       elems[#elems+1] = {type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite='item/poison-capsule', number=420000}
     end
     return elems
-  end,
-  depot_trains = function(player)
-    local children = {}
-    for i=1,7 do
-      children[#children+1] = {type='flow', style={padding=4, horizontal_spacing=12}, children={
-        {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-          {type='minimap', style={width=72, height=72}, position=player.position, zoom=2},
-        }},
-        {type='flow', children={
-          {type='label', caption='Delivering'},
-          {template='pushers.horizontal'}
-        }},
-        {type='flow', children={
-          {type='label', caption='MAIN drop 4'},
-          {template='pushers.horizontal'}
-        }},
-        {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-          {type='scroll-pane', style='ltnm_small_icon_slot_table_scroll_pane', vertical_scroll_policy='always', children={
-            {type='table', style={name='ltnm_icon_slot_table', width=144}, column_count=4, children=gui.call_template('train_contents', i == 1 and 22 or 3)}
-          }}
-        }}
-      }}
-      if i ~= 7 then
-        children[#children+1] = {type='line', style={horizontally_stretchable=true}, direction='horizontal'}
-      end
-    end
-    return children
   end
-}
-
-local train_column_widths = {
-  minimap = 72,
-  status = 156,
-  destination = 170,
-  contents = 156
 }
 
 local function update_active_tab(player, player_table, name)
@@ -164,11 +130,9 @@ function self.create(player, player_table)
             -- toolbar
             {type='frame', style='subheader_frame', children={
               {type='flow', style={vertical_align='center', height=28, horizontal_spacing=12, left_margin=4}, children={
-                {type='label', style={name='bold_label', horizontal_align='center', width=72}, caption='Preview'},
-                {type='label', style={name='bold_label', width=156}, caption='Status'},
-                {type='label', style={name='bold_label', width=170}, caption='Destination'},
-                {type='label', style={name='bold_label'}, caption='Contents'},
-                {template='pushers.horizontal'}
+                {type='label', style='bold_label', caption={'ltnm-gui.train-status'}},
+                {template='pushers.horizontal'},
+                {type='label', style={name='bold_label', width=144}, caption={'ltnm-gui.shipment'}},
               }}
             }},
             -- trains
@@ -385,9 +349,64 @@ function self.update(player, player_table, state_changes)
       end
       -- update selection in global
       depot_data.selected = new_selection
+      -- update trains list
+      state_changes.depot_trains = true
     end
   end
 
+  -- DEPOT TRAINS
+  if state_changes.depot_trains then
+    local trains_pane = gui_data.depots.trains_scrollpane
+    trains_pane.clear()
+
+    local trains = data.depots[gui_data.depots.selected].trains
+    for _,train_id in ipairs(trains) do
+      local train = data.deliveries[train_id]
+      -- build GUI structure
+      local elems = gui.build(trains_pane,
+        {type='flow', style={padding=4, horizontal_spacing=12, vertical_align='center'}, children={
+          -- minimaps can't be tied to a specific entity (yet) so we'll omit it for now
+          -- {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+          --   {type='minimap', style={width=72, height=72}, position=train.train.carriages[1].position, zoom=2},
+          -- }},
+          {type='flow', style={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical', save_as='status_flow'},
+          {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+            {type='scroll-pane', style='ltnm_small_icon_slot_table_scroll_pane', children={
+              {type='table', style={name='ltnm_icon_slot_table', width=144}, column_count=6, save_as='contents_table'}
+            }}
+          }}
+        }}
+      )
+      -- train status
+      local status_flow = elems.status_flow
+      local state = train.train.state
+      local def = defines.train_state
+      if state == def.on_the_path or state == def.arrive_signal or state == def.wait_signal or state == def.arrive_station then
+        status_flow.add{type='label', caption={'', {'ltnm-gui.'..(train.pickupDone and 'delivering-to' or 'fetching-from')}, ':'}}
+        status_flow.add{type='label', style='bold_label', caption=train.to}
+      elseif state == def.wait_station then
+        status_flow.add{type='label', caption={'', {'ltnm-gui.'..(train.pickupDone and 'unloading-at' or 'loading-at')}, ':'}}
+        status_flow.add{type='label', style='bold_label', caption=train.from}
+      else
+        local breakpoint
+      end
+      -- contents table
+      local contents_table = elems.contents_table
+      for name,count in pairs(train.shipment) do
+        contents_table.add{type='sprite-button', style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'), number=count}
+          .ignored_by_interaction = true
+      end
+      -- add separator
+      trains_pane.add{type='line', direction='horizontal'}.style.horizontally_stretchable = true
+    end
+    trains_pane.children[#trains_pane.children].destroy()
+  end
+
+end
+
+return self
+
+--[[
   -- STATIONS
   do
     local pane = gui_data.stations_scroll_pane
@@ -474,7 +493,4 @@ function self.update(player, player_table, state_changes)
       add{type='sprite-button', style='ltnm_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
     end
   end
-
-end
-
-return self
+]]
