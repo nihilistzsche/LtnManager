@@ -364,12 +364,14 @@ function self.update(player, player_table, state_changes)
       local train = data.deliveries[train_id]
       -- build GUI structure
       local elems = gui.build(trains_pane,
-        {type='flow', style={padding=4, horizontal_spacing=12, vertical_align='center'}, children={
+        {type='flow', style={padding=4, vertical_align='center'}, children={
           -- minimaps can't be tied to a specific entity (yet) so we'll omit it for now
           -- {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
           --   {type='minimap', style={width=72, height=72}, position=train.train.carriages[1].position, zoom=2},
           -- }},
-          {type='flow', style={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical', save_as='status_flow'},
+          {type='flow', style={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical',
+            save_as='status_flow'},
+          {type='flow', style={padding=0, margin=0}, save_as='composition_flow'},
           {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
             {type='scroll-pane', style='ltnm_small_icon_slot_table_scroll_pane', children={
               {type='table', style={name='ltnm_icon_slot_table', width=144}, column_count=6, save_as='contents_table'}
