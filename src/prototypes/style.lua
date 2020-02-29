@@ -241,7 +241,7 @@ styles.ltnm_main_frame_header = {
   },
   horizontal_flow_style = {
     type = 'horizontal_flow_style',
-    top_padding = 2,
+    top_padding = 3,
     vertical_align = 'center'
   }
 }
