@@ -42,15 +42,15 @@ local function get_subtable(s, t)
   return o
 end
 
-local function get_event_name(gui_name, handlers_path)
-  return 'gui.'..gui_name..'.'..handlers_path..'.'..n
+local function get_event_name(gui_name, handlers_path, event_name)
+  return 'gui.'..gui_name..'.'..handlers_path..'.'..event_name
 end
 
 local function register_handlers(gui_name, handlers_path, options)
   local handlers_t = get_subtable(gui_name..'.'..handlers_path, handlers)
   for n,func in pairs(handlers_t) do
     local t = table.deepcopy(options)
-    t.name = get_event_name(gui_name, handlers_path)
+    t.name = get_event_name(gui_name, handlers_path, n)
     -- check if the event has already been registered
     if event.is_registered(t.name, t.player_index) then
       -- append the GUI filters with our new element
