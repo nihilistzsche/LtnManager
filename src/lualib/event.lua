@@ -99,6 +99,7 @@ local function dispatch_event(e)
   end
   return event
 end
+
 -- pass-through handlers for special events
 local bootstrap_handlers = {
   on_init = function()
@@ -112,6 +113,15 @@ local bootstrap_handlers = {
     dispatch_event(e)
   end
 }
+
+-- appends an array with the elements in the second array
+local function append_array(t1, t2)
+  local t1_len = #t1
+  for i=1,#t2 do
+    t1[t1_len+i] = t2[i]
+  end
+  return t1
+end
 
 -- -----------------------------------------------------------------------------
 -- EVENTS
@@ -292,10 +302,23 @@ function event.generate_id(name)
 end
 
 -- updates the GUI filters for the given conditional event
-function event.update_gui_filters(name, player_index, filters)
+function event.update_gui_filters(name, player_index, filters, append_mode)
+  if type(filters) ~= 'table' or filters.gui then
+    filters = {filters}
+  end
   local event_data = global.__lualib.event[name]
   if not event_data then error('Cannot update GUI filters for a non-existent event!') end
-  event_data.gui_filters[player_index] = filters
+  if append_mode then
+    local filters_t = event_data.gui_filters
+    filters_t[player_index] = append_array(filters_t[player_index], filters)
+  else
+    event_data.gui_filters[player_index] = filters
+  end
+end
+
+-- retrieves and returns the global data for the given conditional event
+function event.get_event_data(name)
+  return global.__lualib.event[name]
 end
 
 -- -------------------------------------
