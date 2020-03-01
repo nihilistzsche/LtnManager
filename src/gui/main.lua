@@ -374,7 +374,7 @@ function self.update(player, player_table, state_changes)
           {type='flow', style={padding=0, margin=0}, save_as='composition_flow'},
           {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
             {type='scroll-pane', style='ltnm_small_icon_slot_table_scroll_pane', children={
-              {type='table', style={name='ltnm_icon_slot_table', width=144}, column_count=6, save_as='contents_table'}
+              {type='table', style={name='ltnm_icon_slot_table', width=144}, column_count=4, save_as='contents_table'}
             }}
           }}
         }}

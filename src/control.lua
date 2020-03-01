@@ -27,20 +27,13 @@ end
 
 event.on_init(function()
   global.data = {}
-  global.data.stations  = {}
-  global.flags = {
-
-  }
+  global.flags = {}
   global.players = {}
   for i,p in pairs(game.players) do
     setup_player(p, i)
   end
   data_manager.setup_events()
-end)
-
-event.on_load(function()
-  data_manager.setup_events()
-end)
+end, {insert_at_front=true})
 
 event.on_configuration_changed(migrations)
 
@@ -54,6 +47,10 @@ event.on_gui_click(function(e)
   if player_table.gui.main then
     main_gui.destroy(player, player_table)
   else
-    main_gui.create(player, player_table)
+    if global.data then
+      main_gui.create(player, player_table)
+    else
+      player.print{'ltnm-message.TEMP-COMEUPWITHANAMESTUPID!'}
+    end
   end
 end, {gui_filters='ltnm_button'})
