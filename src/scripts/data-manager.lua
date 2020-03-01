@@ -19,10 +19,11 @@ local self = {}
 
   depots
     available_trains (int)
-    trains
-      (array of train_id)
+    num_trains (int)
     stations
       (array of station_id)
+    trains
+      (array of train_id)
   stations
     [station_id]
       -- from LTN
@@ -57,8 +58,8 @@ local self = {}
       requested
         (dictionary of name -> count)
       status
-        name
-        count
+        name (string)
+        count (int)
   stations_by_network
     (dictionary of network_id -> array of train_id)
   inventory
@@ -77,6 +78,7 @@ local self = {}
       force
       train
       network_id
+      state
       -- en route
       from
       to
@@ -141,6 +143,7 @@ local function iterate_data()
       local station_id = station_ids[i]
       local station = stations[station_id]
       local network_id = station.network_id
+      local station_name = station.entity.backer_name
       if not station then error('Station ID mismatch') end
 
       -- add station to by-network lookup
@@ -158,11 +161,17 @@ local function iterate_data()
       -- get station trains
       local station_trains = station.entity.get_train_stop_trains()
       local station_train_ids = {}
+      local station_available_trains = 0
 
       -- iterate trains
       for ti=1,#station_trains do
         local train = station_trains[ti]
         local train_id = train.id
+        local train_state = train.state
+        local schedule = train.schedule
+        if train_state == defines.train_state.wait_station and schedule.records[schedule.current].station == station_name then
+          station_available_trains = station_available_trains + 1
+        end
         station_train_ids[ti] = train_id
 
         -- retrieve or construct train table
@@ -173,18 +182,18 @@ local function iterate_data()
             force = station.entity.force,
             returning_to_depot = true
           }
+          trains[train_id].state = train.state
         end
       end
 
       -- add station and trains to depot
       if station.isDepot then
-        local depot_name = station.entity.backer_name
-        local depot = depots[depot_name]
+        local depot = depots[station_name]
         if depot then
           depot.stations[#depot.stations+1] = station_id
         else
           -- only add trains once, since all stations will have the same trains
-          depots[depot_name] = {stations={}, trains=station_train_ids}
+          depots[station_name] = {available_trains=station_available_trains, num_trains=#station_train_ids, stations={}, trains=station_train_ids}
         end
       end
 

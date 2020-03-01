@@ -277,7 +277,7 @@ function self.update(player, player_table, state_changes)
             {type='label', style={name='caption_label', font_color={28, 28, 28}}, caption=name, save_as='name_label'},
             {type='flow', direction='horizontal', children={
               {type='label', style={name='bold_label', font_color={28, 28, 28}}, caption={'', {'ltnm-gui.trains'}, ':'}, save_as='bold_labels.trains'},
-              {type='label', style={font_color={}}, caption='N/A', save_as='standard_labels.trains'}
+              {type='label', style={font_color={}}, caption=t.available_trains..'/'..t.num_trains, save_as='standard_labels.trains'}
             }},
             {type='flow', style={vertical_align='center', horizontal_spacing=6}, save_as='status_flow', children={
               {type='label', style={name='bold_label', font_color={28, 28, 28}}, caption={'', {'ltnm-gui.status'}, ':'}, save_as='bold_labels.status'}
@@ -375,7 +375,7 @@ function self.update(player, player_table, state_changes)
       )
       -- train status
       local status_flow = elems.status_flow
-      local state = train.train.state
+      local state = train.state
       local def = defines.train_state
       if state == def.on_the_path or state == def.arrive_signal or state == def.wait_signal or state == def.arrive_station then
         if train.returning_to_depot then
