@@ -287,10 +287,8 @@ function self.update(player, player_table, state_changes)
       )
       local statuses = {}
       for _,station_id in ipairs(t.stations) do
-        local station = data.stations[station_id]
-        local signal = station.lampControl.get_circuit_network(defines.wire_type.red).signals[1]
-        local signal_name = signal.signal.name
-        statuses[signal_name] = (statuses[signal_name] or 0) + signal.count
+        local status = data.stations[station_id].status
+        statuses[status.name] = (statuses[status.name] or 0) + status.count
       end
       local status_flow = elems.status_flow
       for status_name, status_count in pairs(statuses) do
@@ -361,14 +359,10 @@ function self.update(player, player_table, state_changes)
 
     local trains = data.depots[gui_data.depots.selected].trains
     for _,train_id in ipairs(trains) do
-      local train = data.deliveries[train_id]
+      local train = data.trains[train_id]
       -- build GUI structure
       local elems = gui.build(trains_pane,
         {type='flow', style={padding=4, vertical_align='center'}, children={
-          -- minimaps can't be tied to a specific entity (yet) so we'll omit it for now
-          -- {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-          --   {type='minimap', style={width=72, height=72}, position=train.train.carriages[1].position, zoom=2},
-          -- }},
           {type='flow', style={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical',
             save_as='status_flow'},
           {type='flow', style={padding=0, margin=0}, save_as='composition_flow'},
@@ -384,19 +378,29 @@ function self.update(player, player_table, state_changes)
       local state = train.train.state
       local def = defines.train_state
       if state == def.on_the_path or state == def.arrive_signal or state == def.wait_signal or state == def.arrive_station then
-        status_flow.add{type='label', caption={'', {'ltnm-gui.'..(train.pickupDone and 'delivering-to' or 'fetching-from')}, ':'}}
-        status_flow.add{type='label', style='bold_label', caption=train.to}
+        if train.returning_to_depot then
+          status_flow.add{type='label', style='bold_label', caption={'ltnm-gui.returning-to-depot'}}
+        else
+          status_flow.add{type='label', caption={'', {'ltnm-gui.'..(train.pickupDone and 'delivering-to' or 'fetching-from')}, ':'}}
+          status_flow.add{type='label', style='bold_label', caption=train.to}
+        end
       elseif state == def.wait_station then
-        status_flow.add{type='label', caption={'', {'ltnm-gui.'..(train.pickupDone and 'unloading-at' or 'loading-at')}, ':'}}
-        status_flow.add{type='label', style='bold_label', caption=train.from}
+        if train.surface or train.returning_to_depot then
+          status_flow.add{type='label', style='bold_label', caption={'ltnm-gui.parked-at-depot'}}
+        else
+          status_flow.add{type='label', caption={'', {'ltnm-gui.'..(train.pickupDone and 'unloading-at' or 'loading-at')}, ':'}}
+          status_flow.add{type='label', style='bold_label', caption=train.from or train.to}
+        end
       else
         local breakpoint
       end
       -- contents table
-      local contents_table = elems.contents_table
-      for name,count in pairs(train.shipment) do
-        contents_table.add{type='sprite-button', style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'), number=count}
-          .ignored_by_interaction = true
+      if train.shipment then
+        local contents_table = elems.contents_table
+        for name,count in pairs(train.shipment) do
+          contents_table.add{type='sprite-button', style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'), number=count}
+            .ignored_by_interaction = true
+        end
       end
       -- add separator
       trains_pane.add{type='line', direction='horizontal'}.style.horizontally_stretchable = true

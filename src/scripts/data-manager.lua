@@ -56,7 +56,9 @@ local self = {}
         (dictionary of name -> count)
       requested
         (dictionary of name -> count)
-      status (string)
+      status
+        name
+        count
   stations_by_network
     (dictionary of network_id -> array of train_id)
   inventory
@@ -85,6 +87,8 @@ local self = {}
       capacity
       fluid_capacity
       surface
+      -- returning to depot
+      returning_to_depot (boolean)
   history
     (TBD)
   alerts
@@ -147,8 +151,9 @@ local function iterate_data()
         stations_by_network[network_id] = {station_id}
       end
 
-      -- get lamp color
-      station.status = station.lampControl.get_circuit_network(defines.wire_type.red).signals[1].signal.name
+      -- get status
+      local signal = station.lampControl.get_circuit_network(defines.wire_type.red).signals[1]
+      station.status = {name=signal.signal.name, count=signal.count}
 
       -- get station trains
       local station_trains = station.entity.get_train_stop_trains()
@@ -165,7 +170,8 @@ local function iterate_data()
           trains[train_id] = deliveries[train_id] or available_trains[train_id] or {
             train = train,
             network_id = network_id,
-            force = station.entity.force
+            force = station.entity.force,
+            returning_to_depot = true
           }
         end
       end
