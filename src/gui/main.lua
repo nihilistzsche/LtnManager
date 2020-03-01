@@ -309,7 +309,12 @@ function self.update(player, player_table, state_changes)
     gui_data.depots.buttons = buttons_data
 
     -- set selected depot button
-    state_changes.selected_depot = state_changes.selected_depot or gui_data.depots.selected
+    if data.depots[gui_data.depots.selected] then
+      state_changes.selected_depot = state_changes.selected_depot or gui_data.depots.selected
+    else
+      state_changes.selected_depot = true
+      gui_data.depots.selected = nil
+    end
   end
 
   -- SELECTED DEPOT
@@ -405,7 +410,16 @@ function self.update(player, player_table, state_changes)
       -- add separator
       trains_pane.add{type='line', direction='horizontal'}.style.horizontally_stretchable = true
     end
-    trains_pane.children[#trains_pane.children].destroy()
+    local num_children = #trains_pane.children
+    if num_children > 1 then
+      trains_pane.children[num_children].destroy()
+    else
+      gui.build(trains_pane,
+        {type='flow', style={horizontally_stretchable=true, vertically_stretchable=true, horizontal_align='center', vertical_align='center'}, children={
+          {type='label', caption={'ltnm-gui.select-a-depot-to-show-trains'}}
+        }}
+      )
+    end
   end
 
 end
