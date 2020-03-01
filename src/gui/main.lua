@@ -130,9 +130,9 @@ function self.create(player, player_table)
             -- toolbar
             {type='frame', style='subheader_frame', children={
               {type='flow', style={vertical_align='center', height=28, horizontal_spacing=12, left_margin=4}, children={
-                {type='label', style='bold_label', caption={'ltnm-gui.train-status'}},
+                {type='label', style='caption_label', caption={'ltnm-gui.train-status'}},
                 {template='pushers.horizontal'},
-                {type='label', style={name='bold_label', width=144}, caption={'ltnm-gui.shipment'}},
+                {type='label', style={name='caption_label', width=144}, caption={'ltnm-gui.shipment'}},
               }}
             }},
             -- trains
