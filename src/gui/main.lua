@@ -159,6 +159,8 @@ function self.create(player, player_table)
               {type='label', style={name='caption_label', left_margin=-8, width=220}, caption={'ltnm-gui.station-name'}},
               {type='label', style={name='caption_label', width=144}, caption={'ltnm-gui.provided-requested'}},
               {type='label', style={name='caption_label', width=144}, caption={'ltnm-gui.deliveries'}},
+              {template='pushers.horizontal'},
+              {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.station-filters-tooltip'}}
             }}
           }},
           {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations.scroll_pane'}
@@ -475,8 +477,8 @@ function self.update(player, player_table, state_changes)
             -- ltn combinator button
             {type='flow', style={right_margin=2}, children={
               {template='pushers.horizontal'},
-              {type='frame', style={name='ltnm_station_slot_table_frame', width=36}, children={
-                {type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite='item/constant-combinator'}
+              {type='frame', style='ltnm_combinator_button_frame', children={
+                {type='sprite-button', style='ltnm_combinator_button', sprite='item/constant-combinator', tooltip={'ltnm-gui.open-ltn-combinator-interface'}}
               }}
             }}
           }}

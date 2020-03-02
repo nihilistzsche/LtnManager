@@ -22,7 +22,7 @@ local function mipped_icon(name, position, filename, size, mipmap_count)
   return {
     type = 'sprite',
     name = name,
-    filename = filename or '__LtnManager__/graphics/gui/nav-icons.png',
+    filename = filename,
     position = position,
     size = size or 32,
     mipmap_count = mipmap_count or 2,
@@ -30,7 +30,11 @@ local function mipped_icon(name, position, filename, size, mipmap_count)
   }
 end
 
+local nav_icons = '__LtnManager__/graphics/gui/nav-icons.png'
+local tool_icons = '__LtnManager__/graphics/gui/tool-icons.png'
+
 data:extend{
-  mipped_icon('ltnm_refresh_white', {0,0}),
-  mipped_icon('ltnm_refresh_black', {48,0})
+  mipped_icon('ltnm_refresh_white', {0,0}, nav_icons),
+  mipped_icon('ltnm_refresh_black', {48,0}, nav_icons),
+  mipped_icon('ltnm_filter', {0,0}, tool_icons)
 }

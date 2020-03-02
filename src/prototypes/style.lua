@@ -169,6 +169,19 @@ styles.ltnm_depot_button_for_scrollbar = {
   width = 202
 }
 
+styles.ltnm_combinator_button = {
+  type = 'button_style',
+  parent = 'tool_button',
+  size = 32,
+  padding = 1,
+  hovered_graphical_set = {
+    base = {position = {34, 17}, corner_size = 8},
+    shadow = default_dirt,
+    -- no glow, since it is inset
+    -- glow = default_glow(default_glow_color, 0.5)
+  },
+}
+
 -- -----------------------------------------------------------------------------
 -- EMPTY WIDGET STYLES
 
@@ -377,6 +390,12 @@ styles.ltnm_station_items_frame = {
     type = 'vertical_flow_style',
     vertical_spacing = 4
   }
+}
+
+styles.ltnm_combinator_button_frame = {
+  type = 'frame_style',
+  parent = 'ltnm_dark_content_frame_in_light_frame',
+  size = 32
 }
 
 -- -----------------------------------------------------------------------------
