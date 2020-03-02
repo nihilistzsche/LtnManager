@@ -330,6 +330,55 @@ styles.ltnm_depot_frame = {
   right_padding = 4
 }
 
+styles.ltnm_station_row_frame = {
+  type = 'frame_style',
+  parent = 'dark_frame',
+  minimal_height = 40,
+  padding = 0,
+  horizontally_stretchable = 'on',
+  horizontal_flow_style = {
+    type = 'horizontal_flow_style',
+    vertical_align = 'center',
+    horizontal_spacing = 12
+  }
+}
+
+styles.ltnm_station_slot_table_frame = {
+  type = 'frame_style',
+  parent = 'ltnm_dark_content_frame_in_light_frame',
+  top_margin = 2,
+  bottom_margin = 2
+}
+
+-- remove the left border so it transitions seamlessly from a scrollbar over there
+styles.ltnm_station_slot_table_frame_adjacent = {
+  type = 'frame_style',
+  parent = 'ltnm_station_slot_table_frame',
+  graphical_set = {
+    base = {
+      position = {85,0},
+      corner_size = 8,
+      draw_type = 'outer',
+      center = {position={42,8}, size=1},
+      left = {},
+      left_top = {},
+      left_bottom = {}
+    },
+    shadow = default_inner_shadow
+  }
+}
+
+styles.ltnm_station_items_frame = {
+  type = 'frame_style',
+  parent = 'dark_frame',
+  padding = 4,
+  top_padding = 2,
+  vertical_flow_style = {
+    type = 'vertical_flow_style',
+    vertical_spacing = 4
+  }
+}
+
 -- -----------------------------------------------------------------------------
 -- SCROLL PANE STYLES
 
@@ -435,34 +484,17 @@ styles.ltnm_stations_scroll_pane = {
   }
 }
 
+styles.ltnm_station_slot_table_scroll_pane = {
+  type = 'scroll_pane_style',
+  parent = 'ltnm_small_icon_slot_table_scroll_pane',
+  maximal_height = 108,
+  horizontally_squashable = 'off'
+}
+
 styles.ltnm_trains_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_blank_scroll_pane',
   extra_right_padding_when_activated = -12
-}
-
-styles.ltnm_station_row_frame = {
-  type = 'frame_style',
-  parent = 'dark_frame',
-  minimal_height = 40,
-  padding = 0,
-  horizontally_stretchable = 'on',
-  horizontal_flow_style = {
-    type = 'horizontal_flow_style',
-    vertical_align = 'center',
-    horizontal_spacing = 12
-  }
-}
-
-styles.ltnm_station_items_frame = {
-  type = 'frame_style',
-  parent = 'dark_frame',
-  padding = 4,
-  top_padding = 2,
-  vertical_flow_style = {
-    type = 'vertical_flow_style',
-    vertical_spacing = 4
-  }
 }
 
 -- -----------------------------------------------------------------------------
@@ -484,6 +516,13 @@ styles.ltnm_icon_slot_table = {
   horizontal_spacing = 0,
   vertical_spacing = 0,
   width = 240
+}
+
+styles.ltnm_small_icon_slot_table = {
+  type = 'table_style',
+  parent = 'ltnm_icon_slot_table',
+  width = 144,
+  minimal_height = 36
 }
 
 styles.ltnm_depots_table = {

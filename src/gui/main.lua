@@ -36,7 +36,16 @@ gui.add_templates{
   end,
   close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
     clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='close_button', save_as='titlebar.close_button'},
-  mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='frame_tab'}
+  mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='frame_tab'},
+  station_slot_table = function(name)
+    return {type='flow', children={
+      {type='frame', style='ltnm_station_slot_table_frame', save_as=name..'_frame', children={
+        {type='scroll-pane', style='ltnm_station_slot_table_scroll_pane', save_as=name..'_scroll_pane', children={
+          {type='table', style='ltnm_small_icon_slot_table', column_count=4, save_as=name..'_table'}
+        }}
+      }}
+    }}
+  end
 }
 
 -- TEMPORARY, FOR LAYOUT PROTOTYPING
@@ -65,6 +74,8 @@ local function update_active_tab(player, player_table, name)
   if name == 'depots' then
     changes.depot_buttons = true
     changes.selected_depot = player_table.gui.main.depots.selected or true
+  elseif name == 'stations' then
+    changes.stations_list = true
   end
   self.update(player, player_table, changes)
 end
@@ -146,11 +157,11 @@ function self.create(player, player_table)
             {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
               {type='empty-widget', style={height=28}},
               {type='label', style={name='caption_label', left_margin=-8, width=220}, caption={'ltnm-gui.station-name'}},
-              {type='label', style={name='caption_label', width=168}, caption={'ltnm-gui.provided-requested'}},
-              {type='label', style={name='caption_label', width=134}, caption={'ltnm-gui.deliveries'}},
+              {type='label', style={name='caption_label', width=144}, caption={'ltnm-gui.provided-requested'}},
+              {type='label', style={name='caption_label', width=144}, caption={'ltnm-gui.deliveries'}},
             }}
           }},
-          {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations_scroll_pane'}
+          {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations.scroll_pane'}
         }},
         -- INVENTORY
         {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.inventory', children={
@@ -383,7 +394,7 @@ function self.update(player, player_table, state_changes)
           {type='flow', style={padding=0, margin=0}, save_as='composition_flow'},
           {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
             {type='scroll-pane', style='ltnm_small_icon_slot_table_scroll_pane', children={
-              {type='table', style={name='ltnm_icon_slot_table', width=144}, column_count=4, save_as='contents_table'}
+              {type='table', style='ltnm_small_icon_slot_table', column_count=4, save_as='contents_table'}
             }}
           }}
         }}
@@ -431,6 +442,95 @@ function self.update(player, player_table, state_changes)
       )
     end
   end
+
+  -- STATION FILTERS
+  if state_changes.station_filters then
+
+  end
+
+  -- STATION SORT
+  if state_changes.station_sort then
+
+  end
+
+  -- not used externally, but is called by the above two situations
+  if state_changes.stations_list then
+    local stations_pane = gui_data.stations.scroll_pane
+    stations_pane.clear()
+
+    local stations = data.stations
+    for id,t in pairs(stations) do
+      if not t.isDepot then -- don't include depots in the stations list
+        -- build GUI structure
+        local elems = gui.build(stations_pane,
+          {type='frame', style='ltnm_station_row_frame', children={
+            -- name / status
+            {type='flow', style={vertical_align='center', width=220}, children={
+              {type='sprite', style={left_margin=2}, sprite='ltnm_indicator_'..t.status.name},
+              {type='label', style={left_margin=2}, caption=t.entity.backer_name}
+            }},
+            -- items
+            gui.call_template('station_slot_table', 'provided_requested'),
+            gui.call_template('station_slot_table', 'deliveries'),
+            -- ltn combinator button
+            {type='flow', style={right_margin=2}, children={
+              {template='pushers.horizontal'},
+              {type='frame', style={name='ltnm_station_slot_table_frame', width=36}, children={
+                {type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite='item/constant-combinator'}
+              }}
+            }}
+          }}
+        )
+
+        -- add provided/requested materials
+        local table_add = elems.provided_requested_table.add
+        local provided_requested_rows = 0
+        for key,color in pairs{provided='green', requested='red'} do
+          local materials = t[key]
+          if materials then
+            for name,count in pairs(materials) do
+              provided_requested_rows = provided_requested_rows + 1
+              table_add{type='sprite-button', style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
+            end
+          end
+        end
+        provided_requested_rows = math.ceil(provided_requested_rows / 4) -- number of columns
+
+        -- add active deliveries
+        local deliveries = t.activeDeliveries
+        table_add = elems.deliveries_table.add
+        local deliveries_rows = 0
+        for i=1,#deliveries do
+          local shipment = data.trains[deliveries[i]].shipment
+          for name,count in pairs(shipment) do
+            deliveries_rows = deliveries_rows + 1
+            table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
+          end
+        end
+        deliveries_rows = math.ceil(deliveries_rows / 4) -- number of columns
+        
+        local num_rows = math.max(provided_requested_rows, deliveries_rows)
+        
+        -- set scroll pane properties
+        if provided_requested_rows > 3 then
+          elems.provided_requested_frame.style.right_margin = -12
+          elems.deliveries_frame.style = 'ltnm_station_slot_table_frame_adjacent'
+        end
+        if deliveries_rows > 3 then
+          elems.deliveries_frame.style.right_margin = -12
+        end
+        if num_rows > 1 then
+          local frame_height = 36 * math.min(num_rows, 3)
+          elems.provided_requested_frame.style.height = frame_height
+          elems.provided_requested_scroll_pane.style.height = frame_height
+          elems.deliveries_frame.style.height = frame_height
+          elems.deliveries_scroll_pane.style.height = frame_height
+        end
+      end
+    end
+  end
+  
+
 
 end
 
