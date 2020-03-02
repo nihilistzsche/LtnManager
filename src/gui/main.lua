@@ -151,7 +151,7 @@ function self.create(player, player_table)
           }}
         }},
         -- STATIONS
-        {type='frame', style='ltnm_dark_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.stations', children={
+        {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.stations', children={
           -- toolbar
           {type='frame', style={name='subheader_frame', horizontally_stretchable=true}, direction='vertical', children={
             {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
@@ -427,7 +427,6 @@ function self.update(player, player_table, state_changes)
         local contents_table = elems.contents_table
         for name,count in pairs(train.shipment) do
           contents_table.add{type='sprite-button', style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'), number=count}
-            .ignored_by_interaction = true
         end
       end
       -- add separator
@@ -465,7 +464,7 @@ function self.update(player, player_table, state_changes)
       if not t.isDepot then -- don't include depots in the stations list
         -- build GUI structure
         local elems = gui.build(stations_pane,
-          {type='frame', style='ltnm_station_row_frame', children={
+          {type='flow', style={vertical_align='center', horizontal_spacing=12, left_margin=2, right_margin=2}, children={
             -- name / status
             {type='flow', style={vertical_align='center', width=220}, children={
               {type='sprite', style={left_margin=2}, sprite='ltnm_indicator_'..t.status.name},
@@ -483,6 +482,7 @@ function self.update(player, player_table, state_changes)
             }}
           }}
         )
+        stations_pane.add{type='line', direction='horizontal'}.style.horizontally_stretchable = true
 
         -- add provided/requested materials
         local table_add = elems.provided_requested_table.add
@@ -530,10 +530,9 @@ function self.update(player, player_table, state_changes)
         end
       end
     end
+
+    stations_pane.children[#stations_pane.children].destroy()
   end
-  
-
-
 end
 
 return self

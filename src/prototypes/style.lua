@@ -489,25 +489,21 @@ styles.ltnm_small_icon_slot_table_scroll_pane = {
   }
 }
 
-styles.ltnm_stations_scroll_pane = {
-  type = 'scroll_pane_style',
-  parent = 'ltnm_blank_scroll_pane',
-  vertically_stretchable = 'on',
-  horizontally_stretchable = 'on',
-  background_graphical_set = {
-    position = {282, 17},
-    corner_size = 8,
-    overall_tiling_vertical_spacing = 12,
-    overall_tiling_vertical_size = 32,
-    overall_tiling_vertical_padding = 4
-  }
-}
-
 styles.ltnm_station_slot_table_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_small_icon_slot_table_scroll_pane',
   maximal_height = 108,
   horizontally_squashable = 'off'
+}
+
+styles.ltnm_stations_scroll_pane = {
+  type = 'scroll_pane_style',
+  parent = 'ltnm_blank_scroll_pane',
+  extra_right_padding_when_activated = -12,
+  vertical_flow_style = {
+    type = 'vertical_flow_style',
+    padding = 2
+  }
 }
 
 styles.ltnm_trains_scroll_pane = {
