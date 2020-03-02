@@ -108,6 +108,126 @@ local self = {}
 ]]
 
 -- -----------------------------------------------------------------------------
+-- PROCESSING FUNCTIONS
+
+local function iterate_stations()
+  local data = global.working_data
+
+  local depots = data.depots
+  local stations = data.stations
+  local stations_by_network = data.stations_by_network
+  local station_ids = data.station_ids
+  local num_stations = data.num_stations
+  local trains = data.trains
+
+  local inv_available = data.inventory.available
+  local inv_requested = data.inventory.requested
+  local inv_in_transit = data.inventory.in_transit
+
+  local provided_by_stop = data.provided_by_stop
+  local requested_by_stop = data.requested_by_stop
+  local deliveries = data.deliveries
+  local available_trains = data.available_trains
+  
+  local index = data.index
+  local num_to_iterate = settings.global['ltnm-stations-per-tick'].value
+  local end_index = index + num_to_iterate
+
+  for i=index,end_index do
+    local station_id = station_ids[i]
+    local station = stations[station_id]
+    local network_id = station.network_id
+    local station_name = station.entity.backer_name
+    if not station then error('Station ID mismatch') end
+
+    -- add station to by-network lookup
+    local network_stations = stations_by_network[network_id]
+    if network_stations then
+      network_stations[#network_stations+1] = station_id
+    else
+      stations_by_network[network_id] = {station_id}
+    end
+
+    -- get status
+    local signal = station.lampControl.get_circuit_network(defines.wire_type.red).signals[1]
+    station.status = {name=signal.signal.name, count=signal.count}
+
+    -- get station trains
+    local station_trains = station.entity.get_train_stop_trains()
+    local station_train_ids = {}
+    local station_available_trains = 0
+
+    -- iterate trains
+    for ti=1,#station_trains do
+      local train = station_trains[ti]
+      local train_id = train.id
+      local train_state = train.state
+      local schedule = train.schedule
+      if train_state == defines.train_state.wait_station and schedule.records[schedule.current].station == station_name then
+        station_available_trains = station_available_trains + 1
+      end
+      station_train_ids[ti] = train_id
+
+      -- retrieve or construct train table
+      if not trains[train_id] then
+        trains[train_id] = deliveries[train_id] or available_trains[train_id] or {
+          train = train,
+          network_id = network_id,
+          force = station.entity.force,
+          returning_to_depot = true
+        }
+        trains[train_id].state = train.state
+      end
+    end
+
+    -- add station and trains to depot
+    if station.isDepot then
+      local depot = depots[station_name]
+      if depot then
+        depot.stations[#depot.stations+1] = station_id
+      else
+        -- only add trains once, since all stations will have the same trains
+        depots[station_name] = {available_trains=station_available_trains, num_trains=#station_train_ids, stations={}, trains=station_train_ids}
+      end
+    end
+
+    -- process station items
+    local provided = provided_by_stop[station_id]
+    if provided then
+      -- add to station
+      station.provided = provided
+      -- add to network
+      local inventory = inv_available[network_id]
+      if not inventory then
+        inv_available[network_id] = provided
+      else
+        inventory = util.add_materials(provided, inventory)
+      end
+    end
+    local requested = requested_by_stop[station_id]
+    if requested then
+      -- add to station
+      station.requested = requested
+      -- add to network
+      local inventory = inv_requested[network_id]
+      if not inventory then
+        inv_available[network_id] = requested
+      else
+        inventory = util.add_materials(requested, inventory)
+      end
+    end
+
+    -- end this step if we are done
+    if i == num_stations then
+      data.step = 2
+      return
+    end
+  end
+
+  data.index = end_index
+end
+
+-- -----------------------------------------------------------------------------
 -- HANDLERS
 
 -- declare these two here so the iterate_data function can access them
@@ -117,121 +237,9 @@ local on_stops_updated, on_dispatcher_updated
 local function iterate_data()
   local data = global.working_data
   local step = data.step
-  
-  if step == 1 then -- iterate stations
-    local depots = data.depots
-    local stations = data.stations
-    local stations_by_network = data.stations_by_network
-    local station_ids = data.station_ids
-    local num_stations = data.num_stations
-    local trains = data.trains
 
-    local inv_available = data.inventory.available
-    local inv_requested = data.inventory.requested
-    local inv_in_transit = data.inventory.in_transit
-
-    local provided_by_stop = data.provided_by_stop
-    local requested_by_stop = data.requested_by_stop
-    local deliveries = data.deliveries
-    local available_trains = data.available_trains
-    
-    local index = data.index
-    local num_to_iterate = settings.global['ltnm-stations-per-tick'].value
-    local end_index = index + num_to_iterate
-
-    for i=index,end_index do
-      local station_id = station_ids[i]
-      local station = stations[station_id]
-      local network_id = station.network_id
-      local station_name = station.entity.backer_name
-      if not station then error('Station ID mismatch') end
-
-      -- add station to by-network lookup
-      local network_stations = stations_by_network[network_id]
-      if network_stations then
-        network_stations[#network_stations+1] = station_id
-      else
-        stations_by_network[network_id] = {station_id}
-      end
-
-      -- get status
-      local signal = station.lampControl.get_circuit_network(defines.wire_type.red).signals[1]
-      station.status = {name=signal.signal.name, count=signal.count}
-
-      -- get station trains
-      local station_trains = station.entity.get_train_stop_trains()
-      local station_train_ids = {}
-      local station_available_trains = 0
-
-      -- iterate trains
-      for ti=1,#station_trains do
-        local train = station_trains[ti]
-        local train_id = train.id
-        local train_state = train.state
-        local schedule = train.schedule
-        if train_state == defines.train_state.wait_station and schedule.records[schedule.current].station == station_name then
-          station_available_trains = station_available_trains + 1
-        end
-        station_train_ids[ti] = train_id
-
-        -- retrieve or construct train table
-        if not trains[train_id] then
-          trains[train_id] = deliveries[train_id] or available_trains[train_id] or {
-            train = train,
-            network_id = network_id,
-            force = station.entity.force,
-            returning_to_depot = true
-          }
-          trains[train_id].state = train.state
-        end
-      end
-
-      -- add station and trains to depot
-      if station.isDepot then
-        local depot = depots[station_name]
-        if depot then
-          depot.stations[#depot.stations+1] = station_id
-        else
-          -- only add trains once, since all stations will have the same trains
-          depots[station_name] = {available_trains=station_available_trains, num_trains=#station_train_ids, stations={}, trains=station_train_ids}
-        end
-      end
-
-      -- process station items
-      local provided = provided_by_stop[station_id]
-      if provided then
-        -- add to station
-        station.provided = provided
-        -- add to network
-        local inventory = inv_available[network_id]
-        if not inventory then
-          inv_available[network_id] = provided
-        else
-          inventory = util.add_materials(provided, inventory)
-        end
-      end
-      local requested = requested_by_stop[station_id]
-      if requested then
-        -- add to station
-        station.requested = requested
-        -- add to network
-        local inventory = inv_requested[network_id]
-        if not inventory then
-          inv_available[network_id] = requested
-        else
-          inventory = util.add_materials(requested, inventory)
-        end
-      end
-
-      -- end this step if we are done
-      if i == num_stations then
-        data.step = 2
-        return
-      end
-    end
-
-    -- update index
-    data.index = end_index
+  if step == 1 then
+    iterate_stations()
   elseif step == 2 then
     -- process in transit items
     local in_transit = data.inventory.in_transit
