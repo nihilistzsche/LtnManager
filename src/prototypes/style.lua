@@ -371,7 +371,7 @@ styles.ltnm_depots_scroll_pane_for_scrollbar = {
     overall_tiling_horizontal_padding = 4,
     overall_tiling_horizontal_size = 194,
     overall_tiling_horizontal_spacing = 8,
-    overall_tiling_vertical_padding = 4,
+    overall_tiling_vertical_padding = 2,
     overall_tiling_vertical_size = 78,
     overall_tiling_vertical_spacing = 8
   }

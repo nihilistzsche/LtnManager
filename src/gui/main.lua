@@ -36,7 +36,7 @@ gui.add_templates{
   end,
   close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
     clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='close_button', save_as='titlebar.close_button'},
-  mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}}
+  mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='frame_tab'}
 }
 
 -- TEMPORARY, FOR LAYOUT PROTOTYPING
@@ -103,11 +103,11 @@ function self.create(player, player_table)
     {type='frame', style='ltnm_empty_frame', direction='vertical', save_as='window', children={
       -- TITLEBAR
       {type='flow', style={horizontal_spacing=0}, direction='horizontal', children={
-        {template='mock_frame_tab', caption={'ltnm-gui.depots'}, handlers='frame_tab', save_as='tabbed_pane.tabs.depots'},
-        {template='mock_frame_tab', caption={'ltnm-gui.stations'}, handlers='frame_tab', save_as='tabbed_pane.tabs.stations'},
-        {template='mock_frame_tab', caption={'ltnm-gui.inventory'}, handlers='frame_tab', save_as='tabbed_pane.tabs.inventory'},
-        {template='mock_frame_tab', caption={'ltnm-gui.history'}, handlers='frame_tab', save_as='tabbed_pane.tabs.history'},
-        {template='mock_frame_tab', caption={'ltnm-gui.alerts'}, handlers='frame_tab', save_as='tabbed_pane.tabs.alerts'},
+        {template='mock_frame_tab', caption={'ltnm-gui.depots'}, save_as='tabbed_pane.tabs.depots'},
+        {template='mock_frame_tab', caption={'ltnm-gui.stations'}, save_as='tabbed_pane.tabs.stations'},
+        {template='mock_frame_tab', caption={'ltnm-gui.inventory'}, save_as='tabbed_pane.tabs.inventory'},
+        {template='mock_frame_tab', caption={'ltnm-gui.history'}, save_as='tabbed_pane.tabs.history'},
+        {template='mock_frame_tab', caption={'ltnm-gui.alerts'}, save_as='tabbed_pane.tabs.alerts'},
         {type='frame', style='ltnm_main_frame_header', children={
           {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
             save_as='titlebar.drag_handle'},
@@ -121,7 +121,7 @@ function self.create(player, player_table)
         {type='flow', style={vertical_spacing=12}, direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.depots', children={
           -- buttons
           {type='frame', style='ltnm_dark_content_frame', direction='vertical', children={
-            {type='scroll-pane', style='ltnm_depots_scroll_pane', horizontal_scroll_policy='never', children={
+            {type='scroll-pane', style='ltnm_depots_scroll_pane', horizontal_scroll_policy='never', save_as='depots.buttons_scroll_pane', children={
               {type='table', style='ltnm_depots_table', column_count=3, save_as='depots.buttons_table'}
             }}
           }},
@@ -268,11 +268,21 @@ function self.update(player, player_table, state_changes)
     local buttons_data = {}
 
     local button_index = 0
+    local num_depots = table_size(data.depots)
+    local button_style = num_depots > 6 and 'ltnm_depot_button_for_scrollbar' or 'ltnm_depot_button'
+
+    -- edit scroll pane style depending on number of depots
+    if num_depots > 6 then
+      gui_data.depots.buttons_scroll_pane.style = 'ltnm_depots_scroll_pane_for_scrollbar'
+    else
+      gui_data.depots.buttons_scroll_pane.style = 'ltnm_depots_scroll_pane'
+    end
+
     -- build all buttons as if they're inactive
     for name,t in pairs(data.depots) do
       button_index = button_index + 1
       local elems = gui.build(buttons_table, 'main', player.index,
-        {type='button', name='ltnm_depot_button_'..name, style='ltnm_depot_button', handlers='depot_button', save_as='button', children={
+        {type='button', name='ltnm_depot_button_'..name, style=button_style, handlers='depot_button', save_as='button', children={
           {type='flow', ignored_by_interaction=true, direction='vertical', children={
             {type='label', style={name='caption_label', font_color={28, 28, 28}}, caption=name, save_as='name_label'},
             {type='flow', direction='horizontal', children={

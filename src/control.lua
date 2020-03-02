@@ -26,7 +26,6 @@ local function setup_player(player, index)
 end
 
 event.on_init(function()
-  global.data = {}
   global.flags = {}
   global.players = {}
   for i,p in pairs(game.players) do
