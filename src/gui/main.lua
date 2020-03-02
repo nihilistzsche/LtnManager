@@ -142,12 +142,12 @@ function self.create(player, player_table)
         -- STATIONS
         {type='frame', style='ltnm_dark_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.stations', children={
           -- toolbar
-          {type='frame', style='subheader_frame', direction='vertical', children={
+          {type='frame', style={name='subheader_frame', horizontally_stretchable=true}, direction='vertical', children={
             {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
               {type='empty-widget', style={height=28}},
-              {type='label', style={name='bold_label', left_margin=-8, width=220}, caption={'ltnm-gui.station-name'}},
-              {type='label', style={name='bold_label', width=168}, caption={'ltnm-gui.provided-requested'}},
-              {type='label', style={name='bold_label', width=134}, caption={'ltnm-gui.deliveries'}},
+              {type='label', style={name='caption_label', left_margin=-8, width=220}, caption={'ltnm-gui.station-name'}},
+              {type='label', style={name='caption_label', width=168}, caption={'ltnm-gui.provided-requested'}},
+              {type='label', style={name='caption_label', width=134}, caption={'ltnm-gui.deliveries'}},
             }}
           }},
           {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations_scroll_pane'}

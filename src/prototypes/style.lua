@@ -425,6 +425,7 @@ styles.ltnm_stations_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_blank_scroll_pane',
   vertically_stretchable = 'on',
+  horizontally_stretchable = 'on',
   background_graphical_set = {
     position = {282, 17},
     corner_size = 8,
