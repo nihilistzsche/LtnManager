@@ -160,7 +160,7 @@ function self.create(player, player_table)
               {type='label', style={name='caption_label', width=144}, caption={'ltnm-gui.provided-requested'}},
               {type='label', style={name='caption_label', width=144}, caption={'ltnm-gui.deliveries'}},
               {template='pushers.horizontal'},
-              {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.station-filters-tooltip'}}
+              -- {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.station-filters-tooltip'}}
             }}
           }},
           {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations.scroll_pane'}
