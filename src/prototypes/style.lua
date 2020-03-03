@@ -146,8 +146,8 @@ styles.ltnm_mock_frame_tab = {
 }
 
 styles.ltnm_depot_button = {
-  type = "button_style",
-  parent = "button",
+  type = 'button_style',
+  parent = 'button',
   width = 206,
   height = 85,
   padding = 4,
@@ -358,9 +358,7 @@ styles.ltnm_station_row_frame = {
 
 styles.ltnm_station_slot_table_frame = {
   type = 'frame_style',
-  parent = 'ltnm_dark_content_frame_in_light_frame',
-  top_margin = 2,
-  bottom_margin = 2
+  parent = 'ltnm_dark_content_frame_in_light_frame'
 }
 
 -- remove the left border so it transitions seamlessly from a scrollbar over there
@@ -398,6 +396,28 @@ styles.ltnm_combinator_button_frame = {
   size = 32
 }
 
+styles.ltnm_toolbar_frame = {
+  type = 'frame_style',
+  parent = 'frame',
+  graphical_set = {
+    base = {
+      center = {position = {256, 25}, size = {1, 1}},
+      bottom = {position = {256, 26}, size = {1, 8}}
+    },
+    shadow = bottom_shadow
+  },
+  horizontal_flow_style = {
+    type = 'horizontal_flow_style',
+    vertical_align = 'center'
+  },
+  vertical_align = 'center',
+  top_padding = 3, -- optical correction - move one pixel up from perfect position
+  right_padding = 4,
+  left_padding = 4,
+  bottom_padding = 1,
+  vertically_stretchable = 'off'
+}
+
 -- -----------------------------------------------------------------------------
 -- IMAGE STYLES
 
@@ -409,11 +429,23 @@ styles.ltnm_material_icon = {
   left_margin = 2
 }
 
+styles.ltnm_status_icon = {
+  type = 'image_style',
+  stretch_image_to_widget_size = true,
+  size = 14
+}
+
+styles.ltnm_station_status_icon = {
+  type = 'image_style',
+  parent = 'ltnm_status_icon',
+  left_margin = 2
+}
+
 -- -----------------------------------------------------------------------------
 -- SCROLL PANE STYLES
 
 styles.ltnm_blank_scroll_pane = {
-  type = "scroll_pane_style",
+  type = 'scroll_pane_style',
   extra_padding_when_activated = 0,
   padding = 4,
   graphical_set = {
@@ -552,7 +584,7 @@ styles.ltnm_small_icon_slot_table = {
 }
 
 styles.ltnm_depots_table = {
-  type = "table_style",
+  type = 'table_style',
   horizontal_spacing = 0,
   vertical_spacing = 0,
   padding = 0

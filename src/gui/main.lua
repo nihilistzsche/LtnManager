@@ -24,40 +24,41 @@ gui.add_templates{
     vertical = {type='empty-widget', style={vertically_stretchable=true}},
     both = {type='empty-widget', style={horizontally_stretchable=true, vertically_stretchable=true}}
   },
-  inventory_slot_table_with_label = function(name)
-    return {type='flow', direction='vertical', children={
-      {type='label', style='caption_label', caption={'ltnm-gui.'..string_gsub(name, '_', '-')}},
-      {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-        {type='scroll-pane', style='ltnm_icon_slot_table_scroll_pane', vertical_scroll_policy='always', children={
-          {type='table', style='ltnm_icon_slot_table', column_count=6, save_as='inventory_'..name..'_table'}
-        }}
-      }}
-    }}
-  end,
   close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
     clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='close_button', save_as='titlebar.close_button'},
   mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='frame_tab'},
-  station_slot_table = function(name)
-    return {type='flow', children={
-      {type='frame', style='ltnm_station_slot_table_frame', save_as=name..'_frame', children={
-        {type='scroll-pane', style='ltnm_station_slot_table_scroll_pane', save_as=name..'_scroll_pane', children={
-          {type='table', style='ltnm_small_icon_slot_table', column_count=4, save_as=name..'_table'}
-        }}
-      }}
-    }}
-  end,
-  colored_indicator_with_value = function(name, color, value)
+  depot_status_indicator = function(name, color, value)
     return {type='flow', style={vertical_align='center'}, children={
-      {type='sprite', sprite='ltnm_indicator_'..color, save_as=name..'_circle'},
+      {type='sprite', style='ltnm_status_icon', sprite='ltnm_indicator_'..color, save_as=name..'_circle'},
       {type='label', style={font_color={}}, caption=value, save_as=name..'_label'}
     }}
   end,
-  label_with_value = function(name, label_caption, value)
-    return {type='flow', children={
-      {type='label', style='bold_label', caption=label_caption, save_as=name..'_label'},
-      {type='label', caption=value, save_as=name..'_value'}
+  station_slot_table = function(name)
+    return {type='frame', style='ltnm_station_slot_table_frame', save_as=name..'_frame', children={
+      {type='scroll-pane', style='ltnm_station_slot_table_scroll_pane', save_as=name..'_scroll_pane', children={
+        {type='table', style='ltnm_small_icon_slot_table', column_count=4, save_as=name..'_table'}
+      }}
     }}
-  end
+  end,
+  inventory = {
+    slot_table_with_label = function(name)
+      return {type='flow', direction='vertical', children={
+        {type='label', style='caption_label', caption={'ltnm-gui.'..string_gsub(name, '_', '-')}},
+        {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+          {type='scroll-pane', style='ltnm_icon_slot_table_scroll_pane', vertical_scroll_policy='always', children={
+            {type='table', style='ltnm_icon_slot_table', column_count=6, save_as='inventory.'..name..'_table'}
+          }}
+        }}
+      }}
+    end,
+    label_with_value = function(name, label_caption, value)
+      return {type='flow', style={left_margin=2, right_margin=2}, children={
+        {type='label', style='bold_label', caption={'', label_caption, ':'}, save_as=name..'_label'},
+        {template='pushers.horizontal'},
+        {type='label', caption=value, save_as=name..'_value'}
+      }}
+    end
+  }
 }
 
 -- TEMPORARY, FOR LAYOUT PROTOTYPING
@@ -153,7 +154,7 @@ function self.create(player, player_table)
           -- trains
           {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
             -- toolbar
-            {type='frame', style='subheader_frame', children={
+            {type='frame', style='ltnm_toolbar_frame', children={
               {type='flow', style={vertical_align='center', height=28, horizontal_spacing=12, left_margin=4}, children={
                 {type='label', style='caption_label', caption={'ltnm-gui.train-status'}},
                 {template='pushers.horizontal'},
@@ -167,7 +168,7 @@ function self.create(player, player_table)
         -- STATIONS
         {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.stations', children={
           -- toolbar
-          {type='frame', style={name='subheader_frame', horizontally_stretchable=true}, direction='vertical', children={
+          {type='frame', style={name='ltnm_toolbar_frame', horizontally_stretchable=true}, direction='vertical', children={
             {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
               {type='empty-widget', style={height=28}},
               {type='label', style={name='caption_label', left_margin=-8, width=220}, caption={'ltnm-gui.station-name'}},
@@ -182,7 +183,7 @@ function self.create(player, player_table)
         -- INVENTORY
         {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.inventory', children={
           -- toolbar
-          {type='frame', style='subheader_frame', direction='horizontal', children={
+          {type='frame', style={name='ltnm_toolbar_frame', height=nil}, direction='horizontal', children={
             {template='pushers.horizontal'},
             {type='button', style='tool_button', caption='ID'}
           }},
@@ -190,13 +191,13 @@ function self.create(player, player_table)
           {type='flow', style={padding=10, horizontal_spacing=10}, direction='horizontal', children={
             -- inventory tables
             {type='flow', style={padding=0}, direction='vertical', children={
-              gui.call_template('inventory_slot_table_with_label', 'available'),
-              gui.call_template('inventory_slot_table_with_label', 'requested'),
-              gui.call_template('inventory_slot_table_with_label', 'in_transit')
+              gui.call_template('inventory.slot_table_with_label', 'available'),
+              gui.call_template('inventory.slot_table_with_label', 'requested'),
+              gui.call_template('inventory.slot_table_with_label', 'in_transit')
             }},
             -- item information
-            {type='frame', style='ltnm_light_content_frame_in_light_frame', direction='vertical', children={
-              {type='frame', style='subheader_frame', direction='vertical', children={
+            {type='frame', style={name='ltnm_light_content_frame_in_light_frame', horizontally_stretchable=true, vertically_stretchable=true}, direction='vertical', children={
+              {type='frame', style='ltnm_toolbar_frame', direction='vertical', children={
                 -- icon and name
                 {type='flow', style={vertical_align='center'}, children={
                   {type='sprite', style='ltnm_material_icon', sprite='item/iron-ore'},
@@ -204,17 +205,12 @@ function self.create(player, player_table)
                   {template='pushers.horizontal'},
                 }},
                 -- info
-                {type='flow', children={
-                  gui.call_template('colored_indicator_with_value', 'available', 'signal-green', 100),
-                  {template='pushers.horizontal'},
-                  gui.call_template('colored_indicator_with_value', 'requested', 'signal-red', 100),
-                  {template='pushers.horizontal'},
-                  gui.call_template('colored_indicator_with_value', 'in_transit', 'signal-blue', 100),
-                }}
+                gui.call_template('inventory.label_with_value', 'available', {'ltnm-gui.available'}, 0),
+                gui.call_template('inventory.label_with_value', 'requested', {'ltnm-gui.requested'}, 0),
+                gui.call_template('inventory.label_with_value', 'in_transit', {'ltnm-gui.in-transit'}, 0)
               }},
-              {type='scroll-pane', 'ltnm_blank_scroll_pane', children={
-                {template='pushers.both'}
-              }}
+              {type='scroll-pane', {name='ltnm_blank_scroll_pane', horizontally_stretchable=true, vertically_stretchable=true},
+                save_as='inventory.locations_scroll_pane'}
             }}
           }}
         }},
@@ -310,7 +306,7 @@ function self.update(player, player_table, state_changes)
       end
       local status_flow = elems.status_flow
       for status_name, status_count in pairs(statuses) do
-        local output = gui.build(status_flow, gui.call_template('colored_indicator_with_value', 'indicator', status_name, status_count))
+        local output = gui.build(status_flow, gui.call_template('depot_status_indicator', 'indicator', status_name, status_count))
         elems.standard_labels[status_name] = output.indicator_label
       end
 
@@ -457,7 +453,7 @@ function self.update(player, player_table, state_changes)
           {type='flow', style={vertical_align='center', horizontal_spacing=12, left_margin=2, right_margin=2}, children={
             -- name / status
             {type='flow', style={vertical_align='center', width=220}, children={
-              {type='sprite', style={left_margin=2}, sprite='ltnm_indicator_'..t.status.name},
+              {type='sprite', style='ltnm_station_status_icon', sprite='ltnm_indicator_'..t.status.name},
               {type='label', style={left_margin=2}, caption=t.entity.backer_name}
             }},
             -- items
@@ -527,7 +523,10 @@ function self.update(player, player_table, state_changes)
   -- INVENTORY CONTENTS
   -- also not used externally
   if state_changes.inventory_contents then
+    local locations_pane = gui_data.inventory.locations_scroll_pane
+    locations_pane.clear()
 
+    
   end
 end
 
