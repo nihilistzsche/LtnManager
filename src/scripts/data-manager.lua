@@ -60,10 +60,8 @@ local self = {}
       status
         name (string)
         count (int)
-  stations_by_network
-    (dictionary of network_id -> array of train_id)
   inventory
-    available
+    provided
       [network_id]
         (dictionary of name -> count)
     requested
@@ -95,6 +93,15 @@ local self = {}
     (TBD)
   alerts
     (TBD)
+  -- lookup tables - included in output
+  network_to_stations
+    (dictionary of network_id -> array of train_id)
+  material_locations
+    [material_name]
+      stations
+        (array of station_id)
+      trains
+        (array of train_id)
   -- working data - excluded from output
   provided_by_stop
   requested_by_stop
@@ -115,17 +122,15 @@ local function iterate_stations()
 
   local depots = data.depots
   local stations = data.stations
-  local stations_by_network = data.stations_by_network
   local station_ids = data.station_ids
   local num_stations = data.num_stations
   local trains = data.trains
+  
+  local network_to_stations = data.network_to_stations
+  local material_locations = data.material_locations
 
-  local inv_available = data.inventory.available
-  local inv_requested = data.inventory.requested
-  local inv_in_transit = data.inventory.in_transit
+  local inventory = data.inventory
 
-  local provided_by_stop = data.provided_by_stop
-  local requested_by_stop = data.requested_by_stop
   local deliveries = data.deliveries
   local available_trains = data.available_trains
   
@@ -141,11 +146,11 @@ local function iterate_stations()
     if not station then error('Station ID mismatch') end
 
     -- add station to by-network lookup
-    local network_stations = stations_by_network[network_id]
+    local network_stations = network_to_stations[network_id]
     if network_stations then
       network_stations[#network_stations+1] = station_id
     else
-      stations_by_network[network_id] = {station_id}
+      network_to_stations[network_id] = {station_id}
     end
 
     -- get status
@@ -191,29 +196,28 @@ local function iterate_stations()
       end
     end
 
-    -- process station items
-    local provided = provided_by_stop[station_id]
-    if provided then
-      -- add to station
-      station.provided = provided
-      -- add to network
-      local inventory = inv_available[network_id]
-      if not inventory then
-        inv_available[network_id] = provided
-      else
-        inventory = util.add_materials(provided, inventory)
-      end
-    end
-    local requested = requested_by_stop[station_id]
-    if requested then
-      -- add to station
-      station.requested = requested
-      -- add to network
-      local inventory = inv_requested[network_id]
-      if not inventory then
-        inv_available[network_id] = requested
-      else
-        inventory = util.add_materials(requested, inventory)
+    -- process station materials
+    for _,mode in ipairs{'provided', 'requested'} do
+      local materials = data[mode..'_by_stop'][station_id]
+      if materials then
+        -- add to station
+        station[mode] = materials
+        -- add to network
+        local inv = inventory[mode][network_id]
+        if not inv then
+          inventory[mode][network_id] = materials
+        else
+          inv = util.add_materials(materials, inv)
+        end
+        -- add to lookup
+        for name,_ in pairs(materials) do
+          local locations = material_locations[name]
+          if not locations then
+            material_locations[name] = {stations={station_id}, trains={}}
+          else
+            locations.stations[#locations.stations+1] = station_id
+          end
+        end
       end
     end
 
@@ -243,8 +247,19 @@ local function iterate_data()
   elseif step == 2 then
     -- process in transit items
     local in_transit = data.inventory.in_transit
-    for _,t in pairs(data.deliveries) do
+    local material_locations = data.material_locations
+    for id,t in pairs(data.deliveries) do
+      -- add to in transit inventory
       in_transit[t.network_id] = util.add_materials(t.shipment, in_transit[t.network_id] or {})
+      -- sort items into locations
+      for name,count in pairs(t.shipment) do
+        local locations = material_locations[name]
+        if not locations then
+          material_locations[name] = {stations={}, trains={id}}
+        else
+          locations.trains[#locations.trains+1] = id
+        end
+      end
     end
     -- next step
     data.step = 100
@@ -252,11 +267,12 @@ local function iterate_data()
     global.data = {
       depots = data.depots,
       stations = data.stations,
-      stations_by_network = data.stations_by_network,
       inventory = data.inventory,
       trains = data.trains,
       history = data.history,
-      alerts = data.alerts
+      alerts = data.alerts,
+      network_to_stations = data.network_to_stations,
+      material_locations = data.material_locations
     }
     global.working_data = nil
     -- reset events
@@ -291,15 +307,17 @@ function on_dispatcher_updated(e)
     -- output tables
     depots = {},
     stations = stations,
-    stations_by_network = {},
     inventory = {
-      available = {},
+      provided = {},
       requested = {},
       in_transit = {}
     },
     trains = {},
     history = {},
     alerts = {},
+    -- lookup tables
+    network_to_stations = {},
+    material_locations = {},
     -- data tables
     station_ids = station_ids,
     num_stations = station_index,
