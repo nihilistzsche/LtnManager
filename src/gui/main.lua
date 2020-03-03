@@ -25,8 +25,8 @@ gui.add_templates{
     both = {type='empty-widget', style={horizontally_stretchable=true, vertically_stretchable=true}}
   },
   close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
-    clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='close_button', save_as='titlebar.close_button'},
-  mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='frame_tab'},
+    clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='titlebar.close_button', save_as='titlebar.close_button'},
+  mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='titlebar.frame_tab'},
   depot_status_indicator = function(name, color, value)
     return {type='flow', style={vertical_align='center'}, children={
       {type='sprite', style='ltnm_status_icon', sprite='ltnm_indicator_'..color, save_as=name..'_circle'},
@@ -96,28 +96,40 @@ local function update_active_tab(player, player_table, name)
 end
 
 gui.add_handlers('main', {
-  close_button = {
-    on_gui_click = function(e)
-      self.destroy(game.get_player(e.player_index), global.players[e.player_index])
-    end
+  titlebar = {
+    frame_tab = {
+      on_gui_click = function(e)
+        local name = e.default_tab or string_gsub(e.element.caption[1], 'ltnm%-gui%.', '')
+        update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
+      end
+    },
+    close_button = {
+      on_gui_click = function(e)
+        self.destroy(game.get_player(e.player_index), global.players[e.player_index])
+      end
+    },
+    refresh_button = {
+      on_gui_click = function(e)
+        local player_table = global.players[e.player_index]
+        update_active_tab(game.get_player(e.player_index), global.players[e.player_index], player_table.gui.main.tabbed_pane.selected)
+      end
+    }
   },
-  depot_button = {
-    on_gui_click = function(e)
-      local _,_,name = string_find(e.element.name, '^ltnm_depot_button_(.*)$')
-      self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
-    end
+  depots = {
+    depot_button = {
+      on_gui_click = function(e)
+        local _,_,name = string_find(e.element.name, '^ltnm_depot_button_(.*)$')
+        self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
+      end
+    }
   },
-  frame_tab = {
-    on_gui_click = function(e)
-      local name = e.default_tab or string_gsub(e.element.caption[1], 'ltnm%-gui%.', '')
-      update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
-    end
-  },
-  refresh_button = {
-    on_gui_click = function(e)
-      local player_table = global.players[e.player_index]
-      update_active_tab(game.get_player(e.player_index), global.players[e.player_index], player_table.gui.main.tabbed_pane.selected)
-    end
+  inventory = {
+    material_button = {
+      on_gui_click = function(e)
+        local _,_,name = string_find(e.element.name, '^ltnm_inventory_slot_button_(.*)$')
+        self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_material=name})
+      end
+    }
   }
 })
 
@@ -138,7 +150,7 @@ function self.create(player, player_table)
           {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
             save_as='titlebar.drag_handle'},
           {template='close_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black', clicked_sprite='ltnm_refresh_black',
-            tooltip={'ltnm-gui.refresh-current-tab'}, handlers='refresh_button', save_as='titlebar.refresh_button'},
+            tooltip={'ltnm-gui.refresh-current-tab'}, handlers='titlebar.refresh_button', save_as='titlebar.refresh_button'},
           {template='close_button'}
         }}
       }},
@@ -228,8 +240,11 @@ function self.create(player, player_table)
 
   player_table.gui.main = gui_data
 
+  -- other handlers
+  gui.register_handlers('main', 'inventory.material_button', {player_index=player.index, gui_filters='ltnm_inventory_slot_button_'})
+
   -- set initial contents
-  gui.call_handler('main.frame_tab.on_gui_click', {name=defines.events.on_gui_click, tick=game.tick, player_index=player.index, default_tab='depots'})
+  gui.call_handler('main.titlebar.frame_tab.on_gui_click', {name=defines.events.on_gui_click, tick=game.tick, player_index=player.index, default_tab='depots'})
 end
 
 -- completely destroys the GUI
@@ -267,7 +282,7 @@ function self.update(player, player_table, state_changes)
     local buttons_table = gui_data.depots.buttons_table
     -- delete old buttons and deregister handler
     buttons_table.clear()
-    gui.deregister_handlers('main', 'depot_button', player.index)
+    gui.deregister_handlers('main', 'depots.depot_button', player.index)
 
     local buttons_data = {}
 
@@ -286,7 +301,7 @@ function self.update(player, player_table, state_changes)
     for name,t in pairs(data.depots) do
       button_index = button_index + 1
       local elems = gui.build(buttons_table, 'main', player.index,
-        {type='button', name='ltnm_depot_button_'..name, style=button_style, handlers='depot_button', save_as='button', children={
+        {type='button', name='ltnm_depot_button_'..name, style=button_style, handlers='depots.depot_button', save_as='button', children={
           {type='flow', ignored_by_interaction=true, direction='vertical', children={
             {type='label', style={name='caption_label', font_color={28, 28, 28}}, caption=name, save_as='name_label'},
             {type='flow', direction='horizontal', children={
@@ -524,6 +539,8 @@ function self.update(player, player_table, state_changes)
   -- also not used externally
   if state_changes.inventory_contents then
     local inventory = data.inventory
+    gui_data.inventory.material_buttons = {}
+    local buttons = gui_data.inventory.material_buttons
     for type,color in pairs{provided='green', requested='red', in_transit='blue'} do
       -- combine materials (temporary until network filters become a thing)
       local combined_materials = {}
@@ -534,10 +551,39 @@ function self.update(player, player_table, state_changes)
       local table = gui_data.inventory[type..'_table']
       table.clear()
       local add = table.add
+      local elems = {}
       for name,count in pairs(combined_materials) do
-        add{type='sprite-button', style='ltnm_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
+        elems[name] = add{type='sprite-button', name='ltnm_inventory_slot_button_'..name, style='ltnm_slot_button_'..color,
+          sprite=string_gsub(name, ',', '/'), number=count}
+      end
+      buttons[type] = elems
+    end
+    -- remove previous selection since the buttons are no longer glowing
+    state_changes.selected_material = state_changes.selected_material or gui_data.inventory.selected
+    gui_data.inventory.selected = nil
+  end
+
+  -- SELECTED MATERIAL
+  if state_changes.selected_material then
+    -- set selected button glow
+    local inventory_gui_data = gui_data.inventory
+    for _,type in ipairs{'provided', 'requested', 'in_transit'} do
+      local buttons = inventory_gui_data.material_buttons[type]
+      -- deselect previous button
+      local button = buttons[inventory_gui_data.selected]
+      if button then
+        button.style = string_gsub(button.style.name, 'ltnm_active_', 'ltnm_')
+        button.ignored_by_interaction = false
+      end
+      -- select new button
+      button = buttons[state_changes.selected_material]
+      if button then
+        button.style = string_gsub(button.style.name, 'ltnm_', 'ltnm_active_')
+        button.ignored_by_interaction = true
       end
     end
+    -- save selection to global
+    inventory_gui_data.selected = state_changes.selected_material
   end
 end
 
