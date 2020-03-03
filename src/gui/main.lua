@@ -191,7 +191,7 @@ function self.create(player, player_table)
           {type='flow', style={padding=10, horizontal_spacing=10}, direction='horizontal', children={
             -- inventory tables
             {type='flow', style={padding=0}, direction='vertical', children={
-              gui.call_template('inventory.slot_table_with_label', 'available'),
+              gui.call_template('inventory.slot_table_with_label', 'provided'),
               gui.call_template('inventory.slot_table_with_label', 'requested'),
               gui.call_template('inventory.slot_table_with_label', 'in_transit')
             }},
@@ -200,12 +200,12 @@ function self.create(player, player_table)
               {type='frame', style='ltnm_toolbar_frame', direction='vertical', children={
                 -- icon and name
                 {type='flow', style={vertical_align='center'}, children={
-                  {type='sprite', style='ltnm_material_icon', sprite='item/iron-ore'},
-                  {type='label', style={name='caption_label', left_margin=2}, caption={'item-name.iron-ore'}},
+                  {type='sprite', style='ltnm_material_icon', sprite='item-group/intermediate-products'},
+                  {type='label', style={name='caption_label', left_margin=2}, caption={'ltnm-gui.choose-an-item'}},
                   {template='pushers.horizontal'},
                 }},
                 -- info
-                gui.call_template('inventory.label_with_value', 'available', {'ltnm-gui.available'}, 0),
+                gui.call_template('inventory.label_with_value', 'provided', {'ltnm-gui.provided'}, 0),
                 gui.call_template('inventory.label_with_value', 'requested', {'ltnm-gui.requested'}, 0),
                 gui.call_template('inventory.label_with_value', 'in_transit', {'ltnm-gui.in-transit'}, 0)
               }},
@@ -523,29 +523,22 @@ function self.update(player, player_table, state_changes)
   -- INVENTORY CONTENTS
   -- also not used externally
   if state_changes.inventory_contents then
-    local locations_pane = gui_data.inventory.locations_scroll_pane
-    locations_pane.clear()
-
-    
+    local inventory = data.inventory
+    for type,color in pairs{provided='green', requested='red', in_transit='blue'} do
+      -- combine materials (temporary until network filters become a thing)
+      local combined_materials = {}
+      for _,materials in pairs(inventory[type]) do
+        combined_materials = util.add_materials(materials, combined_materials)
+      end
+      -- add to table
+      local table = gui_data.inventory[type..'_table']
+      table.clear()
+      local add = table.add
+      for name,count in pairs(combined_materials) do
+        add{type='sprite-button', style='ltnm_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
+      end
+    end
   end
 end
 
 return self
-
---[[
-  -- INVENTORY
-  local inventory = data.inventory
-  for type,color in pairs{available='green', requested='red', in_transit='blue'} do
-    -- combine materials
-    local combined_materials = {}
-    for _,materials in pairs(inventory[type]) do
-      combined_materials = util.add_materials(materials, combined_materials)
-    end
-    -- add to table
-    local table = gui_data['inventory_'..type..'_table']
-    local add = table.add
-    for name,count in pairs(combined_materials) do
-      add{type='sprite-button', style='ltnm_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
-    end
-  end
-]]
