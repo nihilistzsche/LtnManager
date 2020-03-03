@@ -399,6 +399,17 @@ styles.ltnm_combinator_button_frame = {
 }
 
 -- -----------------------------------------------------------------------------
+-- IMAGE STYLES
+
+styles.ltnm_material_icon = {
+  type = 'image_style',
+  stretch_image_to_widget_size = true,
+  size = 28,
+  padding = 2,
+  left_margin = 2
+}
+
+-- -----------------------------------------------------------------------------
 -- SCROLL PANE STYLES
 
 styles.ltnm_blank_scroll_pane = {

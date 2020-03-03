@@ -45,6 +45,18 @@ gui.add_templates{
         }}
       }}
     }}
+  end,
+  colored_indicator_with_value = function(name, color, value)
+    return {type='flow', style={vertical_align='center'}, children={
+      {type='sprite', sprite='ltnm_indicator_'..color, save_as=name..'_circle'},
+      {type='label', style={font_color={}}, caption=value, save_as=name..'_label'}
+    }}
+  end,
+  label_with_value = function(name, label_caption, value)
+    return {type='flow', children={
+      {type='label', style='bold_label', caption=label_caption, save_as=name..'_label'},
+      {type='label', caption=value, save_as=name..'_value'}
+    }}
   end
 }
 
@@ -76,6 +88,8 @@ local function update_active_tab(player, player_table, name)
     changes.selected_depot = player_table.gui.main.depots.selected or true
   elseif name == 'stations' then
     changes.stations_list = true
+  elseif name == 'inventory' then
+    changes.inventory_contents = true
   end
   self.update(player, player_table, changes)
 end
@@ -181,44 +195,25 @@ function self.create(player, player_table)
               gui.call_template('inventory_slot_table_with_label', 'in_transit')
             }},
             -- item information
-            {type='flow', direction='vertical', children={
-              {type='table', style='bordered_table', column_count=1, children={
-                {type='flow', style={vertical_align='center'}, direction='horizontal', children={
-                  {type='sprite', style='ltnm_inventory_selected_icon', sprite='item/iron-ore'},
-                  {type='label', style='bold_label', caption='Iron ore'},
-                  {template='pushers.horizontal'}
+            {type='frame', style='ltnm_light_content_frame_in_light_frame', direction='vertical', children={
+              {type='frame', style='subheader_frame', direction='vertical', children={
+                -- icon and name
+                {type='flow', style={vertical_align='center'}, children={
+                  {type='sprite', style='ltnm_material_icon', sprite='item/iron-ore'},
+                  {type='label', style={name='caption_label', left_margin=2}, caption={'item-name.iron-ore'}},
+                  {template='pushers.horizontal'},
+                }},
+                -- info
+                {type='flow', children={
+                  gui.call_template('colored_indicator_with_value', 'available', 'signal-green', 100),
+                  {template='pushers.horizontal'},
+                  gui.call_template('colored_indicator_with_value', 'requested', 'signal-red', 100),
+                  {template='pushers.horizontal'},
+                  gui.call_template('colored_indicator_with_value', 'in_transit', 'signal-blue', 100),
                 }}
               }},
-              {type='label', style='caption_label', caption={'ltnm-gui.stations'}},
-              {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-                {type='scroll-pane', style='ltnm_blank_scroll_pane', children={
-                  -- demoing frame GUI structure
-                  {type='frame', style='ltnm_station_items_frame', direction='vertical', children={
-                    -- labels / info
-                    {type='flow', direction='horizontal', children={
-                      {type='label', style='bold_label', caption='Lorem ipsum'},
-                      {template='pushers.horizontal'},
-                      {type='label', caption='[font=default-bold]ID: [/font]3'}
-                    }},
-                    -- provided / requested
-                    {type='table', style={horizontal_spacing=2, vertical_spacing=2}, column_count=8, children=gui.call_template('demo_station_contents')}
-                  }}
-                }}
-              }},
-              {type='label', style='caption_label', caption={'ltnm-gui.deliveries'}},
-              {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-                {type='scroll-pane', style='ltnm_blank_scroll_pane', children={
-                  -- demoing frame GUI structure
-                  {type='frame', style='ltnm_station_items_frame', direction='vertical', children={
-                    -- labels / info
-                    {type='flow', direction='horizontal', children={
-                      {type='label', style='bold_label', caption='Lorem ipsum  ->  Dolor sit amet'},
-                      {template='pushers.horizontal'}
-                    }},
-                    -- provided / requested
-                    {type='table', style={horizontal_spacing=2, vertical_spacing=2}, column_count=8, children=gui.call_template('demo_station_contents')}
-                  }}
-                }}
+              {type='scroll-pane', 'ltnm_blank_scroll_pane', children={
+                {template='pushers.both'}
               }}
             }}
           }}
@@ -315,13 +310,8 @@ function self.update(player, player_table, state_changes)
       end
       local status_flow = elems.status_flow
       for status_name, status_count in pairs(statuses) do
-        local output = gui.build(status_flow,
-          {type='flow', style={vertical_align='center'}, children={
-            {type='sprite', sprite='ltnm_indicator_'..status_name},
-            {type='label', style={font_color={}}, caption=status_count, save_as='label'}
-          }}
-        )
-        elems.standard_labels[status_name] = output.label
+        local output = gui.build(status_flow, gui.call_template('colored_indicator_with_value', 'indicator', status_name, status_count))
+        elems.standard_labels[status_name] = output.indicator_label
       end
 
       -- add elems to button table
@@ -533,82 +523,17 @@ function self.update(player, player_table, state_changes)
 
     stations_pane.children[#stations_pane.children].destroy()
   end
+
+  -- INVENTORY CONTENTS
+  -- also not used externally
+  if state_changes.inventory_contents then
+
+  end
 end
 
 return self
 
 --[[
-  -- STATIONS
-  do
-    local pane = gui_data.stations_scroll_pane
-    local stations = global.data.stations
-    for id,t in pairs(stations) do
-      if not t.isDepot then
-        -- get lamp color
-        local color = t.lampControl.get_circuit_network(defines.wire_type.red).signals[1].signal.name
-        local frame = pane.add{type='frame', style='ltnm_station_row_frame', direction='horizontal'}
-        -- name
-        local name_flow = frame.add{type='flow', direction='horizontal'}
-        name_flow.style.vertical_align = 'center'
-        name_flow.style.width = 220
-        name_flow.add{type='sprite', sprite='ltnm_indicator_'..color}.style.left_margin = 2
-        name_flow.add{type='label', caption=t.entity.backer_name}.style.left_margin = 2
-        -- items
-        do
-          local table = frame.add{type='table', column_count=5}
-          table.style.horizontal_spacing = 2
-          table.style.vertical_spacing = 2
-          table.style.width = 168
-          local i = 0
-          if t.available then
-            local materials = t.available
-            for name,count in pairs(materials) do
-              i = i + 1
-              table.add{type='sprite-button', style='ltnm_bordered_slot_button_green', sprite=string_gsub(name, ',', '/'), number=count}
-            end
-          end
-          if t.requests then
-            local materials = t.requests
-            for name,count in pairs(materials) do
-              i = i + 1
-              table.add{type='sprite-button', style='ltnm_bordered_slot_button_red', sprite=string_gsub(name, ',', '/'), number=-count}
-            end
-          end
-          if i%5 ~= 0 or i == 0 then
-            for _=1,5-(i%5) do
-              table.add{type='sprite-button', style='ltnm_bordered_slot_button_dark_grey'}
-            end
-          end
-        end
-        -- active deliveries
-        do
-          local deliveries = data.deliveries
-          local combined_shipment = {}
-          for _,delivery_id in ipairs(t.activeDeliveries) do
-            local delivery = deliveries[delivery_id]
-            combined_shipment = util.add_materials(delivery.shipment, combined_shipment)
-          end
-          local table = frame.add{type='table', column_count=4}
-          table.style.horizontal_spacing = 2
-          table.style.vertical_spacing = 2
-          table.style.width = 134
-          local i = 0
-          for name,count in pairs(combined_shipment) do
-            i = i + 1
-            table.add{type='sprite-button', style='ltnm_bordered_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
-          end
-          if i%4 ~= 0 or i == 0 then
-            for _=1,4-(i%4) do
-              table.add{type='sprite-button', style='ltnm_bordered_slot_button_dark_grey'}
-            end
-          end
-        end
-        -- ltn combinator button
-        frame.add{type='sprite-button', style='ltnm_bordered_slot_button_dark_grey', sprite='item/constant-combinator'}
-      end
-    end
-  end
-
   -- INVENTORY
   local inventory = data.inventory
   for type,color in pairs{available='green', requested='red', in_transit='blue'} do
