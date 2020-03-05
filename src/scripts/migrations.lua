@@ -1,16 +1,14 @@
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- MIGRATIONS
 
-local migrations = require('lualib/migrations')
+local migration = require('__RaiLuaLib__.lualib.migration')
 
 -- table of migration functions
-local migration_functions = {}
+local migrations = {}
 
 -- run the migrations
 return function(e)
-  if migrations.on_config_changed(e, migration_functions) then
-    -- generic migrations
-    log('Applying generic migrations')
-    -- add migrations here...
+  if migration.on_config_changed(e, migrations) then
+    -- add generic migrations here...
   end
 end

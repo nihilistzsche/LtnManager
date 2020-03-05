@@ -3,10 +3,10 @@
 -- The main GUI for the mod
 
 -- dependencies
-local constants = require('scripts/constants')
-local event = require('lualib/event')
-local gui = require('lualib/gui')
-local util = require('scripts/util')
+local constants = require('scripts.constants')
+local event = require('__RaiLuaLib__.lualib.event')
+local gui = require('__RaiLuaLib__.lualib.gui')
+local util = require('scripts.util')
 
 -- locals
 local string_find = string.find
@@ -99,6 +99,7 @@ gui.add_handlers('main', {
   titlebar = {
     frame_tab = {
       on_gui_click = function(e)
+        log('click!')
         local name = e.default_tab or string_gsub(e.element.caption[1], 'ltnm%-gui%.', '')
         update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
       end

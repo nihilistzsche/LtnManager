@@ -4,8 +4,8 @@
 -- This script is the only place to touch LTN data, the rest of the mod uses the data that this script produces.
 
 -- dependencies
-local event = require('lualib/event')
-local util = require('scripts/util')
+local event = require('__RaiLuaLib__.lualib.event')
+local util = require('scripts.util')
 
 -- locals
 local ltn_event_ids = {}

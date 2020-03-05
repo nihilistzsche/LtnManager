@@ -1,20 +1,17 @@
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- CONTROL SCRIPTING
 
--- debug adapter
-pcall(require,'__debugadapter__/debugadapter.lua')
-
 -- dependencies
-local event = require('lualib/event')
+local event = require('__RaiLuaLib__.lualib.event')
 local mod_gui = require('mod-gui')
 
 -- scripts
-local data_manager = require('scripts/data-manager')
-local main_gui = require('gui/main')
-local migrations = require('scripts/migrations')
+local data_manager = require('scripts.data-manager')
+local main_gui = require('gui.main')
+local migrations = require('scripts.migrations')
 
 -- -----------------------------------------------------------------------------
--- PROTOTYPING
+-- INIT
 
 local function setup_player(player, index)
   global.players[index] = {

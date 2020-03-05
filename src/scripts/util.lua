@@ -1,7 +1,7 @@
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- CONTROL STAGE UTILITIES
 
-local util = require('__core__/lualib/util')
+local util = require('__core__.lualib.util')
 
 -- adds the contents of two material tables together
 -- t1 contains the items we are adding into the table, t2 will be returned
