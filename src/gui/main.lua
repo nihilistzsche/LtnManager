@@ -36,7 +36,7 @@ gui.add_templates{
   station_slot_table = function(name)
     return {type='frame', style='ltnm_station_slot_table_frame', save_as=name..'_frame', children={
       {type='scroll-pane', style='ltnm_station_slot_table_scroll_pane', save_as=name..'_scroll_pane', children={
-        {type='table', style='ltnm_small_icon_slot_table', column_count=4, save_as=name..'_table'}
+        {type='table', style='ltnm_small_slot_table', column_count=4, save_as=name..'_table'}
       }}
     }}
   end,
@@ -45,17 +45,17 @@ gui.add_templates{
       return {type='flow', direction='vertical', children={
         {type='label', style='caption_label', caption={'ltnm-gui.'..string_gsub(name, '_', '-')}},
         {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-          {type='scroll-pane', style='ltnm_icon_slot_table_scroll_pane', vertical_scroll_policy='always', children={
-            {type='table', style='ltnm_icon_slot_table', column_count=6, save_as='inventory.'..name..'_table'}
+          {type='scroll-pane', style='ltnm_slot_table_scroll_pane', vertical_scroll_policy='always', children={
+            {type='table', style='ltnm_inventory_slot_table', column_count=6, save_as='inventory.'..name..'_table'}
           }}
         }}
       }}
     end,
     label_with_value = function(name, label_caption, value)
       return {type='flow', style={left_margin=2, right_margin=2}, children={
-        {type='label', style='bold_label', caption={'', label_caption, ':'}, save_as=name..'_label'},
+        {type='label', style='bold_label', caption={'', label_caption, ':'}, save_as='inventory.info_pane.'..name..'_label'},
         {template='pushers.horizontal'},
-        {type='label', caption=value, save_as=name..'_value'}
+        {type='label', caption=value, save_as='inventory.info_pane.'..name..'_value'}
       }}
     end
   }
@@ -213,8 +213,8 @@ function self.create(player, player_table)
               {type='frame', style='ltnm_toolbar_frame', direction='vertical', children={
                 -- icon and name
                 {type='flow', style={vertical_align='center'}, children={
-                  {type='sprite', style='ltnm_material_icon', sprite='item-group/intermediate-products'},
-                  {type='label', style={name='caption_label', left_margin=2}, caption={'ltnm-gui.choose-an-item'}},
+                  {type='sprite', style='ltnm_material_icon', sprite='item-group/intermediate-products', save_as='inventory.info_pane.icon'},
+                  {type='label', style={name='caption_label', left_margin=2}, caption={'ltnm-gui.choose-an-item'}, save_as='inventory.info_pane.name'},
                   {template='pushers.horizontal'},
                 }},
                 -- info
@@ -222,7 +222,7 @@ function self.create(player, player_table)
                 gui.call_template('inventory.label_with_value', 'requested', {'ltnm-gui.requested'}, 0),
                 gui.call_template('inventory.label_with_value', 'in_transit', {'ltnm-gui.in-transit'}, 0)
               }},
-              {type='scroll-pane', {name='ltnm_blank_scroll_pane', horizontally_stretchable=true, vertically_stretchable=true},
+              {type='scroll-pane', style={name='ltnm_material_locations_scroll_pane', horizontally_stretchable=true, vertically_stretchable=true},
                 save_as='inventory.locations_scroll_pane'}
             }}
           }}
@@ -397,8 +397,8 @@ function self.update(player, player_table, state_changes)
             save_as='status_flow'},
           {type='flow', style={padding=0, margin=0}, save_as='composition_flow'},
           {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-            {type='scroll-pane', style='ltnm_small_icon_slot_table_scroll_pane', children={
-              {type='table', style='ltnm_small_icon_slot_table', column_count=4, save_as='contents_table'}
+            {type='scroll-pane', style='ltnm_train_slot_table_scroll_pane', children={
+              {type='table', style='ltnm_small_slot_table', column_count=4, save_as='contents_table'}
             }}
           }}
         }}
@@ -583,8 +583,101 @@ function self.update(player, player_table, state_changes)
         button.ignored_by_interaction = true
       end
     end
+
     -- save selection to global
     inventory_gui_data.selected = state_changes.selected_material
+
+    -- basic material info
+    local _, _, material_type, material_name = string_find(state_changes.selected_material, '(.*),(.*)')
+    local info_pane = inventory_gui_data.info_pane
+    info_pane.icon.sprite = material_type..'/'..material_name
+    info_pane.name.caption = game[material_type..'_prototypes'][material_name].localised_name
+
+    -- TODO: available/requested/in transit numbers (requires some data manager processing)
+
+    -- set up scroll pane and locals
+    local locations_pane = inventory_gui_data.locations_scroll_pane
+    locations_pane.clear()
+    local pane_add = locations_pane.add
+    local locations = data.material_locations[state_changes.selected_material]
+
+    -- stations
+    local stations = data.stations
+    local station_ids = locations.stations
+    if #station_ids > 0 then
+      gui.build(locations_pane,
+        {type='flow', children={
+          {type='label', style='caption_label', caption={'ltnm-gui.stations'}},
+          {template='pushers.horizontal'}
+        }}
+      )
+      pane_add{type='line', style='ltnm_material_locations_line', direction='horizontal'}
+      for i=1,#station_ids do
+        local station = stations[station_ids[i]]
+        if station then
+          local materials_table = gui.build(locations_pane,
+            {type='flow', direction='vertical', children={
+              {type='label', style='bold_label', caption=station.entity.backer_name},
+              {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+                {type='scroll-pane', style='ltnm_material_location_slot_table_scroll_pane', children={
+                  {type='table', style='ltnm_small_slot_table', column_count=8, save_as='table'}
+                }}
+              }}
+            }}
+          ).table
+          local table_add = materials_table.add
+          for mode,color in pairs{provided='green', requested='red'} do
+            local materials = station[mode]
+            if materials then
+              for name,count in pairs(materials) do
+                table_add{type='sprite-button', style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
+              end
+            end
+          end
+          pane_add{type='line', style='ltnm_material_locations_line', direction='horizontal'}
+        else
+          error('Could not find station of ID: '..station_ids[i])
+        end
+      end
+    end
+
+    -- stations
+    local trains = data.trains
+    local train_ids = locations.trains
+    if #train_ids > 0 then
+      gui.build(locations_pane,
+        {type='flow', children={
+          {type='label', style='caption_label', caption={'ltnm-gui.trains'}},
+          {template='pushers.horizontal'}
+        }}
+      )
+      pane_add{type='line', style='ltnm_material_locations_line', direction='horizontal'}
+      for i=1,#train_ids do
+        local train = trains[train_ids[i]]
+        if train then
+          local materials_table = gui.build(locations_pane,
+            {type='flow', direction='vertical', children={
+              {type='label', style='bold_label', caption=train.from..'  ->  '..train.to},
+              {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+                {type='scroll-pane', style='ltnm_material_location_slot_table_scroll_pane', children={
+                  {type='table', style='ltnm_small_slot_table', column_count=8, save_as='table'}
+                }}
+              }}
+            }}
+          ).table
+          local table_add = materials_table.add
+          local materials = train.shipment
+          if materials then
+            for name,count in pairs(materials) do
+              table_add{type='sprite-button', style='ltnm_small_slot_button_blue', sprite=string_gsub(name, ',', '/'), number=count}
+            end
+          end
+          pane_add{type='line', style='ltnm_material_locations_line', direction='horizontal'}
+        else
+          error('Could not find train of ID: '..train_ids[i])
+        end
+      end
+    end
   end
 end
 

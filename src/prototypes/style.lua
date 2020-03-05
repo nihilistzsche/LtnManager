@@ -442,6 +442,18 @@ styles.ltnm_station_status_icon = {
 }
 
 -- -----------------------------------------------------------------------------
+-- LINE STYLES
+
+styles.ltnm_material_locations_line = {
+  type = 'line_style',
+  top_padding = 2,
+  bottom_padding = 4,
+  left_padding = -4,
+  right_padding = -4,
+  horizontally_stretchable = 'on'
+}
+
+-- -----------------------------------------------------------------------------
 -- SCROLL PANE STYLES
 
 styles.ltnm_blank_scroll_pane = {
@@ -488,13 +500,14 @@ styles.ltnm_depots_scroll_pane_for_scrollbar = {
   }
 }
 
-styles.ltnm_icon_slot_table_scroll_pane = {
+styles.ltnm_slot_table_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_blank_scroll_pane',
   padding = 0,
   margin = 0,
   extra_padding_when_activated = 0,
   height = 160,
+  horizontally_squashable = 'off',
   background_graphical_set = {
     base = {
       position = {282, 17},
@@ -509,15 +522,14 @@ styles.ltnm_icon_slot_table_scroll_pane = {
   }
 }
 
-styles.ltnm_small_icon_slot_table_scroll_pane = {
+styles.ltnm_small_slot_table_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_blank_scroll_pane',
   padding = 0,
   margin = 0,
   extra_padding_when_activated = 0,
   minimal_height = 36,
-  maximal_height = 72,
-  minimal_width = 144,
+  horizontally_squashable = 'off',
   background_graphical_set = {
     base = {
       position = {282, 17},
@@ -532,11 +544,18 @@ styles.ltnm_small_icon_slot_table_scroll_pane = {
   }
 }
 
+styles.ltnm_train_slot_table_scroll_pane = {
+  type = 'scroll_pane_style',
+  parent = 'ltnm_small_slot_table_scroll_pane',
+  minimal_width = 144,
+  maximal_height = 72
+}
+
 styles.ltnm_station_slot_table_scroll_pane = {
   type = 'scroll_pane_style',
-  parent = 'ltnm_small_icon_slot_table_scroll_pane',
-  maximal_height = 108,
-  horizontally_squashable = 'off'
+  parent = 'ltnm_small_slot_table_scroll_pane',
+  minimal_width = 144,
+  maximal_height = 108
 }
 
 styles.ltnm_stations_scroll_pane = {
@@ -555,6 +574,23 @@ styles.ltnm_trains_scroll_pane = {
   extra_right_padding_when_activated = -12
 }
 
+styles.ltnm_material_locations_scroll_pane = {
+  type = 'scroll_pane_style',
+  parent = 'ltnm_blank_scroll_pane',
+  vertical_flow_style = {
+    type = 'vertical_flow_style',
+    padding = 6,
+    horizontal_align = 'center'
+  }
+}
+
+styles.ltnm_material_location_slot_table_scroll_pane = {
+  type = 'scroll_pane_style',
+  parent = 'ltnm_small_slot_table_scroll_pane',
+  minimal_width = 288,
+  maximal_height = 228
+}
+
 -- -----------------------------------------------------------------------------
 -- SPRITE STYLES
 
@@ -568,18 +604,22 @@ styles.ltnm_inventory_selected_icon = {
 -- -----------------------------------------------------------------------------
 -- TABLE STYLES
 
-styles.ltnm_icon_slot_table = {
+styles.ltnm_slot_table = {
   type = 'table_style',
   parent = 'slot_table',
   horizontal_spacing = 0,
-  vertical_spacing = 0,
+  vertical_spacing = 0
+}
+
+styles.ltnm_inventory_slot_table = {
+  type = 'table_style',
+  parent = 'ltnm_slot_table',
   width = 240
 }
 
-styles.ltnm_small_icon_slot_table = {
+styles.ltnm_small_slot_table = {
   type = 'table_style',
-  parent = 'ltnm_icon_slot_table',
-  width = 144,
+  parent = 'ltnm_slot_table',
   minimal_height = 36
 }
 
@@ -588,4 +628,10 @@ styles.ltnm_depots_table = {
   horizontal_spacing = 0,
   vertical_spacing = 0,
   padding = 0
+}
+
+styles.ltnm_material_locations_table = {
+  type = 'table_style',
+  parent = 'bordered_table',
+  bottom_cell_padding = 8
 }
