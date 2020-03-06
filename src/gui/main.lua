@@ -241,10 +241,10 @@ function self.create(player, player_table)
         {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.history', children={
           -- toolbar
           {type='frame', style='ltnm_toolbar_frame', children={
-            {type='label', style='caption_label', caption={'ltnm-gui.depot'}},
+            {type='label', style={name='caption_label', width=140, left_margin=4}, caption={'ltnm-gui.depot'}},
             {type='label', style='caption_label', caption={'ltnm-gui.route'}},
             {template='pushers.horizontal'},
-            {type='label', style='caption_label', caption={'ltnm-gui.runtime'}},
+            {type='label', style={name='caption_label', right_margin=8}, caption={'ltnm-gui.runtime'}},
             {type='label', style={name='caption_label', width=116}, caption={'ltnm-gui.shipment'}},
             {type='sprite-button', style='red_icon_button', sprite='utility/trash', tooltip={'ltnm-gui.clear-history'}, save_as='history.delete_button'}
           }},
@@ -720,21 +720,30 @@ function self.update(player, player_table, state_changes)
 
     for i=1,#history do
       local entry = history[i]
-      gui.build(history_pane, {
+      local table_add = gui.build(history_pane, {
         {type='flow', style={vertical_align='center', padding=4}, children={
-          {type='label', style='bold_label', caption=entry.depot},
-          {type='label', style='bold_label', caption=entry.from},
-          {type='label', style='caption_label', caption='->'},
-          {type='label', style='bold_label', caption=entry.to},
-          {type='label', caption='N/A'},
-          {template='pushers.horizontal'},
+          {type='label', style={name='bold_label', width=140}, caption=entry.depot},
+          {type='flow', style={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical', children={
+            {type='label', style='bold_label', caption=entry.from},
+            {type='flow', children={
+              {type='label', style='caption_label', caption='->'},
+              {type='label', style='bold_label', caption=entry.to}
+            }}
+          }},
+          {type='label', style={right_margin=8}, caption=entry.runtime and util.ticks_to_time(entry.runtime) or 'N/A'},
           {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-            {type='scroll-pane', style='ltnm_train_slot_table_scroll_pane'}
+            {type='scroll-pane', style='ltnm_train_slot_table_scroll_pane', children={
+              {type='table', style='ltnm_small_slot_table', column_count=4, save_as='table'}
+            }}
           }}
         }},
         {type='line', style={horizontally_stretchable=true}, direction='horizontal'}
-      })
+      }).table.add
+      for name,count in pairs(entry.actual_shipment or entry.shipment) do
+        table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
+      end
     end
+    history_pane.children[#history_pane.children].destroy()
   end
 end
 
