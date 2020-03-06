@@ -91,6 +91,8 @@ local function update_active_tab(player, player_table, name)
     changes.stations_list = true
   elseif name == 'inventory' then
     changes.inventory_contents = true
+  elseif name == 'history' then
+    changes.history = true
   end
   self.update(player, player_table, changes)
 end
@@ -208,26 +210,40 @@ function self.create(player, player_table)
               gui.call_template('inventory.slot_table_with_label', 'in_transit')
             }},
             -- item information
-            {type='frame', style={name='ltnm_light_content_frame_in_light_frame', horizontally_stretchable=true, vertically_stretchable=true}, direction='vertical', children={
-              {type='frame', style='ltnm_toolbar_frame', direction='vertical', children={
-                -- icon and name
-                {type='flow', style={vertical_align='center'}, children={
-                  {type='sprite', style='ltnm_material_icon', sprite='item-group/intermediate-products', save_as='inventory.info_pane.icon'},
-                  {type='label', style={name='caption_label', left_margin=2}, caption={'ltnm-gui.choose-an-item'}, save_as='inventory.info_pane.name'},
-                  {template='pushers.horizontal'},
+            {type='frame', style={name='ltnm_light_content_frame_in_light_frame', horizontally_stretchable=true, vertically_stretchable=true},
+              direction='vertical', children={
+                {type='frame', style='ltnm_toolbar_frame', direction='vertical', children={
+                  -- icon and name
+                  {type='flow', style={vertical_align='center'}, children={
+                    {type='sprite', style='ltnm_material_icon', sprite='item-group/intermediate-products', save_as='inventory.info_pane.icon'},
+                    {type='label', style={name='caption_label', left_margin=2}, caption={'ltnm-gui.choose-an-item'}, save_as='inventory.info_pane.name'},
+                    {template='pushers.horizontal'},
+                  }},
+                  -- info
+                  gui.call_template('inventory.label_with_value', 'provided', {'ltnm-gui.provided'}, 0),
+                  gui.call_template('inventory.label_with_value', 'requested', {'ltnm-gui.requested'}, 0),
+                  gui.call_template('inventory.label_with_value', 'in_transit', {'ltnm-gui.in-transit'}, 0)
                 }},
-                -- info
-                gui.call_template('inventory.label_with_value', 'provided', {'ltnm-gui.provided'}, 0),
-                gui.call_template('inventory.label_with_value', 'requested', {'ltnm-gui.requested'}, 0),
-                gui.call_template('inventory.label_with_value', 'in_transit', {'ltnm-gui.in-transit'}, 0)
-              }},
-              {type='scroll-pane', style={name='ltnm_material_locations_scroll_pane', horizontally_stretchable=true, vertically_stretchable=true},
-                save_as='inventory.locations_scroll_pane'}
-            }}
+                {type='scroll-pane', style={name='ltnm_material_locations_scroll_pane', horizontally_stretchable=true, vertically_stretchable=true},
+                  save_as='inventory.locations_scroll_pane'}
+              }
+            }
           }}
         }},
         -- HISTORY
-        {type='empty-widget', mods={visible=false}, save_as='tabbed_pane.contents.history'},
+        {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.history', children={
+          -- toolbar
+          {type='frame', style='ltnm_toolbar_frame', children={
+            {type='label', style='caption_label', caption={'ltnm-gui.depot'}},
+            {type='label', style='caption_label', caption={'ltnm-gui.route'}},
+            {template='pushers.horizontal'},
+            {type='label', style='caption_label', caption={'ltnm-gui.runtime'}},
+            {type='label', style={name='caption_label', width=116}, caption={'ltnm-gui.shipment'}},
+            {type='sprite-button', style='red_icon_button', sprite='utility/trash', tooltip={'ltnm-gui.clear-history'}, save_as='history.delete_button'}
+          }},
+          -- listing
+          {type='scroll-pane', style={name='ltnm_blank_scroll_pane', horizontally_stretchable=true, vertically_stretchable=true}, save_as='history.pane'}
+        }},
         -- ALERTS
         {type='empty-widget', mods={visible=false}, save_as='tabbed_pane.contents.alerts'}
       }}
@@ -252,6 +268,8 @@ function self.destroy(player, player_table)
   gui.deregister_all('main', player.index)
   player_table.gui.main.window.destroy()
   player_table.gui.main = nil
+  -- set shortcut state
+  player.set_shortcut_toggled('ltnm-toggle-gui', false)
 end
 
 -- -------------------------------------
@@ -684,6 +702,31 @@ function self.update(player, player_table, state_changes)
           error('Could not find train of ID: '..train_ids[i])
         end
       end
+    end
+  end
+
+  -- HISTORY
+  if state_changes.history then
+    local history = data.history
+    local history_pane = gui_data.history.pane
+    history_pane.clear()
+
+    for i=1,#history do
+      local entry = history[i]
+      gui.build(history_pane, {
+        {type='flow', style={vertical_align='center', padding=4}, children={
+          {type='label', style='bold_label', caption=entry.depot},
+          {type='label', style='bold_label', caption=entry.from},
+          {type='label', style='caption_label', caption='->'},
+          {type='label', style='bold_label', caption=entry.to},
+          {type='label', caption='N/A'},
+          {template='pushers.horizontal'},
+          {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+            {type='scroll-pane', style='ltnm_train_slot_table_scroll_pane'}
+          }}
+        }},
+        {type='line', style={horizontally_stretchable=true}, direction='horizontal'}
+      })
     end
   end
 end

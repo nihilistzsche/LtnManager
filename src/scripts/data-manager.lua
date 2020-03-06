@@ -90,7 +90,10 @@ local self = {}
       -- returning to depot
       returning_to_depot (boolean)
   history
-    (TBD)
+    [array index]
+      train_id
+      planned_shipment
+      actual_shipment
   alerts
     (TBD)
   -- lookup tables - included in output
@@ -182,6 +185,7 @@ local function iterate_stations()
           returning_to_depot = true
         }
         trains[train_id].state = train.state
+        trains[train_id].depot = schedule.records[1].station
       end
     end
 
@@ -267,6 +271,7 @@ local function iterate_data()
     global.data = {
       depots = data.depots,
       stations = data.stations,
+      num_stations = data.num_stations,
       inventory = data.inventory,
       trains = data.trains,
       history = data.history,
@@ -274,7 +279,6 @@ local function iterate_data()
       network_to_stations = data.network_to_stations,
       material_locations = data.material_locations
     }
-    global.working_data = nil
     -- reset events
     event.deregister_conditional(iterate_data, 'iterate_ltn_data')
     event.register(ltn_event_ids.on_stops_updated, on_stops_updated, {name='ltn_on_stops_updated'})
@@ -283,7 +287,7 @@ local function iterate_data()
 end
 
 function on_stops_updated(e)
-  global.working_data = {stations=e.logistic_train_stops}
+  global.working_data.stations = e.logistic_train_stops
 end
 
 function on_dispatcher_updated(e)
@@ -302,47 +306,67 @@ function on_dispatcher_updated(e)
     station_ids[station_index] = station_id
   end
 
-  -- set up data table for iteration
-  global.working_data = {
-    -- output tables
-    depots = {},
-    stations = stations,
-    inventory = {
-      provided = {},
-      requested = {},
-      in_transit = {}
-    },
-    trains = {},
-    history = {},
-    alerts = {},
-    -- lookup tables
-    network_to_stations = {},
-    material_locations = {},
-    -- data tables
-    station_ids = station_ids,
-    num_stations = station_index,
-    provided_by_stop = e.provided_by_stop,
-    requested_by_stop = e.requests_by_stop,
-    deliveries = e.deliveries,
-    available_trains = e.available_trains,
-    -- iteration data
-    step = 1,
-    index = 1
+  -- reset data table for iteration
+  local data = global.working_data
+  data.depots = {}
+  data.stations = stations
+  data.inventory = {
+    provided = {},
+    requested = {},
+    in_transit = {}
   }
+  data.trains = {}
+  -- lookup tables
+  data.network_to_stations = {}
+  data.material_locations = {}
+  -- data tables
+  data.station_ids = station_ids
+  data.num_stations = station_index
+  data.provided_by_stop = e.provided_by_stop
+  data.requested_by_stop = e.requests_by_stop
+  data.deliveries = e.deliveries
+  data.available_trains = e.available_trains
+  -- iteration data
+  data.step = 1
+  data.index = 1
 
   -- register data iteration handler
   event.on_tick(iterate_data, {name='iterate_ltn_data', skip_validation=true})
 end
 
-local function on_dispatcher_no_train_found(e)
-  local breakpoint
-end
-
 local function on_delivery_pickup_complete(e)
-  local breakpoint
+  local train = global.data.trains[e.train_id]
+  if not train then error('Could not find train of ID: '..e.train_id) end
+  table.insert(global.working_data.history, 1, {
+    type = 'pickup',
+    from = train.from,
+    to = train.to,
+    from_id = train.from_id,
+    to_id = train.to_id,
+    depot = train.depot,
+    actual_shipment = e.actual_shipment,
+    planned_shipment = e.planned_shipment,
+    runtime = game.tick - train.started
+  })
+  global.working_data.history[51] = nil -- limit to 50 entries
 end
 
 local function on_delivery_completed(e)
+  local train = global.data.trains[e.train_id]
+  if not train then error('Could not find train of ID: '..e.train_id) end
+  table.insert(global.working_data.history, 1, {
+    type = 'delivery',
+    from = train.from,
+    to = train.to,
+    from_id = train.from_id,
+    to_id = train.to_id,
+    depot = train.depot,
+    shipment = e.shipment
+  })
+  global.working_data.history[51] = nil -- limit to 50 entries
+end
+
+local function on_dispatcher_no_train_found(e)
   local breakpoint
 end
 
@@ -375,6 +399,9 @@ end
 -- re-register the events in on_load
 event.on_load(function()
   event.load_conditional_handlers(ltn_handlers)
+  event.load_conditional_handlers{
+    iterate_ltn_data = iterate_data
+  }
 end)
 
 -- -----------------------------------------------------------------------------
