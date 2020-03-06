@@ -5,6 +5,9 @@
 local event = require('__RaiLuaLib__.lualib.event')
 local mod_gui = require('mod-gui')
 
+-- globals
+UPDATE_SHORTCUT_EVENT = event.generate_id('update_shortcut_availability')
+
 -- scripts
 local data_manager = require('scripts.data-manager')
 local main_gui = require('gui.main')
@@ -19,12 +22,15 @@ local function setup_player(player, index)
     flags = {},
     gui = {}
   }
-  mod_gui.get_button_flow(player).add{type='button', name='ltnm_button', style=mod_gui.button_style, caption='LTNM'}
+  player.set_shortcut_available('ltnm-toggle-gui', global.flags.shortcut_enabled)
 end
 
 event.on_init(function()
-  global.flags = {}
+  global.flags = {
+    shortcut_enabled = false
+  }
   global.players = {}
+  global.working_data = {history={}, alerts={}}
   for i,p in pairs(game.players) do
     setup_player(p, i)
   end
@@ -37,16 +43,31 @@ event.on_player_created(function(e)
   setup_player(game.get_player(e.player_index), e.player_index)
 end)
 
-event.on_gui_click(function(e)
-  local player = game.get_player(e.player_index)
-  local player_table = global.players[e.player_index]
-  if player_table.gui.main then
-    main_gui.destroy(player, player_table)
-  else
-    if global.data then
-      main_gui.create(player, player_table)
+event.register({defines.events.on_lua_shortcut, 'ltnm-toggle-gui'}, function(e)
+  if e.input_name or (e.prototype_name == 'ltnm-toggle-gui') then
+    local player = game.get_player(e.player_index)
+    if not global.flags.shortcut_enabled then return end -- don't follow hotkey if the shortcut is disabled
+    local player_table = global.players[e.player_index]
+    -- toggle GUI
+    if player_table.gui.main then
+      main_gui.destroy(player, player_table)
     else
-      player.print{'ltnm-message.TEMP-COMEUPWITHANAMESTUPID!'}
+      if global.data then
+        main_gui.create(player, player_table)
+      else
+        player.print{'ltnm-message.TEMP-COMEUPWITHANAMESTUPID!'}
+      end
     end
+    -- set shortcut state
+    player.set_shortcut_toggled('ltnm-toggle-gui', player_table.gui.main and true or false)
   end
-end, {gui_filters='ltnm_button'})
+end)
+
+-- enable/disable the shortcut depending on if there's any data
+event.register(UPDATE_SHORTCUT_EVENT, function(e)
+  global.flags.shortcut_enabled = (global.data.num_stations > 0)
+  local enabled = global.flags.shortcut_enabled
+  for _,p in pairs(game.players) do
+    p.set_shortcut_available('ltnm-toggle-gui', enabled)
+  end
+end)

@@ -1,6 +1,8 @@
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- SPRITES
 
+local util = require('prototypes.util')
+
 -- station status indicators
 local indicator_sprites = {}
 for i,t in ipairs(data.raw.lamp['small-lamp'].signal_to_color_mapping) do
@@ -18,23 +20,11 @@ for i,t in ipairs(data.raw.lamp['small-lamp'].signal_to_color_mapping) do
 end
 data:extend(indicator_sprites)
 
-local function mipped_icon(name, position, filename, size, mipmap_count)
-  return {
-    type = 'sprite',
-    name = name,
-    filename = filename,
-    position = position,
-    size = size or 32,
-    mipmap_count = mipmap_count or 2,
-    flags = {'icon'}
-  }
-end
-
 local nav_icons = '__LtnManager__/graphics/gui/nav-icons.png'
 local tool_icons = '__LtnManager__/graphics/gui/tool-icons.png'
 
 data:extend{
-  mipped_icon('ltnm_refresh_white', {0,0}, nav_icons),
-  mipped_icon('ltnm_refresh_black', {48,0}, nav_icons),
-  mipped_icon('ltnm_filter', {0,0}, tool_icons)
+  util.mipped_icon('ltnm_refresh_white', {0,0}, nav_icons),
+  util.mipped_icon('ltnm_refresh_black', {48,0}, nav_icons),
+  util.mipped_icon('ltnm_filter', {0,0}, tool_icons)
 }
