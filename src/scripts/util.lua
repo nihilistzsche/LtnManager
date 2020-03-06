@@ -17,4 +17,17 @@ function util.add_materials(t1, t2)
   return t2
 end
 
+-- add commas to separate thousands
+-- from lua-users.org: http://lua-users.org/wiki/FormattingNumbers
+function util.comma_value(input)
+  local formatted = input
+  while true do
+    formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+    if (k==0) then
+      break
+    end
+  end
+  return formatted
+end
+
 return util

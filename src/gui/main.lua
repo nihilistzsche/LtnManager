@@ -99,7 +99,6 @@ gui.add_handlers('main', {
   titlebar = {
     frame_tab = {
       on_gui_click = function(e)
-        log('click!')
         local name = e.default_tab or string_gsub(e.element.caption[1], 'ltnm%-gui%.', '')
         update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
       end
@@ -540,16 +539,20 @@ function self.update(player, player_table, state_changes)
   -- also not used externally
   if state_changes.inventory_contents then
     local inventory = data.inventory
-    gui_data.inventory.material_buttons = {}
-    local buttons = gui_data.inventory.material_buttons
+    local inventory_gui_data = gui_data.inventory
+    inventory_gui_data.material_buttons = {}
+    inventory_gui_data.contents = {}
+    local buttons = inventory_gui_data.material_buttons
     for type,color in pairs{provided='green', requested='red', in_transit='blue'} do
       -- combine materials (temporary until network filters become a thing)
       local combined_materials = {}
       for _,materials in pairs(inventory[type]) do
         combined_materials = util.add_materials(materials, combined_materials)
       end
+      -- add combined materials to the GUI table (also temporary)
+      inventory_gui_data.contents[type] = combined_materials
       -- add to table
-      local table = gui_data.inventory[type..'_table']
+      local table = inventory_gui_data[type..'_table']
       table.clear()
       local add = table.add
       local elems = {}
@@ -560,8 +563,8 @@ function self.update(player, player_table, state_changes)
       buttons[type] = elems
     end
     -- remove previous selection since the buttons are no longer glowing
-    state_changes.selected_material = state_changes.selected_material or gui_data.inventory.selected
-    gui_data.inventory.selected = nil
+    state_changes.selected_material = state_changes.selected_material or inventory_gui_data.selected
+    inventory_gui_data.selected = nil
   end
 
   -- SELECTED MATERIAL
@@ -594,6 +597,10 @@ function self.update(player, player_table, state_changes)
     info_pane.name.caption = game[material_type..'_prototypes'][material_name].localised_name
 
     -- TODO: available/requested/in transit numbers (requires some data manager processing)
+    local contents = inventory_gui_data.contents
+    for _,type in ipairs{'provided', 'requested', 'in_transit'} do
+      info_pane[type..'_value'].caption = util.comma_value(contents[type][inventory_gui_data.selected] or 0)
+    end
 
     -- set up scroll pane and locals
     local locations_pane = inventory_gui_data.locations_scroll_pane
