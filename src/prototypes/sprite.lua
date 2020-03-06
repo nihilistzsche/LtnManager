@@ -20,11 +20,9 @@ for i,t in ipairs(data.raw.lamp['small-lamp'].signal_to_color_mapping) do
 end
 data:extend(indicator_sprites)
 
-local nav_icons = '__LtnManager__/graphics/gui/nav-icons.png'
-local tool_icons = '__LtnManager__/graphics/gui/tool-icons.png'
-
 data:extend{
-  util.mipped_icon('ltnm_refresh_white', {0,0}, nav_icons),
-  util.mipped_icon('ltnm_refresh_black', {48,0}, nav_icons),
-  util.mipped_icon('ltnm_filter', {0,0}, tool_icons)
+  util.mipped_icon('ltnm_refresh_white', {0,0}, util.paths.nav_icons),
+  util.mipped_icon('ltnm_refresh_black', {48,0}, util.paths.nav_icons),
+  util.mipped_icon('ltnm_filter', {0,0}, util.paths.tool_icons),
+  util.mipped_icon('ltnm_mod_gui_button_icon', {0,0}, util.paths.shortcut_icons)
 }
