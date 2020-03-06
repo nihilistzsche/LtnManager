@@ -115,6 +115,11 @@ gui.add_handlers('main', {
         local player_table = global.players[e.player_index]
         update_active_tab(game.get_player(e.player_index), global.players[e.player_index], player_table.gui.main.tabbed_pane.selected)
       end
+    },
+    pin_button = {
+      on_gui_click = function(e)
+        
+      end
     }
   },
   depots = {
@@ -151,7 +156,9 @@ function self.create(player, player_table)
         {type='frame', style='ltnm_main_frame_header', children={
           {type='empty-widget', style={name='draggable_space_header', horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
             save_as='titlebar.drag_handle'},
-          {template='close_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black', clicked_sprite='ltnm_refresh_black',
+          {type='sprite-button', style='close_button', sprite='ltnm_pin_white', hovered_sprite='ltnm_pin_black', clicked_sprite='ltnm_pin_black',
+            tooltip={'ltnm-gui.keep-open'}, handlers='titlebar.pin_button', save_as='titlebar.pin_button'},
+          {type='sprite-button', style='close_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black', clicked_sprite='ltnm_refresh_black',
             tooltip={'ltnm-gui.refresh-current-tab'}, handlers='titlebar.refresh_button', save_as='titlebar.refresh_button'},
           {template='close_button'}
         }}
