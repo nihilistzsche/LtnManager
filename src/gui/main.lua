@@ -529,8 +529,8 @@ function self.update(player, player_table, state_changes)
           local name = signal.signal.name
           if name ~= 'ltn-network-id' and string_find(name, '^ltn%-') then
             signals_rows = signals_rows + 1
-            table_add{type='sprite-button', style='ltnm_inactive_small_slot_button_dark_grey', sprite='virtual-signal/'..name, number=signal.count,
-              tooltip={'virtual-signal-name.'..name}}
+            table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite='virtual-signal/'..name, number=signal.count,
+              tooltip={'virtual-signal-name.'..name}}.enabled = false
           end
         end
         signals_rows = math.ceil(signals_rows / 4) -- number of columns

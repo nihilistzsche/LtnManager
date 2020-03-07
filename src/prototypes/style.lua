@@ -8,24 +8,28 @@ local styles = data.raw['gui-style'].default
 
 local slot_buttons_tileset = '__LtnManager__/graphics/gui/slot-buttons.png'
 
-local function slot_button(y, glow_color, default_x, size, override_x)
+local function slot_button(y, glow_color, default_x, size)
   return {
     type = 'button_style',
     parent = 'quick_bar_slot_button',
     size = size or 40,
     default_graphical_set = {
-      base = {border=4, position={(override_x or default_x or 0),y}, size=80, filename=slot_buttons_tileset},
+      base = {border=4, position={(default_x or 0),y}, size=80, filename=slot_buttons_tileset},
       shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
     },
     hovered_graphical_set = {
-      base = {border=4, position={(override_x or 80),y}, size=80, filename=slot_buttons_tileset},
+      base = {border=4, position={80,y}, size=80, filename=slot_buttons_tileset},
       shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
-      glow = override_x and {} or offset_by_2_rounded_corners_glow(glow_color)
+      glow = offset_by_2_rounded_corners_glow(glow_color)
     },
     clicked_graphical_set = {
-      base = {border=4, position={(override_x or 160),y}, size=80, filename=slot_buttons_tileset},
+      base = {border=4, position={160,y}, size=80, filename=slot_buttons_tileset},
       shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
-    }
+    },
+    disabled_graphical_set = { -- identical to default graphical set
+      base = {border=4, position={(default_x or 0),y}, size=80, filename=slot_buttons_tileset},
+      shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
+    },
   }
 end
 
@@ -75,8 +79,6 @@ for _,data in ipairs(slot_button_data) do
   styles['ltnm_active_slot_button_'..data.name] = slot_button(data.y, data.glow, 80)
   styles['ltnm_active_small_slot_button_'..data.name] = slot_button(data.y, data.glow, 80, 36)
   -- styles['ltnm_active_bordered_slot_button_'..data.name] = bordered_slot_button(data.y, data.glow, 80)
-  styles['ltnm_inactive_slot_button_'..data.name] = slot_button(data.y, data.glow, nil, nil, 0)
-  styles['ltnm_inactive_small_slot_button_'..data.name] = slot_button(data.y, data.glow, nil, 36, 0)
 end
 
 local function ltnm_tab_base(pos)
