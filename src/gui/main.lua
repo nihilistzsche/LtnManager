@@ -27,17 +27,10 @@ gui.add_templates{
   close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
     clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='titlebar.close_button', save_as='titlebar.close_button'},
   mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='titlebar.frame_tab'},
-  depot_status_indicator = function(name, color, value)
+  status_indicator = function(name, color, value)
     return {type='flow', style={vertical_align='center'}, children={
       {type='sprite', style='ltnm_status_icon', sprite='ltnm_indicator_'..color, save_as=name..'_circle'},
-      {type='label', style={font_color={}}, caption=value, save_as=name..'_label'}
-    }}
-  end,
-  station_slot_table = function(name)
-    return {type='frame', style='ltnm_station_slot_table_frame', save_as=name..'_frame', children={
-      {type='scroll-pane', style='ltnm_station_slot_table_scroll_pane', save_as=name..'_scroll_pane', children={
-        {type='table', style='ltnm_small_slot_table', column_count=4, save_as=name..'_table'}
-      }}
+      {type='label', caption=value, save_as=name..'_label'}
     }}
   end,
   inventory = {
@@ -59,27 +52,6 @@ gui.add_templates{
       }}
     end
   }
-}
-
--- TEMPORARY, FOR LAYOUT PROTOTYPING
-gui.add_templates{
-  demo_station_contents = function()
-    local elems = {}
-    for i=1,20 do
-      elems[#elems+1] = {type='sprite-button', style='ltnm_bordered_slot_button_green', sprite='item/poison-capsule', number=420000}
-    end
-    for i=21,24 do
-      elems[#elems+1] = {type='sprite-button', style='ltnm_bordered_slot_button_red', sprite='item/poison-capsule', number=-6900}
-    end
-    return elems
-  end,
-  train_contents = function(num)
-    local elems = {}
-    for i=1,num do
-      elems[#elems+1] = {type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite='item/poison-capsule', number=420000}
-    end
-    return elems
-  end
 }
 
 local function update_active_tab(player, player_table, name)
@@ -105,9 +77,9 @@ gui.add_handlers('main', {
         update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
       end
     },
-    close_button = {
+    pin_button = {
       on_gui_click = function(e)
-        self.destroy(game.get_player(e.player_index), global.players[e.player_index])
+        
       end
     },
     refresh_button = {
@@ -116,11 +88,11 @@ gui.add_handlers('main', {
         update_active_tab(game.get_player(e.player_index), global.players[e.player_index], player_table.gui.main.tabbed_pane.selected)
       end
     },
-    pin_button = {
+    close_button = {
       on_gui_click = function(e)
-        
+        self.destroy(game.get_player(e.player_index), global.players[e.player_index])
       end
-    }
+    },
   },
   depots = {
     depot_button = {
@@ -192,14 +164,18 @@ function self.create(player, player_table)
           {type='frame', style={name='ltnm_toolbar_frame', horizontally_stretchable=true}, direction='vertical', children={
             {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
               {type='empty-widget', style={height=28}},
-              {type='label', style={name='caption_label', left_margin=-8, width=220}, caption={'ltnm-gui.station-name'}},
-              {type='label', style={name='caption_label', width=144}, caption={'ltnm-gui.provided-requested'}},
+              {type='label', style={name='caption_label', left_margin=-4, width=200}, caption={'ltnm-gui.station-name'}},
+              {type='label', style={name='caption_label', horizontal_align='center', width=24}, caption={'ltnm-gui.id'}},
+              {type='label', style={name='caption_label', horizontal_align='center', width=34}, caption={'ltnm-gui.status'}},
+              {type='label', style={name='caption_label', width=180}, caption={'ltnm-gui.provided-requested'}},
               {type='label', style={name='caption_label', width=144}, caption={'ltnm-gui.deliveries'}},
               {template='pushers.horizontal'},
-              -- {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.station-filters-tooltip'}}
+              {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.station-filters-tooltip'}}
             }}
           }},
-          {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations.scroll_pane'}
+          {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations.scroll_pane', children={
+            {type='table', style='ltnm_row_table', column_count=6, save_as='stations.table'}
+          }}
         }},
         -- INVENTORY
         {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.inventory', children={
@@ -346,7 +322,7 @@ function self.update(player, player_table, state_changes)
       end
       local status_flow = elems.status_flow
       for status_name, status_count in pairs(statuses) do
-        local output = gui.build(status_flow, gui.call_template('depot_status_indicator', 'indicator', status_name, status_count))
+        local output = gui.build(status_flow, gui.call_template('status_indicator', 'indicator', status_name, status_count))
         elems.standard_labels[status_name] = output.indicator_label
       end
 
@@ -482,33 +458,33 @@ function self.update(player, player_table, state_changes)
 
   -- not used externally, but is called by the above two situations
   if state_changes.stations_list then
-    local stations_pane = gui_data.stations.scroll_pane
-    stations_pane.clear()
+    local stations_table = gui_data.stations.table
+    stations_table.clear()
 
     local stations = data.stations
     for id,t in pairs(stations) do
       if not t.isDepot then -- don't include depots in the stations list
         -- build GUI structure
-        local elems = gui.build(stations_pane,
-          {type='flow', style={vertical_align='center', horizontal_spacing=12, left_margin=2, right_margin=2}, children={
-            -- name / status
-            {type='flow', style={vertical_align='center', width=220}, children={
-              {type='sprite', style='ltnm_station_status_icon', sprite='ltnm_indicator_'..t.status.name},
-              {type='label', style={left_margin=2}, caption=t.entity.backer_name}
-            }},
-            -- items
-            gui.call_template('station_slot_table', 'provided_requested'),
-            gui.call_template('station_slot_table', 'deliveries'),
-            -- ltn combinator button
-            {type='flow', style={right_margin=2}, children={
-              {template='pushers.horizontal'},
-              {type='frame', style='ltnm_combinator_button_frame', children={
-                {type='sprite-button', style='ltnm_combinator_button', sprite='item/constant-combinator', tooltip={'ltnm-gui.open-ltn-combinator-interface'}}
-              }}
+        local elems = gui.build(stations_table, {
+          {type='label', style='bold_label', caption=t.entity.backer_name},
+          {type='label', caption=t.network_id},
+          gui.call_template('status_indicator', 'indicator', t.status.name, t.status.count),
+          -- items
+          {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='provided_requested_frame', children={
+            {type='scroll-pane', style='ltnm_station_provided_requested_slot_table_scroll_pane', save_as='provided_requested_scroll_pane', children={
+              {type='table', style='ltnm_small_slot_table', column_count=5, save_as='provided_requested_table'}
             }}
+          }},
+          {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='deliveries_frame', children={
+            {type='scroll-pane', style='ltnm_station_deliveries_slot_table_scroll_pane', save_as='deliveries_scroll_pane', children={
+              {type='table', style='ltnm_small_slot_table', column_count=4, save_as='deliveries_table'}
+            }}
+          }},
+          -- ltn combinator button
+          {type='frame', style='ltnm_combinator_button_frame', children={
+            {type='sprite-button', style='ltnm_combinator_button', sprite='item/constant-combinator', tooltip={'ltnm-gui.open-ltn-combinator-interface'}}
           }}
-        )
-        stations_pane.add{type='line', direction='horizontal'}.style.horizontally_stretchable = true
+        })
 
         -- add provided/requested materials
         local table_add = elems.provided_requested_table.add
@@ -522,7 +498,7 @@ function self.update(player, player_table, state_changes)
             end
           end
         end
-        provided_requested_rows = math.ceil(provided_requested_rows / 4) -- number of columns
+        provided_requested_rows = math.ceil(provided_requested_rows / 6) -- number of columns
 
         -- add active deliveries
         local deliveries = t.activeDeliveries
@@ -535,14 +511,14 @@ function self.update(player, player_table, state_changes)
             table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
           end
         end
-        deliveries_rows = math.ceil(deliveries_rows / 4) -- number of columns
+        deliveries_rows = math.ceil(deliveries_rows / 6) -- number of columns
         
         local num_rows = math.max(provided_requested_rows, deliveries_rows)
         
         -- set scroll pane properties
         if provided_requested_rows > 3 then
           elems.provided_requested_frame.style.right_margin = -12
-          elems.deliveries_frame.style = 'ltnm_station_slot_table_frame_adjacent'
+          elems.deliveries_frame.style = 'ltnm_dark_content_frame_in_light_frame_no_left'
         end
         if deliveries_rows > 3 then
           elems.deliveries_frame.style.right_margin = -12
@@ -556,8 +532,6 @@ function self.update(player, player_table, state_changes)
         end
       end
     end
-
-    stations_pane.children[#stations_pane.children].destroy()
   end
 
   -- INVENTORY CONTENTS

@@ -262,7 +262,7 @@ styles.ltnm_main_frame_header = {
 styles.ltnm_main_frame_content = {
   type = 'frame_style',
   parent = 'dialog_frame',
-  width = 642,
+  width = 742,
   height = 636,
   graphical_set = {
     base = {
@@ -336,35 +336,10 @@ styles.ltnm_light_content_frame_in_light_frame = {
   }
 }
 
-styles.ltnm_depot_frame = {
-  type = 'frame_style',
-  parent = 'dark_frame',
-  left_padding = 4,
-  right_padding = 4
-}
-
-styles.ltnm_station_row_frame = {
-  type = 'frame_style',
-  parent = 'dark_frame',
-  minimal_height = 40,
-  padding = 0,
-  horizontally_stretchable = 'on',
-  horizontal_flow_style = {
-    type = 'horizontal_flow_style',
-    vertical_align = 'center',
-    horizontal_spacing = 12
-  }
-}
-
-styles.ltnm_station_slot_table_frame = {
-  type = 'frame_style',
-  parent = 'ltnm_dark_content_frame_in_light_frame'
-}
-
 -- remove the left border so it transitions seamlessly from a scrollbar over there
-styles.ltnm_station_slot_table_frame_adjacent = {
+styles.ltnm_dark_content_frame_in_light_frame_no_left = {
   type = 'frame_style',
-  parent = 'ltnm_station_slot_table_frame',
+  parent = 'ltnm_dark_content_frame_in_light_frame',
   graphical_set = {
     base = {
       position = {85,0},
@@ -376,17 +351,6 @@ styles.ltnm_station_slot_table_frame_adjacent = {
       left_bottom = {}
     },
     shadow = default_inner_shadow
-  }
-}
-
-styles.ltnm_station_items_frame = {
-  type = 'frame_style',
-  parent = 'dark_frame',
-  padding = 4,
-  top_padding = 2,
-  vertical_flow_style = {
-    type = 'vertical_flow_style',
-    vertical_spacing = 4
   }
 }
 
@@ -551,7 +515,14 @@ styles.ltnm_train_slot_table_scroll_pane = {
   maximal_height = 72
 }
 
-styles.ltnm_station_slot_table_scroll_pane = {
+styles.ltnm_station_provided_requested_slot_table_scroll_pane = {
+  type = 'scroll_pane_style',
+  parent = 'ltnm_small_slot_table_scroll_pane',
+  minimal_width = 180,
+  maximal_height = 108
+}
+
+styles.ltnm_station_deliveries_slot_table_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_small_slot_table_scroll_pane',
   minimal_width = 144,
@@ -564,7 +535,7 @@ styles.ltnm_stations_scroll_pane = {
   extra_right_padding_when_activated = -12,
   vertical_flow_style = {
     type = 'vertical_flow_style',
-    padding = 2
+    -- padding = 2
   }
 }
 
@@ -579,7 +550,7 @@ styles.ltnm_material_locations_scroll_pane = {
   parent = 'ltnm_blank_scroll_pane',
   vertical_flow_style = {
     type = 'vertical_flow_style',
-    padding = 6,
+    padding = 5,
     horizontal_align = 'center'
   }
 }
@@ -603,6 +574,52 @@ styles.ltnm_inventory_selected_icon = {
 
 -- -----------------------------------------------------------------------------
 -- TABLE STYLES
+
+styles.ltnm_row_table = {
+  type = 'table_style',
+  border = {
+    border_width = 8,
+    horizontal_line = {position = {8, 40}, size = {1, 8}},
+  },
+  -- border = {
+  --   border_width = 8,
+  --   vertical_line = {position = {0, 40}, size = {8, 1}},
+  --   horizontal_line = {position = {8, 40}, size = {1, 8}},
+  --   top_right_corner = {position = {16, 40}, size = {8, 8}},
+  --   bottom_right_corner = {position = {24, 40}, size = {8, 8}},
+  --   bottom_left_corner = {position = {32, 40}, size = {8, 8}},
+  --   top_left_coner = {position = {40, 40}, size = {8, 8}},
+  --   top_t = {position = {64, 40}, size = {8, 8}},
+  --   right_t = {position = {72, 40}, size = {8, 8}},
+  --   bottom_t = {position = {48, 40}, size = {8, 8}},
+  --   left_t = {position = {56, 40}, size = {8, 8}},
+  --   cross = {position = {80, 40}, size = {8, 8}},
+  --   top_end = {position = {88, 40}, size = {8, 8}},
+  --   right_end = {position = {96, 40}, size = {8, 8}},
+  --   bottom_end = {position = {104, 40}, size = {8, 8}},
+  --   left_end = {position = {112, 40}, size = {8, 8}}
+  -- },
+  top_cell_padding = 6,
+  bottom_cell_padding = 6,
+  left_cell_padding = 4,
+  right_cell_padding = 4,
+  column_widths = {
+    {column=1, width=200},
+    {column=2, width=24},
+    {column=3, width=34},
+    {column=4, width=180},
+    {column=5, width=144},
+    {column=6, width=40}
+  },
+  column_alignments = {
+    {column=1, alignment='middle-left'},
+    {column=2, alignment='middle-center'},
+    {column=3, alignment='middle-center'},
+    {column=4, alignment='middle-left'},
+    {column=5, alignment='middle-left'},
+    {column=6, alignment='middle-center'}
+  }
+}
 
 styles.ltnm_slot_table = {
   type = 'table_style',
