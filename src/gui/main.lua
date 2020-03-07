@@ -167,7 +167,7 @@ function self.create(player, player_table)
           {type='frame', style='ltnm_toolbar_frame', style_mods={horizontally_stretchable=true}, direction='vertical', children={
             {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
               {type='empty-widget', style_mods={height=28}},
-              {type='label', style='caption_label', style_mods={left_margin=-4, width=200}, caption={'ltnm-gui.station-name'}},
+              {type='checkbox', style='ltnm_sort_checkbox_active', style_mods={left_margin=-4, width=200}, caption={'ltnm-gui.station-name'}, state=true},
               {type='label', style='caption_label', style_mods={horizontal_align='center', width=24}, caption={'ltnm-gui.id'}},
               {type='label', style='caption_label', style_mods={horizontal_align='center', width=34}, caption={'ltnm-gui.status'}},
               {type='label', style='caption_label', style_mods={width=180}, caption={'ltnm-gui.provided-requested'}},

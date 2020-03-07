@@ -1,6 +1,8 @@
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- GUI STYLES
 
+local util = require('prototypes.util')
+
 local styles = data.raw['gui-style'].default
 
 -- -----------------------------------------------------------------------------
@@ -184,6 +186,86 @@ styles.ltnm_combinator_button = {
     -- no glow, since it is inset
     -- glow = default_glow(default_glow_color, 0.5)
   },
+}
+
+-- -----------------------------------------------------------------------------
+-- CHECKBOX STYLES
+
+-- inactive is grey until hovered
+-- checked == descending, unchecked == ascending
+styles.ltnm_sort_checkbox_inactive = {
+  type = "checkbox_style",
+  font = "default-bold",
+  font_color = default_font_color,
+  padding = 0,
+  default_graphical_set =
+  {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  hovered_graphical_set =
+  {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-hover.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  clicked_graphical_set =
+  {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  disabled_graphical_set =
+  {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  selected_graphical_set =
+  {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-down-white.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  selected_hovered_graphical_set =
+  {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-down-hover.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  selected_clicked_graphical_set =
+  {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-down-white.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  selected_disabled_graphical_set =
+  {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-down-white.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  checkmark = util.empty_checkmark,
+  disabled_checkmark = util.empty_checkmark,
+  text_padding = 5
+}
+
+-- active is orange by default
+styles.ltnm_sort_checkbox_active = {
+  type = 'checkbox_style',
+  parent = 'ltnm_sort_checkbox_inactive',
+  font_color = bold_font_color,
+  default_graphical_set = {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-active.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  selected_graphical_set = {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-down-active.png",
+    size = {16, 16},
+    scale = 0.5
+  }
 }
 
 -- -----------------------------------------------------------------------------
