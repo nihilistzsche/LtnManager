@@ -8,22 +8,22 @@ local styles = data.raw['gui-style'].default
 
 local slot_buttons_tileset = '__LtnManager__/graphics/gui/slot-buttons.png'
 
-local function slot_button(y, glow_color, default_x, size)
+local function slot_button(y, glow_color, default_x, size, override_x)
   return {
     type = 'button_style',
     parent = 'quick_bar_slot_button',
     size = size or 40,
     default_graphical_set = {
-      base = {border=4, position={(default_x or 0),y}, size=80, filename=slot_buttons_tileset},
+      base = {border=4, position={(override_x or default_x or 0),y}, size=80, filename=slot_buttons_tileset},
       shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
     },
     hovered_graphical_set = {
-      base = {border=4, position={80,y}, size=80, filename=slot_buttons_tileset},
+      base = {border=4, position={(override_x or 80),y}, size=80, filename=slot_buttons_tileset},
       shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
-      glow = offset_by_2_rounded_corners_glow(glow_color)
+      glow = override_x and {} or offset_by_2_rounded_corners_glow(glow_color)
     },
     clicked_graphical_set = {
-      base = {border=4, position={160,y}, size=80, filename=slot_buttons_tileset},
+      base = {border=4, position={(override_x or 160),y}, size=80, filename=slot_buttons_tileset},
       shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
     }
   }
@@ -75,6 +75,8 @@ for _,data in ipairs(slot_button_data) do
   styles['ltnm_active_slot_button_'..data.name] = slot_button(data.y, data.glow, 80)
   styles['ltnm_active_small_slot_button_'..data.name] = slot_button(data.y, data.glow, 80, 36)
   -- styles['ltnm_active_bordered_slot_button_'..data.name] = bordered_slot_button(data.y, data.glow, 80)
+  styles['ltnm_inactive_slot_button_'..data.name] = slot_button(data.y, data.glow, nil, nil, 0)
+  styles['ltnm_inactive_small_slot_button_'..data.name] = slot_button(data.y, data.glow, nil, 36, 0)
 end
 
 local function ltnm_tab_base(pos)
@@ -262,7 +264,7 @@ styles.ltnm_main_frame_header = {
 styles.ltnm_main_frame_content = {
   type = 'frame_style',
   parent = 'dialog_frame',
-  width = 742,
+  width = 846,
   height = 636,
   graphical_set = {
     base = {
@@ -522,21 +524,11 @@ styles.ltnm_station_provided_requested_slot_table_scroll_pane = {
   maximal_height = 108
 }
 
-styles.ltnm_station_deliveries_slot_table_scroll_pane = {
+styles.ltnm_station_shipments_slot_table_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_small_slot_table_scroll_pane',
   minimal_width = 144,
   maximal_height = 108
-}
-
-styles.ltnm_stations_scroll_pane = {
-  type = 'scroll_pane_style',
-  parent = 'ltnm_blank_scroll_pane',
-  extra_right_padding_when_activated = -12,
-  vertical_flow_style = {
-    type = 'vertical_flow_style',
-    -- padding = 2
-  }
 }
 
 styles.ltnm_trains_scroll_pane = {
@@ -609,7 +601,8 @@ styles.ltnm_row_table = {
     {column=3, width=34},
     {column=4, width=180},
     {column=5, width=144},
-    {column=6, width=40}
+    {column=6, width=144},
+    {column=7, width=40}
   },
   column_alignments = {
     {column=1, alignment='middle-left'},
@@ -617,7 +610,8 @@ styles.ltnm_row_table = {
     {column=3, alignment='middle-center'},
     {column=4, alignment='middle-left'},
     {column=5, alignment='middle-left'},
-    {column=6, alignment='middle-center'}
+    {column=6, alignment='middle-left'},
+    {column=7, alignment='middle-center'}
   }
 }
 

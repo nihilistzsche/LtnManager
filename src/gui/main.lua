@@ -8,6 +8,8 @@ local event = require('__RaiLuaLib__.lualib.event')
 local gui = require('__RaiLuaLib__.lualib.gui')
 local util = require('scripts.util')
 
+-- local profiler = require('__profiler__/profiler.lua')
+
 -- locals
 local string_find = string.find
 local string_gsub = string.gsub
@@ -116,6 +118,7 @@ gui.add_handlers('main', {
 -- GUI MANAGEMENT
 
 function self.create(player, player_table)
+  -- profiler.Start()
   local gui_data = gui.build(player.gui.screen, {
     {type='frame', style='ltnm_empty_frame', direction='vertical', save_as='window', children={
       -- TITLEBAR
@@ -168,12 +171,13 @@ function self.create(player, player_table)
               {type='label', style='caption_label', style_mods={horizontal_align='center', width=24}, caption={'ltnm-gui.id'}},
               {type='label', style='caption_label', style_mods={horizontal_align='center', width=34}, caption={'ltnm-gui.status'}},
               {type='label', style='caption_label', style_mods={width=180}, caption={'ltnm-gui.provided-requested'}},
-              {type='label', style='caption_label', style_mods={width=144}, caption={'ltnm-gui.deliveries'}},
+              {type='label', style='caption_label', style_mods={width=144}, caption={'ltnm-gui.shipments'}},
+              {type='label', style='caption_label', caption={'ltnm-gui.control-signals'}},
               {template='pushers.horizontal'},
               {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.station-filters-tooltip'}}
             }}
           }},
-          {type='scroll-pane', style='ltnm_stations_scroll_pane', direction='vertical', save_as='stations.scroll_pane', children={
+          {type='scroll-pane', style='ltnm_blank_scroll_pane', direction='vertical', save_as='stations.scroll_pane', children={
             {type='table', style='ltnm_row_table', column_count=6, save_as='stations.table'}
           }}
         }},
@@ -244,6 +248,7 @@ function self.create(player, player_table)
 
   -- set initial contents
   gui.call_handler('main.titlebar.frame_tab.on_gui_click', {name=defines.events.on_gui_click, tick=game.tick, player_index=player.index, default_tab='depots'})
+  -- profiler.Stop()
 end
 
 -- completely destroys the GUI
@@ -466,7 +471,7 @@ function self.update(player, player_table, state_changes)
       if not t.isDepot then -- don't include depots in the stations list
         -- build GUI structure
         local elems = gui.build(stations_table, {
-          {type='label', style='bold_label', caption=t.entity.backer_name},
+          {type='label', style='hoverable_bold_label', caption=t.entity.backer_name},
           {type='label', caption=t.network_id},
           gui.call_template('status_indicator', 'indicator', t.status.name, t.status.count),
           -- items
@@ -475,14 +480,16 @@ function self.update(player, player_table, state_changes)
               {type='table', style='ltnm_small_slot_table', column_count=5, save_as='provided_requested_table'}
             }}
           }},
-          {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='deliveries_frame', children={
-            {type='scroll-pane', style='ltnm_station_deliveries_slot_table_scroll_pane', save_as='deliveries_scroll_pane', children={
-              {type='table', style='ltnm_small_slot_table', column_count=4, save_as='deliveries_table'}
+          {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='shipments_frame', children={
+            {type='scroll-pane', style='ltnm_station_shipments_slot_table_scroll_pane', save_as='shipments_scroll_pane', children={
+              {type='table', style='ltnm_small_slot_table', column_count=4, save_as='shipments_table'}
             }}
           }},
-          -- ltn combinator button
-          {type='frame', style='ltnm_combinator_button_frame', children={
-            {type='sprite-button', style='ltnm_combinator_button', sprite='item/constant-combinator', tooltip={'ltnm-gui.open-ltn-combinator-interface'}}
+          -- control signals
+          {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='signals_frame', children={
+            {type='scroll-pane', style='ltnm_station_shipments_slot_table_scroll_pane', save_as='signals_scroll_pane', children={
+              {type='table', style='ltnm_small_slot_table', column_count=4, save_as='signals_table'}
+            }}
           }}
         })
 
@@ -500,35 +507,53 @@ function self.update(player, player_table, state_changes)
         end
         provided_requested_rows = math.ceil(provided_requested_rows / 6) -- number of columns
 
-        -- add active deliveries
-        local deliveries = t.activeDeliveries
-        table_add = elems.deliveries_table.add
-        local deliveries_rows = 0
-        for i=1,#deliveries do
-          local shipment = data.trains[deliveries[i]].shipment
+        -- add active shipments
+        local shipments = t.activeDeliveries
+        table_add = elems.shipments_table.add
+        local shipments_rows = 0
+        for i=1,#shipments do
+          local shipment = data.trains[shipments[i]].shipment
           for name,count in pairs(shipment) do
-            deliveries_rows = deliveries_rows + 1
+            shipments_rows = shipments_rows + 1
             table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
           end
         end
-        deliveries_rows = math.ceil(deliveries_rows / 6) -- number of columns
-        
-        local num_rows = math.max(provided_requested_rows, deliveries_rows)
-        
+        shipments_rows = math.ceil(shipments_rows / 4) -- number of columns
+
+        -- add control signals
+        local signals = t.input.get_merged_signals()
+        table_add = elems.signals_table.add
+        local signals_rows = 0
+        for i=1,#signals do
+          local signal = signals[i]
+          local name = signal.signal.name
+          if name ~= 'ltn-network-id' and string_find(name, '^ltn%-') then
+            signals_rows = signals_rows + 1
+            table_add{type='sprite-button', style='ltnm_inactive_small_slot_button_dark_grey', sprite='virtual-signal/'..name, number=signal.count,
+              tooltip={'virtual-signal-name.'..name}}
+          end
+        end
+        signals_rows = math.ceil(signals_rows / 4) -- number of columns
+
+        local num_rows = math.max(provided_requested_rows, shipments_rows, signals_rows)
+
         -- set scroll pane properties
         if provided_requested_rows > 3 then
           elems.provided_requested_frame.style.right_margin = -12
           elems.deliveries_frame.style = 'ltnm_dark_content_frame_in_light_frame_no_left'
         end
-        if deliveries_rows > 3 then
+        if shipments_rows > 3 then
+          elems.shipments_frame.style.right_margin = -12
+          elems.signals_frame.style = 'ltnm_dark_content_frame_in_light_frame_no_left'
+        end
+        if shipments_rows > 3 then
           elems.deliveries_frame.style.right_margin = -12
         end
         if num_rows > 1 then
           local frame_height = 36 * math.min(num_rows, 3)
-          elems.provided_requested_frame.style.height = frame_height
           elems.provided_requested_scroll_pane.style.height = frame_height
-          elems.deliveries_frame.style.height = frame_height
-          elems.deliveries_scroll_pane.style.height = frame_height
+          elems.shipments_scroll_pane.style.height = frame_height
+          elems.signals_scroll_pane.style.height = frame_height
         end
       end
     end
