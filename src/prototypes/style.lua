@@ -196,7 +196,7 @@ styles.ltnm_combinator_button = {
 styles.ltnm_sort_checkbox_inactive = {
   type = "checkbox_style",
   font = "default-bold",
-  font_color = default_font_color,
+  font_color = bold_font_color,
   padding = 0,
   default_graphical_set =
   {
@@ -255,7 +255,7 @@ styles.ltnm_sort_checkbox_inactive = {
 styles.ltnm_sort_checkbox_active = {
   type = 'checkbox_style',
   parent = 'ltnm_sort_checkbox_inactive',
-  font_color = bold_font_color,
+  -- font_color = bold_font_color,
   default_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-up-active.png",
     size = {16, 16},
@@ -678,15 +678,19 @@ styles.ltnm_row_table = {
   top_cell_padding = 6,
   bottom_cell_padding = 6,
   left_cell_padding = 4,
-  right_cell_padding = 4,
+  right_cell_padding = 4
+}
+
+styles.ltnm_stations_table = {
+  type = 'table_style',
+  parent = 'ltnm_row_table',
   column_widths = {
     {column=1, width=200},
     {column=2, width=24},
     {column=3, width=34},
     {column=4, width=180},
     {column=5, width=144},
-    {column=6, width=144},
-    {column=7, width=40}
+    {column=6, width=144}
   },
   column_alignments = {
     {column=1, alignment='middle-left'},
@@ -694,8 +698,7 @@ styles.ltnm_row_table = {
     {column=3, alignment='middle-center'},
     {column=4, alignment='middle-left'},
     {column=5, alignment='middle-left'},
-    {column=6, alignment='middle-left'},
-    {column=7, alignment='middle-center'}
+    {column=6, alignment='middle-left'}
   }
 }
 

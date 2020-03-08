@@ -167,18 +167,18 @@ function self.create(player, player_table)
           {type='frame', style='ltnm_toolbar_frame', style_mods={horizontally_stretchable=true}, direction='vertical', children={
             {type='flow', style='ltnm_station_labels_flow', direction='horizontal', children={
               {type='empty-widget', style_mods={height=28}},
-              {type='checkbox', style='ltnm_sort_checkbox_active', style_mods={left_margin=-4, width=200}, caption={'ltnm-gui.station-name'}, state=true},
-              {type='label', style='caption_label', style_mods={horizontal_align='center', width=24}, caption={'ltnm-gui.id'}},
-              {type='label', style='caption_label', style_mods={horizontal_align='center', width=34}, caption={'ltnm-gui.status'}},
+              {type='checkbox', style='ltnm_sort_checkbox_active', style_mods={left_margin=-4}, caption={'ltnm-gui.station-name'}, state=true},
+              {template='pushers.horizontal'},
+              {type='checkbox', style='ltnm_sort_checkbox_inactive', style_mods={horizontal_align='center', width=24}, caption={'ltnm-gui.id'}, state=true},
+              {type='checkbox', style='ltnm_sort_checkbox_inactive', style_mods={horizontal_align='center', width=34}, state=true},
               {type='label', style='caption_label', style_mods={width=180}, caption={'ltnm-gui.provided-requested'}},
               {type='label', style='caption_label', style_mods={width=144}, caption={'ltnm-gui.shipments'}},
-              {type='label', style='caption_label', caption={'ltnm-gui.control-signals'}},
-              {template='pushers.horizontal'},
+              {type='label', style='caption_label', style_mods={width=124}, caption={'ltnm-gui.control-signals'}},
               {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.station-filters-tooltip'}}
             }}
           }},
-          {type='scroll-pane', style='ltnm_blank_scroll_pane', direction='vertical', save_as='stations.scroll_pane', children={
-            {type='table', style='ltnm_row_table', column_count=6, save_as='stations.table'}
+          {type='scroll-pane', style='ltnm_blank_scroll_pane', direction='vertical', vertical_scroll_policy='always', save_as='stations.scroll_pane', children={
+            {type='table', style='ltnm_stations_table', style_mods={vertically_stretchable=true}, column_count=6, save_as='stations.table'}
           }}
         }},
         -- INVENTORY
