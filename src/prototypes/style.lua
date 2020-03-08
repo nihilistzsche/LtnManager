@@ -154,9 +154,9 @@ styles.ltnm_mock_frame_tab = {
 styles.ltnm_depot_button = {
   type = 'button_style',
   parent = 'button',
-  width = 206,
   height = 85,
   padding = 4,
+  width = 206,
   clicked_vertical_offset = 0,
   clicked_graphical_set = {
     base = {position = {34, 17}, corner_size = 8},
@@ -166,13 +166,6 @@ styles.ltnm_depot_button = {
     base = {position = {68, 0}, corner_size = 8},
     shadow = default_dirt
   }
-}
-
--- make the button narrower to account for the scrollbar
-styles.ltnm_depot_button_for_scrollbar = {
-  type = 'button_style',
-  parent = 'ltnm_depot_button',
-  width = 202
 }
 
 styles.ltnm_combinator_button = {
@@ -277,7 +270,6 @@ styles.ltnm_titlebar_drag_handle = {
   horizontally_stretchable = 'on',
   natural_height = 24,
   minimal_width = 24,
-  -- right_margin = 7
 }
 
 -- -----------------------------------------------------------------------------
@@ -340,7 +332,7 @@ styles.ltnm_main_frame_header = {
   },
   horizontal_flow_style = {
     type = 'horizontal_flow_style',
-    top_padding = 3,
+    top_padding = 4,
     vertical_align = 'center'
   }
 }
@@ -440,12 +432,6 @@ styles.ltnm_dark_content_frame_in_light_frame_no_left = {
   }
 }
 
-styles.ltnm_combinator_button_frame = {
-  type = 'frame_style',
-  parent = 'ltnm_dark_content_frame_in_light_frame',
-  size = 32
-}
-
 styles.ltnm_toolbar_frame = {
   type = 'frame_style',
   parent = 'frame',
@@ -458,7 +444,9 @@ styles.ltnm_toolbar_frame = {
   },
   horizontal_flow_style = {
     type = 'horizontal_flow_style',
-    vertical_align = 'center'
+    vertical_align = 'center',
+    height = 28,
+    horizontal_spacing = 12
   },
   vertical_align = 'center',
   top_padding = 3, -- optical correction - move one pixel up from perfect position
@@ -519,9 +507,8 @@ styles.ltnm_depots_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_blank_scroll_pane',
   padding = 0,
-  minimal_height = 85,
-  maximal_height = 170,
-  horizontally_stretchable = 'on',
+  vertically_stretchable = 'on',
+  width = 206,
   background_graphical_set = {
     position = {282, 17},
     corner_size = 8,
@@ -529,22 +516,6 @@ styles.ltnm_depots_scroll_pane = {
     overall_tiling_horizontal_size = 198,
     overall_tiling_horizontal_spacing = 8,
     overall_tiling_vertical_padding = 4,
-    overall_tiling_vertical_size = 78,
-    overall_tiling_vertical_spacing = 8
-  }
-}
-
--- adjust the rubber grid to fit the slightly narrower buttons when the scrollbar is active
-styles.ltnm_depots_scroll_pane_for_scrollbar = {
-  type = 'scroll_pane_style',
-  parent = 'ltnm_depots_scroll_pane',
-  background_graphical_set = {
-    position = {282, 17},
-    corner_size = 8,
-    overall_tiling_horizontal_padding = 4,
-    overall_tiling_horizontal_size = 194,
-    overall_tiling_horizontal_spacing = 8,
-    overall_tiling_vertical_padding = 2,
     overall_tiling_vertical_size = 78,
     overall_tiling_vertical_spacing = 8
   }
@@ -651,7 +622,7 @@ styles.ltnm_inventory_selected_icon = {
 -- -----------------------------------------------------------------------------
 -- TABLE STYLES
 
-styles.ltnm_row_table = {
+styles.ltnm_rows_table = {
   type = 'table_style',
   border = {
     border_width = 8,
@@ -681,9 +652,17 @@ styles.ltnm_row_table = {
   right_cell_padding = 4
 }
 
+styles.ltnm_depot_trains_table = {
+  type = 'table_style',
+  parent = 'ltnm_rows_table',
+  column_widths = {
+    {column=1, width=120}
+  }
+}
+
 styles.ltnm_stations_table = {
   type = 'table_style',
-  parent = 'ltnm_row_table',
+  parent = 'ltnm_rows_table',
   column_widths = {
     {column=1, width=200},
     {column=2, width=24},

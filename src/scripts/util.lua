@@ -22,7 +22,7 @@ end
 function util.comma_value(input)
   local formatted = input
   while true do
-    formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+    formatted, k = string.gsub(formatted, '^(-?%d+)(%d%d%d)', '%1,%2')
     if (k==0) then
       break
     end

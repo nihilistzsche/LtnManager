@@ -5,6 +5,7 @@
 
 -- dependencies
 local event = require('__RaiLuaLib__.lualib.event')
+local train_util = require('__OpteraLib__/script/train')
 local util = require('scripts.util')
 
 -- locals
@@ -77,6 +78,7 @@ local self = {}
       train
       network_id
       state
+      composition
       -- en route
       from
       to
@@ -186,6 +188,7 @@ local function iterate_stations()
         }
         trains[train_id].state = train.state
         trains[train_id].depot = schedule.records[1].station
+        trains[train_id].composition = train_util.get_train_composition_string(train)
       end
     end
 
