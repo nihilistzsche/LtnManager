@@ -525,14 +525,14 @@ function self.update(player, player_table, state_changes)
         -- set scroll pane properties
         if provided_requested_rows > 3 then
           elems.provided_requested_frame.style.right_margin = -12
-          elems.deliveries_frame.style = 'ltnm_dark_content_frame_in_light_frame_no_left'
+          elems.shipments_frame.style = 'ltnm_dark_content_frame_in_light_frame_no_left'
         end
         if shipments_rows > 3 then
           elems.shipments_frame.style.right_margin = -12
           elems.signals_frame.style = 'ltnm_dark_content_frame_in_light_frame_no_left'
         end
         if shipments_rows > 3 then
-          elems.deliveries_frame.style.right_margin = -12
+          elems.shipments_frame.style.right_margin = -12
         end
         if num_rows > 1 then
           local frame_height = 36 * math.min(num_rows, 3)
