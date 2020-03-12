@@ -5,10 +5,11 @@
 
 -- dependencies
 local event = require('__RaiLuaLib__.lualib.event')
-local train_util = require('__OpteraLib__/script/train')
 local util = require('scripts.util')
 
 -- locals
+local table_sort = table.sort
+
 local ltn_event_ids = {}
 
 -- self object
@@ -122,9 +123,7 @@ local self = {}
 -- -----------------------------------------------------------------------------
 -- PROCESSING FUNCTIONS
 
-local function iterate_stations()
-  local data = global.working_data
-
+local function iterate_stations(data)
   local depots = data.depots
   local stations = data.stations
   local station_ids = data.station_ids
@@ -180,15 +179,17 @@ local function iterate_stations()
 
       -- retrieve or construct train table
       if not trains[train_id] then
-        trains[train_id] = deliveries[train_id] or available_trains[train_id] or {
+        local train_data = deliveries[train_id] or available_trains[train_id] or {
           train = train,
           network_id = network_id,
           force = station.entity.force,
           returning_to_depot = true
         }
-        trains[train_id].state = train.state
-        trains[train_id].depot = schedule.records[1].station
-        trains[train_id].composition = train_util.get_train_composition_string(train)
+        train_data.state = train.state
+        train_data.depot = schedule.records[1].station
+        train_data.composition = util.train.get_composition_string(train)
+        train_data.status = util.train.get_status_string(train_data)
+        trains[train_id] = train_data
       end
     end
 
@@ -197,9 +198,41 @@ local function iterate_stations()
       local depot = depots[station_name]
       if depot then
         depot.stations[#depot.stations+1] = station_id
-      else
-        -- only add trains once, since all stations will have the same trains
-        depots[station_name] = {available_trains=station_available_trains, num_trains=#station_train_ids, stations={}, trains=station_train_ids}
+      else -- only add trains once, since all depot stations will have the same trains
+        local sort = {
+          composition = {lookup={}, values={}},
+          status = {lookup={}, values={}}
+        }
+        for ti=1,#station_trains do
+          local train_id = station_trains[ti].id
+          local train = trains[train_id]
+          -- add to sorting tables
+          for _,type in ipairs{'composition', 'status'} do
+            local key = train[type]
+            local tables = sort[type]
+            local lookup = tables.lookup[key]
+            if lookup then
+              lookup[#lookup+1] = train_id
+            else
+              tables.lookup[key] = {train_id}
+            end
+            table.insert(tables.values, key)
+          end
+        end
+        -- add to depots table
+        local depot_data = {available_trains=station_available_trains, num_trains=#station_train_ids, stations={}, trains={}}
+        -- sort and output train data
+        for _,type in ipairs{'composition', 'status'} do
+          local tables = sort[type]
+          local lookup = tables.lookup
+          local values = tables.values
+          table_sort(values)
+          local output = {}
+          for vi=1,#values do
+            output[vi] = table.remove(lookup[values[vi]])
+          end
+          depot_data['by_'..type] = output
+        end
       end
     end
 
@@ -250,7 +283,7 @@ local function iterate_data()
   local step = data.step
 
   if step == 1 then
-    iterate_stations()
+    iterate_stations(data)
   elseif step == 2 then
     -- process in transit items
     local in_transit = data.inventory.in_transit
@@ -268,7 +301,8 @@ local function iterate_data()
         end
       end
     end
-    -- next step
+    data.step = 3
+  elseif step == 3 then -- sort depot trains
     data.step = 100
   elseif step == 100 then -- finish up, copy to output
     global.data = {

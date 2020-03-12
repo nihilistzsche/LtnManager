@@ -37,4 +37,30 @@ function util.ticks_to_time(ticks)
   return math.floor(seconds / 60)..':'..math.floor(seconds % 60)
 end
 
+util.train = require('__OpteraLib__/script/train')
+
+-- for OCD's sake
+util.train.get_composition_string = util.train.get_train_composition_string
+
+-- create a string naming the status of the train
+function util.train.get_status_string(train_data)
+  local state = train_data.train.state
+  local def = defines.train_state
+  if state == def.on_the_path or state == def.arrive_signal or state == def.wait_signal or state == def.arrive_station then
+    if train_data.returning_to_depot then
+      return {'ltnm-gui.returning-to-depot'}
+    else
+      return {'', {'ltnm-gui.'..(train_data.pickupDone and 'delivering-to' or 'fetching-from')}, ':\n'..train_data.to}
+    end
+  elseif state == def.wait_station then
+    if train_data.surface or train_data.returning_to_depot then
+      return {'ltnm-gui.parked-at-depot'}
+    else
+      return {'', {'ltnm-gui.'..(train_data.pickupDone and 'unloading-at' or 'loading-at')}, ':\n'..(train_data.from or train_data.to)}
+    end
+  else
+    local breakpoint
+  end
+end
+
 return util
