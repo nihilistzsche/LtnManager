@@ -20,15 +20,15 @@ local self = {}
 -- -----------------------------------------------------------------------------
 -- GUI DATA
 
-gui.add_templates{
+gui.templates:extend{
   pushers = {
     horizontal = {type='empty-widget', style_mods={horizontally_stretchable=true}},
     vertical = {type='empty-widget', style_mods={vertically_stretchable=true}},
     both = {type='empty-widget', style_mods={horizontally_stretchable=true, vertically_stretchable=true}}
   },
   close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
-    clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='titlebar.close_button', save_as='titlebar.close_button'},
-  mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='titlebar.frame_tab'},
+    clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='main.titlebar.close_button', save_as='titlebar.close_button'},
+  mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='main.titlebar.frame_tab'},
   status_indicator = function(name, color, value)
     return {type='flow', style_mods={vertical_align='center'}, children={
       {type='sprite', style='ltnm_status_icon', sprite='ltnm_indicator_'..color, save_as=name..'_circle'},
@@ -71,48 +71,48 @@ local function update_active_tab(player, player_table, name)
   self.update(player, player_table, changes)
 end
 
-gui.add_handlers('main', {
+gui.handlers:extend{main={
   titlebar = {
     frame_tab = {
-      on_gui_click = function(e)
+      click = {id=defines.events.on_gui_click, handler=function(e)
         local name = e.default_tab or string_gsub(e.element.caption[1], 'ltnm%-gui%.', '')
         update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
-      end
+      end}
     },
     pin_button = {
-      on_gui_click = function(e)
+      click = {id=defines.events.on_gui_click, handler=function(e)
         
-      end
+      end}
     },
     refresh_button = {
-      on_gui_click = function(e)
+      click = {id=defines.events.on_gui_click, handler=function(e)
         local player_table = global.players[e.player_index]
         update_active_tab(game.get_player(e.player_index), global.players[e.player_index], player_table.gui.main.tabbed_pane.selected)
-      end
+      end}
     },
     close_button = {
-      on_gui_click = function(e)
+      click = {id=defines.events.on_gui_click, handler=function(e)
         self.destroy(game.get_player(e.player_index), global.players[e.player_index])
-      end
+      end}
     },
   },
   depots = {
     depot_button = {
-      on_gui_click = function(e)
+      click = {id=defines.events.on_gui_click, handler=function(e)
         local _,_,name = string_find(e.element.name, '^ltnm_depot_button_(.*)$')
         self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
-      end
+      end}
     }
   },
   inventory = {
     material_button = {
-      on_gui_click = function(e)
+      click = {id=defines.events.on_gui_click, handler=function(e)
         local _,_,name = string_find(e.element.name, '^ltnm_inventory_slot_button_(.*)$')
         self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_material=name})
-      end
+      end}
     }
   }
-})
+}}
 
 -- -----------------------------------------------------------------------------
 -- GUI MANAGEMENT
@@ -132,9 +132,9 @@ function self.create(player, player_table)
           {type='empty-widget', style='draggable_space_header', style_mods={horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
             save_as='titlebar.drag_handle'},
           {type='sprite-button', style='close_button', sprite='ltnm_pin_white', hovered_sprite='ltnm_pin_black', clicked_sprite='ltnm_pin_black',
-            tooltip={'ltnm-gui.keep-open'}, handlers='titlebar.pin_button', save_as='titlebar.pin_button'},
+            tooltip={'ltnm-gui.keep-open'}, handlers='main.titlebar.pin_button', save_as='titlebar.pin_button'},
           {type='sprite-button', style='close_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black', clicked_sprite='ltnm_refresh_black',
-            tooltip={'ltnm-gui.refresh-current-tab'}, handlers='titlebar.refresh_button', save_as='titlebar.refresh_button'},
+            tooltip={'ltnm-gui.refresh-current-tab'}, handlers='main.titlebar.refresh_button', save_as='titlebar.refresh_button'},
           {template='close_button'}
         }}
       }},
@@ -192,9 +192,9 @@ function self.create(player, player_table)
           {type='flow', style_mods={padding=10, horizontal_spacing=10}, direction='horizontal', children={
             -- inventory tables
             {type='flow', style_mods={padding=0}, direction='vertical', children={
-              gui.call_template('inventory.slot_table_with_label', 'provided'),
-              gui.call_template('inventory.slot_table_with_label', 'requested'),
-              gui.call_template('inventory.slot_table_with_label', 'in_transit')
+              gui.templates.inventory.slot_table_with_label('provided'),
+              gui.templates.inventory.slot_table_with_label('requested'),
+              gui.templates.inventory.slot_table_with_label('in_transit')
             }},
             -- item information
             {type='frame', style='ltnm_light_content_frame_in_light_frame', style_mods={horizontally_stretchable=true, vertically_stretchable=true},
@@ -207,9 +207,9 @@ function self.create(player, player_table)
                     {template='pushers.horizontal'},
                   }},
                   -- info
-                  gui.call_template('inventory.label_with_value', 'provided', {'ltnm-gui.provided'}, 0),
-                  gui.call_template('inventory.label_with_value', 'requested', {'ltnm-gui.requested'}, 0),
-                  gui.call_template('inventory.label_with_value', 'in_transit', {'ltnm-gui.in-transit'}, 0)
+                  gui.templates.inventory.label_with_value('provided', {'ltnm-gui.provided'}, 0),
+                  gui.templates.inventory.label_with_value('requested', {'ltnm-gui.requested'}, 0),
+                  gui.templates.inventory.label_with_value('in_transit', {'ltnm-gui.in-transit'}, 0)
                 }},
                 {type='scroll-pane', style='ltnm_material_locations_scroll_pane', style_mods={horizontally_stretchable=true, vertically_stretchable=true},
                   save_as='inventory.locations_scroll_pane'}
@@ -244,16 +244,17 @@ function self.create(player, player_table)
   player_table.gui.main = gui_data
 
   -- other handlers
-  gui.register_handlers('main', 'inventory.material_button', {player_index=player.index, gui_filters='ltnm_inventory_slot_button_'})
+  event.enable_group('gui.main.inventory.material_button', player.index, 'ltnm_inventory_slot_button_')
 
   -- set initial contents
-  gui.call_handler('main.titlebar.frame_tab.on_gui_click', {name=defines.events.on_gui_click, tick=game.tick, player_index=player.index, default_tab='depots'})
+  gui.handlers.main.titlebar.frame_tab.click.handler{name=defines.events.on_gui_click, tick=game.tick, player_index=player.index,
+    default_tab='depots'}
   -- profiler.Stop()
 end
 
 -- completely destroys the GUI
 function self.destroy(player, player_table)
-  gui.deregister_all('main', player.index)
+  event.disable_group('gui.main', player.index)
   player_table.gui.main.window.destroy()
   player_table.gui.main = nil
   -- set shortcut state
@@ -286,9 +287,9 @@ function self.update(player, player_table, state_changes)
   -- DEPOT BUTTONS
   if state_changes.depot_buttons then
     local buttons_pane = gui_data.depots.buttons_scroll_pane
-    -- delete old buttons and deregister handler
+    -- delete old buttons and disable handler
     buttons_pane.clear()
-    gui.deregister_handlers('main', 'depots.depot_button', player.index)
+    event.disable_group('gui.main.depots.depot_button', player.index)
 
     local buttons_data = {}
 
@@ -298,7 +299,7 @@ function self.update(player, player_table, state_changes)
     for name,t in pairs(data.depots) do
       button_index = button_index + 1
       local elems = gui.build(buttons_pane, {
-        {type='button', name='ltnm_depot_button_'..name, style='ltnm_depot_button', handlers='depots.depot_button', save_as='button', children={
+        {type='button', name='ltnm_depot_button_'..name, style='ltnm_depot_button', handlers='main.depots.depot_button', save_as='button', children={
           {type='flow', ignored_by_interaction=true, direction='vertical', children={
             {type='label', style='caption_label', style_mods={font_color={28, 28, 28}}, caption=name, save_as='name_label'},
             {type='flow', direction='horizontal', children={
@@ -318,7 +319,7 @@ function self.update(player, player_table, state_changes)
       end
       local status_flow = elems.status_flow
       for status_name, status_count in pairs(statuses) do
-        local output = gui.build(status_flow, {gui.call_template('status_indicator', 'indicator', status_name, status_count)})
+        local output = gui.build(status_flow, {gui.templates.status_indicator('indicator', status_name, status_count)})
         elems.standard_labels[status_name] = output.indicator_label
       end
 
@@ -380,10 +381,11 @@ function self.update(player, player_table, state_changes)
 
   -- DEPOT TRAINS
   if state_changes.depot_trains then
+
     local trains_table = gui_data.depots.trains_table
     trains_table.clear()
 
-    local trains = data.depots[gui_data.depots.selected].trains
+    local trains = data.depots[gui_data.depots.selected].trains_temp
     for _,train_id in ipairs(trains) do
       local train = data.trains[train_id]
       -- build GUI structure
@@ -458,7 +460,7 @@ function self.update(player, player_table, state_changes)
         local elems = gui.build(stations_table, {
           {type='label', style='hoverable_bold_label', caption=t.entity.backer_name},
           {type='label', caption=t.network_id},
-          gui.call_template('status_indicator', 'indicator', t.status.name, t.status.count),
+          gui.templates.status_indicator('indicator', t.status.name, t.status.count),
           -- items
           {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='provided_requested_frame', children={
             {type='scroll-pane', style='ltnm_station_provided_requested_slot_table_scroll_pane', save_as='provided_requested_scroll_pane', children={

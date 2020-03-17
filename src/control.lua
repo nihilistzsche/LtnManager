@@ -4,6 +4,8 @@
 -- dependencies
 local event = require('__RaiLuaLib__.lualib.event')
 local mod_gui = require('mod-gui')
+local translation = require('__RaiLuaLib__.lualib.translation')
+local util = require('scripts.util')
 
 -- scripts
 local data_manager = require('scripts.data-manager')
@@ -12,6 +14,33 @@ local migrations = require('scripts.migrations')
 
 -- -----------------------------------------------------------------------------
 -- UTILITIES
+
+local function build_translation_data()
+  local translation_data = {
+    materials = {}
+  }
+  -- materials
+  for name,prototype in pairs(util.merge{game.fluid_prototypes, game.item_prototypes}) do
+    translation_data.materials[#translation_data.materials+1] = {internal=name, localised=prototype.localised_name}
+  end
+  -- gui
+  translation_data.gui = {
+    {internal='delivering-to', localised={'ltnm-gui.delivering-to'}},
+    {internal='fetching-from', localised={'ltnm-gui.fetching-from'}},
+    {internal='loading-at', localised={'ltnm-gui.loading-at'}},
+    {internal='parked-at-depot', localised={'ltnm-gui.parked-at-depot'}},
+    {internal='returning-to-depot', localised={'ltnm-gui.returning-to-depot'}},
+    {internal='unloading-at', localised={'ltnm-gui.unloading-at'}},
+  }
+  global.__lualib.translation.translation_data = translation_data
+end
+
+local function run_player_translations(player)
+  local translation_data = global.__lualib.translation.translation_data
+  for _,name in ipairs{'materials', 'gui'} do
+    translation.start(player, name, translation_data[name], {lowercase_sorted_translations=true, include_failed_translations=true})
+  end
+end
 
 local function create_mod_gui_button(player)
   local button = mod_gui.get_button_flow(player).add{type='sprite-button', name='ltnm_toggle_gui', style=mod_gui.button_style,
@@ -23,7 +52,10 @@ end
 local function setup_player(player, index)
   local data = {
     dictionary = {},
-    flags = {},
+    flags = {
+      can_open_gui = false,
+      translations_finished = false
+    },
     gui = {}
   }
   if player.mod_settings['ltnm-show-mod-gui-button'].value then
@@ -39,7 +71,7 @@ local function toggle_gui(e)
   if player_table.gui.main then
     main_gui.destroy(player, player_table)
   else
-    if global.data then
+    if player_table.flags.can_open_gui then
       main_gui.create(player, player_table)
     else
       player.print{'ltnm-message.TEMP-COMEUPWITHANAMESTUPID!'}
@@ -49,6 +81,14 @@ local function toggle_gui(e)
   player.set_shortcut_toggled('ltnm-toggle-gui', player_table.gui.main and true or false)
 end
 
+-- registered conditionally, tied to the LTN on_stops_updated event
+local function enable_gui(e)
+  local players = global.players
+  for i,p in pairs(e.registered_players) do
+    players[i].flags.can_open_gui = true
+  end
+end
+
 -- -----------------------------------------------------------------------------
 -- EVENTS
 
@@ -56,11 +96,15 @@ event.on_init(function()
   global.flags = {}
   global.players = {}
   global.working_data = {history={}, alerts={}}
+  build_translation_data()
   for i,p in pairs(game.players) do
     setup_player(p, i)
+    if p.connected then
+      run_player_translations(p)
+    end
   end
   data_manager.setup_events()
-end, {insert_at_front=true})
+end)
 
 event.on_configuration_changed(migrations)
 
@@ -70,6 +114,13 @@ end)
 
 event.on_player_removed(function(e)
   global.players[e.player_index] = nil
+end)
+
+event.on_player_joined_game(function(e)
+  local player_table = global.players[e.player_index]
+  player_table.flags.can_open_gui = false
+  player_table.flags.translations_finished = false
+  run_player_translations(game.get_player(e.player_index))
 end)
 
 event.on_runtime_mod_setting_changed(function(e)
@@ -92,4 +143,20 @@ event.register({defines.events.on_lua_shortcut, 'ltnm-toggle-gui'}, function(e)
   end
 end)
 
-event.on_gui_click(toggle_gui, {gui_filters='ltnm_toggle_gui'})
+event.on_gui_click(toggle_gui, 'ltnm_toggle_gui')
+
+event.register(translation.finish_event, function(e)
+  local player_table = global.players[e.player_index]
+  -- add to player table
+  player_table.dictionary[e.dictionary_name] = {
+    lookup = e.lookup,
+    lookup_lower = e.lookup_lower,
+    sorted_translations = e.sorted_translations,
+    translations = e.translations
+  }
+  -- if this player is done translating
+  if global.__lualib.translation.players[e.player_index].active_translations_count == 0 then
+    -- on the next LTN data update, the GUI will become open-able
+    player_table.flags.can_open_gui = true
+  end
+end)

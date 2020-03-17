@@ -12,8 +12,8 @@ local table_sort = table.sort
 
 local ltn_event_ids = {}
 
--- self object
-local self = {}
+-- object
+local data_manager = {}
 
 --[[
   DATA STRUCTURE
@@ -199,40 +199,7 @@ local function iterate_stations(data)
       if depot then
         depot.stations[#depot.stations+1] = station_id
       else -- only add trains once, since all depot stations will have the same trains
-        local sort = {
-          composition = {lookup={}, values={}},
-          status = {lookup={}, values={}}
-        }
-        for ti=1,#station_trains do
-          local train_id = station_trains[ti].id
-          local train = trains[train_id]
-          -- add to sorting tables
-          for _,type in ipairs{'composition', 'status'} do
-            local key = train[type]
-            local tables = sort[type]
-            local lookup = tables.lookup[key]
-            if lookup then
-              lookup[#lookup+1] = train_id
-            else
-              tables.lookup[key] = {train_id}
-            end
-            table.insert(tables.values, key)
-          end
-        end
-        -- add to depots table
-        local depot_data = {available_trains=station_available_trains, num_trains=#station_train_ids, stations={}, trains={}}
-        -- sort and output train data
-        for _,type in ipairs{'composition', 'status'} do
-          local tables = sort[type]
-          local lookup = tables.lookup
-          local values = tables.values
-          table_sort(values)
-          local output = {}
-          for vi=1,#values do
-            output[vi] = table.remove(lookup[values[vi]])
-          end
-          depot_data['by_'..type] = output
-        end
+        depots[station_name] = {available_trains=station_available_trains, num_trains=#station_train_ids, stations={station_id}, trains_temp=station_train_ids}
       end
     end
 
@@ -274,9 +241,6 @@ end
 -- -----------------------------------------------------------------------------
 -- HANDLERS
 
--- declare these two here so the iterate_data function can access them
-local on_stops_updated, on_dispatcher_updated
-
 -- called on_tick until data iteration is finished
 local function iterate_data()
   local data = global.working_data
@@ -303,7 +267,40 @@ local function iterate_data()
     end
     data.step = 3
   elseif step == 3 then -- sort depot trains
+    local depots = data.depots
+    local players = global.players
+    for n,t in pairs(data.depots) do
+      -- STUFF
+    end
+    -- -- the sorting of depot trains will be different for every player, based on their language
+    -- for i,_ in pairs(game.players) do
+    --   local dictionary = players[i].dictionary
+    --   -- if the dictionary doesn't exist yet, they can't actually open the GUI anyway
+    --   if dictionary.gui then
+        
+    --   end
+    -- end
     data.step = 100
+
+    --[[
+      
+      for ti=1,#station_trains do
+        local train_id = station_trains[ti].id
+        local train = trains[train_id]
+        -- add to sorting tables
+        for _,type in ipairs{'composition', 'status'} do
+          local key = train[type]
+          local tables = sort[type]
+          local lookup = tables.lookup[key]
+          if lookup then
+            lookup[#lookup+1] = train_id
+          else
+            tables.lookup[key] = {train_id}
+          end
+          table.insert(tables.values, key)
+        end
+      end
+    ]]
   elseif step == 100 then -- finish up, copy to output
     global.data = {
       depots = data.depots,
@@ -317,23 +314,23 @@ local function iterate_data()
       material_locations = data.material_locations
     }
     -- reset events
-    event.deregister_conditional(iterate_data, 'iterate_ltn_data')
-    event.register(ltn_event_ids.on_stops_updated, on_stops_updated, {name='ltn_on_stops_updated'})
-    event.register(ltn_event_ids.on_dispatcher_updated, on_dispatcher_updated, {name='ltn_on_dispatcher_updated'})
+    event.enable('ltn_on_stops_updated')
+    event.enable('ltn_on_dispatcher_updated')
+    event.disable('iterate_ltn_data')
   end
 end
 
-function on_stops_updated(e)
+local function on_stops_updated(e)
   global.working_data.stations = e.logistic_train_stops
 end
 
-function on_dispatcher_updated(e)
+local function on_dispatcher_updated(e)
   local stations = global.working_data.stations
   if not stations then error('LTN event desync: did not receive stations in time!') end
 
   -- deregister events for this update cycle
-  event.deregister_conditional(on_stops_updated, 'ltn_on_stops_updated')
-  event.deregister_conditional(on_dispatcher_updated, 'ltn_on_dispatcher_updated')
+  event.disable('ltn_on_stops_updated')
+  event.disable('ltn_on_dispatcher_updated')
 
   -- set up data tables
   local station_ids = {}
@@ -367,8 +364,8 @@ function on_dispatcher_updated(e)
   data.step = 1
   data.index = 1
 
-  -- register data iteration handler
-  event.on_tick(iterate_data, {name='iterate_ltn_data', skip_validation=true})
+  -- enable data iteration handler
+  event.enable('iterate_ltn_data')
 end
 
 local function on_delivery_pickup_complete(e)
@@ -425,24 +422,22 @@ local ltn_handlers = {
   on_delivery_failed = on_delivery_failed
 }
 
-function self.setup_events()
+function data_manager.setup_events()
   if not remote.interfaces['logistic-train-network'] then
     error('Could not establish connection to LTN!')
   end
+  local events = {}
   for id,handler in pairs(ltn_handlers) do
     ltn_event_ids[id] = remote.call('logistic-train-network', id)
-    event.register(ltn_event_ids[id], handler, {name=id})
+    events['ltn_'..id] = {id=ltn_event_ids[id], handler=handler, group='ltn'}
   end
+  events.iterate_ltn_data = {id=defines.events.on_tick, handler=iterate_data, options={skip_validation=true}}
+  event.register_conditional(events)
+  event.enable_group('ltn')
 end
-
--- re-register the events in on_load
-event.on_load(function()
-  event.load_conditional_handlers(ltn_handlers)
-  event.load_conditional_handlers{
-    iterate_ltn_data = iterate_data
-  }
-end)
 
 -- -----------------------------------------------------------------------------
 
-return self
+data_manager.ltn_event_ids = ltn_event_ids
+
+return data_manager
