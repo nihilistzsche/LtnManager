@@ -53,8 +53,7 @@ local function setup_player(player, index)
   local data = {
     dictionary = {},
     flags = {
-      can_open_gui = false,
-      translations_finished = false
+      can_open_gui = false
     },
     gui = {}
   }
@@ -84,8 +83,9 @@ end
 -- registered conditionally, tied to the LTN on_stops_updated event
 local function enable_gui(e)
   local players = global.players
-  for i,p in pairs(e.registered_players) do
+  for _,i in pairs(e.registered_players) do
     players[i].flags.can_open_gui = true
+    event.disable('enable_gui_on_next_ltn_update', i)
   end
 end
 
@@ -111,6 +111,12 @@ event.on_load(function()
   data_manager.setup_events()
 end)
 
+event.register({'on_init', 'on_load'}, function()
+  event.register_conditional{
+    enable_gui_on_next_ltn_update = {id=data_manager.ltn_event_ids.on_dispatcher_updated, handler=enable_gui}
+  }
+end)
+
 event.on_configuration_changed(migrations)
 
 event.on_player_created(function(e)
@@ -124,7 +130,6 @@ end)
 event.on_player_joined_game(function(e)
   local player_table = global.players[e.player_index]
   player_table.flags.can_open_gui = false
-  player_table.flags.translations_finished = false
   run_player_translations(game.get_player(e.player_index))
 end)
 
@@ -161,7 +166,7 @@ event.register(translation.finish_event, function(e)
   }
   -- if this player is done translating
   if global.__lualib.translation.players[e.player_index].active_translations_count == 0 then
-    -- on the next LTN data update, the GUI will become open-able
-    player_table.flags.can_open_gui = true
+    -- enable opening the GUI on the next LTN update cycle
+    event.enable('enable_gui_on_next_ltn_update', e.player_index)
   end
 end)

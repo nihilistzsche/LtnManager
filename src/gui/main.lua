@@ -8,7 +8,7 @@ local event = require('__RaiLuaLib__.lualib.event')
 local gui = require('__RaiLuaLib__.lualib.gui')
 local util = require('scripts.util')
 
-local profiler = require('__profiler__/profiler.lua')
+-- local profiler = require('__profiler__/profiler.lua')
 
 -- locals
 local string_find = string.find
@@ -118,7 +118,7 @@ gui.handlers:extend{main={
 -- GUI MANAGEMENT
 
 function self.create(player, player_table)
-  profiler.Start()
+  -- profiler.Start()
   local gui_data = gui.build(player.gui.screen, {
     {type='frame', style='ltnm_empty_frame', direction='vertical', save_as='window', children={
       -- TITLEBAR
@@ -249,7 +249,7 @@ function self.create(player, player_table)
   -- set initial contents
   gui.handlers.main.titlebar.frame_tab.click.handler{name=defines.events.on_gui_click, tick=game.tick, player_index=player.index,
     default_tab='depots'}
-  profiler.Stop()
+  -- profiler.Stop()
 end
 
 -- completely destroys the GUI
