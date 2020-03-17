@@ -104,6 +104,11 @@ event.on_init(function()
     end
   end
   data_manager.setup_events()
+  data_manager.enable_events()
+end)
+
+event.on_load(function()
+  data_manager.setup_events()
 end)
 
 event.on_configuration_changed(migrations)
