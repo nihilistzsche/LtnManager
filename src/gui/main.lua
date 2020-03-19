@@ -26,7 +26,7 @@ gui.templates:extend{
     vertical = {type='empty-widget', style_mods={vertically_stretchable=true}},
     both = {type='empty-widget', style_mods={horizontally_stretchable=true, vertically_stretchable=true}}
   },
-  close_button = {type='sprite-button', style='close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
+  close_button = {type='sprite-button', style='ltnm_close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
     clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='main.titlebar.close_button', save_as='titlebar.close_button'},
   mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='main.titlebar.frame_tab'},
   status_indicator = function(name, color, value)
@@ -131,10 +131,11 @@ function self.create(player, player_table)
         {type='frame', style='ltnm_main_frame_header', children={
           {type='empty-widget', style='draggable_space_header', style_mods={horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
             save_as='titlebar.drag_handle'},
-          {type='sprite-button', style='close_button', sprite='ltnm_pin_white', hovered_sprite='ltnm_pin_black', clicked_sprite='ltnm_pin_black',
+          {type='sprite-button', style='ltnm_close_button', sprite='ltnm_pin_white', hovered_sprite='ltnm_pin_black', clicked_sprite='ltnm_pin_black',
             tooltip={'ltnm-gui.keep-open'}, handlers='main.titlebar.pin_button', save_as='titlebar.pin_button'},
-          {type='sprite-button', style='close_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black', clicked_sprite='ltnm_refresh_black',
-            tooltip={'ltnm-gui.refresh-current-tab'}, handlers='main.titlebar.refresh_button', save_as='titlebar.refresh_button'},
+          {type='sprite-button', style='ltnm_close_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black',
+            clicked_sprite='ltnm_refresh_black', tooltip={'ltnm-gui.refresh-current-tab'}, handlers='main.titlebar.refresh_button',
+            save_as='titlebar.refresh_button'},
           {template='close_button'}
         }}
       }},

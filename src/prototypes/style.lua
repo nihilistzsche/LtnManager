@@ -181,6 +181,12 @@ styles.ltnm_combinator_button = {
   },
 }
 
+styles.ltnm_close_button = {
+  type = 'button_style',
+  parent = 'close_button',
+  size = 20
+}
+
 -- -----------------------------------------------------------------------------
 -- CHECKBOX STYLES
 
