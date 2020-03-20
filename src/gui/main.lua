@@ -74,42 +74,42 @@ end
 gui.handlers:extend{main={
   titlebar = {
     frame_tab = {
-      click = {id=defines.events.on_gui_click, handler=function(e)
+      on_gui_click = function(e)
         local name = e.default_tab or string_gsub(e.element.caption[1], 'ltnm%-gui%.', '')
         update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
-      end}
+      end
     },
     pin_button = {
-      click = {id=defines.events.on_gui_click, handler=function(e)
+      on_gui_click = function(e)
         
-      end}
+      end
     },
     refresh_button = {
-      click = {id=defines.events.on_gui_click, handler=function(e)
+      on_gui_click = function(e)
         local player_table = global.players[e.player_index]
         update_active_tab(game.get_player(e.player_index), global.players[e.player_index], player_table.gui.main.tabbed_pane.selected)
-      end}
+      end
     },
     close_button = {
-      click = {id=defines.events.on_gui_click, handler=function(e)
+      on_gui_click = function(e)
         self.destroy(game.get_player(e.player_index), global.players[e.player_index])
-      end}
+      end
     },
   },
   depots = {
     depot_button = {
-      click = {id=defines.events.on_gui_click, handler=function(e)
+      on_gui_click = function(e)
         local _,_,name = string_find(e.element.name, '^ltnm_depot_button_(.*)$')
         self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
-      end}
+      end
     }
   },
   inventory = {
     material_button = {
-      click = {id=defines.events.on_gui_click, handler=function(e)
+      on_gui_click = function(e)
         local _,_,name = string_find(e.element.name, '^ltnm_inventory_slot_button_(.*)$')
         self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_material=name})
-      end}
+      end
     }
   }
 }}
@@ -252,7 +252,7 @@ function self.create(player, player_table)
   event.enable_group('gui.main.inventory.material_button', player.index, 'ltnm_inventory_slot_button_')
 
   -- set initial contents
-  gui.handlers.main.titlebar.frame_tab.click.handler{name=defines.events.on_gui_click, tick=game.tick, player_index=player.index,
+  gui.handlers.main.titlebar.frame_tab.on_gui_click{name=defines.events.on_gui_click, tick=game.tick, player_index=player.index,
     default_tab='depots'}
   -- profiler.Stop()
 end
