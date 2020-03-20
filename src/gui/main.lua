@@ -222,21 +222,25 @@ function self.create(player, player_table)
         {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.history', children={
           -- toolbar
           {type='frame', style='ltnm_toolbar_frame', children={
-            {type='checkbox', style='ltnm_sort_checkbox_inactive', state=true, style_mods={width=136, left_margin=4}, caption={'ltnm-gui.depot'}},
+            {type='checkbox', style='ltnm_sort_checkbox_inactive', state=true, style_mods={width=140, left_margin=8}, caption={'ltnm-gui.depot'}},
             {type='checkbox', style='ltnm_sort_checkbox_inactive', state=true, caption={'ltnm-gui.route'}},
             {template='pushers.horizontal'},
-            {type='label', style='caption_label', style_mods={right_margin=8}, caption={'ltnm-gui.runtime'}},
-            {type='label', style='caption_label', style_mods={width=112}, caption={'ltnm-gui.shipment'}},
+            {type='checkbox', style='ltnm_sort_checkbox_inactive', style_mods={right_margin=8}, state=true, caption={'ltnm-gui.runtime'}},
+            {type='label', style='caption_label', style_mods={width=124}, caption={'ltnm-gui.shipment'}},
             {type='sprite-button', style='red_icon_button', sprite='utility/trash', tooltip={'ltnm-gui.clear-history'}, save_as='history.delete_button'}
           }},
           -- listing
-          {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={horizontally_stretchable=true, vertically_stretchable=true}, save_as='history.pane'}
+          {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={horizontally_stretchable=true, vertically_stretchable=true},
+            vertical_scroll_policy='always', save_as='history.pane', children={
+              {type='table', style='ltnm_rows_table', style_mods={vertically_stretchable=true}, column_count=4, save_as='history.table'}
+            }
+          }
         }},
         -- ALERTS
         {type='empty-widget', mods={visible=false}, save_as='tabbed_pane.contents.alerts'}
       }}
     }}
-  }, 'main', player.index)
+  })
 
   -- dragging and centering
   gui_data.titlebar.drag_handle.drag_target = gui_data.window
@@ -312,7 +316,7 @@ function self.update(player, player_table, state_changes)
             }}
           }}
         }}
-      }, 'main', player.index)
+      })
       local statuses = {}
       for _,station_id in ipairs(t.stations) do
         local status = data.stations[station_id].status
@@ -702,29 +706,26 @@ function self.update(player, player_table, state_changes)
   -- HISTORY
   if state_changes.history then
     local history = data.history
-    local history_pane = gui_data.history.pane
-    history_pane.clear()
+    local history_table = gui_data.history.table
+    history_table.clear()
 
     for i=1,#history do
       local entry = history[i]
-      local table_add = gui.build(history_pane, {
-        {type='flow', style_mods={vertical_align='center', padding=4}, children={
-          {type='label', style='bold_label', style_mods={width=140}, caption=entry.depot},
-          {type='flow', style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical', children={
-            {type='label', style='bold_label', caption=entry.from},
-            {type='flow', children={
-              {type='label', style='caption_label', caption='->'},
-              {type='label', style='bold_label', caption=entry.to}
-            }}
-          }},
-          {type='label', style_mods={right_margin=8}, caption=entry.runtime and util.ticks_to_time(entry.runtime) or 'N/A'},
-          {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-            {type='scroll-pane', style='ltnm_train_slot_table_scroll_pane', children={
-              {type='table', style='ltnm_small_slot_table', column_count=4, save_as='table'}
-            }}
+      local table_add = gui.build(history_table, {
+        {type='label', style='bold_label', style_mods={width=140}, caption=entry.depot},
+        {type='flow', style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical', children={
+          {type='label', style='bold_label', caption=entry.from},
+          {type='flow', children={
+            {type='label', style='caption_label', caption='->'},
+            {type='label', style='bold_label', caption=entry.to}
           }}
         }},
-        {type='line', style_mods={horizontally_stretchable=true}, direction='horizontal'}
+        {type='label', style_mods={right_margin=8}, caption=entry.runtime and util.ticks_to_time(entry.runtime) or 'N/A'},
+        {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+          {type='scroll-pane', style='ltnm_train_slot_table_scroll_pane', children={
+            {type='table', style='ltnm_small_slot_table', column_count=4, save_as='table'}
+          }}
+        }}
       }).table.add
       for name,count in pairs(entry.actual_shipment or entry.shipment) do
         table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
