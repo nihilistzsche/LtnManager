@@ -25,6 +25,5 @@ data:extend{
   util.mipped_icon('ltnm_refresh_white', {48,0}, util.paths.nav_icons),
   util.mipped_icon('ltnm_pin_black', {0,32}, util.paths.nav_icons),
   util.mipped_icon('ltnm_pin_white', {48,32}, util.paths.nav_icons),
-  util.mipped_icon('ltnm_filter', {0,0}, util.paths.tool_icons),
-  util.mipped_icon('ltnm_mod_gui_button_icon', {0,0}, util.paths.shortcut_icons)
+  util.mipped_icon('ltnm_filter', {0,0}, util.paths.tool_icons)
 }

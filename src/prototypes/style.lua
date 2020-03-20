@@ -524,6 +524,10 @@ styles.ltnm_depots_scroll_pane = {
     overall_tiling_vertical_padding = 4,
     overall_tiling_vertical_size = 78,
     overall_tiling_vertical_spacing = 8
+  },
+  vertical_flow_style = {
+    type = 'vertical_flow_style',
+    vertical_spacing = 0
   }
 }
 

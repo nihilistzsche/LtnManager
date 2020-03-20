@@ -3,7 +3,6 @@
 
 -- dependencies
 local event = require('__RaiLuaLib__.lualib.event')
-local mod_gui = require('mod-gui')
 local translation = require('__RaiLuaLib__.lualib.translation')
 local util = require('scripts.util')
 
@@ -42,13 +41,6 @@ local function run_player_translations(player)
   end
 end
 
-local function create_mod_gui_button(player)
-  local button = mod_gui.get_button_flow(player).add{type='sprite-button', name='ltnm_toggle_gui', style=mod_gui.button_style,
-    tooltip={'shortcut-name.ltnm-toggle-gui'}, sprite='ltnm_mod_gui_button_icon'}
-  button.style.padding = 5
-  return button
-end
-
 local function setup_player(player, index)
   local data = {
     dictionary = {},
@@ -57,9 +49,6 @@ local function setup_player(player, index)
     },
     gui = {}
   }
-  if player.mod_settings['ltnm-show-mod-gui-button'].value then
-    data.gui.mod_gui_button = create_mod_gui_button(player)
-  end
   global.players[index] = data
 end
 
@@ -131,20 +120,6 @@ event.on_player_joined_game(function(e)
   local player_table = global.players[e.player_index]
   player_table.flags.can_open_gui = false
   run_player_translations(game.get_player(e.player_index))
-end)
-
-event.on_runtime_mod_setting_changed(function(e)
-  -- add / remove the mod gui button if they changed that setting
-  if e.setting == 'ltnm-show-mod-gui-button' then
-    local player = game.get_player(e.player_index)
-    local player_gui = global.players[e.player_index].gui
-    if player_gui.mod_gui_button then
-      player_gui.mod_gui_button.destroy()
-      player_gui.mod_gui_button = nil
-    else
-      player_gui.mod_gui_button = create_mod_gui_button(player)
-    end
-  end
 end)
 
 event.register({defines.events.on_lua_shortcut, 'ltnm-toggle-gui'}, function(e)

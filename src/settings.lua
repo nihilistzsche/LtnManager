@@ -10,13 +10,5 @@ data:extend{
     minimum_value = 1,
     default_value = 10,
     order = 'a'
-  },
-  -- player
-  {
-    type = 'bool-setting',
-    name = 'ltnm-show-mod-gui-button',
-    setting_type = 'runtime-per-user',
-    default_value = false,
-    order = 'a'
   }
 }
