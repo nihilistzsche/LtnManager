@@ -104,6 +104,8 @@ local data_manager = {}
   -- lookup tables - included in output
   network_to_stations
     (dictionary of network_id -> array of train_id)
+  sorted_stations
+    (dictionary of type -> array of station_id)
   material_locations
     [material_name]
       stations
@@ -260,7 +262,6 @@ local function process_in_transit_materials(data)
 end
 
 local function sort_depot_trains(data)
-  local depots = data.depots
   local players = global.players
   local trains = data.trains
   for n,depot in pairs(data.depots) do
@@ -327,6 +328,57 @@ local function sort_depot_trains(data)
   end
 
   -- next step
+  data.step = 4
+end
+
+local function sort_stations(data)
+  -- sorting tables
+  local sort = {
+    name = {lookup={}, values={}},
+    network_id = {lookup={}, values={}},
+    status = {lookup={}, values={}},
+  }
+
+  -- iterate stations
+  for station_id,station_data in pairs(data.stations) do
+    if not station_data.isDepot then
+      -- organize station data
+      local station = {
+        name = station_data.entity.backer_name,
+        network_id = station_data.network_id,
+        status = station_data.status.name..'_'..station_data.status.count
+      }
+      -- sort data
+      for key,t in pairs(sort) do
+        local value = station[key]
+        local lookup = t.lookup[value]
+        if lookup then
+          lookup[#lookup+1] = station_id
+        else
+          t.lookup[value] = {station_id}
+        end
+        table_insert(t.values, value)
+      end
+    end
+  end
+
+  -- sort data
+  local results = {}
+  for key,t in pairs(sort) do
+    local result = {}
+    local lookup = t.lookup
+    local values = t.values
+    table_sort(values)
+    for i,value in ipairs(values) do
+      result[i] = table_remove(lookup[value])
+    end
+    results[key] = result
+  end
+
+  -- save data
+  data.sorted_stations = results
+
+  -- next step
   data.step = 100
 end
 
@@ -344,17 +396,23 @@ local function iterate_data()
     process_in_transit_materials(data)
   elseif step == 3 then
     sort_depot_trains(data)
+  elseif step == 4 then
+    sort_stations(data)
   elseif step == 100 then -- finish up, copy to output
     global.data = {
+      -- bulk data
       depots = data.depots,
       stations = data.stations,
-      num_stations = data.num_stations,
       inventory = data.inventory,
       trains = data.trains,
       history = data.history,
       alerts = data.alerts,
+      -- lookup tables
+      sorted_stations = data.sorted_stations,
       network_to_stations = data.network_to_stations,
-      material_locations = data.material_locations
+      material_locations = data.material_locations,
+      -- other
+      num_stations = data.num_stations
     }
     -- reset events
     event.enable('ltn_on_stops_updated')

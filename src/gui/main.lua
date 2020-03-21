@@ -72,6 +72,11 @@ local function update_active_tab(player, player_table, name)
 end
 
 gui.handlers:extend{main={
+  window = {
+    on_gui_closed = function(e)
+      self.destroy(game.get_player(e.player_index), global.players[e.player_index])
+    end
+  },
   titlebar = {
     frame_tab = {
       on_gui_click = function(e)
@@ -120,9 +125,23 @@ gui.handlers:extend{main={
             gui_data.composition_sort_checkbox.style = 'ltnm_sort_checkbox_inactive'
           end
         else
+          -- update the state in global
           gui_data['sort_'..clicked_type] = e.element.state
         end
+        -- update GUI contents
         self.update(game.get_player(e.player_index), player_table, {depot_trains=true})
+      end
+    }
+  },
+  stations = {
+    sort_checkbox = {
+      on_gui_checked_state_changed = function(e)
+        game.print(serpent.block(e))
+      end
+    },
+    material_button = {
+      on_gui_click = function(e)
+        game.print(serpent.block(e))
       end
     }
   },
@@ -141,8 +160,9 @@ gui.handlers:extend{main={
 
 function self.create(player, player_table)
   -- profiler.Start()
+  -- create base GUI structure
   local gui_data = gui.build(player.gui.screen, {
-    {type='frame', style='ltnm_empty_frame', direction='vertical', save_as='window', children={
+    {type='frame', style='ltnm_empty_frame', direction='vertical', handlers='main.window', save_as='window', children={
       -- TITLEBAR
       {type='flow', style_mods={horizontal_spacing=0}, direction='horizontal', children={
         {template='mock_frame_tab', caption={'ltnm-gui.depots'}, save_as='tabbed_pane.tabs.depots'},
@@ -193,10 +213,13 @@ function self.create(player, player_table)
           -- toolbar
           {type='frame', style='ltnm_toolbar_frame', children={
             {type='empty-widget', style_mods={height=28}},
-            {type='checkbox', style='ltnm_sort_checkbox_active', style_mods={left_margin=-4}, caption={'ltnm-gui.station-name'}, state=true},
+            {type='checkbox', name='ltnm_sort_station_name', style='ltnm_sort_checkbox_active', style_mods={left_margin=-4}, caption={'ltnm-gui.station-name'},
+              handlers='main.stations.sort_checkbox', state=true},
             {template='pushers.horizontal'},
-            {type='checkbox', style='ltnm_sort_checkbox_inactive', style_mods={horizontal_align='center', width=24}, caption={'ltnm-gui.id'}, state=true},
-            {type='checkbox', style='ltnm_sort_checkbox_inactive', style_mods={horizontal_align='center', width=34}, state=true},
+            {type='checkbox', name='ltnm_sort_station_network_id', style='ltnm_sort_checkbox_inactive', style_mods={horizontal_align='center', width=24},
+              caption={'ltnm-gui.id'}, handlers='main.stations.sort_checkbox', state=true},
+            {type='checkbox', name='ltnm_sort_station_status', style='ltnm_sort_checkbox_inactive', style_mods={horizontal_align='center', width=34},
+              handlers='main.stations.sort_checkbox', state=true},
             {type='label', style='caption_label', style_mods={width=180}, caption={'ltnm-gui.provided-requested'}},
             {type='label', style='caption_label', style_mods={width=144}, caption={'ltnm-gui.shipments'}},
             {type='label', style='caption_label', style_mods={width=124}, caption={'ltnm-gui.control-signals'}},
@@ -267,6 +290,7 @@ function self.create(player, player_table)
   })
 
   -- other handlers
+  event.enable_group('gui.main.stations.material_button', player.index, 'ltnm_station_material_button_')
   event.enable_group('gui.main.inventory.material_button', player.index, 'ltnm_inventory_slot_button_')
 
   -- default settings
@@ -278,8 +302,11 @@ function self.create(player, player_table)
   gui_data.titlebar.drag_handle.drag_target = gui_data.window
   gui_data.window.force_auto_center()
 
-  player_table.gui.main = gui_data
+  -- opened
+  player.opened = gui_data.window
 
+  -- save data to global
+  player_table.gui.main = gui_data
 
   -- set initial contents
   gui.handlers.main.titlebar.frame_tab.on_gui_click{name=defines.events.on_gui_click, tick=game.tick, player_index=player.index,
