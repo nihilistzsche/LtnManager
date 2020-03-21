@@ -101,6 +101,13 @@ gui.handlers:extend{main={
       end
     },
   },
+  material_button = {
+    on_gui_click = function(e)
+      self.update(game.get_player(e.player_index), global.players[e.player_index],
+        {active_tab='inventory', inventory_contents=true, selected_material=string_gsub(e.element.sprite, '/', ',')}
+      )
+    end
+  },
   depots = {
     depot_button = {
       on_gui_click = function(e)
@@ -152,11 +159,6 @@ gui.handlers:extend{main={
         end
         -- update GUI contents
         self.update(game.get_player(e.player_index), player_table, {stations_list=true})
-      end
-    },
-    material_button = {
-      on_gui_click = function(e)
-        game.print(serpent.block(e))
       end
     }
   },
@@ -306,7 +308,7 @@ function self.create(player, player_table)
   })
 
   -- other handlers
-  event.enable_group('gui.main.stations.material_button', player.index, 'ltnm_station_material_button_')
+  event.enable_group('gui.main.material_button', player.index, 'ltnm_material_button_')
   event.enable_group('gui.main.inventory.material_button', player.index, 'ltnm_inventory_slot_button_')
 
   -- default settings
@@ -501,7 +503,11 @@ function self.update(player, player_table, state_changes)
       if train.shipment then
         local contents_table = elems.contents_table
         for name,count in pairs(train.shipment) do
-          contents_table.add{type='sprite-button', style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'), number=count}
+          contents_table.add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'),
+            number=count}
+          -- gui.build(contents_table, {
+          --   {type='sprite-button', style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'), number=count, handlers='main.material_button'}
+          -- })
         end
       end
     end
@@ -561,7 +567,8 @@ function self.update(player, player_table, state_changes)
         if materials then
           for name,count in pairs(materials) do
             provided_requested_rows = provided_requested_rows + 1
-            table_add{type='sprite-button', style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
+            table_add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'),
+              number=count}
           end
         end
       end
@@ -575,7 +582,8 @@ function self.update(player, player_table, state_changes)
         local shipment = data.trains[shipments[i]].shipment
         for name,count in pairs(shipment) do
           shipments_rows = shipments_rows + 1
-          table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
+          table_add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'),
+            number=count}
         end
       end
       shipments_rows = math.ceil(shipments_rows / 4) -- number of columns
@@ -619,7 +627,6 @@ function self.update(player, player_table, state_changes)
   end
 
   -- INVENTORY CONTENTS
-  -- also not used externally
   if state_changes.inventory_contents then
     local inventory = data.inventory
     local inventory_gui_data = gui_data.inventory
