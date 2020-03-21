@@ -300,9 +300,9 @@ local function sort_depot_trains(data)
           -- sort trains
           for _,train_id in ipairs(depot.trains_temp) do
             local train = trains[train_id]
-            local status = util.train.get_status_string(train, translations)
+            local status, status_data = util.train.get_status_string(train, translations)
             -- add status to train data
-            train.status[pi] = status
+            train.status[pi] = status_data
             -- add to sorting tables
             local lookup = sort_lookup[status]
             if lookup then

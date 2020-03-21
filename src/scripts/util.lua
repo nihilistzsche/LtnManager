@@ -43,23 +43,28 @@ util.train = require('__OpteraLib__/script/train')
 util.train.get_composition_string = util.train.get_train_composition_string
 
 -- create a string naming the status of the train
+-- first return is the string used for sorting, second return is the formatted string data for display
 function util.train.get_status_string(train_data, translations)
   local state = train_data.train.state
   local def = defines.train_state
   if state == def.on_the_path or state == def.arrive_signal or state == def.wait_signal or state == def.arrive_station then
     if train_data.returning_to_depot then
-      return translations['returning-to-depot']
+      return translations['returning-to-depot'], {{'bold_label', translations['returning-to-depot']}}
     else
-      return translations[train_data.pickupDone and 'delivering-to' or 'fetching-from']..':^^'..train_data.to
+      return
+        translations[train_data.pickupDone and 'delivering-to' or 'fetching-from']..':^^'..train_data.to,
+        {{'label', translations[train_data.pickupDone and 'delivering-to' or 'fetching-from']..':'}, {'bold_label', train_data.to}}
     end
   elseif state == def.wait_station then
     if train_data.surface or train_data.returning_to_depot then
-      return translations['parked-at-depot']
+      return translations['parked-at-depot'], {{'bold_green_label', translations['parked-at-depot']}}
     else
-      return translations[train_data.pickupDone and 'unloading-at' or 'loading-at']..':^^'..(train_data.from or train_data.to)
+      return
+        translations[train_data.pickupDone and 'unloading-at' or 'loading-at']..':^^'..(train_data.from or train_data.to),
+        {{'label', translations[train_data.pickupDone and 'unloading-at' or 'loading-at']..':'}, {'bold_label', train_data.from or train_data.to}}
     end
   else
-    local breakpoint
+    return 'N/A', {{'bold_red_label', 'N/A'}}
   end
 end
 

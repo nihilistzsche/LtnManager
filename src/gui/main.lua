@@ -102,6 +102,28 @@ gui.handlers:extend{main={
         local _,_,name = string_find(e.element.name, '^ltnm_depot_button_(.*)$')
         self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
       end
+    },
+    sort_checkbox = {
+      on_gui_checked_state_changed = function(e)
+        local _,_,clicked_type = string_find(e.element.name, '^ltnm_sort_train_(.-)$')
+        local player_table = global.players[e.player_index]
+        local gui_data = player_table.gui.main.depots
+        if gui_data.active_sort ~= clicked_type then
+          -- reset the checkbox value and switch active sort
+          e.element.state = not e.element.state
+          gui_data.active_sort = clicked_type
+          -- update styles
+          e.element.style = 'ltnm_sort_checkbox_active'
+          if clicked_type == 'composition' then
+            gui_data.status_sort_checkbox.style = 'ltnm_sort_checkbox_inactive'
+          else
+            gui_data.composition_sort_checkbox.style = 'ltnm_sort_checkbox_inactive'
+          end
+        else
+          gui_data['sort_'..clicked_type] = e.element.state
+        end
+        self.update(game.get_player(e.player_index), player_table, {depot_trains=true})
+      end
     }
   },
   inventory = {
@@ -150,8 +172,10 @@ function self.create(player, player_table)
           {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
             -- toolbar
             {type='frame', style='ltnm_toolbar_frame', children={
-              {type='checkbox', style='ltnm_sort_checkbox_active', style_mods={left_margin=8, width=120}, caption={'ltnm-gui.composition'}, state=true},
-              {type='checkbox', style='ltnm_sort_checkbox_inactive', caption={'ltnm-gui.train-status'}, state=true},
+              {type='checkbox', name='ltnm_sort_train_composition', style='ltnm_sort_checkbox_active', style_mods={left_margin=8, width=120},
+                caption={'ltnm-gui.composition'}, state=true, handlers='main.depots.sort_checkbox', save_as='depots.composition_sort_checkbox'},
+              {type='checkbox', name='ltnm_sort_train_status', style='ltnm_sort_checkbox_inactive', caption={'ltnm-gui.train-status'}, state=true,
+                handlers='main.depots.sort_checkbox', save_as='depots.status_sort_checkbox'},
               {template='pushers.horizontal'},
               {type='label', style='caption_label', style_mods={width=144}, caption={'ltnm-gui.shipment'}},
               {type='empty-widget', style_mods={width=6}}
@@ -422,7 +446,10 @@ function self.update(player, player_table, state_changes)
         }}
       })
       -- train status
-      elems.status_flow.add{type='label', style='bold_label', caption=train.status[player.index]}
+      local status_flow_add = elems.status_flow.add
+      for _,t in ipairs(train.status[player.index]) do
+        status_flow_add{type='label', style=t[1], caption=t[2]}
+      end
       -- contents table
       if train.shipment then
         local contents_table = elems.contents_table
@@ -431,27 +458,17 @@ function self.update(player, player_table, state_changes)
         end
       end
     end
-    local num_children = #trains_table.children
-    if num_children == 0 then
-      gui.build(gui_data.depots.trains_scrollpane, {
-        {type='flow', style_mods={horizontally_stretchable=true, vertically_stretchable=true, horizontal_align='center', vertical_align='center'}, children={
-          {type='label', caption={'ltnm-gui.select-a-depot-to-show-trains'}}
-        }}
-      })
-    end
+    -- local num_children = #trains_table.children
+    -- if num_children == 0 then
+    --   gui.build(gui_data.depots.trains_scrollpane, {
+    --     {type='flow', style_mods={horizontally_stretchable=true, vertically_stretchable=true, horizontal_align='center', vertical_align='center'}, children={
+    --       {type='label', caption={'ltnm-gui.select-a-depot-to-show-trains'}}
+    --     }}
+    --   })
+    -- end
   end
 
-  -- STATION FILTERS
-  if state_changes.station_filters then
-
-  end
-
-  -- STATION SORT
-  if state_changes.station_sort then
-
-  end
-
-  -- not used externally, but is called by the above two situations
+  -- STATIONS LIST
   if state_changes.stations_list then
     local stations_table = gui_data.stations.table
     stations_table.clear()
