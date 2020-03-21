@@ -315,7 +315,7 @@ function self.create(player, player_table)
   gui_data.depots.active_sort = 'composition'
   gui_data.depots.sort_composition = true
   gui_data.depots.sort_status = true
-  gui_data.stations.active_sort = 'network_id'
+  gui_data.stations.active_sort = 'name'
   gui_data.stations.sort_name = true
   gui_data.stations.sort_network_id = true
   gui_data.stations.sort_status = true
