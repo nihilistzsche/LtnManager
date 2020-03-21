@@ -41,7 +41,7 @@ gui.templates:extend{
         {type='label', style='caption_label', caption={'ltnm-gui.'..string_gsub(name, '_', '-')}},
         {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
           {type='scroll-pane', style='ltnm_slot_table_scroll_pane', vertical_scroll_policy='always', children={
-            {type='table', style='ltnm_inventory_slot_table', column_count=6, save_as='inventory.'..name..'_table'}
+            {type='table', style='ltnm_inventory_slot_table', column_count=10, save_as='inventory.'..name..'_table'}
           }}
         }}
       }}
@@ -271,7 +271,7 @@ function self.create(player, player_table)
                   gui.templates.inventory.label_with_value('in_transit', {'ltnm-gui.in-transit'}, 0)
                 }},
                 {type='scroll-pane', style='ltnm_material_locations_scroll_pane', style_mods={horizontally_stretchable=true, vertically_stretchable=true},
-                  save_as='inventory.locations_scroll_pane'}
+                  vertical_scroll_policy='always', save_as='inventory.locations_scroll_pane'}
               }
             }
           }}
@@ -317,7 +317,7 @@ function self.create(player, player_table)
   gui_data.window.force_auto_center()
 
   -- opened
-  player.opened = gui_data.window
+  -- player.opened = gui_data.window
 
   -- save data to global
   player_table.gui.main = gui_data

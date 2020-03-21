@@ -701,7 +701,7 @@ styles.ltnm_slot_table = {
 styles.ltnm_inventory_slot_table = {
   type = 'table_style',
   parent = 'ltnm_slot_table',
-  width = 240
+  width = 400
 }
 
 styles.ltnm_small_slot_table = {
