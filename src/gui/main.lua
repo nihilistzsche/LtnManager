@@ -121,16 +121,12 @@ gui.handlers:extend{main={
         local player_table = global.players[e.player_index]
         local gui_data = player_table.gui.main.depots
         if gui_data.active_sort ~= clicked_type then
+          -- update styles
+          gui_data[gui_data.active_sort..'_sort_checkbox'].style = 'ltnm_sort_checkbox_inactive'
+          e.element.style = 'ltnm_sort_checkbox_active'
           -- reset the checkbox value and switch active sort
           e.element.state = not e.element.state
           gui_data.active_sort = clicked_type
-          -- update styles
-          e.element.style = 'ltnm_sort_checkbox_active'
-          if clicked_type == 'composition' then
-            gui_data.status_sort_checkbox.style = 'ltnm_sort_checkbox_inactive'
-          else
-            gui_data.composition_sort_checkbox.style = 'ltnm_sort_checkbox_inactive'
-          end
         else
           -- update the state in global
           gui_data['sort_'..clicked_type] = e.element.state
