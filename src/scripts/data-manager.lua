@@ -498,7 +498,8 @@ local function on_delivery_completed(e)
     from_id = train.from_id,
     to_id = train.to_id,
     depot = train.depot,
-    shipment = e.shipment
+    shipment = e.shipment,
+    runtime = game.tick - train.started
   })
   global.working_data.history[51] = nil -- limit to 50 entries
 end
