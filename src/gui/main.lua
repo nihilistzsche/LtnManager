@@ -103,8 +103,12 @@ gui.handlers:extend{main={
   },
   material_button = {
     on_gui_click = function(e)
-      self.update(game.get_player(e.player_index), global.players[e.player_index],
-        {active_tab='inventory', inventory_contents=true, selected_material=string_gsub(e.element.sprite, '/', ',')}
+      local player_table = global.players[e.player_index]
+      local on_inventory_tab = player_table.gui.main.tabbed_pane.selected == 'inventory'
+      self.update(game.get_player(e.player_index), player_table, {
+        active_tab = (not on_inventory_tab) and 'inventory',
+        inventory_contents = (not on_inventory_tab) and true,
+        selected_material = string_gsub(e.element.sprite, '/', ',')}
       )
     end
   },
@@ -158,14 +162,7 @@ gui.handlers:extend{main={
       end
     }
   },
-  inventory = {
-    material_button = {
-      on_gui_click = function(e)
-        local _,_,name = string_find(e.element.name, '^ltnm_inventory_slot_button_(.*)$')
-        self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_material=name})
-      end
-    }
-  }
+  inventory = {}
 }}
 
 -- -----------------------------------------------------------------------------
@@ -305,7 +302,6 @@ function self.create(player, player_table)
 
   -- other handlers
   event.enable_group('gui.main.material_button', player.index, 'ltnm_material_button_')
-  event.enable_group('gui.main.inventory.material_button', player.index, 'ltnm_inventory_slot_button_')
 
   -- default settings
   gui_data.depots.active_sort = 'composition'
@@ -643,7 +639,7 @@ function self.update(player, player_table, state_changes)
       local add = table.add
       local elems = {}
       for name,count in pairs(combined_materials) do
-        elems[name] = add{type='sprite-button', name='ltnm_inventory_slot_button_'..name, style='ltnm_slot_button_'..color,
+        elems[name] = add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_slot_button_'..color,
           sprite=string_gsub(name, ',', '/'), number=count}
       end
       buttons[type] = elems
@@ -723,7 +719,8 @@ function self.update(player, player_table, state_changes)
             local materials = station[mode]
             if materials then
               for name,count in pairs(materials) do
-                table_add{type='sprite-button', style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
+                table_add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'),
+                  number=count}
               end
             end
           end
@@ -762,7 +759,8 @@ function self.update(player, player_table, state_changes)
           local materials = train.shipment
           if materials then
             for name,count in pairs(materials) do
-              table_add{type='sprite-button', style='ltnm_small_slot_button_blue', sprite=string_gsub(name, ',', '/'), number=count}
+              table_add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_small_slot_button_blue', sprite=string_gsub(name, ',', '/'),
+                number=count}
             end
           end
           pane_add{type='line', style='ltnm_material_locations_line', direction='horizontal'}
