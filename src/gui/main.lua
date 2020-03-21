@@ -136,7 +136,22 @@ gui.handlers:extend{main={
   stations = {
     sort_checkbox = {
       on_gui_checked_state_changed = function(e)
-        game.print(serpent.block(e))
+        local _,_,clicked_type = string_find(e.element.name, '^ltnm_sort_station_(.-)$')
+        local player_table = global.players[e.player_index]
+        local gui_data = player_table.gui.main.stations
+        if gui_data.active_sort ~= clicked_type then
+          -- update styles
+          gui_data[gui_data.active_sort..'_sort_checkbox'].style = 'ltnm_sort_checkbox_inactive'
+          e.element.style = 'ltnm_sort_checkbox_active'
+          -- reset the checkbox value and switch active sort
+          e.element.state = not e.element.state
+          gui_data.active_sort = clicked_type
+        else
+          -- update the state in global
+          gui_data['sort_'..clicked_type] = e.element.state
+        end
+        -- update GUI contents
+        self.update(game.get_player(e.player_index), player_table, {stations_list=true})
       end
     },
     material_button = {
@@ -214,16 +229,17 @@ function self.create(player, player_table)
           {type='frame', style='ltnm_toolbar_frame', children={
             {type='empty-widget', style_mods={height=28}},
             {type='checkbox', name='ltnm_sort_station_name', style='ltnm_sort_checkbox_active', style_mods={left_margin=-4}, caption={'ltnm-gui.station-name'},
-              handlers='main.stations.sort_checkbox', state=true},
+              state=true, handlers='main.stations.sort_checkbox', save_as='stations.name_sort_checkbox'},
             {template='pushers.horizontal'},
             {type='checkbox', name='ltnm_sort_station_network_id', style='ltnm_sort_checkbox_inactive', style_mods={horizontal_align='center', width=24},
-              caption={'ltnm-gui.id'}, handlers='main.stations.sort_checkbox', state=true},
+              state=true, caption={'ltnm-gui.id'}, handlers='main.stations.sort_checkbox', save_as='stations.network_id_sort_checkbox'},
             {type='checkbox', name='ltnm_sort_station_status', style='ltnm_sort_checkbox_inactive', style_mods={horizontal_align='center', width=34},
-              handlers='main.stations.sort_checkbox', state=true},
+              state=true, handlers='main.stations.sort_checkbox', save_as='stations.status_sort_checkbox'},
             {type='label', style='caption_label', style_mods={width=180}, caption={'ltnm-gui.provided-requested'}},
             {type='label', style='caption_label', style_mods={width=144}, caption={'ltnm-gui.shipments'}},
-            {type='label', style='caption_label', style_mods={width=124}, caption={'ltnm-gui.control-signals'}},
-            {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.station-filters-tooltip'}}
+            {type='label', style='caption_label', style_mods={width=144}, caption={'ltnm-gui.control-signals'}},
+            {type='empty-widget', style_mods={width=8}}
+            -- {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.station-filters-tooltip'}}
           }},
           {type='scroll-pane', style='ltnm_blank_scroll_pane', direction='vertical', vertical_scroll_policy='always', save_as='stations.scroll_pane', children={
             {type='table', style='ltnm_stations_table', style_mods={vertically_stretchable=true}, column_count=6, save_as='stations.table'}
@@ -297,6 +313,10 @@ function self.create(player, player_table)
   gui_data.depots.active_sort = 'composition'
   gui_data.depots.sort_composition = true
   gui_data.depots.sort_status = true
+  gui_data.stations.active_sort = 'network_id'
+  gui_data.stations.sort_name = true
+  gui_data.stations.sort_network_id = true
+  gui_data.stations.sort_status = true
 
   -- dragging and centering
   gui_data.titlebar.drag_handle.drag_target = gui_data.window
@@ -500,95 +520,100 @@ function self.update(player, player_table, state_changes)
     local stations_table = gui_data.stations.table
     stations_table.clear()
 
+    local active_sort = gui_data.stations.active_sort
+    local sort_value = gui_data.stations['sort_'..active_sort]
     local stations = data.stations
-    for id,t in pairs(stations) do
-      if not t.isDepot then -- don't include depots in the stations list
-        -- build GUI structure
-        local elems = gui.build(stations_table, {
-          {type='label', style='hoverable_bold_label', caption=t.entity.backer_name},
-          {type='label', caption=t.network_id},
-          gui.templates.status_indicator('indicator', t.status.name, t.status.count),
-          -- items
-          {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='provided_requested_frame', children={
-            {type='scroll-pane', style='ltnm_station_provided_requested_slot_table_scroll_pane', save_as='provided_requested_scroll_pane', children={
-              {type='table', style='ltnm_small_slot_table', column_count=5, save_as='provided_requested_table'}
-            }}
-          }},
-          {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='shipments_frame', children={
-            {type='scroll-pane', style='ltnm_station_shipments_slot_table_scroll_pane', save_as='shipments_scroll_pane', children={
-              {type='table', style='ltnm_small_slot_table', column_count=4, save_as='shipments_table'}
-            }}
-          }},
-          -- control signals
-          {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='signals_frame', children={
-            {type='scroll-pane', style='ltnm_station_shipments_slot_table_scroll_pane', save_as='signals_scroll_pane', children={
-              {type='table', style='ltnm_small_slot_table', column_count=4, save_as='signals_table'}
-            }}
+    local sorted_stations = data.sorted_stations[active_sort]
+    local start = sort_value and 1 or #sorted_stations
+    local finish = sort_value and #sorted_stations or 1
+    local delta = sort_value and 1 or -1
+    for i=start,finish,delta do
+      local t = stations[sorted_stations[i]]
+      -- build GUI structure
+      local elems = gui.build(stations_table, {
+        {type='label', style='hoverable_bold_label', caption=t.entity.backer_name},
+        {type='label', caption=t.network_id},
+        gui.templates.status_indicator('indicator', t.status.name, t.status.count),
+        -- items
+        {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='provided_requested_frame', children={
+          {type='scroll-pane', style='ltnm_station_provided_requested_slot_table_scroll_pane', save_as='provided_requested_scroll_pane', children={
+            {type='table', style='ltnm_small_slot_table', column_count=5, save_as='provided_requested_table'}
           }}
-        })
+        }},
+        {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='shipments_frame', children={
+          {type='scroll-pane', style='ltnm_station_shipments_slot_table_scroll_pane', save_as='shipments_scroll_pane', children={
+            {type='table', style='ltnm_small_slot_table', column_count=4, save_as='shipments_table'}
+          }}
+        }},
+        -- control signals
+        {type='frame', style='ltnm_dark_content_frame_in_light_frame', save_as='signals_frame', children={
+          {type='scroll-pane', style='ltnm_station_shipments_slot_table_scroll_pane', save_as='signals_scroll_pane', children={
+            {type='table', style='ltnm_small_slot_table', column_count=4, save_as='signals_table'}
+          }}
+        }}
+      })
 
-        -- add provided/requested materials
-        local table_add = elems.provided_requested_table.add
-        local provided_requested_rows = 0
-        for key,color in pairs{provided='green', requested='red'} do
-          local materials = t[key]
-          if materials then
-            for name,count in pairs(materials) do
-              provided_requested_rows = provided_requested_rows + 1
-              table_add{type='sprite-button', style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
-            end
+      -- add provided/requested materials
+      local table_add = elems.provided_requested_table.add
+      local provided_requested_rows = 0
+      for key,color in pairs{provided='green', requested='red'} do
+        local materials = t[key]
+        if materials then
+          for name,count in pairs(materials) do
+            provided_requested_rows = provided_requested_rows + 1
+            table_add{type='sprite-button', style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'), number=count}
           end
         end
-        provided_requested_rows = math.ceil(provided_requested_rows / 6) -- number of columns
+      end
+      provided_requested_rows = math.ceil(provided_requested_rows / 6) -- number of columns
 
-        -- add active shipments
-        local shipments = t.activeDeliveries
-        table_add = elems.shipments_table.add
-        local shipments_rows = 0
-        for i=1,#shipments do
-          local shipment = data.trains[shipments[i]].shipment
-          for name,count in pairs(shipment) do
-            shipments_rows = shipments_rows + 1
-            table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
-          end
+      -- add active shipments
+      local shipments = t.activeDeliveries
+      table_add = elems.shipments_table.add
+      local shipments_rows = 0
+      for i=1,#shipments do
+        local shipment = data.trains[shipments[i]].shipment
+        for name,count in pairs(shipment) do
+          shipments_rows = shipments_rows + 1
+          table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
         end
-        shipments_rows = math.ceil(shipments_rows / 4) -- number of columns
+      end
+      shipments_rows = math.ceil(shipments_rows / 4) -- number of columns
 
-        -- add control signals
-        local signals = t.input.get_merged_signals()
-        table_add = elems.signals_table.add
-        local signals_rows = 0
-        for i=1,#signals do
-          local signal = signals[i]
-          local name = signal.signal.name
-          if name ~= 'ltn-network-id' and string_find(name, '^ltn%-') then
-            signals_rows = signals_rows + 1
-            table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite='virtual-signal/'..name, number=signal.count,
-              tooltip={'virtual-signal-name.'..name}}.enabled = false
-          end
+      -- add control signals
+      local signals = t.input.get_merged_signals()
+      table_add = elems.signals_table.add
+      local signals_rows = 0
+      for i=1,#signals do
+        local signal = signals[i]
+        local name = signal.signal.name
+        if name ~= 'ltn-network-id' and string_find(name, '^ltn%-') then
+          signals_rows = signals_rows + 1
+          table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite='virtual-signal/'..name, number=signal.count,
+            tooltip={'virtual-signal-name.'..name}}.enabled = false
         end
-        signals_rows = math.ceil(signals_rows / 4) -- number of columns
+      end
+      signals_rows = math.ceil(signals_rows / 4) -- number of columns
 
-        local num_rows = math.max(provided_requested_rows, shipments_rows, signals_rows)
+      local num_rows = math.max(provided_requested_rows, shipments_rows, signals_rows)
 
-        -- set scroll pane properties
-        if provided_requested_rows > 3 then
-          elems.provided_requested_frame.style.right_margin = -12
-          elems.shipments_frame.style = 'ltnm_dark_content_frame_in_light_frame_no_left'
-        end
-        if shipments_rows > 3 then
-          elems.shipments_frame.style.right_margin = -12
-          elems.signals_frame.style = 'ltnm_dark_content_frame_in_light_frame_no_left'
-        end
-        if shipments_rows > 3 then
-          elems.shipments_frame.style.right_margin = -12
-        end
-        if num_rows > 1 then
-          local frame_height = 36 * math.min(num_rows, 3)
-          elems.provided_requested_scroll_pane.style.height = frame_height
-          elems.shipments_scroll_pane.style.height = frame_height
-          elems.signals_scroll_pane.style.height = frame_height
-        end
+      -- set scroll pane properties
+      if provided_requested_rows > 3 then
+        elems.provided_requested_frame.style.right_margin = -12
+        elems.shipments_frame.style = 'ltnm_dark_content_frame_in_light_frame_no_left'
+      end
+      if shipments_rows > 3 then
+        elems.shipments_frame.style.right_margin = -12
+        elems.signals_frame.style = 'ltnm_dark_content_frame_in_light_frame_no_left'
+      end
+      if shipments_rows > 3 then
+        elems.shipments_frame.style.right_margin = -12
+      end
+      if num_rows > 1 then
+        local frame_height = 36 * math.min(num_rows, 3)
+        elems.provided_requested_scroll_pane.style.height = frame_height
+        elems.shipments_scroll_pane.style.height = frame_height
+        elems.signals_scroll_pane.style.height = frame_height
       end
     end
   end
