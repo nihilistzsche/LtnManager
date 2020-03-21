@@ -240,6 +240,96 @@ local function iterate_stations(data)
   data.index = end_index
 end
 
+local function process_in_transit_materials(data)
+  local in_transit = data.inventory.in_transit
+  local material_locations = data.material_locations
+  for id,t in pairs(data.deliveries) do
+    -- add to in transit inventory
+    in_transit[t.network_id] = util.add_materials(t.shipment, in_transit[t.network_id] or {})
+    -- sort materials into locations
+    for name,count in pairs(t.shipment) do
+      local locations = material_locations[name]
+      if not locations then
+        material_locations[name] = {stations={}, trains={id}}
+      else
+        locations.trains[#locations.trains+1] = id
+      end
+    end
+  end
+  data.step = 3
+end
+
+local function sort_depot_trains(data)
+  local depots = data.depots
+  local players = global.players
+  local trains = data.trains
+  for n,depot in pairs(data.depots) do
+    local depot_trains = {}
+    -- sort by composition - same for all players
+    do
+      local sort_lookup = {}
+      local sort_values = {}
+      for _,train_id in ipairs(depot.trains_temp) do
+        local train = data.trains[train_id]
+        local lookup = sort_lookup[train.composition]
+        if lookup then
+          lookup[#lookup+1] = train_id
+        else
+          sort_lookup[train.composition] = {train_id}
+        end
+        table_insert(sort_values, train.composition)
+      end
+      table_sort(sort_values)
+      local result = {}
+      for i,value in ipairs(sort_values) do
+        result[i] = table_remove(sort_lookup[value])
+      end
+      depot_trains.composition = result
+    end
+
+    -- sort by status - player-specific based on language
+    do
+      local results_by_player = {}
+      for pi,_ in pairs(game.players) do
+        local player_table = players[pi]
+        -- only bother if they can actually open the GUI
+        if player_table.flags.can_open_gui then
+          local sort_lookup = {}
+          local sort_values = {}
+          local translations = player_table.dictionary.gui.translations
+          -- sort trains
+          for _,train_id in ipairs(depot.trains_temp) do
+            local train = trains[train_id]
+            local status = util.train.get_status_string(train, translations)
+            -- add status to train data
+            train.status[pi] = status
+            -- add to sorting tables
+            local lookup = sort_lookup[status]
+            if lookup then
+              lookup[#lookup+1] = train_id
+            else
+              sort_lookup[status] = {train_id}
+            end
+            table_insert(sort_values, status)
+          end
+          table_sort(sort_values)
+          local result = {}
+          for i,value in ipairs(sort_values) do
+            result[i] = table_remove(sort_lookup[value])
+          end
+          results_by_player[pi] = result
+        end
+      end
+      depot_trains.status = results_by_player
+    end
+    depot.trains = depot_trains
+    depot.trains_temp = nil
+  end
+
+  -- next step
+  data.step = 100
+end
+
 -- -----------------------------------------------------------------------------
 -- HANDLERS
 
@@ -251,91 +341,9 @@ local function iterate_data()
   if step == 1 then
     iterate_stations(data)
   elseif step == 2 then
-    -- process in transit items
-    local in_transit = data.inventory.in_transit
-    local material_locations = data.material_locations
-    for id,t in pairs(data.deliveries) do
-      -- add to in transit inventory
-      in_transit[t.network_id] = util.add_materials(t.shipment, in_transit[t.network_id] or {})
-      -- sort items into locations
-      for name,count in pairs(t.shipment) do
-        local locations = material_locations[name]
-        if not locations then
-          material_locations[name] = {stations={}, trains={id}}
-        else
-          locations.trains[#locations.trains+1] = id
-        end
-      end
-    end
-    data.step = 3
-  elseif step == 3 then -- sort depot trains
-    local depots = data.depots
-    local players = global.players
-    local trains = data.trains
-    for n,depot in pairs(data.depots) do
-      local depot_trains = {}
-      -- sort by composition - same for all players
-      do
-        local sort_lookup = {}
-        local sort_values = {}
-        for _,train_id in ipairs(depot.trains_temp) do
-          local train = data.trains[train_id]
-          local lookup = sort_lookup[train.composition]
-          if lookup then
-            lookup[#lookup+1] = train_id
-          else
-            sort_lookup[train.composition] = {train_id}
-          end
-          table_insert(sort_values, train.composition)
-        end
-        table_sort(sort_values)
-        local result = {}
-        for i,value in ipairs(sort_values) do
-          result[i] = table_remove(sort_lookup[value])
-        end
-        depot_trains.composition = result
-      end
-
-      -- sort by status - player-specific based on language
-      do
-        local results_by_player = {}
-        for pi,_ in pairs(game.players) do
-          local player_table = players[pi]
-          -- only bother if they can actually open the GUI
-          if player_table.flags.can_open_gui then
-            local sort_lookup = {}
-            local sort_values = {}
-            local translations = player_table.dictionary.gui.translations
-            -- sort trains
-            for _,train_id in ipairs(depot.trains_temp) do
-              local train = trains[train_id]
-              local status = util.train.get_status_string(train, translations)
-              -- add status to train data
-              train.status[pi] = status
-              -- add to sorting tables
-              local lookup = sort_lookup[status]
-              if lookup then
-                lookup[#lookup+1] = train_id
-              else
-                sort_lookup[status] = {train_id}
-              end
-              table_insert(sort_values, status)
-            end
-            table_sort(sort_values)
-            local result = {}
-            for i,value in ipairs(sort_values) do
-              result[i] = table_remove(sort_lookup[value])
-            end
-            results_by_player[pi] = result
-          end
-        end
-        depot_trains.status = results_by_player
-      end
-      depot.trains = depot_trains
-    end
-
-    -- next step
-    data.step = 100
+    process_in_transit_materials(data)
+  elseif step == 3 then
+    sort_depot_trains(data)
   elseif step == 100 then -- finish up, copy to output
     global.data = {
       depots = data.depots,

@@ -242,14 +242,20 @@ function self.create(player, player_table)
     }}
   })
 
+  -- other handlers
+  event.enable_group('gui.main.inventory.material_button', player.index, 'ltnm_inventory_slot_button_')
+
+  -- default settings
+  gui_data.depots.active_sort = 'composition'
+  gui_data.depots.sort_composition = true
+  gui_data.depots.sort_status = true
+
   -- dragging and centering
   gui_data.titlebar.drag_handle.drag_target = gui_data.window
   gui_data.window.force_auto_center()
 
   player_table.gui.main = gui_data
 
-  -- other handlers
-  event.enable_group('gui.main.inventory.material_button', player.index, 'ltnm_inventory_slot_button_')
 
   -- set initial contents
   gui.handlers.main.titlebar.frame_tab.on_gui_click{name=defines.events.on_gui_click, tick=game.tick, player_index=player.index,
@@ -386,12 +392,23 @@ function self.update(player, player_table, state_changes)
 
   -- DEPOT TRAINS
   if state_changes.depot_trains then
-
     local trains_table = gui_data.depots.trains_table
     trains_table.clear()
 
-    local trains = data.depots[gui_data.depots.selected].trains_temp
-    for _,train_id in ipairs(trains) do
+    local depot_data = gui_data.depots
+    -- retrieve train array and iteration settings
+    local depot = data.depots[depot_data.selected]
+    local active_sort = depot_data.active_sort
+    local trains = depot.trains[active_sort]
+    if active_sort == 'status' then
+      trains = trains[player.index]
+    end
+    local sort_value = depot_data['sort_'..active_sort]
+    local start = sort_value and 1 or #trains
+    local finish = sort_value and #trains or 1
+    local delta = sort_value and 1 or -1
+    for i=start,finish,delta do
+      local train_id = trains[i]
       local train = data.trains[train_id]
       -- build GUI structure
       local elems = gui.build(trains_table, {
@@ -405,26 +422,7 @@ function self.update(player, player_table, state_changes)
         }}
       })
       -- train status
-      local status_flow = elems.status_flow
-      local state = train.state
-      local def = defines.train_state
-      if state == def.on_the_path or state == def.arrive_signal or state == def.wait_signal or state == def.arrive_station then
-        if train.returning_to_depot then
-          status_flow.add{type='label', style='bold_label', caption={'ltnm-gui.returning-to-depot'}}
-        else
-          status_flow.add{type='label', caption={'', {'ltnm-gui.'..(train.pickupDone and 'delivering-to' or 'fetching-from')}, ':'}}
-          status_flow.add{type='label', style='bold_label', caption=train.to}
-        end
-      elseif state == def.wait_station then
-        if train.surface or train.returning_to_depot then
-          status_flow.add{type='label', style='bold_label', caption={'ltnm-gui.parked-at-depot'}}
-        else
-          status_flow.add{type='label', caption={'', {'ltnm-gui.'..(train.pickupDone and 'unloading-at' or 'loading-at')}, ':'}}
-          status_flow.add{type='label', style='bold_label', caption=train.from or train.to}
-        end
-      else
-        local breakpoint
-      end
+      elems.status_flow.add{type='label', style='bold_label', caption=train.status[player.index]}
       -- contents table
       if train.shipment then
         local contents_table = elems.contents_table
