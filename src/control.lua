@@ -35,6 +35,7 @@ local function build_translation_data()
 end
 
 local function run_player_translations(player)
+  player.set_shortcut_available('ltnm-toggle-gui', false)
   local translation_data = global.__lualib.translation.translation_data
   for _,name in ipairs{'materials', 'gui'} do
     translation.start(player, name, translation_data[name], {lowercase_sorted_translations=true, include_failed_translations=true})
@@ -74,6 +75,7 @@ local function enable_gui(e)
   local players = global.players
   for _,i in pairs(e.registered_players) do
     players[i].flags.can_open_gui = true
+    game.get_player(i).set_shortcut_available('ltnm-toggle-gui', true)
     event.disable('enable_gui_on_next_ltn_update', i)
   end
 end
@@ -128,8 +130,6 @@ event.register({defines.events.on_lua_shortcut, 'ltnm-toggle-gui'}, function(e)
   end
 end)
 
-event.on_gui_click(toggle_gui, 'ltnm_toggle_gui')
-
 event.register(translation.finish_event, function(e)
   local player_table = global.players[e.player_index]
   -- add to player table
@@ -144,4 +144,8 @@ event.register(translation.finish_event, function(e)
     -- enable opening the GUI on the next LTN update cycle
     event.enable('enable_gui_on_next_ltn_update', e.player_index)
   end
+end)
+
+event.register(translation.retranslate_all_event, function(e)
+  -- TODO: close GUIs and retranslate all
 end)
