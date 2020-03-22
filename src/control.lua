@@ -20,7 +20,7 @@ local function build_translation_data()
   }
   -- materials
   for _,type in ipairs{'fluid', 'item'} do
-    local prefix = type..'/'
+    local prefix = type..','
     for name,prototype in pairs(game[type..'_prototypes']) do
       translation_data.materials[#translation_data.materials+1] = {internal=prefix..name, localised=prototype.localised_name}
     end

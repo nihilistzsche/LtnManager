@@ -14,6 +14,8 @@ local util = require('scripts.util')
 local bit32_btest = bit32.btest
 local string_find = string.find
 local string_gsub = string.gsub
+local string_lower = string.lower
+local string_match = string.match
 
 -- self object
 local self = {}
@@ -194,7 +196,16 @@ gui.handlers:extend{main={
   inventory = {
     search_textfield = {
       on_gui_text_changed = function(e)
-        game.print(serpent.block(e))
+        local player_table = global.players[e.player_index]
+        local gui_data = player_table.gui.main.inventory
+        gui_data.search_query = e.text
+        self.update(game.get_player(e.player_index), player_table, {inventory_contents=true})
+      end,
+      on_gui_click = function(e)
+        -- select all text if it is the default
+        if e.element.text == global.players[e.player_index].dictionary.gui.translations.search then
+          e.element.select_all()
+        end
       end
     },
     network_id_textfield = {
@@ -698,7 +709,16 @@ function self.update(player, player_table, state_changes)
           combined_materials = util.add_materials(materials, combined_materials)
         end
       end
-      -- TODO: name search
+      -- filter by material name
+      local translations = player_table.dictionary.materials.translations
+      local query = string_lower(inventory_gui_data.search_textfield.text)
+      if query ~= '' and query ~= string_lower(player_table.dictionary.gui.translations.search) then
+        for name,_ in pairs(combined_materials) do
+          if not string_match(translations[name], query) then
+            combined_materials[name] = nil
+          end
+        end
+      end
       -- add combined materials to the GUI table (also temporary)
       inventory_gui_data.contents[type] = combined_materials
       -- add to table
