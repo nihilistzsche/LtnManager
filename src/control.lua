@@ -86,6 +86,13 @@ local function enable_gui(e)
   end
 end
 
+-- auto-update GUIs for all registered players
+local function auto_update_guis(e)
+  for _,i in ipairs(e.registered_players) do
+    main_gui.update_active_tab(game.get_player(i), global.players[i])
+  end
+end
+
 -- -----------------------------------------------------------------------------
 -- EVENTS
 
@@ -110,7 +117,8 @@ end)
 
 event.register({'on_init', 'on_load'}, function()
   event.register_conditional{
-    enable_gui_on_next_ltn_update = {id=data_manager.ltn_event_ids.on_dispatcher_updated, handler=enable_gui}
+    enable_gui_on_next_ltn_update = {id=data_manager.ltn_event_ids.on_dispatcher_updated, handler=enable_gui},
+    auto_refresh = {id=-300, handler=auto_update_guis}
   }
 end)
 

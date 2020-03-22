@@ -26,7 +26,7 @@ gui.templates:extend{
     vertical = {type='empty-widget', style_mods={vertically_stretchable=true}},
     both = {type='empty-widget', style_mods={horizontally_stretchable=true, vertically_stretchable=true}}
   },
-  close_button = {type='sprite-button', style='ltnm_close_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
+  close_button = {type='sprite-button', style='ltnm_frame_action_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
     clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='main.titlebar.close_button', save_as='titlebar.close_button'},
   mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='main.titlebar.frame_tab'},
   status_indicator = function(name, color, value)
@@ -88,21 +88,6 @@ gui.templates:extend{
   }
 }
 
-local function update_active_tab(player, player_table, name)
-  local changes = {active_tab=name}
-  if name == 'depots' then
-    changes.depot_buttons = true
-    changes.selected_depot = player_table.gui.main.depots.selected or true
-  elseif name == 'stations' then
-    changes.stations_list = true
-  elseif name == 'inventory' then
-    changes.inventory_contents = true
-  elseif name == 'history' then
-    changes.history = true
-  end
-  self.update(player, player_table, changes)
-end
-
 gui.handlers:extend{main={
   window = {
     on_gui_closed = function(e)
@@ -113,7 +98,7 @@ gui.handlers:extend{main={
     frame_tab = {
       on_gui_click = function(e)
         local name = e.default_tab or string_gsub(e.element.caption[1], 'ltnm%-gui%.', '')
-        update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
+        self.update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
       end
     },
     pin_button = {
@@ -123,8 +108,17 @@ gui.handlers:extend{main={
     },
     refresh_button = {
       on_gui_click = function(e)
-        local player_table = global.players[e.player_index]
-        update_active_tab(game.get_player(e.player_index), global.players[e.player_index], player_table.gui.main.tabbed_pane.selected)
+        if e.shift then
+          if event.is_enabled('auto_refresh', e.player_index) then
+            event.disable('auto_refresh', e.player_index)
+            e.element.style = 'ltnm_frame_action_button'
+          else
+            event.enable('auto_refresh', e.player_index)
+            e.element.style = 'ltnm_active_frame_action_button'
+          end
+        else
+          self.update_active_tab(game.get_player(e.player_index), global.players[e.player_index])
+        end
       end
     },
     close_button = {
@@ -215,11 +209,11 @@ function self.create(player, player_table)
         {type='frame', style='ltnm_main_frame_header', children={
           {type='empty-widget', style='draggable_space_header', style_mods={horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
             save_as='titlebar.drag_handle'},
-          {type='sprite-button', style='ltnm_close_button', sprite='ltnm_pin_white', hovered_sprite='ltnm_pin_black', clicked_sprite='ltnm_pin_black',
-            tooltip={'ltnm-gui.keep-open'}, handlers='main.titlebar.pin_button', save_as='titlebar.pin_button'},
-          {type='sprite-button', style='ltnm_close_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black',
-            clicked_sprite='ltnm_refresh_black', tooltip={'ltnm-gui.refresh-current-tab'}, handlers='main.titlebar.refresh_button',
-            save_as='titlebar.refresh_button'},
+          {type='sprite-button', style='ltnm_frame_action_button', sprite='ltnm_pin_white', hovered_sprite='ltnm_pin_black', clicked_sprite='ltnm_pin_black',
+            tooltip={'ltnm-gui.keep-open'}, mouse_button_filter={'left'}, handlers='main.titlebar.pin_button', save_as='titlebar.pin_button'},
+          {type='sprite-button', style='ltnm_frame_action_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black',
+            clicked_sprite='ltnm_refresh_black', tooltip={'ltnm-gui.refresh-button-tooltip'}, mouse_button_filter={'left'},
+            handlers='main.titlebar.refresh_button', save_as='titlebar.refresh_button'},
           {template='close_button'}
         }}
       }},
@@ -342,6 +336,7 @@ function self.create(player, player_table)
   event.enable_group('gui.main.material_button', player.index, 'ltnm_material_button_')
 
   -- default settings
+  gui_data.tabbed_pane.selected = 'depots'
   gui_data.depots.active_sort = 'composition'
   gui_data.depots.sort_composition = true
   gui_data.depots.sort_status = true
@@ -361,8 +356,7 @@ function self.create(player, player_table)
   player_table.gui.main = gui_data
 
   -- set initial contents
-  gui.handlers.main.titlebar.frame_tab.on_gui_click{name=defines.events.on_gui_click, tick=game.tick, player_index=player.index,
-    default_tab='depots'}
+  self.update_active_tab(player, player_table)
   -- profiler.Stop()
 end
 
@@ -793,6 +787,22 @@ function self.update(player, player_table, state_changes)
       end
     end
   end
+end
+
+function self.update_active_tab(player, player_table, name)
+  name = name or player_table.gui.main.tabbed_pane.selected
+  local changes = {active_tab=name}
+  if name == 'depots' then
+    changes.depot_buttons = true
+    changes.selected_depot = player_table.gui.main.depots.selected or true
+  elseif name == 'stations' then
+    changes.stations_list = true
+  elseif name == 'inventory' then
+    changes.inventory_contents = true
+  elseif name == 'history' then
+    changes.history = true
+  end
+  self.update(player, player_table, changes)
 end
 
 return self

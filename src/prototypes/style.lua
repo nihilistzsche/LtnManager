@@ -13,7 +13,7 @@ local slot_buttons_tileset = '__LtnManager__/graphics/gui/slot-buttons.png'
 local function slot_button(y, glow_color, default_x, size)
   return {
     type = 'button_style',
-    parent = 'quick_bar_slot_button',
+    parent = 'CGUI_filter_slot_button',
     size = size or 40,
     default_graphical_set = {
       base = {border=4, position={(default_x or 0),y}, size=80, filename=slot_buttons_tileset},
@@ -168,23 +168,27 @@ styles.ltnm_depot_button = {
   }
 }
 
-styles.ltnm_combinator_button = {
-  type = 'button_style',
-  parent = 'tool_button',
-  size = 32,
-  padding = 1,
-  hovered_graphical_set = {
-    base = {position = {34, 17}, corner_size = 8},
-    shadow = default_dirt,
-    -- no glow, since it is inset
-    -- glow = default_glow(default_glow_color, 0.5)
-  },
-}
-
-styles.ltnm_close_button = {
+styles.ltnm_frame_action_button = {
   type = 'button_style',
   parent = 'close_button',
   size = 20
+}
+
+styles.ltnm_active_frame_action_button = {
+  type = 'button_style',
+  parent = 'ltnm_frame_action_button',
+  default_graphical_set = {
+    base = {position = {272, 169}, corner_size = 8},
+    shadow = {position = {440, 24}, corner_size = 8, draw_type = "outer"}
+  },
+  hovered_graphical_set = {
+    base = {position = {369, 17}, corner_size = 8},
+    shadow = default_dirt
+  },
+  clicked_graphical_set = {
+    base = {position = {352, 17}, corner_size = 8},
+    shadow = default_dirt
+  }
 }
 
 -- -----------------------------------------------------------------------------
