@@ -470,6 +470,7 @@ local function on_dispatcher_updated(e)
 end
 
 local function on_delivery_pickup_complete(e)
+  local breakpoint
   -- if not global.data then return end
   -- local train = global.data.trains[e.train_id]
   -- if not train then error('Could not find train of ID: '..e.train_id) end

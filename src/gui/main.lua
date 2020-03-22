@@ -272,7 +272,7 @@ function self.create(player, player_table)
           {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
             -- toolbar
             {type='frame', style='ltnm_toolbar_frame', style_mods={height=nil}, direction='horizontal', children={
-              {type='textfield', text=player_table.dictionary.gui.translations['search-for-materials'], save_as='inventory.search_textfield'},
+              {type='textfield', text=player_table.dictionary.gui.translations.search, save_as='inventory.search_textfield'},
               {template='pushers.horizontal'},
               {type='label', style='caption_label', caption='ID:'},
               {type='textfield', style='short_number_textfield', style_mods={right_margin=-8}, text='-1', save_as='inventory.network_id_textfield'},

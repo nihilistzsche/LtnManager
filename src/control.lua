@@ -35,7 +35,7 @@ local function build_translation_data()
     {internal='returning-to-depot', localised={'ltnm-gui.returning-to-depot'}},
     {internal='unloading-at', localised={'ltnm-gui.unloading-at'}},
     -- other
-    {internal='search-for-materials', localised={'ltnm-gui.search-for-materials'}}
+    {internal='search', localised={'ltnm-gui.search'}}
   }
   global.__lualib.translation.translation_data = translation_data
 end
