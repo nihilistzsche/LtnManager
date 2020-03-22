@@ -88,8 +88,13 @@ end
 
 -- auto-update GUIs for all registered players
 local function auto_update_guis(e)
+  local players = global.players
   for _,i in ipairs(e.registered_players) do
-    main_gui.update_active_tab(game.get_player(i), global.players[i])
+    local player_table = players[i]
+    -- only update if they have the GUI open
+    if player_table.gui.main then
+      main_gui.update_active_tab(game.get_player(i), player_table)
+    end
   end
 end
 
