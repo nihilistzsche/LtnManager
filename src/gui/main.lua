@@ -52,6 +52,37 @@ gui.templates:extend{
         {template='pushers.horizontal'},
         {type='label', caption=value, save_as='inventory.info_pane.'..name..'_value'}
       }}
+    end,
+    small_slot_table_with_label = function(parent, labels, materials, translations)
+      local elems = gui.build(parent, {
+        {type='flow', direction='vertical', children={
+          {type='flow', save_as='labels_flow'},
+          {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+            {type='scroll-pane', style='ltnm_material_location_slot_table_scroll_pane', vertical_scroll_policy='always', children={
+              {type='table', style='ltnm_materials_in_location_slot_table', column_count=9, save_as='table'}
+            }}
+          }}
+        }}
+      })
+      -- populate labels
+      local flow = elems.labels_flow
+      local flow_add = flow.add
+      for _,t in ipairs(labels) do
+        flow_add{type='label', style=t[1], caption=t[2], tooltip=t[3]}
+        flow_add{type='empty-widget'}.style.horizontally_stretchable = true
+      end
+      flow.children[#flow.children].destroy()
+      -- populate materials
+      slot_style = slot_style or 'dark_grey'
+      local table_add = elems.table.add
+      for _,t in ipairs(materials) do
+        local style = 'ltnm_small_slot_button_'..t[1]
+        for name,count in pairs(t[2]) do
+          table_add{type='sprite-button', name='ltnm_material_button_'..name, style=style, sprite=string_gsub(name, ',', '/'), number=count,
+            tooltip=translations[name]}
+        end
+      end
+      return elems
     end
   }
 }
@@ -244,8 +275,11 @@ function self.create(player, player_table)
         {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.inventory', children={
           -- toolbar
           {type='frame', style='ltnm_toolbar_frame', style_mods={height=nil}, direction='horizontal', children={
+            {type='textfield', save_as='inventory.search_textfield'},
             {template='pushers.horizontal'},
-            {type='button', style='tool_button', caption='ID'}
+            {type='label', style='caption_label', caption='ID:'},
+            {type='textfield', style='short_number_textfield', style_mods={right_margin=-8}, save_as='inventory.network_id_textfield'},
+            {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.network-selection-dialog'}}
           }},
           -- contents
           {type='flow', style_mods={padding=10, horizontal_spacing=10}, direction='horizontal', children={
@@ -529,7 +563,7 @@ function self.update(player, player_table, state_changes)
       local t = stations[sorted_stations[i]]
       -- build GUI structure
       local elems = gui.build(stations_table, {
-        {type='label', style='hoverable_bold_label', caption=t.entity.backer_name},
+        {type='label', style='hoverable_bold_label', style_mods={horizontally_stretchable=true}, caption=t.entity.backer_name},
         {type='label', caption=t.network_id},
         gui.templates.status_indicator('indicator', t.status.name, t.status.count),
         -- items
@@ -687,86 +721,41 @@ function self.update(player, player_table, state_changes)
     -- set up scroll pane and locals
     local locations_pane = inventory_gui_data.locations_scroll_pane
     locations_pane.clear()
-    local pane_add = locations_pane.add
     local locations = data.material_locations[state_changes.selected_material]
+    local location_template = gui.templates.inventory.small_slot_table_with_label
 
     -- stations
     local stations = data.stations
     local station_ids = locations.stations
     if #station_ids > 0 then
-      gui.build(locations_pane, {
-        {type='flow', children={
-          {type='label', style='caption_label', caption={'ltnm-gui.stations'}},
-          {template='pushers.horizontal'}
-        }}
-      })
-      pane_add{type='line', style='ltnm_material_locations_line', direction='horizontal'}
+      locations_pane.add{type='label', style='ltnm_material_locations_label', caption={'ltnm-gui.stations'}}
+      local table = locations_pane.add{type='table', style='ltnm_material_locations_table', column_count=1}
       for i=1,#station_ids do
         local station = stations[station_ids[i]]
-        if station then
-          local materials_table = gui.build(locations_pane, {
-            {type='flow', direction='vertical', children={
-              {type='label', style='bold_label', caption=station.entity.backer_name},
-              {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-                {type='scroll-pane', style='ltnm_material_location_slot_table_scroll_pane', children={
-                  {type='table', style='ltnm_small_slot_table', column_count=8, save_as='table'}
-                }}
-              }}
-            }}
-          }).table
-          local table_add = materials_table.add
-          for mode,color in pairs{provided='green', requested='red'} do
-            local materials = station[mode]
-            if materials then
-              for name,count in pairs(materials) do
-                table_add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'),
-                  number=count}
-              end
-            end
+        local materials = {}
+        for mode,color in pairs{provided='green', requested='red'} do
+          local contents = station[mode]
+          if contents then
+            materials[#materials+1] = {color, contents}
           end
-          pane_add{type='line', style='ltnm_material_locations_line', direction='horizontal'}
-        else
-          error('Could not find station of ID: '..station_ids[i])
         end
+        location_template(table, {{'bold_label', station.entity.backer_name}, {'label', 'ID: '..station.network_id}}, materials, {})
       end
     end
 
-    -- stations
+    -- trains
     local trains = data.trains
     local train_ids = locations.trains
     if #train_ids > 0 then
-      gui.build(locations_pane, {
-        {type='flow', children={
-          {type='label', style='caption_label', caption={'ltnm-gui.trains'}},
-          {template='pushers.horizontal'}
-        }}
-      })
-      pane_add{type='line', style='ltnm_material_locations_line', direction='horizontal'}
+      locations_pane.add{type='label', style='ltnm_material_locations_label', caption={'ltnm-gui.trains'}}
+      local table = locations_pane.add{type='table', style='ltnm_material_locations_table', column_count=1}
       for i=1,#train_ids do
         local train = trains[train_ids[i]]
-        if train then
-          local materials_table = gui.build(locations_pane, {
-            {type='flow', direction='vertical', children={
-              {type='label', style='bold_label', caption=train.from..'  ->  '..train.to},
-              {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-                {type='scroll-pane', style='ltnm_material_location_slot_table_scroll_pane', children={
-                  {type='table', style='ltnm_small_slot_table', column_count=8, save_as='table'}
-                }}
-              }}
-            }}
-          }).table
-          local table_add = materials_table.add
-          local materials = train.shipment
-          if materials then
-            for name,count in pairs(materials) do
-              table_add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_small_slot_button_blue', sprite=string_gsub(name, ',', '/'),
-                number=count}
-            end
-          end
-          pane_add{type='line', style='ltnm_material_locations_line', direction='horizontal'}
-        else
-          error('Could not find train of ID: '..train_ids[i])
+        local materials = {}
+        if train.shipment then
+          materials = {{'blue', train.shipment}}
         end
+        location_template(table, {{'bold_label', train.from}, {'caption_label', '->'}, {'bold_label', train.to}}, materials, {})
       end
     end
   end

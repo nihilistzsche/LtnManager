@@ -191,7 +191,7 @@ styles.ltnm_close_button = {
 -- CHECKBOX STYLES
 
 -- inactive is grey until hovered
--- checked == descending, unchecked == ascending
+-- checked = descending, unchecked = ascending
 styles.ltnm_sort_checkbox_inactive = {
   type = "checkbox_style",
   font = "default-bold",
@@ -346,7 +346,7 @@ styles.ltnm_main_frame_header = {
 styles.ltnm_main_frame_content = {
   type = 'frame_style',
   parent = 'dialog_frame',
-  width = 846,
+  width = 836,
   height = 636,
   graphical_set = {
     base = {
@@ -486,6 +486,15 @@ styles.ltnm_station_status_icon = {
 }
 
 -- -----------------------------------------------------------------------------
+-- LABEL STYLES
+
+styles.ltnm_material_locations_label = {
+  type = 'label_style',
+  parent = 'caption_label',
+  left_margin = 2
+}
+
+-- -----------------------------------------------------------------------------
 -- LINE STYLES
 
 styles.ltnm_material_locations_line = {
@@ -607,16 +616,15 @@ styles.ltnm_material_locations_scroll_pane = {
   parent = 'ltnm_blank_scroll_pane',
   vertical_flow_style = {
     type = 'vertical_flow_style',
-    padding = 5,
-    horizontal_align = 'center'
+    padding = 5
   }
 }
 
 styles.ltnm_material_location_slot_table_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_small_slot_table_scroll_pane',
-  minimal_width = 288,
-  maximal_height = 228
+  maximal_height = 228,
+  horizontally_squashable = 'off'
 }
 
 -- -----------------------------------------------------------------------------
@@ -674,7 +682,6 @@ styles.ltnm_stations_table = {
   type = 'table_style',
   parent = 'ltnm_rows_table',
   column_widths = {
-    {column=1, width=200},
     {column=2, width=24},
     {column=3, width=34},
     {column=4, width=180},
@@ -704,6 +711,12 @@ styles.ltnm_inventory_slot_table = {
   width = 400
 }
 
+styles.ltnm_materials_in_location_slot_table = {
+  type = 'table_style',
+  parent = 'ltnm_small_slot_table',
+  width = 324
+}
+
 styles.ltnm_small_slot_table = {
   type = 'table_style',
   parent = 'ltnm_slot_table',
@@ -719,6 +732,11 @@ styles.ltnm_depots_table = {
 
 styles.ltnm_material_locations_table = {
   type = 'table_style',
-  parent = 'bordered_table',
-  bottom_cell_padding = 8
+  parent = 'ltnm_rows_table',
+  top_margin = 2,
+  left_margin = -6,
+  right_margin = -6,
+  top_cell_padding = 4,
+  bottom_cell_padding = 8,
+  width = 352
 }

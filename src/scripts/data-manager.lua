@@ -470,21 +470,21 @@ local function on_dispatcher_updated(e)
 end
 
 local function on_delivery_pickup_complete(e)
-  if not global.data then return end
-  local train = global.data.trains[e.train_id]
-  if not train then error('Could not find train of ID: '..e.train_id) end
-  table.insert(global.working_data.history, 1, {
-    type = 'pickup',
-    from = train.from,
-    to = train.to,
-    from_id = train.from_id,
-    to_id = train.to_id,
-    depot = train.depot,
-    actual_shipment = e.actual_shipment,
-    planned_shipment = e.planned_shipment,
-    runtime = game.tick - train.started
-  })
-  global.working_data.history[51] = nil -- limit to 50 entries
+  -- if not global.data then return end
+  -- local train = global.data.trains[e.train_id]
+  -- if not train then error('Could not find train of ID: '..e.train_id) end
+  -- table.insert(global.working_data.history, 1, {
+  --   type = 'pickup',
+  --   from = train.from,
+  --   to = train.to,
+  --   from_id = train.from_id,
+  --   to_id = train.to_id,
+  --   depot = train.depot,
+  --   actual_shipment = e.actual_shipment,
+  --   planned_shipment = e.planned_shipment,
+  --   runtime = game.tick - train.started
+  -- })
+  -- global.working_data.history[51] = nil -- limit to 50 entries
 end
 
 local function on_delivery_completed(e)
