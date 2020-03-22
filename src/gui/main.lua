@@ -11,6 +11,7 @@ local util = require('scripts.util')
 -- local profiler = require('__profiler__/profiler.lua')
 
 -- locals
+local bit32_btest = bit32.btest
 local string_find = string.find
 local string_gsub = string.gsub
 
@@ -76,10 +77,12 @@ gui.templates:extend{
       -- populate materials
       slot_style = slot_style or 'dark_grey'
       local table_add = elems.table.add
+      local i = 0
       for _,t in ipairs(materials) do
         local style = 'ltnm_small_slot_button_'..t[1]
         for name,count in pairs(t[2]) do
-          table_add{type='sprite-button', name='ltnm_material_button_'..name, style=style, sprite=string_gsub(name, ',', '/'), number=count,
+          i = i + 1
+          table_add{type='sprite-button', name='ltnm_material_button_'..i, style=style, sprite=string_gsub(name, ',', '/'), number=count,
             tooltip=translations[name]}
         end
       end
@@ -188,7 +191,22 @@ gui.handlers:extend{main={
       end
     }
   },
-  inventory = {}
+  inventory = {
+    search_textfield = {
+      on_gui_text_changed = function(e)
+        game.print(serpent.block(e))
+      end
+    },
+    network_id_textfield = {
+      on_gui_text_changed = function(e)
+        local player_table = global.players[e.player_index]
+        local gui_data = player_table.gui.main.inventory
+        local input = tonumber(e.text) or -1
+        gui_data.selected_network_id = input
+        self.update(game.get_player(e.player_index), player_table, {inventory_contents=true})
+      end
+    }
+  }
 }}
 
 -- -----------------------------------------------------------------------------
@@ -272,11 +290,13 @@ function self.create(player, player_table)
           {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
             -- toolbar
             {type='frame', style='ltnm_toolbar_frame', style_mods={height=nil}, direction='horizontal', children={
-              {type='textfield', text=player_table.dictionary.gui.translations.search, save_as='inventory.search_textfield'},
+              {type='textfield', text=player_table.dictionary.gui.translations.search, lose_focus_on_confirm=true, handlers='main.inventory.search_textfield',
+                save_as='inventory.search_textfield'},
               {template='pushers.horizontal'},
               {type='label', style='caption_label', caption='ID:'},
-              {type='textfield', style='short_number_textfield', style_mods={right_margin=-8}, text='-1', save_as='inventory.network_id_textfield'},
-              {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.network-selection-dialog'}}
+              {type='textfield', style='short_number_textfield', style_mods={right_margin=-8}, text='-1', lose_focus_on_confirm=true, numeric=true,
+                allow_negative=true, handlers='main.inventory.network_id_textfield', save_as='inventory.network_id_textfield'},
+              {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.network-selection-dialog'}, mods={enabled=false}}
             }},
             -- inventory tables
             {type='flow', style_mods={padding=10, top_padding=4}, direction='vertical', children={
@@ -317,7 +337,8 @@ function self.create(player, player_table)
             {template='pushers.horizontal'},
             {type='checkbox', style='ltnm_sort_checkbox_inactive', style_mods={right_margin=8}, state=true, caption={'ltnm-gui.runtime'}},
             {type='label', style='caption_label', style_mods={width=124}, caption={'ltnm-gui.shipment'}},
-            {type='sprite-button', style='red_icon_button', sprite='utility/trash', tooltip={'ltnm-gui.clear-history'}, save_as='history.delete_button'}
+            {type='sprite-button', style='red_icon_button', sprite='utility/trash', tooltip={'ltnm-gui.clear-history'}, mods={enabled=false},
+              save_as='history.delete_button'}
           }},
           -- listing
           {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={horizontally_stretchable=true, vertically_stretchable=true},
@@ -337,13 +358,18 @@ function self.create(player, player_table)
 
   -- default settings
   gui_data.tabbed_pane.selected = 'depots'
+
   gui_data.depots.active_sort = 'composition'
   gui_data.depots.sort_composition = true
   gui_data.depots.sort_status = true
+
   gui_data.stations.active_sort = 'name'
   gui_data.stations.sort_name = true
   gui_data.stations.sort_network_id = true
   gui_data.stations.sort_status = true
+
+  gui_data.inventory.selected_network_id = -1
+  gui_data.inventory.search_query = ''
 
   -- dragging and centering
   gui_data.titlebar.drag_handle.drag_target = gui_data.window
@@ -526,8 +552,10 @@ function self.update(player, player_table, state_changes)
       -- contents table
       if train.shipment then
         local contents_table = elems.contents_table
+        local i = 0
         for name,count in pairs(train.shipment) do
-          contents_table.add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'),
+          i = i + 1
+          contents_table.add{type='sprite-button', name='ltnm_material_button_'..i, style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'),
             number=count}
           -- gui.build(contents_table, {
           --   {type='sprite-button', style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'), number=count, handlers='main.material_button'}
@@ -586,12 +614,14 @@ function self.update(player, player_table, state_changes)
       -- add provided/requested materials
       local table_add = elems.provided_requested_table.add
       local provided_requested_rows = 0
+      local mi = 0
       for key,color in pairs{provided='green', requested='red'} do
         local materials = t[key]
         if materials then
           for name,count in pairs(materials) do
+            mi = mi + 1
             provided_requested_rows = provided_requested_rows + 1
-            table_add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'),
+            table_add{type='sprite-button', name='ltnm_material_button_'..mi, style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'),
               number=count}
           end
         end
@@ -602,11 +632,13 @@ function self.update(player, player_table, state_changes)
       local shipments = t.activeDeliveries
       table_add = elems.shipments_table.add
       local shipments_rows = 0
+      local mi = 0
       for i=1,#shipments do
         local shipment = data.trains[shipments[i]].shipment
         for name,count in pairs(shipment) do
+          mi = mi + 1
           shipments_rows = shipments_rows + 1
-          table_add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'),
+          table_add{type='sprite-button', name='ltnm_material_button_'..mi, style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'),
             number=count}
         end
       end
@@ -654,15 +686,19 @@ function self.update(player, player_table, state_changes)
   if state_changes.inventory_contents then
     local inventory = data.inventory
     local inventory_gui_data = gui_data.inventory
+    local selected_network_id = inventory_gui_data.selected_network_id
     inventory_gui_data.material_buttons = {}
     inventory_gui_data.contents = {}
     local buttons = inventory_gui_data.material_buttons
     for type,color in pairs{provided='green', requested='red', in_transit='blue'} do
-      -- combine materials (temporary until network filters become a thing)
+      -- combine contents of each matching network
       local combined_materials = {}
-      for _,materials in pairs(inventory[type]) do
-        combined_materials = util.add_materials(materials, combined_materials)
+      for network_id,materials in pairs(inventory[type]) do
+        if bit32_btest(network_id, selected_network_id) then
+          combined_materials = util.add_materials(materials, combined_materials)
+        end
       end
+      -- TODO: name search
       -- add combined materials to the GUI table (also temporary)
       inventory_gui_data.contents[type] = combined_materials
       -- add to table
@@ -670,8 +706,10 @@ function self.update(player, player_table, state_changes)
       table.clear()
       local add = table.add
       local elems = {}
+      local i = 0
       for name,count in pairs(combined_materials) do
-        elems[name] = add{type='sprite-button', name='ltnm_material_button_'..name, style='ltnm_slot_button_'..color,
+        i = i + 1
+        elems[name] = add{type='sprite-button', name='ltnm_material_button_'..i, style='ltnm_slot_button_'..color,
           sprite=string_gsub(name, ',', '/'), number=count}
       end
       buttons[type] = elems
@@ -710,7 +748,7 @@ function self.update(player, player_table, state_changes)
     info_pane.icon.sprite = material_type..'/'..material_name
     info_pane.name.caption = game[material_type..'_prototypes'][material_name].localised_name
 
-    -- TODO: available/requested/in transit numbers (requires some data manager processing)
+    -- material counts
     local contents = inventory_gui_data.contents
     for _,type in ipairs{'provided', 'requested', 'in_transit'} do
       info_pane[type..'_value'].caption = util.comma_value(contents[type][inventory_gui_data.selected] or 0)
@@ -723,38 +761,67 @@ function self.update(player, player_table, state_changes)
     local location_template = gui.templates.inventory.small_slot_table_with_label
 
     -- stations
+    local empty = 0
+    local selected_network_id = inventory_gui_data.selected_network_id
     local stations = data.stations
     local station_ids = locations.stations
     if #station_ids > 0 then
-      locations_pane.add{type='label', style='ltnm_material_locations_label', caption={'ltnm-gui.stations'}}
+      local label = locations_pane.add{type='label', style='ltnm_material_locations_label', caption={'ltnm-gui.stations'}}
       local table = locations_pane.add{type='table', style='ltnm_material_locations_table', column_count=1}
       for i=1,#station_ids do
         local station = stations[station_ids[i]]
-        local materials = {}
-        for mode,color in pairs{provided='green', requested='red'} do
-          local contents = station[mode]
-          if contents then
-            materials[#materials+1] = {color, contents}
+        if bit32_btest(station.network_id, selected_network_id) then
+          local materials = {}
+          for mode,color in pairs{provided='green', requested='red'} do
+            local contents = station[mode]
+            if contents then
+              materials[#materials+1] = {color, contents}
+            end
           end
+          location_template(table, {{'bold_label', station.entity.backer_name}}, materials, {})
         end
-        location_template(table, {{'bold_label', station.entity.backer_name}, {'label', 'ID: '..station.network_id}}, materials, {})
       end
+      if #table.children == 0 then
+        empty = empty + 1
+        label.destroy()
+        table.destroy()
+      end
+    else
+      empty = empty + 1
     end
 
     -- trains
     local trains = data.trains
     local train_ids = locations.trains
     if #train_ids > 0 then
-      locations_pane.add{type='label', style='ltnm_material_locations_label', caption={'ltnm-gui.trains'}}
+      local label = locations_pane.add{type='label', style='ltnm_material_locations_label', caption={'ltnm-gui.trains'}}
       local table = locations_pane.add{type='table', style='ltnm_material_locations_table', column_count=1}
       for i=1,#train_ids do
         local train = trains[train_ids[i]]
-        local materials = {}
-        if train.shipment then
-          materials = {{'blue', train.shipment}}
+        if bit32_btest(train.network_id, selected_network_id) then
+          local materials = {}
+          if train.shipment then
+            materials = {{'blue', train.shipment}}
+          end
+          location_template(table, {{'bold_label', train.from}, {'caption_label', '->'}, {'bold_label', train.to}}, materials, {})
         end
-        location_template(table, {{'bold_label', train.from}, {'caption_label', '->'}, {'bold_label', train.to}}, materials, {})
       end
+      if #table.children == 0 then
+        empty = empty + 1
+        label.destroy()
+        table.destroy()
+      end
+    else
+      empty = empty + 1
+    end
+
+    -- placeholder
+    if empty == 2 then
+      gui.build(locations_pane, {
+        {type='flow', style_mods={horizontally_stretchable=true, vertically_stretchable=true, horizontal_align='center', vertical_align='center'}, children={
+          {type='label', caption={'ltnm-gui.nothing-to-see-here'}}
+        }}
+      })
     end
   end
 
