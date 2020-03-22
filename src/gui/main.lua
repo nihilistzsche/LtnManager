@@ -36,11 +36,12 @@ gui.templates:extend{
     }}
   end,
   inventory = {
-    slot_table_with_label = function(name)
-      return {type='flow', direction='vertical', children={
+    slot_table_with_label = function(name, rows)
+      rows = rows or 4
+      return {type='flow', style_mods={vertical_spacing=8, top_padding=4}, direction='vertical', children={
         {type='label', style='caption_label', caption={'ltnm-gui.'..string_gsub(name, '_', '-')}},
         {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-          {type='scroll-pane', style='ltnm_slot_table_scroll_pane', vertical_scroll_policy='always', children={
+          {type='scroll-pane', style='ltnm_slot_table_scroll_pane', style_mods={height=rows*40}, vertical_scroll_policy='always', children={
             {type='table', style='ltnm_inventory_slot_table', column_count=10, save_as='inventory.'..name..'_table'}
           }}
         }}
@@ -272,32 +273,34 @@ function self.create(player, player_table)
           }}
         }},
         -- INVENTORY
-        {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.inventory', children={
-          -- toolbar
-          {type='frame', style='ltnm_toolbar_frame', style_mods={height=nil}, direction='horizontal', children={
-            {type='textfield', save_as='inventory.search_textfield'},
-            {template='pushers.horizontal'},
-            {type='label', style='caption_label', caption='ID:'},
-            {type='textfield', style='short_number_textfield', style_mods={right_margin=-8}, save_as='inventory.network_id_textfield'},
-            {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.network-selection-dialog'}}
-          }},
-          -- contents
-          {type='flow', style_mods={padding=10, horizontal_spacing=10}, direction='horizontal', children={
-            -- inventory tables
-            {type='flow', style_mods={padding=0}, direction='vertical', children={
-              gui.templates.inventory.slot_table_with_label('provided'),
-              gui.templates.inventory.slot_table_with_label('requested'),
-              gui.templates.inventory.slot_table_with_label('in_transit')
+        {type='flow', style_mods={horizontal_spacing=12}, mods={visible=false}, save_as='tabbed_pane.contents.inventory', children={
+          -- left column
+          {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
+            -- toolbar
+            {type='frame', style='ltnm_toolbar_frame', style_mods={height=nil}, direction='horizontal', children={
+              {type='textfield', text=player_table.dictionary.gui.translations['search-for-materials'], save_as='inventory.search_textfield'},
+              {template='pushers.horizontal'},
+              {type='label', style='caption_label', caption='ID:'},
+              {type='textfield', style='short_number_textfield', style_mods={right_margin=-8}, text='-1', save_as='inventory.network_id_textfield'},
+              {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.network-selection-dialog'}}
             }},
+            -- inventory tables
+            {type='flow', style_mods={padding=10, top_padding=4}, direction='vertical', children={
+              gui.templates.inventory.slot_table_with_label('provided', 6),
+              gui.templates.inventory.slot_table_with_label('requested', 3),
+              gui.templates.inventory.slot_table_with_label('in_transit', 2)
+            }}
+          }},
+          -- right column
+          {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
             -- item information
             {type='frame', style='ltnm_light_content_frame_in_light_frame', style_mods={horizontally_stretchable=true, vertically_stretchable=true},
               direction='vertical', children={
-                {type='frame', style='ltnm_toolbar_frame', direction='vertical', children={
+                {type='frame', style='ltnm_item_info_toolbar_frame', direction='vertical', children={
                   -- icon and name
                   {type='flow', style_mods={vertical_align='center'}, children={
                     {type='sprite', style='ltnm_material_icon', sprite='item-group/intermediate-products', save_as='inventory.info_pane.icon'},
-                    {type='label', style='caption_label', style_mods={left_margin=2}, caption={'ltnm-gui.choose-an-item'}, save_as='inventory.info_pane.name'},
-                    {template='pushers.horizontal'},
+                    {type='label', style='caption_label', style_mods={left_margin=2}, caption={'ltnm-gui.choose-an-item'}, save_as='inventory.info_pane.name'}
                   }},
                   -- info
                   gui.templates.inventory.label_with_value('provided', {'ltnm-gui.provided'}, 0),
@@ -308,6 +311,7 @@ function self.create(player, player_table)
                   vertical_scroll_policy='always', save_as='inventory.locations_scroll_pane'}
               }
             }
+
           }}
         }},
         -- HISTORY

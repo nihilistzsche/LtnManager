@@ -24,12 +24,15 @@ local function build_translation_data()
   end
   -- gui
   translation_data.gui = {
+    -- train status
     {internal='delivering-to', localised={'ltnm-gui.delivering-to'}},
     {internal='fetching-from', localised={'ltnm-gui.fetching-from'}},
     {internal='loading-at', localised={'ltnm-gui.loading-at'}},
     {internal='parked-at-depot', localised={'ltnm-gui.parked-at-depot'}},
     {internal='returning-to-depot', localised={'ltnm-gui.returning-to-depot'}},
     {internal='unloading-at', localised={'ltnm-gui.unloading-at'}},
+    -- other
+    {internal='search-for-materials', localised={'ltnm-gui.search-for-materials'}}
   }
   global.__lualib.translation.translation_data = translation_data
 end

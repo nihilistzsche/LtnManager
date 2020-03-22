@@ -346,8 +346,8 @@ styles.ltnm_main_frame_header = {
 styles.ltnm_main_frame_content = {
   type = 'frame_style',
   parent = 'dialog_frame',
-  width = 836,
-  height = 636,
+  width = 838,
+  height = 615,
   graphical_set = {
     base = {
       position = {0,0},
@@ -462,6 +462,12 @@ styles.ltnm_toolbar_frame = {
   vertically_stretchable = 'off'
 }
 
+styles.ltnm_item_info_toolbar_frame = {
+  type = 'frame_style',
+  parent = 'ltnm_toolbar_frame',
+  width = 370 -- hardcode width to prevent in-fighting between stretches
+}
+
 -- -----------------------------------------------------------------------------
 -- IMAGE STYLES
 
@@ -531,7 +537,7 @@ styles.ltnm_depots_scroll_pane = {
     overall_tiling_horizontal_size = 198,
     overall_tiling_horizontal_spacing = 8,
     overall_tiling_vertical_padding = 4,
-    overall_tiling_vertical_size = 78,
+    overall_tiling_vertical_size = 77,
     overall_tiling_vertical_spacing = 8
   },
   vertical_flow_style = {
@@ -546,7 +552,7 @@ styles.ltnm_slot_table_scroll_pane = {
   padding = 0,
   margin = 0,
   extra_padding_when_activated = 0,
-  height = 160,
+  -- height = 160, -- height is adjusted at runtime
   horizontally_squashable = 'off',
   background_graphical_set = {
     base = {
@@ -614,6 +620,7 @@ styles.ltnm_trains_scroll_pane = {
 styles.ltnm_material_locations_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_blank_scroll_pane',
+  width = 370, -- hardcode width to prevent in-fighting between stretches
   vertical_flow_style = {
     type = 'vertical_flow_style',
     padding = 5
