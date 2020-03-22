@@ -19,8 +19,11 @@ local function build_translation_data()
     materials = {}
   }
   -- materials
-  for name,prototype in pairs(util.merge{game.fluid_prototypes, game.item_prototypes}) do
-    translation_data.materials[#translation_data.materials+1] = {internal=name, localised=prototype.localised_name}
+  for _,type in ipairs{'fluid', 'item'} do
+    local prefix = type..'/'
+    for name,prototype in pairs(game[type..'_prototypes']) do
+      translation_data.materials[#translation_data.materials+1] = {internal=prefix..name, localised=prototype.localised_name}
+    end
   end
   -- gui
   translation_data.gui = {
