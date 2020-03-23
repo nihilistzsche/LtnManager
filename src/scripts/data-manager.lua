@@ -199,6 +199,7 @@ local function iterate_stations(data)
       end
     end
 
+    
     -- add station and trains to depot
     if station.isDepot then
       local depot = depots[station_name]
@@ -468,6 +469,10 @@ local function iterate_data()
       sorted_history = data.sorted_history,
       -- other
       num_stations = data.num_stations
+    }
+    global.working_data = {
+      history = global.working_data.history,
+      alerts = global.working_data.alerts
     }
     -- reset events
     event.enable('ltn_on_stops_updated')

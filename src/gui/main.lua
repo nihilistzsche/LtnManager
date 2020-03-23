@@ -249,6 +249,18 @@ gui.handlers:extend{main={
         -- update GUI contents
         self.update(game.get_player(e.player_index), player_table, {history=true})
       end
+    },
+    delete_button = {
+      on_gui_click = function(e)
+        -- remove from current data
+        global.data.history = {}
+        global.working_data.history = {}
+        local sorted_history = global.data.sorted_history
+        for key,_ in pairs(sorted_history) do
+          sorted_history[key] = {}
+        end
+        self.update(game.get_player(e.player_index), global.players[e.player_index], {history=true})
+      end
     }
   }
 }}
@@ -388,8 +400,8 @@ function self.create(player, player_table)
             {type='checkbox', name='ltnm_sort_history_finished', style='ltnm_sort_checkbox_active', style_mods={right_margin=8}, state=false,
               caption={'ltnm-gui.finished'}, handlers='main.history.sort_checkbox', save_as='history.finished_sort_checkbox'},
             {type='label', style='caption_label', style_mods={width=124}, caption={'ltnm-gui.shipment'}},
-            {type='sprite-button', style='red_icon_button', sprite='utility/trash', tooltip={'ltnm-gui.clear-history'}, mods={enabled=false},
-              save_as='history.delete_button'}
+            {type='sprite-button', style='red_icon_button', sprite='utility/trash', tooltip={'ltnm-gui.clear-history'},
+              handlers='main.history.delete_button', save_as='history.delete_button'}
           }},
           -- listing
           {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={horizontally_stretchable=true, vertically_stretchable=true},
@@ -614,22 +626,11 @@ function self.update(player, player_table, state_changes)
         local i = 0
         for name,count in pairs(train.shipment) do
           i = i + 1
-          contents_table.add{type='sprite-button', name='ltnm_material_button_'..i, style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'),
-            number=count}
-          -- gui.build(contents_table, {
-          --   {type='sprite-button', style='ltnm_small_slot_button_green', sprite=string_gsub(name, ',', '/'), number=count, handlers='main.material_button'}
-          -- })
+          contents_table.add{type='sprite-button', name='ltnm_material_button_'..i, style='ltnm_small_slot_button_dark_grey',
+            sprite=string_gsub(name, ',', '/'), number=count}
         end
       end
     end
-    -- local num_children = #trains_table.children
-    -- if num_children == 0 then
-    --   gui.build(gui_data.depots.trains_scrollpane, {
-    --     {type='flow', style_mods={horizontally_stretchable=true, vertically_stretchable=true, horizontal_align='center', vertical_align='center'}, children={
-    --       {type='label', caption={'ltnm-gui.select-a-depot-to-show-trains'}}
-    --     }}
-    --   })
-    -- end
   end
 
   -- STATIONS LIST
