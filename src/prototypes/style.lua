@@ -168,6 +168,13 @@ styles.ltnm_depot_button = {
   }
 }
 
+-- hardcode a smaller button to avoid stretchable / squashable in-fighting
+styles.ltnm_depot_button_for_scrollbar = {
+  type = 'button_style',
+  parent = 'ltnm_depot_button',
+  width = 194
+}
+
 styles.ltnm_frame_action_button = {
   type = 'button_style',
   parent = 'close_button',

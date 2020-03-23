@@ -500,11 +500,13 @@ function self.update(player, player_table, state_changes)
 
     local button_index = 0
 
+    local button_style = table_size(data.depots) > 7 and 'ltnm_depot_button_for_scrollbar' or 'ltnm_depot_button'
+
     -- build all buttons as if they're inactive
     for name,t in pairs(data.depots) do
       button_index = button_index + 1
       local elems = gui.build(buttons_pane, {
-        {type='button', name='ltnm_depot_button_'..name, style='ltnm_depot_button', handlers='main.depots.depot_button', save_as='button', children={
+        {type='button', name='ltnm_depot_button_'..name, style=button_style, handlers='main.depots.depot_button', save_as='button', children={
           {type='flow', ignored_by_interaction=true, direction='vertical', children={
             {type='label', style='caption_label', style_mods={font_color={28, 28, 28}}, caption=name, save_as='name_label'},
             {type='flow', direction='horizontal', children={
