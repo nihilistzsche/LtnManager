@@ -34,7 +34,7 @@ end
 -- this assumes only minutes and seconds, hours are unneeded for our usecase
 function util.ticks_to_time(ticks)
   local seconds = math.floor(ticks / 60)
-  return math.floor(seconds / 60)..':'..math.floor(seconds % 60)
+  return math.floor(seconds / 60)..':'..string.format('%02.f', math.floor(seconds % 60))
 end
 
 util.train = require('__OpteraLib__/script/train')
