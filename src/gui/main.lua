@@ -461,7 +461,7 @@ function self.create(player, player_table)
   gui_data.window.force_auto_center()
 
   -- opened
-  -- player.opened = gui_data.window
+  player.opened = gui_data.window
 
   -- save data to global
   player_table.gui.main = gui_data
@@ -644,7 +644,7 @@ function self.update(player, player_table, state_changes)
         for name,count in pairs(train.shipment) do
           i = i + 1
           contents_table.add{type='sprite-button', name='ltnm_material_button_'..i, style='ltnm_small_slot_button_dark_grey',
-            sprite=string_gsub(name, ',', '/'), number=count}
+            sprite=string_gsub(name, ',', '/'), number=count, tooltip=material_translations[name]}
         end
       end
     end
@@ -700,7 +700,7 @@ function self.update(player, player_table, state_changes)
             mi = mi + 1
             provided_requested_rows = provided_requested_rows + 1
             table_add{type='sprite-button', name='ltnm_material_button_'..mi, style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'),
-              number=count}
+              number=count, tooltip=material_translations[name]}
           end
         end
       end
@@ -717,7 +717,7 @@ function self.update(player, player_table, state_changes)
           mi = mi + 1
           shipments_rows = shipments_rows + 1
           table_add{type='sprite-button', name='ltnm_material_button_'..mi, style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'),
-            number=count}
+            number=count, tooltip=material_translations[name]}
         end
       end
       shipments_rows = math.ceil(shipments_rows / 4) -- number of columns
@@ -795,8 +795,8 @@ function self.update(player, player_table, state_changes)
       local i = 0
       for name,count in pairs(combined_materials) do
         i = i + 1
-        elems[name] = add{type='sprite-button', name='ltnm_material_button_'..i, style='ltnm_slot_button_'..color,
-          sprite=string_gsub(name, ',', '/'), number=count}
+        elems[name] = add{type='sprite-button', name='ltnm_material_button_'..i, style='ltnm_slot_button_'..color, sprite=string_gsub(name, ',', '/'),
+          number=count, tooltip=material_translations[name]}
       end
       buttons[type] = elems
     end
@@ -864,7 +864,7 @@ function self.update(player, player_table, state_changes)
               materials[#materials+1] = {color, contents}
             end
           end
-          location_template(table, {{'bold_label', station.entity.backer_name}}, materials, {})
+          location_template(table, {{'bold_label', station.entity.backer_name}}, materials, material_translations)
         end
       end
       if #table.children == 0 then
@@ -947,8 +947,11 @@ function self.update(player, player_table, state_changes)
             }}
           }}
         }).table.add
+        local mi = 0
         for name,count in pairs(entry.actual_shipment or entry.shipment) do
-          table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'), number=count}
+          mi = mi + 1
+          table_add{type='sprite-button', name='ltnm_material_button_'..mi, style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'),
+            number=count, tooltip=material_translations[name]}
         end
       end
     end
