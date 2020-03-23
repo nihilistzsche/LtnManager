@@ -194,6 +194,7 @@ local function iterate_stations(data)
         train_data.state = train.state
         train_data.depot = schedule.records[1].station
         train_data.composition = util.train.get_composition_string(train)
+        train_data.main_locomotive = util.train.get_main_locomotive(train)
         train_data.status = {}
         trains[train_id] = train_data
       end

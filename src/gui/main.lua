@@ -180,6 +180,12 @@ gui.handlers:extend{main={
         -- update GUI contents
         self.update(game.get_player(e.player_index), player_table, {depot_trains=true})
       end
+    },
+    open_train_button = {
+      on_gui_click = function(e)
+        local train_id = string_gsub(e.element.name, 'ltnm_open_train_', '')
+        game.get_player(e.player_index).opened = global.data.trains[tonumber(train_id)].main_locomotive
+      end
     }
   },
   stations = {
@@ -201,6 +207,12 @@ gui.handlers:extend{main={
         end
         -- update GUI contents
         self.update(game.get_player(e.player_index), player_table, {stations_list=true})
+      end
+    },
+    open_station_button = {
+      on_gui_click = function(e)
+        local station_id = string_gsub(e.element.name, 'ltnm_open_station_', '')
+        game.get_player(e.player_index).zoom_to_world(global.data.stations[tonumber(station_id)].entity.position, 0.5)
       end
     }
   },
@@ -337,7 +349,8 @@ function self.create(player, player_table)
             -- {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.station-filters-tooltip'}}
           }},
           {type='scroll-pane', style='ltnm_blank_scroll_pane', direction='vertical', vertical_scroll_policy='always', save_as='stations.scroll_pane', children={
-            {type='table', style='ltnm_stations_table', style_mods={vertically_stretchable=true}, column_count=6, save_as='stations.table'}
+            {type='table', style='ltnm_stations_table', style_mods={vertically_stretchable=true, horizontally_stretchable=true}, column_count=6,
+              save_as='stations.table'}
           }}
         }},
         -- INVENTORY
@@ -417,8 +430,10 @@ function self.create(player, player_table)
   })
 
   -- other handlers
-  event.enable_group('gui.main.material_button', player.index, 'ltnm_material_button_')
   event.enable('gui.main.ltnm-search', player.index)
+  event.enable_group('gui.main.material_button', player.index, 'ltnm_material_button_')
+  event.enable_group('gui.main.depots.open_train_button', player.index, 'ltnm_open_train_')
+  event.enable_group('gui.main.stations.open_station_button', player.index, 'ltnm_open_station_')
 
   -- default settings
   gui_data.tabbed_pane.selected = 'depots'
@@ -608,7 +623,7 @@ function self.update(player, player_table, state_changes)
       local train = data.trains[train_id]
       -- build GUI structure
       local elems = gui.build(trains_table, {
-        {type='label', style='hoverable_bold_label', style_mods={top_margin=-2}, caption=train.composition},
+        {type='label', name='ltnm_open_train_'..train_id, style='hoverable_bold_label', style_mods={top_margin=-2}, caption=train.composition},
         {type='flow', style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical',
           save_as='status_flow'},
         {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
@@ -651,7 +666,8 @@ function self.update(player, player_table, state_changes)
       local t = stations[sorted_stations[i]]
       -- build GUI structure
       local elems = gui.build(stations_table, {
-        {type='label', style='hoverable_bold_label', style_mods={horizontally_stretchable=true}, caption=t.entity.backer_name},
+        {type='label', name='ltnm_open_station_'..sorted_stations[i], style='hoverable_bold_label', style_mods={horizontally_stretchable=true},
+          caption=t.entity.backer_name},
         {type='label', caption=t.network_id},
         gui.templates.status_indicator('indicator', t.status.name, t.status.count),
         -- items
