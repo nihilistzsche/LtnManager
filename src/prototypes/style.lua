@@ -634,7 +634,7 @@ styles.ltnm_material_locations_scroll_pane = {
 styles.ltnm_material_location_slot_table_scroll_pane = {
   type = 'scroll_pane_style',
   parent = 'ltnm_small_slot_table_scroll_pane',
-  maximal_height = 228,
+  maximal_height = 216,
   horizontally_squashable = 'off'
 }
 

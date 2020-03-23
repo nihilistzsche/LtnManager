@@ -31,10 +31,19 @@ function util.comma_value(input)
 end
 
 -- convert a number of ticks into runtime
--- this assumes only minutes and seconds, hours are unneeded for our usecase
+-- always shows minutes and seconds, hours is optional
 function util.ticks_to_time(ticks)
   local seconds = math.floor(ticks / 60)
-  return math.floor(seconds / 60)..':'..string.format('%02.f', math.floor(seconds % 60))
+  local hours = string.format('%02.f', math.floor(seconds/3600));
+  if tonumber(hours) > 0 then
+    local mins = string.format('%02.f', math.floor(seconds/60 - (hours*60)));
+    local secs = string.format('%02.f', math.floor(seconds - hours*3600 - mins *60));
+    return hours..':'..mins..':'..secs
+  else
+    local mins = math.floor(seconds/60);
+    local secs = string.format('%02.f', math.floor(seconds - hours*3600 - mins *60));
+    return mins..':'..secs
+  end
 end
 
 util.train = require('__OpteraLib__/script/train')

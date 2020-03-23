@@ -112,6 +112,8 @@ local data_manager = {}
         (array of station_id)
       trains
         (array of train_id)
+  sorted_history
+    (dictionary of type -> array of history_index)
   -- working data - excluded from output
   provided_by_stop
   requested_by_stop
@@ -266,6 +268,7 @@ local function sort_depot_trains(data)
   local trains = data.trains
   for n,depot in pairs(data.depots) do
     local depot_trains = {}
+
     -- sort by composition - same for all players
     do
       local sort_lookup = {}
@@ -379,6 +382,55 @@ local function sort_stations(data)
   data.sorted_stations = results
 
   -- next step
+  data.step = 5
+end
+
+local function sort_history(data)
+  -- sorting tables
+  local sort = {
+    depot = {lookup={}, values={}},
+    route = {lookup={}, values={}},
+    network_id = {lookup={}, values={}},
+    runtime = {lookup={}, values={}},
+    finished = {lookup={}, values={}}
+  }
+
+  -- iterate history to fill sorting tables
+  for i,entry in ipairs(data.history) do
+    for sort_type,sort_table in pairs(sort) do
+      local value
+      if sort_type == 'route' then
+        value = entry.from..' -> '..entry.to
+      else
+        value = entry[sort_type]
+      end
+      local lookup = sort_table.lookup[value]
+      if lookup then
+        lookup[#lookup+1] = i
+      else
+        sort_table.lookup[value] = {i}
+      end
+      sort_table.values[#sort_table.values+1] = value
+    end
+  end
+
+  -- sort and output
+  local output = {}
+  for sort_type,sort_table in pairs(sort) do
+    local lookup = sort_table.lookup
+    local values = sort_table.values
+    local out = {}
+    table_sort(values)
+    for i,value in ipairs(values) do
+      out[i] = table_remove(lookup[value])
+    end
+    output[sort_type] = out
+  end
+
+  -- save data
+  data.sorted_history = output
+
+  -- next step
   data.step = 100
 end
 
@@ -398,6 +450,8 @@ local function iterate_data()
     sort_depot_trains(data)
   elseif step == 4 then
     sort_stations(data)
+  elseif step == 5 then
+    sort_history(data)
   elseif step == 100 then -- finish up, copy to output
     global.data = {
       -- bulk data
@@ -411,6 +465,7 @@ local function iterate_data()
       sorted_stations = data.sorted_stations,
       network_to_stations = data.network_to_stations,
       material_locations = data.material_locations,
+      sorted_history = data.sorted_history,
       -- other
       num_stations = data.num_stations
     }
@@ -498,9 +553,11 @@ local function on_delivery_completed(e)
     to = train.to,
     from_id = train.from_id,
     to_id = train.to_id,
+    network_id = train.network_id,
     depot = train.depot,
     shipment = e.shipment,
-    runtime = game.tick - train.started
+    runtime = game.tick - train.started,
+    finished = game.tick
   })
   global.working_data.history[51] = nil -- limit to 50 entries
 end
