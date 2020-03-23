@@ -10,6 +10,12 @@ data:extend{
     name = 'ltnm-toggle-gui',
     key_sequence = 'CONTROL + T'
   },
+  {
+    type = 'custom-input',
+    name = 'ltnm-search',
+    key_sequence = '',
+    linked_game_control = 'focus-search'
+  },
   -- shortcuts
   {
     type = 'shortcut',

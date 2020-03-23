@@ -143,6 +143,17 @@ gui.handlers:extend{main={
       )
     end
   },
+  ['ltnm-search'] = function(e)
+    local player_table = global.players[e.player_index]
+    local gui_data = player_table.gui.main
+    local active_tab = gui_data.tabbed_pane.selected
+    if active_tab == 'inventory' then
+      -- focus textfield
+      gui_data.inventory.search_textfield.focus()
+      -- select all text if on default
+      gui.handlers.main.inventory.search_textfield.on_gui_click{player_index=e.player_index, element=gui_data.inventory.search_textfield}
+    end
+  end,
   depots = {
     depot_button = {
       on_gui_click = function(e)
@@ -305,9 +316,9 @@ function self.create(player, player_table)
                 save_as='inventory.search_textfield'},
               {template='pushers.horizontal'},
               {type='label', style='caption_label', caption='ID:'},
-              {type='textfield', style='short_number_textfield', style_mods={right_margin=-8}, text='-1', lose_focus_on_confirm=true, numeric=true,
+              {type='textfield', style='short_number_textfield', text='-1', lose_focus_on_confirm=true, numeric=true,
                 allow_negative=true, handlers='main.inventory.network_id_textfield', save_as='inventory.network_id_textfield'},
-              {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.network-selection-dialog'}, mods={enabled=false}}
+              -- {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.network-selection-dialog'}, mods={enabled=false}}
             }},
             -- inventory tables
             {type='flow', style_mods={padding=10, top_padding=4}, direction='vertical', children={
@@ -366,6 +377,7 @@ function self.create(player, player_table)
 
   -- other handlers
   event.enable_group('gui.main.material_button', player.index, 'ltnm_material_button_')
+  event.enable('gui.main.ltnm-search', player.index)
 
   -- default settings
   gui_data.tabbed_pane.selected = 'depots'
