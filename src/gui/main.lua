@@ -315,7 +315,7 @@ function self.create(player, player_table)
               {type='textfield', text=player_table.dictionary.gui.translations.search, lose_focus_on_confirm=true, handlers='main.inventory.search_textfield',
                 save_as='inventory.search_textfield'},
               {template='pushers.horizontal'},
-              {type='label', style='caption_label', caption='ID:'},
+              {type='label', style='caption_label', caption={'ltnm-gui.network-id'}},
               {type='textfield', style='short_number_textfield', text='-1', lose_focus_on_confirm=true, numeric=true,
                 allow_negative=true, handlers='main.inventory.network_id_textfield', save_as='inventory.network_id_textfield'},
               -- {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.network-selection-dialog'}, mods={enabled=false}}
