@@ -433,6 +433,52 @@ local function sort_history(data)
   data.sorted_history = output
 
   -- next step
+  data.step = 6
+end
+
+local function sort_alerts(data)
+  -- sorting tables
+  local sort = {
+    time = {lookup={}, values={}},
+    type = {lookup={}, values={}}
+  }
+
+  -- iterate history to fill sorting tables
+  for i,entry in ipairs(data.alerts) do
+    for sort_type,sort_table in pairs(sort) do
+      local value
+      if sort_type == 'route' then
+        value = entry.from..' -> '..entry.to
+      else
+        value = entry[sort_type]
+      end
+      local lookup = sort_table.lookup[value]
+      if lookup then
+        lookup[#lookup+1] = i
+      else
+        sort_table.lookup[value] = {i}
+      end
+      sort_table.values[#sort_table.values+1] = value
+    end
+  end
+
+  -- sort and output
+  local output = {}
+  for sort_type,sort_table in pairs(sort) do
+    local lookup = sort_table.lookup
+    local values = sort_table.values
+    local out = {}
+    table_sort(values)
+    for i,value in ipairs(values) do
+      out[i] = table_remove(lookup[value])
+    end
+    output[sort_type] = out
+  end
+
+  -- save data
+  data.sorted_alerts = output
+
+  -- next step
   data.step = 100
 end
 
@@ -454,6 +500,8 @@ local function iterate_data()
     sort_stations(data)
   elseif step == 5 then
     sort_history(data)
+  elseif step == 6 then
+    sort_alerts(data)
   elseif step == 100 then -- finish up, copy to output
     global.data = {
       -- bulk data
@@ -468,6 +516,7 @@ local function iterate_data()
       network_to_stations = data.network_to_stations,
       material_locations = data.material_locations,
       sorted_history = data.sorted_history,
+      sorted_alerts = data.sorted_alerts,
       -- other
       num_stations = data.num_stations
     }
@@ -531,28 +580,36 @@ local function on_dispatcher_updated(e)
 end
 
 local function on_delivery_pickup_complete(e)
-  local breakpoint
-  -- if not global.data then return end
-  -- local train = global.data.trains[e.train_id]
-  -- if not train then error('Could not find train of ID: '..e.train_id) end
-  -- table.insert(global.working_data.history, 1, {
-  --   type = 'pickup',
-  --   from = train.from,
-  --   to = train.to,
-  --   from_id = train.from_id,
-  --   to_id = train.to_id,
-  --   depot = train.depot,
-  --   actual_shipment = e.actual_shipment,
-  --   planned_shipment = e.planned_shipment,
-  --   runtime = game.tick - train.started
-  -- })
-  -- global.working_data.history[51] = nil -- limit to 50 entries
+  if not global.data then return end
+
+  -- add an error if the actual shipment doesn't match the planned shipment
+  if not table.compare(e.planned_shipment, e.actual_shipment) then
+    -- save train data so it will persist after the delivery is through
+    local train = global.data.trains[e.train_id]
+    if not train then error('Could not find train of ID: '..e.train_id) end
+    local alerts = global.working_data.alerts
+    alerts._index = alerts._index + 1
+    alerts[alerts._index] = {
+      time = game.tick, 
+      type = 'incomplete_pickup',
+      train = {
+        id = e.train_id,
+        from = train.from,
+        to = train.to,
+        depot = train.depot
+      },
+      planned_shipment = e.planned_shipment,
+      actual_shipment = e.planned_shipment
+    }
+  end
 end
 
 local function on_delivery_completed(e)
   if not global.data then return end
   local train = global.data.trains[e.train_id]
   if not train then error('Could not find train of ID: '..e.train_id) end
+
+  -- add to delivery history
   table.insert(global.working_data.history, 1, {
     type = 'delivery',
     from = train.from,
@@ -566,6 +623,31 @@ local function on_delivery_completed(e)
     finished = game.tick
   })
   global.working_data.history[51] = nil -- limit to 50 entries
+
+  -- detect incomplete deliveries
+  local contents = {}
+  for n,c in pairs(train.train.get_contents()) do
+    contents['item,'..n] = c
+  end
+  for n,c in pairs(train.train.get_fluid_contents()) do
+    contents['fluid,'..n] = c
+  end
+  if table_size(contents) > 0 then
+    local alerts = global.working_data.alerts
+    alerts._index = alerts._index + 1
+    alerts[alerts._index] = {
+      time = game.tick, 
+      type = 'incomplete_delivery',
+      train = {
+        id = e.train_id,
+        from = train.from,
+        to = train.to,
+        depot = train.depot
+      },
+      planned_shipment = e.planned_shipment,
+      actual_shipment = e.planned_shipment
+    }
+  end
 end
 
 local function on_dispatcher_no_train_found(e)

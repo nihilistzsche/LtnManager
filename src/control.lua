@@ -104,7 +104,7 @@ end
 event.on_init(function()
   global.flags = {}
   global.players = {}
-  global.working_data = {history={}, alerts={}}
+  global.working_data = {history={}, alerts={_index=0}}
   build_translation_data()
   for i,p in pairs(game.players) do
     setup_player(p, i)

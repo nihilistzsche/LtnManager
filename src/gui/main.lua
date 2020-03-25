@@ -77,7 +77,6 @@ gui.templates:extend{
       end
       flow.children[#flow.children].destroy()
       -- populate materials
-      slot_style = slot_style or 'dark_grey'
       local table_add = elems.table.add
       local i = 0
       for _,t in ipairs(materials) do
@@ -424,7 +423,20 @@ function self.create(player, player_table)
           }
         }},
         -- ALERTS
-        {type='empty-widget', mods={visible=false}, save_as='tabbed_pane.contents.alerts'}
+        {type='flow', style_mods={horizontal_spacing=12}, mods={visible=false}, save_as='tabbed_pane.contents.alerts', children={
+          -- alerts list
+          {type='frame', style='ltnm_light_content_frame', style_mods={width=312}, direction='vertical', children={
+            {type='frame', style='ltnm_toolbar_frame', children={
+              {type='checkbox', name='ltnm_sort_alerts_time', style='ltnm_sort_checkbox_active', style_mods={left_margin=8, width=64}, state=false,
+                caption={'ltnm-gui.time'}, save_as='alerts.time_sort_checkbox'},
+              {type='checkbox', name='ltnm_sort_alerts_alert', style='ltnm_sort_checkbox_inactive', style_mods={width=220}, state=false,
+                caption={'ltnm-gui.alert'}, save_as='alerts.alert_sort_checkbox'}
+            }},
+            {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={vertically_stretchable=true}, children={
+              {type='table', style='ltnm_rows_table', column_count=2, save_as='alerts.table'}
+            }}
+          }}
+        }}
       }}
     }}
   })
@@ -455,6 +467,10 @@ function self.create(player, player_table)
   gui_data.history.sort_route = true
   gui_data.history.sort_runtime = true
   gui_data.history.sort_finished = false
+
+  gui_data.alerts.active_sort = 'time'
+  gui_data.alerts.sort_time = false
+  gui_data.alerts.sort_type = true
 
   -- dragging and centering
   gui_data.titlebar.drag_handle.drag_target = gui_data.window
@@ -956,6 +972,32 @@ function self.update(player, player_table, state_changes)
       end
     end
   end
+
+  -- ALERTS LIST
+  if state_changes.alerts_list then
+    local alerts_table = gui_data.alerts.list_table
+    alerts_table.clear()
+
+    local active_sort = gui_data.alerts.active_sort
+    local sort_value = gui_data.alerts['sort_'..active_sort]
+    local sorted_alerts = data.sorted_alerts[active_sort]
+
+    -- skip if there are no alerts
+    if #sorted_alerts > 0 then
+      local alerts = data.alerts
+      local start = sort_value and 1 or #sorted_alerts
+      local finish = sort_value and #sorted_alerts or 1
+      local delta = sort_value and 1 or -1
+
+      for i=start,finish,delta do
+        local entry = alerts[sorted_alerts[i]]
+        gui.build(alerts_table, {
+          {type='label', style_mods={width=64}, caption=util.ticks_to_time(entry.time)},
+          {type='label', style='hoverable_bold_label', style_mods={horizontally_stretchable=true}, caption={'ltnm-gui.alert-'..entry.type}}
+        })
+      end
+    end
+  end
 end
 
 function self.update_active_tab(player, player_table, name)
@@ -970,6 +1012,8 @@ function self.update_active_tab(player, player_table, name)
     changes.inventory_contents = true
   elseif name == 'history' then
     changes.history = true
+  elseif name == 'alerts' then
+    changes.alerts_list = true
   end
   self.update(player, player_table, changes)
 end
