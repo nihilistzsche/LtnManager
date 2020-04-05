@@ -52,7 +52,8 @@ local function setup_player(player, index)
   local data = {
     dictionary = {},
     flags = {
-      can_open_gui = false
+      can_open_gui = false,
+      translations_finished = false,
     },
     gui = {}
   }
@@ -161,6 +162,7 @@ event.register(translation.finish_event, function(e)
   -- if this player is done translating
   if global.__lualib.translation.players[e.player_index].active_translations_count == 0 then
     -- enable opening the GUI on the next LTN update cycle
+    player_table.flags.translations_finished = true
     event.enable('enable_gui_on_next_ltn_update', e.player_index)
   end
 end)

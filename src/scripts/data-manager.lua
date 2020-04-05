@@ -299,7 +299,7 @@ local function sort_depot_trains(data)
       for pi,_ in pairs(game.players) do
         local player_table = players[pi]
         -- only bother if they can actually open the GUI
-        if player_table.flags.can_open_gui then
+        if player_table.flags.translations_finished then
           local sort_lookup = {}
           local sort_values = {}
           local translations = player_table.dictionary.gui.translations
@@ -439,6 +439,8 @@ end
 local function sort_alerts(data)
   -- sorting tables
   local sort = {
+    depot = {lookup={}, values={}},
+    route = {lookup={}, values={}},
     time = {lookup={}, values={}},
     type = {lookup={}, values={}}
   }
@@ -447,8 +449,10 @@ local function sort_alerts(data)
   for i,entry in ipairs(data.alerts) do
     for sort_type,sort_table in pairs(sort) do
       local value
-      if sort_type == 'route' then
-        value = entry.from..' -> '..entry.to
+      if sort_type == 'depot' then
+        value = entry.train.depot
+      elseif sort_type == 'route' then
+        value = entry.train.from..' -> '..entry.train.to
       else
         value = entry[sort_type]
       end
