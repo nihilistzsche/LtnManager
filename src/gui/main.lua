@@ -132,7 +132,7 @@ gui.handlers:extend{main={
     },
   },
   material_button = {
-    on_gui_click = function(e)
+    on_gui_click = {id=defines.events.on_gui_click, handler=function(e)
       local player_table = global.players[e.player_index]
       local on_inventory_tab = player_table.gui.main.tabbed_pane.selected == 'inventory'
       self.update(game.get_player(e.player_index), player_table, {
@@ -140,7 +140,7 @@ gui.handlers:extend{main={
         inventory_contents = (not on_inventory_tab) and true,
         selected_material = string_gsub(e.element.sprite, '/', ',')}
       )
-    end
+    end, gui_filters='ltnm_material_button_', options={match_filter_strings=true}}
   },
   ['ltnm-search'] = function(e)
     local player_table = global.players[e.player_index]
@@ -181,10 +181,10 @@ gui.handlers:extend{main={
       end
     },
     open_train_button = {
-      on_gui_click = function(e)
+      on_gui_click = {id=defines.events.on_gui_click, handler=function(e)
         local train_id = string_gsub(e.element.name, 'ltnm_open_train_', '')
         game.get_player(e.player_index).opened = global.data.trains[tonumber(train_id)].main_locomotive
-      end
+      end, gui_filters='ltnm_open_train_', options={match_filter_strings=true}}
     }
   },
   stations = {
@@ -443,7 +443,7 @@ function self.create(player, player_table)
 
   -- other handlers
   event.enable('gui.main.ltnm-search', player.index)
-  event.enable_group('gui.main.material_button', player.index, 'ltnm_material_button_')
+  event.enable_group('gui.main.material_button', player.index)
   event.enable_group('gui.main.depots.open_train_button', player.index, 'ltnm_open_train_')
   event.enable_group('gui.main.stations.open_station_button', player.index, 'ltnm_open_station_')
 
@@ -975,7 +975,7 @@ function self.update(player, player_table, state_changes)
 
   -- ALERTS LIST
   if state_changes.alerts_list then
-    local alerts_table = gui_data.alerts.list_table
+    local alerts_table = gui_data.alerts.table
     alerts_table.clear()
 
     local active_sort = gui_data.alerts.active_sort
