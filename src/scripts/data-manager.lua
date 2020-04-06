@@ -135,7 +135,7 @@ local function iterate_stations(data)
   local station_ids = data.station_ids
   local num_stations = data.num_stations
   local trains = data.trains
-  
+
   local network_to_stations = data.network_to_stations
   local material_locations = data.material_locations
 
@@ -143,7 +143,7 @@ local function iterate_stations(data)
 
   local deliveries = data.deliveries
   local available_trains = data.available_trains
-  
+
   local index = data.index
   local num_to_iterate = settings.global['ltnm-stations-per-tick'].value
   local end_index = index + num_to_iterate
@@ -200,7 +200,6 @@ local function iterate_stations(data)
       end
     end
 
-    
     -- add station and trains to depot
     if station.isDepot then
       local depot = depots[station_name]
@@ -594,7 +593,7 @@ local function on_delivery_pickup_complete(e)
     local alerts = global.working_data.alerts
     alerts._index = alerts._index + 1
     alerts[alerts._index] = {
-      time = game.tick, 
+      time = game.tick,
       type = 'incomplete_pickup',
       train = {
         id = e.train_id,
@@ -640,7 +639,7 @@ local function on_delivery_completed(e)
     local alerts = global.working_data.alerts
     alerts._index = alerts._index + 1
     alerts[alerts._index] = {
-      time = game.tick, 
+      time = game.tick,
       type = 'incomplete_delivery',
       train = {
         id = e.train_id,

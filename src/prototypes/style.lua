@@ -511,6 +511,12 @@ styles.ltnm_material_locations_label = {
   left_margin = 2
 }
 
+styles.ltnm_paragraph_label = {
+  type = 'label_style',
+  parent = 'label',
+  single_line = false
+}
+
 -- -----------------------------------------------------------------------------
 -- LINE STYLES
 

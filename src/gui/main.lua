@@ -132,7 +132,7 @@ gui.handlers:extend{main={
     },
   },
   material_button = {
-    on_gui_click = {id=defines.events.on_gui_click, handler=function(e)
+    on_gui_click = {handler=function(e)
       local player_table = global.players[e.player_index]
       local on_inventory_tab = player_table.gui.main.tabbed_pane.selected == 'inventory'
       self.update(game.get_player(e.player_index), player_table, {
@@ -181,7 +181,7 @@ gui.handlers:extend{main={
       end
     },
     open_train_button = {
-      on_gui_click = {id=defines.events.on_gui_click, handler=function(e)
+      on_gui_click = {handler=function(e)
         local train_id = string_gsub(e.element.name, 'ltnm_open_train_', '')
         game.get_player(e.player_index).opened = global.data.trains[tonumber(train_id)].main_locomotive
       end, gui_filters='ltnm_open_train_', options={match_filter_strings=true}}
@@ -272,6 +272,34 @@ gui.handlers:extend{main={
         end
         self.update(game.get_player(e.player_index), global.players[e.player_index], {history=true})
       end
+    }
+  },
+  alerts = {
+    sort_checkbox = {
+      on_gui_checked_state_changed = function(e)
+        local _,_,clicked_type = string_find(e.element.name, '^ltnm_sort_alerts_(.-)$')
+        local player_table = global.players[e.player_index]
+        local gui_data = player_table.gui.main.alerts
+        if gui_data.active_sort ~= clicked_type then
+          -- update styles
+          gui_data[gui_data.active_sort..'_sort_checkbox'].style = 'ltnm_sort_checkbox_inactive'
+          e.element.style = 'ltnm_sort_checkbox_active'
+          -- reset the checkbox value and switch active sort
+          e.element.state = not e.element.state
+          gui_data.active_sort = clicked_type
+        else
+          -- update the state in global
+          gui_data['sort_'..clicked_type] = e.element.state
+        end
+        -- update GUI contents
+        self.update(game.get_player(e.player_index), player_table, {alerts_list=true})
+      end
+    },
+    alert_type_label = {
+      on_gui_click = {handler=function(e)
+        local alert_id = string_gsub(e.element.name, 'ltnm_alert_type_label_', '')
+        self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_alert=alert_id})
+      end, gui_filters='ltnm_alert_type_label_', options={match_filter_strings=true}}
     }
   }
 }}
@@ -428,13 +456,22 @@ function self.create(player, player_table)
           {type='frame', style='ltnm_light_content_frame', style_mods={width=312}, direction='vertical', children={
             {type='frame', style='ltnm_toolbar_frame', children={
               {type='checkbox', name='ltnm_sort_alerts_time', style='ltnm_sort_checkbox_active', style_mods={left_margin=8, width=64}, state=false,
-                caption={'ltnm-gui.time'}, save_as='alerts.time_sort_checkbox'},
-              {type='checkbox', name='ltnm_sort_alerts_alert', style='ltnm_sort_checkbox_inactive', style_mods={width=220}, state=false,
-                caption={'ltnm-gui.alert'}, save_as='alerts.alert_sort_checkbox'}
+                caption={'ltnm-gui.time'}, handlers='main.alerts.sort_checkbox', save_as='alerts.time_sort_checkbox'},
+              {type='checkbox', name='ltnm_sort_alerts_type', style='ltnm_sort_checkbox_inactive', style_mods={width=220}, state=false,
+                caption={'ltnm-gui.alert'}, handlers='main.alerts.sort_checkbox', save_as='alerts.type_sort_checkbox'}
             }},
             {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={vertically_stretchable=true}, children={
               {type='table', style='ltnm_rows_table', column_count=2, save_as='alerts.table'}
             }}
+          }},
+          -- information panel
+          {type='frame', style='ltnm_light_content_frame', style_mods={horizontally_stretchable=true}, direction='vertical', children={
+            {type='frame', style='ltnm_toolbar_frame', children={
+              {type='label', style='subheader_caption_label', caption={'ltnm-gui.select-an-alert'}, save_as='alerts.info_title'},
+              {template='pushers.horizontal'},
+              {type='sprite-button', style='red_icon_button', sprite='utility/trash'}
+            }},
+            {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={vertically_stretchable=true, padding=8}, save_as='alerts.info_pane'}
           }}
         }}
       }}
@@ -443,6 +480,7 @@ function self.create(player, player_table)
 
   -- other handlers
   event.enable('gui.main.ltnm-search', player.index)
+  event.enable_group('gui.main.alerts.alert_type_label', player.index)
   event.enable_group('gui.main.material_button', player.index)
   event.enable_group('gui.main.depots.open_train_button', player.index, 'ltnm_open_train_')
   event.enable_group('gui.main.stations.open_station_button', player.index, 'ltnm_open_station_')
@@ -990,13 +1028,46 @@ function self.update(player, player_table, state_changes)
       local delta = sort_value and 1 or -1
 
       for i=start,finish,delta do
-        local entry = alerts[sorted_alerts[i]]
+        local alert_id = sorted_alerts[i]
+        local entry = alerts[alert_id]
         gui.build(alerts_table, {
           {type='label', style_mods={width=64}, caption=util.ticks_to_time(entry.time)},
-          {type='label', style='hoverable_bold_label', style_mods={horizontally_stretchable=true}, caption={'ltnm-gui.alert-'..entry.type}}
+          {type='label', name='ltnm_alert_type_label_'..alert_id, style='hoverable_bold_label', style_mods={width=212}, caption={'ltnm-gui.alert-'..entry.type}}
         })
       end
     end
+  end
+
+  -- SELECTED ALERT
+  if state_changes.selected_alert then
+    local alert_data = data.alerts[tonumber(state_changes.selected_alert)]
+    local alert_type = alert_data.type
+    local pane = gui_data.alerts.info_pane
+    pane.clear()
+
+    -- update title
+    gui_data.alerts.info_title.caption = {'ltnm-gui.alert-'..alert_type}
+
+    gui.build(pane, {
+      -- description
+      {type='frame', style='bordered_frame', children={
+        {type='label', style='ltnm_paragraph_label', caption={'ltnm-gui.alert-'..alert_type..'-description'}}
+      }},
+      -- train
+      {type='label', style='subheader_caption_label', caption={'ltnm-gui.train'}},
+      {type='flow', direction='horizontal'}
+    })
+
+
+    -- alert-specific stuff
+    if alert_type == 'incomplete_pickup' then
+
+    elseif alert_type == 'incomplete_delivery' then
+
+    else
+      
+    end
+    local breakpoint
   end
 end
 
