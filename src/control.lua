@@ -8,6 +8,7 @@ local translation = require('__RaiLuaLib__.lualib.translation')
 local util = require('scripts.util')
 
 -- scripts
+local alert_popup_gui = require('gui.alert-popup')
 local data_manager = require('scripts.data-manager')
 local main_gui = require('gui.main')
 
@@ -61,7 +62,9 @@ local function setup_player(player, index)
       translate_on_join = true,
       translations_finished = false
     },
-    gui = {}
+    gui = {
+      alert_popup = {_index=1}
+    }
   }
   player.set_shortcut_available('ltnm-toggle-gui', false)
   global.players[index] = data
@@ -70,6 +73,7 @@ end
 local function destroy_player_guis(player, player_table)
   main_gui.close(player, player_table)
   main_gui.destroy(player, player_table)
+  alert_popup_gui.destroy_all(player, player_table)
 end
 
 -- completely close all GUIs and retranslate
@@ -114,14 +118,13 @@ local function auto_update_guis(e)
   end
 end
 
-
 -- -----------------------------------------------------------------------------
 -- STATIC EVENTS
 
 event.on_init(function()
   global.flags = {}
   global.players = {}
-  global.working_data = {history={}, alerts={_index=0}}
+  global.working_data = {history={}, alerts={_index=0}, alert_popups={}}
   build_translation_data()
   for i,p in pairs(game.players) do
     setup_player(p, i)
@@ -136,13 +139,6 @@ end)
 
 event.on_load(function()
   data_manager.setup_events()
-end)
-
-event.register({'on_init', 'on_load'}, function()
-  event.register_conditional{
-    enable_gui_on_next_ltn_update = {id=data_manager.ltn_event_ids.on_dispatcher_updated, handler=enable_gui},
-    auto_refresh = {id=-300, handler=auto_update_guis}
-  }
 end)
 
 event.on_player_created(function(e)
@@ -189,8 +185,12 @@ event.register(translation.finish_event, function(e)
   end
 end)
 
--- this event ID doesn't exist in the root scope, so nest this inside on_init and on_load
+-- LTN and retranslate events don't exist in the root scope, so register them in bootstrap
 event.register({'on_init', 'on_load'}, function()
+  event.register_conditional{
+    enable_gui_on_next_ltn_update = {id=data_manager.ltn_event_ids.on_dispatcher_updated, handler=enable_gui},
+    auto_refresh = {id=-300, handler=auto_update_guis}
+  }
   event.register(translation.retranslate_all_event, function(e)
     local player = game.get_player(e.player_index)
     local player_table = global.players[e.player_index]

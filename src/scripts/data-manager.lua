@@ -14,6 +14,9 @@ local table_sort = table.sort
 
 local ltn_event_ids = {}
 
+-- scripts
+local alert_popup_gui = require('gui.alert-popup')
+
 -- object
 local data_manager = {}
 
@@ -121,6 +124,7 @@ local data_manager = {}
   available_trains
   station_ids
   num_stations
+  alert_popups
   -- iteration data - excluded from output
   step (int)
   index (int)
@@ -505,7 +509,8 @@ local function iterate_data()
     sort_history(data)
   elseif step == 6 then
     sort_alerts(data)
-  elseif step == 100 then -- finish up, copy to output
+  elseif step == 100 then
+    -- output data
     global.data = {
       -- bulk data
       depots = data.depots,
@@ -523,10 +528,19 @@ local function iterate_data()
       -- other
       num_stations = data.num_stations
     }
+
+    -- create alert popups
+    for _,t in pairs(global.working_data.alert_popups) do
+      alert_popup_gui.create_for_all(t)
+    end
+
+    -- reset working data
     global.working_data = {
       history = global.working_data.history,
-      alerts = global.working_data.alerts
+      alerts = global.working_data.alerts,
+      alert_popups = {}
     }
+
     -- reset events
     event.enable('ltn_on_stops_updated')
     event.enable('ltn_on_dispatcher_updated')
@@ -604,6 +618,7 @@ local function on_delivery_pickup_complete(e)
       planned_shipment = e.planned_shipment,
       actual_shipment = e.planned_shipment
     }
+    global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type='incomplete_pickup'}
   end
 end
 
@@ -650,6 +665,7 @@ local function on_delivery_completed(e)
       planned_shipment = e.planned_shipment,
       actual_shipment = e.planned_shipment
     }
+    global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type='incomplete_delivery'}
   end
 end
 

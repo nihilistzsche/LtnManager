@@ -35,37 +35,6 @@ local function slot_button(y, glow_color, default_x, size)
   }
 end
 
--- local row_shadow = {
---   position = {351,109},
---   corner_size = 10,
---   top_outer_border_shift = 4,
---   bottom_outer_border_shift = -4,
---   left_outer_border_shift = 4,
---   right_outer_border_shift = -4,
---   draw_type = 'outer'
--- }
-
--- local function bordered_slot_button(y, glow_color, default_x, size)
---   return {
---     type = 'button_style',
---     size = size or 32,
---     padding = -2,
---     default_graphical_set = {
---       base = {border=4, position={(default_x or 0),y}, size=80, filename=slot_buttons_tileset},
---       shadow = row_shadow
---     },
---     hovered_graphical_set = {
---       base = {border=4, position={80,y}, size=80, filename=slot_buttons_tileset},
---       shadow = row_shadow,
---       glow = offset_by_2_rounded_corners_glow(glow_color)
---     },
---     clicked_graphical_set = {
---       base = {border=4, position={160,y}, size=80, filename=slot_buttons_tileset},
---       shadow = row_shadow
---     }
---   }
--- end
-
 local slot_button_data = {
   {name='dark_grey', y=0, glow=default_glow_color},
   {name='light_grey', y=80, glow=default_glow_color},
@@ -77,10 +46,8 @@ local slot_button_data = {
 for _,data in ipairs(slot_button_data) do
   styles['ltnm_slot_button_'..data.name] = slot_button(data.y, data.glow)
   styles['ltnm_small_slot_button_'..data.name] = slot_button(data.y, data.glow, nil, 36)
-  -- styles['ltnm_bordered_slot_button_'..data.name] = bordered_slot_button(data.y, data.glow)
   styles['ltnm_active_slot_button_'..data.name] = slot_button(data.y, data.glow, 80)
   styles['ltnm_active_small_slot_button_'..data.name] = slot_button(data.y, data.glow, 80, 36)
-  -- styles['ltnm_active_bordered_slot_button_'..data.name] = bordered_slot_button(data.y, data.glow, 80)
 end
 
 local function ltnm_tab_base(pos)
@@ -308,6 +275,15 @@ styles.ltnm_station_labels_flow = {
 
 -- -----------------------------------------------------------------------------
 -- FRAME STYLES
+
+styles.ltnm_alert_popup_frame = {
+  type = 'frame_style',
+  parent = 'dialog_frame',
+  graphical_set = {
+    base = {position={403,17}, corner_size=8},
+    shadow = default_shadow
+  }
+}
 
 styles.ltnm_empty_frame = {
   type = 'frame_style',
