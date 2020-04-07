@@ -50,7 +50,10 @@ gui.handlers:extend{
   main={
     window = {
       on_gui_closed = function(e)
-        main_gui.destroy(game.get_player(e.player_index), global.players[e.player_index])
+        local player_table = global.players[e.player_index]
+        if not player_table.gui.main.window.pinned then
+          main_gui.close(game.get_player(e.player_index), player_table)
+        end
       end
     },
     titlebar = {
@@ -62,7 +65,20 @@ gui.handlers:extend{
       },
       pin_button = {
         on_gui_click = function(e)
-          
+          local player = game.get_player(e.player_index)
+          local player_table = global.players[e.player_index]
+          local window_data = player_table.gui.main.window
+          if window_data.pinned then
+            e.element.style = 'ltnm_frame_action_button'
+            window_data.pinned = false
+            window_data.frame.force_auto_center()
+            player.opened = window_data.frame
+          else
+            e.element.style = 'ltnm_active_frame_action_button'
+            window_data.pinned = true
+            window_data.frame.auto_center = false
+            player.opened = nil
+          end
         end
       },
       refresh_button = {
@@ -82,7 +98,7 @@ gui.handlers:extend{
       },
       close_button = {
         on_gui_click = function(e)
-          main_gui.destroy(game.get_player(e.player_index), global.players[e.player_index])
+          main_gui.close(game.get_player(e.player_index), global.players[e.player_index])
         end
       },
     },
@@ -115,10 +131,9 @@ gui.handlers:extend{
 -- GUI MANAGEMENT
 
 function main_gui.create(player, player_table)
-  -- profiler.Start()
   -- create base GUI structure
   local gui_data = gui.build(player.gui.screen, {
-    {type='frame', style='ltnm_empty_frame', direction='vertical', handlers='main.window', save_as='window', children={
+    {type='frame', style='ltnm_empty_frame', direction='vertical', handlers='main.window', save_as='window.frame', children={
       -- TITLEBAR
       {type='flow', style_mods={horizontal_spacing=0}, direction='horizontal', children={
         {template='mock_frame_tab', caption={'ltnm-gui.depots'}, save_as='tabbed_pane.tabs.depots'},
@@ -155,6 +170,8 @@ function main_gui.create(player, player_table)
   event.enable_group('gui.stations.open_station_button', player.index, 'ltnm_open_station_')
 
   -- default settings
+  gui_data.window.pinned = false
+
   gui_data.tabbed_pane.selected = 'depots'
 
   gui_data.depots.active_sort = 'composition'
@@ -180,27 +197,21 @@ function main_gui.create(player, player_table)
   gui_data.alerts.sort_type = true
 
   -- dragging and centering
-  gui_data.titlebar.drag_handle.drag_target = gui_data.window
-  gui_data.window.force_auto_center()
+  gui_data.titlebar.drag_handle.drag_target = gui_data.window.frame
+  gui_data.window.frame.force_auto_center()
 
-  -- opened
-  player.opened = gui_data.window
+  -- hide window
+  gui_data.window.frame.visible = false
 
   -- save data to global
   player_table.gui.main = gui_data
-
-  -- set initial contents
-  main_gui.update_active_tab(player, player_table)
-  -- profiler.Stop()
 end
 
 -- completely destroys the GUI
 function main_gui.destroy(player, player_table)
   event.disable_group('gui.main', player.index)
-  player_table.gui.main.window.destroy()
+  player_table.gui.main.window.frame.destroy()
   player_table.gui.main = nil
-  -- set shortcut state
-  player.set_shortcut_toggled('ltnm-toggle-gui', false)
 end
 
 -- -------------------------------------
@@ -227,6 +238,7 @@ function main_gui.update(player, player_table, state_changes)
     tabbed_pane_data.selected = state_changes.active_tab
   end
 
+  -- TABS
   for _,tab in pairs(tabs) do
     tab.update(player, player_table, state_changes, gui_data, data, material_translations)
   end
@@ -248,6 +260,34 @@ function main_gui.update_active_tab(player, player_table, name)
     changes.alerts_list = true
   end
   main_gui.update(player, player_table, changes)
+end
+
+function main_gui.open(player, player_table)
+  main_gui.update_active_tab(player, player_table)
+
+  if not player_table.gui.main.window.pinned then
+    player.opened = player_table.gui.main.window.frame
+  end
+
+  player_table.flags.gui_open = true
+  player_table.gui.main.window.frame.visible = true
+
+  player.set_shortcut_toggled('ltnm-toggle-gui', true)
+end
+
+function main_gui.close(player, player_table)
+  player_table.flags.gui_open = false
+  player_table.gui.main.window.frame.visible = false
+
+  player.set_shortcut_toggled('ltnm-toggle-gui', false)
+end
+
+function main_gui.toggle(player, player_table)
+  if player_table.flags.gui_open then
+    main_gui.close(player, player_table)
+  else
+    main_gui.open(player, player_table)
+  end
 end
 
 return main_gui

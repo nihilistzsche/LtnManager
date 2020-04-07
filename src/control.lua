@@ -6,13 +6,15 @@ local event = require('__RaiLuaLib__.lualib.event')
 local translation = require('__RaiLuaLib__.lualib.translation')
 local util = require('scripts.util')
 
--- globals
-UPDATE_MAIN_GUI = true -- forward delcaration
-
 -- scripts
 local data_manager = require('scripts.data-manager')
 local main_gui = require('gui.main')
 local migrations = require('scripts.migrations')
+
+-- globals
+function UPDATE_MAIN_GUI(player, player_table, state_changes)
+  main_gui.update(player, player_table, state_changes)
+end
 
 -- -----------------------------------------------------------------------------
 -- UTILITIES
@@ -56,6 +58,7 @@ local function setup_player(player, index)
     dictionary = {},
     flags = {
       can_open_gui = false,
+      gui_open = false,
       translations_finished = false,
     },
     gui = {}
@@ -63,29 +66,14 @@ local function setup_player(player, index)
   global.players[index] = data
 end
 
-local function toggle_gui(e)
-  local player = game.get_player(e.player_index)
-  local player_table = global.players[e.player_index]
-  -- toggle GUI
-  if player_table.gui.main then
-    main_gui.destroy(player, player_table)
-  else
-    if player_table.flags.can_open_gui then
-      main_gui.create(player, player_table)
-    else
-      player.print{'ltnm-message.TEMP-COMEUPWITHANAMESTUPID!'}
-    end
-  end
-  -- set shortcut state
-  player.set_shortcut_toggled('ltnm-toggle-gui', player_table.gui.main and true or false)
-end
-
 -- registered conditionally, tied to the LTN on_stops_updated event
 local function enable_gui(e)
   local players = global.players
   for _,i in pairs(e.registered_players) do
+    local player = game.get_player(i)
+    main_gui.create(player, players[i])
     players[i].flags.can_open_gui = true
-    game.get_player(i).set_shortcut_available('ltnm-toggle-gui', true)
+    player.set_shortcut_available('ltnm-toggle-gui', true)
     event.disable('enable_gui_on_next_ltn_update', i)
   end
 end
@@ -96,7 +84,7 @@ local function auto_update_guis(e)
   for _,i in ipairs(e.registered_players) do
     local player_table = players[i]
     -- only update if they have the GUI open
-    if player_table.gui.main then
+    if player_table.flags.gui_open then
       main_gui.update_active_tab(game.get_player(i), player_table)
     end
   end
@@ -117,7 +105,7 @@ event.on_init(function()
     end
   end
   data_manager.setup_events()
-  data_manager.enable_events()
+  event.enable_group('ltn')
 end)
 
 event.on_load(function()
@@ -149,7 +137,13 @@ end)
 
 event.register({defines.events.on_lua_shortcut, 'ltnm-toggle-gui'}, function(e)
   if e.input_name or (e.prototype_name == 'ltnm-toggle-gui') then
-    toggle_gui(e)
+    local player = game.get_player(e.player_index)
+    local player_table = global.players[e.player_index]
+    if player_table.flags.can_open_gui then
+      main_gui.toggle(player, player_table)
+    else
+      player.print{'ltnm-message.cannot-open-gui'}
+    end
   end
 end)
 
@@ -171,9 +165,19 @@ event.register(translation.finish_event, function(e)
 end)
 
 event.register(translation.retranslate_all_event, function(e)
-  -- TODO: close GUIs and retranslate all
-end)
+  local player = game.get_player(e.player_index)
+  local player_table = global.players[e.player_index]
 
-function UPDATE_MAIN_GUI(player, player_table, state_changes)
-  main_gui.update(player, player_table, state_changes)
-end
+  -- destroy GUI
+  main_gui.close(player, player_table)
+  main_gui.destroy(player, player_table)
+  player_table.gui.main = nil
+
+  -- set shortcut state
+  player_table.flags.can_open_gui = false
+  player_table.flags.translations_finished = false
+  player.set_shortcut_available('ltnm-toggle-gui', false)
+
+  -- run translations
+  run_player_translations(player)
+end)

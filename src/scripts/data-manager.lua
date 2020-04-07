@@ -686,10 +686,6 @@ function data_manager.setup_events()
   event.register_conditional(events)
 end
 
-function data_manager.enable_events()
-  event.enable_group('ltn')
-end
-
 -- -----------------------------------------------------------------------------
 
 data_manager.ltn_event_ids = ltn_event_ids
