@@ -46,7 +46,6 @@ local function build_translation_data()
 end
 
 local function run_player_translations(player)
-  player.set_shortcut_available('ltnm-toggle-gui', false)
   local translation_data = global.__lualib.translation.translation_data
   for _,name in ipairs{'materials', 'gui'} do
     translation.start(player, name, translation_data[name], {lowercase_sorted_translations=true, include_failed_translations=true})
@@ -152,7 +151,6 @@ event.register(translation.finish_event, function(e)
   -- add to player table
   player_table.dictionary[e.dictionary_name] = {
     lookup = e.lookup,
-    lookup_lower = e.lookup_lower,
     sorted_translations = e.sorted_translations,
     translations = e.translations
   }
@@ -164,20 +162,22 @@ event.register(translation.finish_event, function(e)
   end
 end)
 
-event.register(translation.retranslate_all_event, function(e)
-  local player = game.get_player(e.player_index)
-  local player_table = global.players[e.player_index]
-
-  -- destroy GUI
-  main_gui.close(player, player_table)
-  main_gui.destroy(player, player_table)
-  player_table.gui.main = nil
-
-  -- set shortcut state
-  player_table.flags.can_open_gui = false
-  player_table.flags.translations_finished = false
-  player.set_shortcut_available('ltnm-toggle-gui', false)
-
-  -- run translations
-  run_player_translations(player)
+-- this event ID doesn't exist in the root scope, so nest this inside on_init and on_load
+event.register({'on_init', 'on_load'}, function()
+  event.register(translation.retranslate_all_event, function(e)
+    local player = game.get_player(e.player_index)
+    local player_table = global.players[e.player_index]
+  
+    -- destroy GUI
+    main_gui.close(player, player_table)
+    main_gui.destroy(player, player_table)
+    player_table.gui.main = nil
+  
+    -- set shortcut state
+    player_table.flags.translations_finished = false
+    player.set_shortcut_available('ltnm-toggle-gui', false)
+  
+    -- run translations
+    run_player_translations(player)
+  end)
 end)

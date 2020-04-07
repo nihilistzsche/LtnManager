@@ -212,6 +212,10 @@ function main_gui.destroy(player, player_table)
   event.disable_group('gui.main', player.index)
   player_table.gui.main.window.frame.destroy()
   player_table.gui.main = nil
+
+  player_table.flags.gui_open = false
+  player_table.flags.can_open_gui = false
+  player.set_shortcut_available('ltnm-toggle-gui', false)
 end
 
 -- -------------------------------------
