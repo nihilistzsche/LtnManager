@@ -3,13 +3,13 @@
 
 -- dependencies
 local event = require('__RaiLuaLib__.lualib.event')
+local migration = require('__RaiLuaLib__.lualib.migration')
 local translation = require('__RaiLuaLib__.lualib.translation')
 local util = require('scripts.util')
 
 -- scripts
 local data_manager = require('scripts.data-manager')
 local main_gui = require('gui.main')
-local migrations = require('scripts.migrations')
 
 -- globals
 function UPDATE_MAIN_GUI(player, player_table, state_changes)
@@ -48,7 +48,7 @@ end
 local function run_player_translations(player)
   local translation_data = global.__lualib.translation.translation_data
   for _,name in ipairs{'materials', 'gui'} do
-    translation.start(player, name, translation_data[name], {lowercase_sorted_translations=true, include_failed_translations=true})
+    translation.start(player, name, translation_data[name], {include_failed_translations=true})
   end
 end
 
@@ -58,14 +58,39 @@ local function setup_player(player, index)
     flags = {
       can_open_gui = false,
       gui_open = false,
-      translations_finished = false,
+      translate_on_join = true,
+      translations_finished = false
     },
     gui = {}
   }
+  player.set_shortcut_available('ltnm-toggle-gui', false)
   global.players[index] = data
 end
 
--- registered conditionally, tied to the LTN on_stops_updated event
+local function destroy_player_guis(player, player_table)
+  main_gui.close(player, player_table)
+  main_gui.destroy(player, player_table)
+end
+
+-- completely close all GUIs and retranslate
+local function refresh_player_data(player, player_table)
+  -- destroy GUIs
+  destroy_player_guis(player, player_table)
+  
+  -- set shortcut state
+  player_table.flags.translations_finished = false
+  player.set_shortcut_available('ltnm-toggle-gui', false)
+
+  -- run translations
+  if player.connected then
+    run_player_translations(player)
+  end
+end
+
+-- -----------------------------------------------------------------------------
+-- CONDITIONAL EVENTS
+
+-- tied to LTN on_dispatcher_updated
 local function enable_gui(e)
   local players = global.players
   for _,i in pairs(e.registered_players) do
@@ -89,8 +114,9 @@ local function auto_update_guis(e)
   end
 end
 
+
 -- -----------------------------------------------------------------------------
--- EVENTS
+-- STATIC EVENTS
 
 event.on_init(function()
   global.flags = {}
@@ -100,6 +126,7 @@ event.on_init(function()
   for i,p in pairs(game.players) do
     setup_player(p, i)
     if p.connected then
+      global.players[i].flags.translate_on_join = false
       run_player_translations(p)
     end
   end
@@ -118,8 +145,6 @@ event.register({'on_init', 'on_load'}, function()
   }
 end)
 
-event.on_configuration_changed(migrations)
-
 event.on_player_created(function(e)
   setup_player(game.get_player(e.player_index), e.player_index)
 end)
@@ -130,8 +155,10 @@ end)
 
 event.on_player_joined_game(function(e)
   local player_table = global.players[e.player_index]
-  player_table.flags.can_open_gui = false
-  run_player_translations(game.get_player(e.player_index))
+  if player_table.flags.translate_on_join then
+    player_table.flags.translate_on_join = false
+    run_player_translations(game.get_player(e.player_index))
+  end
 end)
 
 event.register({defines.events.on_lua_shortcut, 'ltnm-toggle-gui'}, function(e)
@@ -167,17 +194,23 @@ event.register({'on_init', 'on_load'}, function()
   event.register(translation.retranslate_all_event, function(e)
     local player = game.get_player(e.player_index)
     local player_table = global.players[e.player_index]
-  
-    -- destroy GUI
-    main_gui.close(player, player_table)
-    main_gui.destroy(player, player_table)
-    player_table.gui.main = nil
-  
-    -- set shortcut state
-    player_table.flags.translations_finished = false
-    player.set_shortcut_available('ltnm-toggle-gui', false)
-  
-    -- run translations
-    run_player_translations(player)
+    refresh_player_data(player, player_table)
   end)
+end)
+
+-- -----------------------------------------------------------------------------
+-- MIGRATIONS
+
+-- table of migration functions
+local migrations = {}
+
+event.on_configuration_changed(function(e)
+  if migration.on_config_changed(e, migrations) then
+    -- update translation data
+    build_translation_data()
+    -- refresh all player information
+    for i,p in pairs(game.players) do
+      refresh_player_data(p, global.players[i])
+    end
+  end
 end)
