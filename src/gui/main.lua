@@ -17,8 +17,14 @@ local string_gsub = string.gsub
 local string_lower = string.lower
 local string_match = string.match
 
--- self object
-local self = {}
+-- tabs
+local tabs = {}
+for _,name in ipairs{'depots', 'stations', 'inventory', 'history', 'alerts'} do
+  tabs[name] = require('gui.'..name)
+end
+
+-- object
+local main_gui = {}
 
 -- -----------------------------------------------------------------------------
 -- GUI DATA
@@ -37,277 +43,78 @@ gui.templates:extend{
       {type='sprite', style='ltnm_status_icon', sprite='ltnm_indicator_'..color, save_as=name..'_circle'},
       {type='label', caption=value, save_as=name..'_label'}
     }}
-  end,
-  inventory = {
-    slot_table_with_label = function(name, rows)
-      rows = rows or 4
-      return {type='flow', style_mods={vertical_spacing=8, top_padding=4}, direction='vertical', children={
-        {type='label', style='caption_label', caption={'ltnm-gui.'..string_gsub(name, '_', '-')}},
-        {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-          {type='scroll-pane', style='ltnm_slot_table_scroll_pane', style_mods={height=rows*40}, vertical_scroll_policy='always', children={
-            {type='table', style='ltnm_inventory_slot_table', column_count=10, save_as='inventory.'..name..'_table'}
-          }}
-        }}
-      }}
-    end,
-    label_with_value = function(name, label_caption, value)
-      return {type='flow', style_mods={left_margin=2, right_margin=2}, children={
-        {type='label', style='bold_label', caption={'', label_caption, ':'}, save_as='inventory.info_pane.'..name..'_label'},
-        {template='pushers.horizontal'},
-        {type='label', caption=value, save_as='inventory.info_pane.'..name..'_value'}
-      }}
-    end,
-    small_slot_table_with_label = function(parent, labels, materials, translations)
-      local elems = gui.build(parent, {
-        {type='flow', direction='vertical', children={
-          {type='flow', save_as='labels_flow'},
-          {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
-            {type='scroll-pane', style='ltnm_material_location_slot_table_scroll_pane', vertical_scroll_policy='always', children={
-              {type='table', style='ltnm_materials_in_location_slot_table', column_count=9, save_as='table'}
-            }}
-          }}
-        }}
-      })
-      -- populate labels
-      local flow = elems.labels_flow
-      local flow_add = flow.add
-      for _,t in ipairs(labels) do
-        flow_add{type='label', style=t[1], caption=t[2], tooltip=t[3]}
-        flow_add{type='empty-widget'}.style.horizontally_stretchable = true
+  end
+}
+
+gui.handlers:extend{
+  main={
+    window = {
+      on_gui_closed = function(e)
+        main_gui.destroy(game.get_player(e.player_index), global.players[e.player_index])
       end
-      flow.children[#flow.children].destroy()
-      -- populate materials
-      local table_add = elems.table.add
-      local i = 0
-      for _,t in ipairs(materials) do
-        local style = 'ltnm_small_slot_button_'..t[1]
-        for name,count in pairs(t[2]) do
-          i = i + 1
-          table_add{type='sprite-button', name='ltnm_material_button_'..i, style=style, sprite=string_gsub(name, ',', '/'), number=count,
-            tooltip=translations[name]}
+    },
+    titlebar = {
+      frame_tab = {
+        on_gui_click = function(e)
+          local name = e.default_tab or string_gsub(e.element.caption[1], 'ltnm%-gui%.', '')
+          main_gui.update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
         end
+      },
+      pin_button = {
+        on_gui_click = function(e)
+          
+        end
+      },
+      refresh_button = {
+        on_gui_click = function(e)
+          if e.shift then
+            if event.is_enabled('auto_refresh', e.player_index) then
+              event.disable('auto_refresh', e.player_index)
+              e.element.style = 'ltnm_frame_action_button'
+            else
+              event.enable('auto_refresh', e.player_index)
+              e.element.style = 'ltnm_active_frame_action_button'
+            end
+          else
+            main_gui.update_active_tab(game.get_player(e.player_index), global.players[e.player_index])
+          end
+        end
+      },
+      close_button = {
+        on_gui_click = function(e)
+          main_gui.destroy(game.get_player(e.player_index), global.players[e.player_index])
+        end
+      },
+    },
+    material_button = {
+      on_gui_click = {handler=function(e)
+        local player_table = global.players[e.player_index]
+        local on_inventory_tab = player_table.gui.main.tabbed_pane.selected == 'inventory'
+        main_gui.update(game.get_player(e.player_index), player_table, {
+          active_tab = (not on_inventory_tab) and 'inventory',
+          inventory_contents = (not on_inventory_tab) and true,
+          selected_material = string_gsub(e.element.sprite, '/', ',')}
+        )
+      end, gui_filters='ltnm_material_button_', options={match_filter_strings=true}}
+    },
+    ['ltnm-search'] = function(e)
+      local player_table = global.players[e.player_index]
+      local gui_data = player_table.gui.main
+      local active_tab = gui_data.tabbed_pane.selected
+      if active_tab == 'inventory' then
+        -- focus textfield
+        gui_data.inventory.search_textfield.focus()
+        -- select all text if on default
+        gui.handlers.main.inventory.search_textfield.on_gui_click{player_index=e.player_index, element=gui_data.inventory.search_textfield}
       end
-      return elems
     end
   }
 }
 
-gui.handlers:extend{main={
-  window = {
-    on_gui_closed = function(e)
-      self.destroy(game.get_player(e.player_index), global.players[e.player_index])
-    end
-  },
-  titlebar = {
-    frame_tab = {
-      on_gui_click = function(e)
-        local name = e.default_tab or string_gsub(e.element.caption[1], 'ltnm%-gui%.', '')
-        self.update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
-      end
-    },
-    pin_button = {
-      on_gui_click = function(e)
-        
-      end
-    },
-    refresh_button = {
-      on_gui_click = function(e)
-        if e.shift then
-          if event.is_enabled('auto_refresh', e.player_index) then
-            event.disable('auto_refresh', e.player_index)
-            e.element.style = 'ltnm_frame_action_button'
-          else
-            event.enable('auto_refresh', e.player_index)
-            e.element.style = 'ltnm_active_frame_action_button'
-          end
-        else
-          self.update_active_tab(game.get_player(e.player_index), global.players[e.player_index])
-        end
-      end
-    },
-    close_button = {
-      on_gui_click = function(e)
-        self.destroy(game.get_player(e.player_index), global.players[e.player_index])
-      end
-    },
-  },
-  material_button = {
-    on_gui_click = {handler=function(e)
-      local player_table = global.players[e.player_index]
-      local on_inventory_tab = player_table.gui.main.tabbed_pane.selected == 'inventory'
-      self.update(game.get_player(e.player_index), player_table, {
-        active_tab = (not on_inventory_tab) and 'inventory',
-        inventory_contents = (not on_inventory_tab) and true,
-        selected_material = string_gsub(e.element.sprite, '/', ',')}
-      )
-    end, gui_filters='ltnm_material_button_', options={match_filter_strings=true}}
-  },
-  ['ltnm-search'] = function(e)
-    local player_table = global.players[e.player_index]
-    local gui_data = player_table.gui.main
-    local active_tab = gui_data.tabbed_pane.selected
-    if active_tab == 'inventory' then
-      -- focus textfield
-      gui_data.inventory.search_textfield.focus()
-      -- select all text if on default
-      gui.handlers.main.inventory.search_textfield.on_gui_click{player_index=e.player_index, element=gui_data.inventory.search_textfield}
-    end
-  end,
-  depots = {
-    depot_button = {
-      on_gui_click = function(e)
-        local _,_,name = string_find(e.element.name, '^ltnm_depot_button_(.*)$')
-        self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
-      end
-    },
-    sort_checkbox = {
-      on_gui_checked_state_changed = function(e)
-        local _,_,clicked_type = string_find(e.element.name, '^ltnm_sort_train_(.-)$')
-        local player_table = global.players[e.player_index]
-        local gui_data = player_table.gui.main.depots
-        if gui_data.active_sort ~= clicked_type then
-          -- update styles
-          gui_data[gui_data.active_sort..'_sort_checkbox'].style = 'ltnm_sort_checkbox_inactive'
-          e.element.style = 'ltnm_sort_checkbox_active'
-          -- reset the checkbox value and switch active sort
-          e.element.state = not e.element.state
-          gui_data.active_sort = clicked_type
-        else
-          -- update the state in global
-          gui_data['sort_'..clicked_type] = e.element.state
-        end
-        -- update GUI contents
-        self.update(game.get_player(e.player_index), player_table, {depot_trains=true})
-      end
-    },
-    open_train_button = {
-      on_gui_click = {handler=function(e)
-        local train_id = string_gsub(e.element.name, 'ltnm_open_train_', '')
-        game.get_player(e.player_index).opened = global.data.trains[tonumber(train_id)].main_locomotive
-      end, gui_filters='ltnm_open_train_', options={match_filter_strings=true}}
-    }
-  },
-  stations = {
-    sort_checkbox = {
-      on_gui_checked_state_changed = function(e)
-        local _,_,clicked_type = string_find(e.element.name, '^ltnm_sort_station_(.-)$')
-        local player_table = global.players[e.player_index]
-        local gui_data = player_table.gui.main.stations
-        if gui_data.active_sort ~= clicked_type then
-          -- update styles
-          gui_data[gui_data.active_sort..'_sort_checkbox'].style = 'ltnm_sort_checkbox_inactive'
-          e.element.style = 'ltnm_sort_checkbox_active'
-          -- reset the checkbox value and switch active sort
-          e.element.state = not e.element.state
-          gui_data.active_sort = clicked_type
-        else
-          -- update the state in global
-          gui_data['sort_'..clicked_type] = e.element.state
-        end
-        -- update GUI contents
-        self.update(game.get_player(e.player_index), player_table, {stations_list=true})
-      end
-    },
-    open_station_button = {
-      on_gui_click = function(e)
-        local station_id = string_gsub(e.element.name, 'ltnm_open_station_', '')
-        game.get_player(e.player_index).zoom_to_world(global.data.stations[tonumber(station_id)].entity.position, 0.5)
-      end
-    }
-  },
-  inventory = {
-    search_textfield = {
-      on_gui_text_changed = function(e)
-        local player_table = global.players[e.player_index]
-        local gui_data = player_table.gui.main.inventory
-        gui_data.search_query = e.text
-        self.update(game.get_player(e.player_index), player_table, {inventory_contents=true})
-      end,
-      on_gui_click = function(e)
-        -- select all text if it is the default
-        if e.element.text == global.players[e.player_index].dictionary.gui.translations.search then
-          e.element.select_all()
-        end
-      end
-    },
-    network_id_textfield = {
-      on_gui_text_changed = function(e)
-        local player_table = global.players[e.player_index]
-        local gui_data = player_table.gui.main.inventory
-        local input = tonumber(e.text) or -1
-        gui_data.selected_network_id = input
-        self.update(game.get_player(e.player_index), player_table, {inventory_contents=true})
-      end
-    }
-  },
-  history = {
-    sort_checkbox = {
-      on_gui_checked_state_changed = function(e)
-        local _,_,clicked_type = string_find(e.element.name, '^ltnm_sort_history_(.-)$')
-        local player_table = global.players[e.player_index]
-        local gui_data = player_table.gui.main.history
-        if gui_data.active_sort ~= clicked_type then
-          -- update styles
-          gui_data[gui_data.active_sort..'_sort_checkbox'].style = 'ltnm_sort_checkbox_inactive'
-          e.element.style = 'ltnm_sort_checkbox_active'
-          -- reset the checkbox value and switch active sort
-          e.element.state = not e.element.state
-          gui_data.active_sort = clicked_type
-        else
-          -- update the state in global
-          gui_data['sort_'..clicked_type] = e.element.state
-        end
-        -- update GUI contents
-        self.update(game.get_player(e.player_index), player_table, {history=true})
-      end
-    },
-    delete_button = {
-      on_gui_click = function(e)
-        -- remove from current data
-        global.data.history = {}
-        global.working_data.history = {}
-        local sorted_history = global.data.sorted_history
-        for key,_ in pairs(sorted_history) do
-          sorted_history[key] = {}
-        end
-        self.update(game.get_player(e.player_index), global.players[e.player_index], {history=true})
-      end
-    }
-  },
-  alerts = {
-    sort_checkbox = {
-      on_gui_checked_state_changed = function(e)
-        local _,_,clicked_type = string_find(e.element.name, '^ltnm_sort_alerts_(.-)$')
-        local player_table = global.players[e.player_index]
-        local gui_data = player_table.gui.main.alerts
-        if gui_data.active_sort ~= clicked_type then
-          -- update styles
-          gui_data[gui_data.active_sort..'_sort_checkbox'].style = 'ltnm_sort_checkbox_inactive'
-          e.element.style = 'ltnm_sort_checkbox_active'
-          -- reset the checkbox value and switch active sort
-          e.element.state = not e.element.state
-          gui_data.active_sort = clicked_type
-        else
-          -- update the state in global
-          gui_data['sort_'..clicked_type] = e.element.state
-        end
-        -- update GUI contents
-        self.update(game.get_player(e.player_index), player_table, {alerts_list=true})
-      end
-    },
-    alert_type_label = {
-      on_gui_click = {handler=function(e)
-        local alert_id = string_gsub(e.element.name, 'ltnm_alert_type_label_', '')
-        self.update(game.get_player(e.player_index), global.players[e.player_index], {selected_alert=alert_id})
-      end, gui_filters='ltnm_alert_type_label_', options={match_filter_strings=true}}
-    }
-  }
-}}
-
 -- -----------------------------------------------------------------------------
 -- GUI MANAGEMENT
 
-function self.create(player, player_table)
+function main_gui.create(player, player_table)
   -- profiler.Start()
   -- create base GUI structure
   local gui_data = gui.build(player.gui.screen, {
@@ -331,149 +138,11 @@ function self.create(player, player_table)
         }}
       }},
       {type='frame', style='ltnm_main_frame_content', children={
-        -- DEPOTS
-        {type='flow', style_mods={horizontal_spacing=12}, mods={visible=false}, save_as='tabbed_pane.contents.depots', children={
-          -- buttons
-          {type='frame', style='ltnm_dark_content_frame', children={
-            {type='scroll-pane', style='ltnm_depots_scroll_pane', save_as='depots.buttons_scroll_pane'}
-          }},
-          -- trains
-          {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
-            -- toolbar
-            {type='frame', style='ltnm_toolbar_frame', children={
-              {type='checkbox', name='ltnm_sort_train_composition', style='ltnm_sort_checkbox_active', style_mods={left_margin=8, width=120},
-                caption={'ltnm-gui.composition'}, state=true, handlers='main.depots.sort_checkbox', save_as='depots.composition_sort_checkbox'},
-              {type='checkbox', name='ltnm_sort_train_status', style='ltnm_sort_checkbox_inactive', caption={'ltnm-gui.train-status'}, state=true,
-                handlers='main.depots.sort_checkbox', save_as='depots.status_sort_checkbox'},
-              {template='pushers.horizontal'},
-              {type='label', style='caption_label', style_mods={width=144}, caption={'ltnm-gui.shipment'}},
-              {type='empty-widget', style_mods={width=6}}
-            }},
-            -- trains
-            {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={vertically_stretchable=true, horizontally_stretchable=true},
-              vertical_scroll_policy='always', save_as='depots.trains_scrollpane', children={
-                {type='table', style='ltnm_depot_trains_table', column_count=3, save_as='depots.trains_table'}
-              }
-            }
-          }}
-        }},
-        -- STATIONS
-        {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.stations', children={
-          -- toolbar
-          {type='frame', style='ltnm_toolbar_frame', children={
-            {type='empty-widget', style_mods={height=28}},
-            {type='checkbox', name='ltnm_sort_station_name', style='ltnm_sort_checkbox_active', style_mods={left_margin=-4}, caption={'ltnm-gui.station-name'},
-              state=true, handlers='main.stations.sort_checkbox', save_as='stations.name_sort_checkbox'},
-            {template='pushers.horizontal'},
-            {type='checkbox', name='ltnm_sort_station_network_id', style='ltnm_sort_checkbox_inactive', style_mods={horizontal_align='center', width=24},
-              state=true, caption={'ltnm-gui.id'}, handlers='main.stations.sort_checkbox', save_as='stations.network_id_sort_checkbox'},
-            {type='checkbox', name='ltnm_sort_station_status', style='ltnm_sort_checkbox_inactive', style_mods={horizontal_align='center', width=34},
-              state=true, handlers='main.stations.sort_checkbox', save_as='stations.status_sort_checkbox'},
-            {type='label', style='caption_label', style_mods={width=180}, caption={'ltnm-gui.provided-requested'}},
-            {type='label', style='caption_label', style_mods={width=144}, caption={'ltnm-gui.shipments'}},
-            {type='label', style='caption_label', style_mods={width=144}, caption={'ltnm-gui.control-signals'}},
-            {type='empty-widget', style_mods={width=8}}
-            -- {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.station-filters-tooltip'}}
-          }},
-          {type='scroll-pane', style='ltnm_blank_scroll_pane', direction='vertical', vertical_scroll_policy='always', save_as='stations.scroll_pane', children={
-            {type='table', style='ltnm_stations_table', style_mods={vertically_stretchable=true, horizontally_stretchable=true}, column_count=6,
-              save_as='stations.table'}
-          }}
-        }},
-        -- INVENTORY
-        {type='flow', style_mods={horizontal_spacing=12}, mods={visible=false}, save_as='tabbed_pane.contents.inventory', children={
-          -- left column
-          {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
-            -- toolbar
-            {type='frame', style='ltnm_toolbar_frame', style_mods={height=nil}, direction='horizontal', children={
-              {type='textfield', text=player_table.dictionary.gui.translations.search, lose_focus_on_confirm=true, handlers='main.inventory.search_textfield',
-                save_as='inventory.search_textfield'},
-              {template='pushers.horizontal'},
-              {type='label', style='caption_label', caption={'ltnm-gui.network-id'}},
-              {type='textfield', style='short_number_textfield', text='-1', lose_focus_on_confirm=true, numeric=true,
-                allow_negative=true, handlers='main.inventory.network_id_textfield', save_as='inventory.network_id_textfield'},
-              -- {type='sprite-button', style='tool_button', sprite='ltnm_filter', tooltip={'ltnm-gui.network-selection-dialog'}, mods={enabled=false}}
-            }},
-            -- inventory tables
-            {type='flow', style_mods={padding=10, top_padding=4}, direction='vertical', children={
-              gui.templates.inventory.slot_table_with_label('provided', 6),
-              gui.templates.inventory.slot_table_with_label('requested', 3),
-              gui.templates.inventory.slot_table_with_label('in_transit', 2)
-            }}
-          }},
-          -- right column
-          {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
-            -- item information
-            {type='frame', style='ltnm_light_content_frame_in_light_frame', style_mods={horizontally_stretchable=true, vertically_stretchable=true},
-              direction='vertical', children={
-                {type='frame', style='ltnm_item_info_toolbar_frame', direction='vertical', children={
-                  -- icon and name
-                  {type='flow', style_mods={vertical_align='center'}, children={
-                    {type='sprite', style='ltnm_material_icon', sprite='item-group/intermediate-products', save_as='inventory.info_pane.icon'},
-                    {type='label', style='caption_label', style_mods={left_margin=2}, caption={'ltnm-gui.choose-an-item'}, save_as='inventory.info_pane.name'}
-                  }},
-                  -- info
-                  gui.templates.inventory.label_with_value('provided', {'ltnm-gui.provided'}, 0),
-                  gui.templates.inventory.label_with_value('requested', {'ltnm-gui.requested'}, 0),
-                  gui.templates.inventory.label_with_value('in_transit', {'ltnm-gui.in-transit'}, 0)
-                }},
-                {type='scroll-pane', style='ltnm_material_locations_scroll_pane', style_mods={horizontally_stretchable=true, vertically_stretchable=true},
-                  vertical_scroll_policy='always', save_as='inventory.locations_scroll_pane'}
-              }
-            }
-
-          }}
-        }},
-        -- HISTORY
-        {type='frame', style='ltnm_light_content_frame', direction='vertical', mods={visible=false}, save_as='tabbed_pane.contents.history', children={
-          -- toolbar
-          {type='frame', style='ltnm_toolbar_frame', children={
-            {type='checkbox', name='ltnm_sort_history_depot', style='ltnm_sort_checkbox_inactive', state=true, style_mods={width=140, left_margin=8},
-              caption={'ltnm-gui.depot'}, handlers='main.history.sort_checkbox', save_as='history.depot_sort_checkbox'},
-            {type='checkbox', name='ltnm_sort_history_route', style='ltnm_sort_checkbox_inactive', state=true, caption={'ltnm-gui.route'},
-              handlers='main.history.sort_checkbox', save_as='history.route_sort_checkbox'},
-            {template='pushers.horizontal'},
-            {type='checkbox', name='ltnm_sort_history_network_id', style='ltnm_sort_checkbox_inactive', style_mods={right_margin=8}, state=true,
-              caption={'ltnm-gui.id'}, handlers='main.history.sort_checkbox', save_as='history.network_id_sort_checkbox'},
-            {type='checkbox', name='ltnm_sort_history_runtime', style='ltnm_sort_checkbox_inactive', style_mods={right_margin=8}, state=true,
-              caption={'ltnm-gui.runtime'}, handlers='main.history.sort_checkbox', save_as='history.runtime_sort_checkbox'},
-            {type='checkbox', name='ltnm_sort_history_finished', style='ltnm_sort_checkbox_active', style_mods={right_margin=8}, state=false,
-              caption={'ltnm-gui.finished'}, handlers='main.history.sort_checkbox', save_as='history.finished_sort_checkbox'},
-            {type='label', style='caption_label', style_mods={width=124}, caption={'ltnm-gui.shipment'}},
-            {type='sprite-button', style='red_icon_button', sprite='utility/trash', tooltip={'ltnm-gui.clear-history'},
-              handlers='main.history.delete_button', save_as='history.delete_button'}
-          }},
-          -- listing
-          {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={horizontally_stretchable=true, vertically_stretchable=true},
-            vertical_scroll_policy='always', save_as='history.pane', children={
-              {type='table', style='ltnm_rows_table', style_mods={vertically_stretchable=true}, column_count=6, save_as='history.table'}
-            }
-          }
-        }},
-        -- ALERTS
-        {type='flow', style_mods={horizontal_spacing=12}, mods={visible=false}, save_as='tabbed_pane.contents.alerts', children={
-          -- alerts list
-          {type='frame', style='ltnm_light_content_frame', style_mods={width=312}, direction='vertical', children={
-            {type='frame', style='ltnm_toolbar_frame', children={
-              {type='checkbox', name='ltnm_sort_alerts_time', style='ltnm_sort_checkbox_active', style_mods={left_margin=8, width=64}, state=false,
-                caption={'ltnm-gui.time'}, handlers='main.alerts.sort_checkbox', save_as='alerts.time_sort_checkbox'},
-              {type='checkbox', name='ltnm_sort_alerts_type', style='ltnm_sort_checkbox_inactive', style_mods={width=220}, state=false,
-                caption={'ltnm-gui.alert'}, handlers='main.alerts.sort_checkbox', save_as='alerts.type_sort_checkbox'}
-            }},
-            {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={vertically_stretchable=true}, children={
-              {type='table', style='ltnm_rows_table', column_count=2, save_as='alerts.table'}
-            }}
-          }},
-          -- information panel
-          {type='frame', style='ltnm_light_content_frame', style_mods={horizontally_stretchable=true}, direction='vertical', children={
-            {type='frame', style='ltnm_toolbar_frame', children={
-              {type='label', style='subheader_caption_label', caption={'ltnm-gui.select-an-alert'}, save_as='alerts.info_title'},
-              {template='pushers.horizontal'},
-              {type='sprite-button', style='red_icon_button', sprite='utility/trash'}
-            }},
-            {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={vertically_stretchable=true, padding=8}, save_as='alerts.info_pane'}
-          }}
-        }}
+        tabs.depots.base_template,
+        tabs.stations.base_template,
+        tabs.inventory.base_template,
+        tabs.history.base_template,
+        tabs.alerts.base_template
       }}
     }}
   })
@@ -521,12 +190,12 @@ function self.create(player, player_table)
   player_table.gui.main = gui_data
 
   -- set initial contents
-  self.update_active_tab(player, player_table)
+  main_gui.update_active_tab(player, player_table)
   -- profiler.Stop()
 end
 
 -- completely destroys the GUI
-function self.destroy(player, player_table)
+function main_gui.destroy(player, player_table)
   event.disable_group('gui.main', player.index)
   player_table.gui.main.window.destroy()
   player_table.gui.main = nil
@@ -538,7 +207,7 @@ end
 -- STATE UPDATES
 
 -- updates the contents of the GUI
-function self.update(player, player_table, state_changes)
+function main_gui.update(player, player_table, state_changes)
   local gui_data = player_table.gui.main
   local data = global.data
   local material_translations = player_table.dictionary.materials.translations
@@ -1071,7 +740,7 @@ function self.update(player, player_table, state_changes)
   end
 end
 
-function self.update_active_tab(player, player_table, name)
+function main_gui.update_active_tab(player, player_table, name)
   name = name or player_table.gui.main.tabbed_pane.selected
   local changes = {active_tab=name}
   if name == 'depots' then
@@ -1086,7 +755,7 @@ function self.update_active_tab(player, player_table, name)
   elseif name == 'alerts' then
     changes.alerts_list = true
   end
-  self.update(player, player_table, changes)
+  main_gui.update(player, player_table, changes)
 end
 
-return self
+return main_gui
