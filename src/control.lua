@@ -6,6 +6,9 @@ local event = require('__RaiLuaLib__.lualib.event')
 local translation = require('__RaiLuaLib__.lualib.translation')
 local util = require('scripts.util')
 
+-- globals
+UPDATE_MAIN_GUI = true -- forward delcaration
+
 -- scripts
 local data_manager = require('scripts.data-manager')
 local main_gui = require('gui.main')
@@ -170,3 +173,7 @@ end)
 event.register(translation.retranslate_all_event, function(e)
   -- TODO: close GUIs and retranslate all
 end)
+
+function UPDATE_MAIN_GUI(player, player_table, state_changes)
+  main_gui.update(player, player_table, state_changes)
+end
