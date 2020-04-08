@@ -608,17 +608,18 @@ local function on_delivery_pickup_complete(e)
     alerts._index = alerts._index + 1
     alerts[alerts._index] = {
       time = game.tick,
-      type = 'incomplete_pickup',
+      type = 'incorrect_pickup',
       train = {
         id = e.train_id,
         from = train.from,
         to = train.to,
-        depot = train.depot
+        depot = train.depot,
+        pickup_done = train.pickupDone or false
       },
       planned_shipment = e.planned_shipment,
       actual_shipment = e.planned_shipment
     }
-    global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type='incomplete_pickup'}
+    global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type='incorrect_pickup'}
   end
 end
 
@@ -674,7 +675,31 @@ local function on_dispatcher_no_train_found(e)
 end
 
 local function on_delivery_failed(e)
-  local breakpoint
+  if not global.data then return end
+
+  local alerts = global.working_data.alerts
+  alerts._index = alerts._index + 1
+  local alert_type
+
+  local train = global.data.trains[e.train_id]
+  if train.train.valid then
+    alert_type = 'delivery_timed_out'
+  else
+    alert_type = 'train_invalidated'
+  end
+
+  alerts[alerts._index] = {
+    time = game.tick,
+    type = alert_type,
+    train = {
+      id = e.train_id,
+      from = train.from,
+      to = train.to,
+      depot = train.depot
+    },
+    shipment = train.shipment
+  }
+  global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type=alert_type}
 end
 
 -- -----------------------------------------------------------------------------
