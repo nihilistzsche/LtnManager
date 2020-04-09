@@ -89,10 +89,12 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
           {type='label', style_mods={width=64}, caption=util.ticks_to_time(alert_data.time)},
           {type='label', style_mods={width=26, horizontal_align='center'}, caption=alert_data.train.id},
           {type='flow', style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical', children={
-            {type='label', style='bold_label', caption=alert_data.train.from},
+            {type='label', name='ltnm_view_station_'..alert_data.train.from_id, style='hoverable_bold_label', caption=alert_data.train.from,
+              tooltip={'ltnm-gui.view-station-on-map'}},
             {type='flow', children={
               {type='label', style='caption_label', caption='->'},
-              {type='label', style='bold_label', caption=alert_data.train.to}
+              {type='label', name='ltnm_view_station_'..alert_data.train.to_id, style='hoverable_bold_label', caption=alert_data.train.to,
+                tooltip={'ltnm-gui.view-station-on-map'}}
             }}
           }},
           {type='label', style='bold_label', style_mods={width=160}, caption={'ltnm-gui.alert-'..alert_data.type},
@@ -134,9 +136,11 @@ alerts_gui.base_template = {type='flow', style_mods={horizontal_spacing=12}, mod
         caption={'ltnm-gui.alert'}, handlers='alerts.sort_checkbox', save_as='alerts.type_sort_checkbox'},
       {type='empty-widget', style_mods={width=237, height=15}}
     }},
-    {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={vertically_stretchable=true}, vertical_scroll_policy='always', children={
-      {type='table', style='ltnm_rows_table', column_count=6, save_as='alerts.table'}
-    }}
+    {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={vertically_stretchable=true, horizontally_stretchable=true},
+      vertical_scroll_policy='always', children={
+        {type='table', style='ltnm_rows_table', column_count=6, save_as='alerts.table'}
+      }
+    }
   }}
 }}
 

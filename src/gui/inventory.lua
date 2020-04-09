@@ -56,7 +56,7 @@ gui.templates:extend{
       local flow = elems.labels_flow
       local flow_add = flow.add
       for _,t in ipairs(labels) do
-        flow_add{type='label', style=t[1], caption=t[2], tooltip=t[3]}
+        flow_add{type='label', style=t[1], caption=t[2], tooltip=t[3], name=t[4]}
         flow_add{type='empty-widget'}.style.horizontally_stretchable = true
       end
       flow.children[#flow.children].destroy()
@@ -212,7 +212,12 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
               materials[#materials+1] = {color, contents}
             end
           end
-          location_template(table, {{'bold_label', station.entity.backer_name}}, materials, material_translations)
+          location_template(
+            table,
+            {{'hoverable_bold_label', station.entity.backer_name, {'ltnm-gui.view-station-on-map'}, 'ltnm_view_station_'..station_ids[i]}},
+            materials,
+            material_translations
+          )
         end
       end
       if #table.children == 0 then
@@ -237,7 +242,9 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
           if train.shipment then
             materials = {{'blue', train.shipment}}
           end
-          location_template(table, {{'bold_label', train.from}, {'caption_label', '->'}, {'bold_label', train.to}}, materials, {})
+          location_template(table, {{'hoverable_bold_label', train.from, {'ltnm-gui.view-station-on-map'}, 'ltnm_view_station_'..train.from_id},
+            {'caption_label', '->'}, {'hoverable_bold_label', train.to, {'ltnm-gui.view-station-on-map'}, 'ltnm_view_station_'..train.to_id}}, materials,
+            material_translations)
         end
       end
       if #table.children == 0 then

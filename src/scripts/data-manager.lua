@@ -612,7 +612,9 @@ local function on_delivery_pickup_complete(e)
       train = {
         id = e.train_id,
         from = train.from,
+        from_id = train.from_id,
         to = train.to,
+        to_id = train.to_id,
         depot = train.depot,
         pickup_done = train.pickupDone or false
       },
@@ -660,7 +662,9 @@ local function on_delivery_completed(e)
       train = {
         id = e.train_id,
         from = train.from,
+        from_id = train.from_id,
         to = train.to,
+        to_id = train.to_id,
         depot = train.depot
       },
       shipment = e.shipment,
@@ -694,7 +698,9 @@ local function on_delivery_failed(e)
     train = {
       id = e.train_id,
       from = train.from,
+      from_id = train.from_id,
       to = train.to,
+      to_id = train.to_id,
       depot = train.depot
     },
     shipment = train.shipment

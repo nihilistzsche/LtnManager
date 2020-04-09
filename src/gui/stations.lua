@@ -39,12 +39,6 @@ gui.handlers:extend{
         -- update GUI contents
         UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {stations_list=true})
       end
-    },
-    open_station_button = {
-      on_gui_click = function(e)
-        local station_id = string_gsub(e.element.name, 'ltnm_open_station_', '')
-        game.get_player(e.player_index).zoom_to_world(global.data.stations[tonumber(station_id)].entity.position, 0.5)
-      end
     }
   }
 }
@@ -68,8 +62,8 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
       local t = stations[sorted_stations[i]]
       -- build GUI structure
       local elems = gui.build(stations_table, {
-        {type='label', name='ltnm_open_station_'..sorted_stations[i], style='hoverable_bold_label', style_mods={horizontally_stretchable=true},
-          caption=t.entity.backer_name},
+        {type='label', name='ltnm_view_station_'..sorted_stations[i], style='hoverable_bold_label', style_mods={horizontally_stretchable=true},
+          caption=t.entity.backer_name, tooltip={'ltnm-gui.view-station-on-map'}},
         {type='label', caption=t.network_id},
         gui.templates.status_indicator('indicator', t.status.name, t.status.count),
         -- items

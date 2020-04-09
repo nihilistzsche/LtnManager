@@ -102,6 +102,23 @@ gui.handlers:extend{
         end
       },
     },
+    open_train_button = {
+      on_gui_click = {handler=function(e)
+        local train_id = string_gsub(e.element.name, 'ltnm_open_train_', '')
+        game.get_player(e.player_index).opened = global.data.trains[tonumber(train_id)].main_locomotive
+      end, gui_filters='ltnm_open_train_', options={match_filter_strings=true}}
+    },
+    view_station_button = {
+      on_gui_click = {handler=function(e)
+        local station_id = string_gsub(e.element.name, 'ltnm_view_station_', '')
+        local player = game.get_player(e.player_index)
+        local player_table = global.players[e.player_index]
+        player.zoom_to_world(global.data.stations[tonumber(station_id)].entity.position, 0.5)
+        if not player_table.gui.main.window.pinned then
+          main_gui.close(player, player_table, true)
+        end
+      end, gui_filters='ltnm_view_station_', options={match_filter_strings=true}}
+    },
     material_button = {
       on_gui_click = {handler=function(e)
         local player_table = global.players[e.player_index]
@@ -115,6 +132,7 @@ gui.handlers:extend{
     },
     ['ltnm-search'] = function(e)
       local player_table = global.players[e.player_index]
+      if not player_table.flags.gui_open then return end
       local gui_data = player_table.gui.main
       local active_tab = gui_data.tabbed_pane.selected
       if active_tab == 'inventory' then
@@ -164,9 +182,9 @@ function main_gui.create(player, player_table)
 
   -- other handlers
   event.enable('gui.main.ltnm-search', player.index)
+  event.enable_group('gui.main.open_train_button', player.index)
+  event.enable_group('gui.main.view_station_button', player.index)
   event.enable_group('gui.main.material_button', player.index)
-  event.enable_group('gui.depots.open_train_button', player.index, 'ltnm_open_train_')
-  event.enable_group('gui.stations.open_station_button', player.index, 'ltnm_open_station_')
 
   -- default settings
   gui_data.window.pinned = false
@@ -280,11 +298,13 @@ function main_gui.open(player, player_table)
   player.set_shortcut_toggled('ltnm-toggle-gui', true)
 end
 
-function main_gui.close(player, player_table)
+function main_gui.close(player, player_table, set_closed)
   player_table.flags.gui_open = false
   player_table.gui.main.window.frame.visible = false
 
   player.set_shortcut_toggled('ltnm-toggle-gui', false)
+
+  if set_closed then player.opened = nil end
 end
 
 function main_gui.toggle(player, player_table)

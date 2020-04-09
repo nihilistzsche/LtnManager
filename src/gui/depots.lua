@@ -45,12 +45,6 @@ gui.handlers:extend{
         -- update GUI contents
         UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {depot_trains=true})
       end
-    },
-    open_train_button = {
-      on_gui_click = {handler=function(e)
-        local train_id = string_gsub(e.element.name, 'ltnm_open_train_', '')
-        game.get_player(e.player_index).opened = global.data.trains[tonumber(train_id)].main_locomotive
-      end, gui_filters='ltnm_open_train_', options={match_filter_strings=true}}
     }
   }
 }
@@ -178,7 +172,8 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
       local train = data.trains[train_id]
       -- build GUI structure
       local elems = gui.build(trains_table, {
-        {type='label', name='ltnm_open_train_'..train_id, style='hoverable_bold_label', style_mods={top_margin=-2}, caption=train.composition},
+        {type='label', name='ltnm_open_train_'..train_id, style='hoverable_bold_label', style_mods={top_margin=-2}, caption=train.composition,
+          tooltip={'ltnm-gui.open-train-gui'}},
         {type='flow', style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical',
           save_as='status_flow'},
         {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
