@@ -46,84 +46,88 @@ local function iterate_stations(data)
     local station_id = station_ids[i]
     local station = stations[station_id]
     if not station then error('Station ID mismatch') end
-    local network_id = station.network_id
-    local station_name = station.entity.backer_name
 
-    -- add station to by-network lookup
-    local network_stations = network_to_stations[network_id]
-    if network_stations then
-      network_stations[#network_stations+1] = station_id
-    else
-      network_to_stations[network_id] = {station_id}
-    end
+    if station.entity.valid and station.input.valid then
+      local network_id = station.network_id
+      local station_name = station.entity.backer_name
 
-    -- get status
-    local signal = station.lampControl.get_circuit_network(defines.wire_type.red).signals[1]
-    station.status = {name=signal.signal.name, count=signal.count}
-
-    -- get station trains
-    local station_trains = station.entity.get_train_stop_trains()
-    local station_train_ids = {}
-    local station_available_trains = 0
-
-    -- iterate trains
-    for ti=1,#station_trains do
-      local train = station_trains[ti]
-      local train_id = train.id
-      local train_state = train.state
-      local schedule = train.schedule
-      if train_state == defines.train_state.wait_station and schedule.records[schedule.current].station == station_name then
-        station_available_trains = station_available_trains + 1
+      -- add station to by-network lookup
+      local network_stations = network_to_stations[network_id]
+      if network_stations then
+        network_stations[#network_stations+1] = station_id
+      else
+        network_to_stations[network_id] = {station_id}
       end
-      station_train_ids[ti] = train_id
 
-      -- retrieve or construct train table
-      if not trains[train_id] then
-        local train_data = deliveries[train_id] or available_trains[train_id] or {
-          train = train,
-          network_id = network_id,
-          force = station.entity.force,
-          returning_to_depot = true
-        }
-        train_data.state = train.state
-        train_data.depot = schedule.records[1].station
-        train_data.composition = util.train.get_composition_string(train)
-        train_data.main_locomotive = util.train.get_main_locomotive(train)
-        train_data.status = {}
-        trains[train_id] = train_data
-      end
-    end
+      -- get status
+      local signal = station.lampControl.get_circuit_network(defines.wire_type.red).signals[1]
+      station.status = {name=signal.signal.name, count=signal.count}
 
-    -- add station and trains to depot
-    if station.isDepot then
-      local depot = depots[station_name]
-      if depot then
-        depot.stations[#depot.stations+1] = station_id
-      else -- only add trains once, since all depot stations will have the same trains
-        depots[station_name] = {available_trains=station_available_trains, num_trains=#station_train_ids, stations={station_id}, trains_temp=station_train_ids}
-      end
-    end
+      -- get station trains
+      local station_trains = station.entity.get_train_stop_trains()
+      local station_train_ids = {}
+      local station_available_trains = 0
 
-    -- process station materials
-    for _,mode in ipairs{'provided', 'requested'} do
-      local materials = data[mode..'_by_stop'][station_id]
-      if materials then
-        -- add to station
-        station[mode] = materials
-        -- add to network
-        local inv = inventory[mode][network_id]
-        if not inv then
-          inventory[mode][network_id] = materials
-        else
-          inv = util.add_materials(materials, inv)
+      -- iterate trains
+      for ti=1,#station_trains do
+        local train = station_trains[ti]
+        local train_id = train.id
+        local train_state = train.state
+        local schedule = train.schedule
+        if train_state == defines.train_state.wait_station and schedule.records[schedule.current].station == station_name then
+          station_available_trains = station_available_trains + 1
         end
-        -- add to lookup
-        for name,_ in pairs(materials) do
-          local locations = material_locations[name]
-          if not locations then
-            material_locations[name] = {stations={station_id}, trains={}}
+        station_train_ids[ti] = train_id
+
+        -- retrieve or construct train table
+        if not trains[train_id] then
+          local train_data = deliveries[train_id] or available_trains[train_id] or {
+            train = train,
+            network_id = network_id,
+            force = station.entity.force,
+            returning_to_depot = true
+          }
+          train_data.state = train.state
+          train_data.depot = schedule.records[1].station
+          train_data.composition = util.train.get_composition_string(train)
+          train_data.main_locomotive = util.train.get_main_locomotive(train)
+          train_data.status = {}
+          trains[train_id] = train_data
+        end
+      end
+
+      -- add station and trains to depot
+      if station.isDepot then
+        local depot = depots[station_name]
+        if depot then
+          depot.stations[#depot.stations+1] = station_id
+        else -- only add trains once, since all depot stations will have the same trains
+          depots[station_name] = {available_trains=station_available_trains, num_trains=#station_train_ids, stations={station_id},
+            trains_temp=station_train_ids}
+        end
+      end
+
+      -- process station materials
+      for _,mode in ipairs{'provided', 'requested'} do
+        local materials = data[mode..'_by_stop'][station_id]
+        if materials then
+          -- add to station
+          station[mode] = materials
+          -- add to network
+          local inv = inventory[mode][network_id]
+          if not inv then
+            inventory[mode][network_id] = materials
           else
-            locations.stations[#locations.stations+1] = station_id
+            inv = util.add_materials(materials, inv)
+          end
+          -- add to lookup
+          for name,_ in pairs(materials) do
+            local locations = material_locations[name]
+            if not locations then
+              material_locations[name] = {stations={station_id}, trains={}}
+            else
+              locations.stations[#locations.stations+1] = station_id
+            end
           end
         end
       end
@@ -170,13 +174,15 @@ local function sort_depot_trains(data)
       local sort_values = {}
       for _,train_id in ipairs(depot.trains_temp) do
         local train = data.trains[train_id]
-        local lookup = sort_lookup[train.composition]
-        if lookup then
-          lookup[#lookup+1] = train_id
-        else
-          sort_lookup[train.composition] = {train_id}
+        if train.train.valid then
+          local lookup = sort_lookup[train.composition]
+          if lookup then
+            lookup[#lookup+1] = train_id
+          else
+            sort_lookup[train.composition] = {train_id}
+          end
+          table_insert(sort_values, train.composition)
         end
-        table_insert(sort_values, train.composition)
       end
       table_sort(sort_values)
       local result = {}
@@ -199,17 +205,19 @@ local function sort_depot_trains(data)
           -- sort trains
           for _,train_id in ipairs(depot.trains_temp) do
             local train = trains[train_id]
-            local status, status_data = util.train.get_status_string(train, translations)
-            -- add status to train data
-            train.status[pi] = status_data
-            -- add to sorting tables
-            local lookup = sort_lookup[status]
-            if lookup then
-              lookup[#lookup+1] = train_id
-            else
-              sort_lookup[status] = {train_id}
+            if train.train.valid then
+              local status, status_data = util.train.get_status_string(train, translations)
+              -- add status to train data
+              train.status[pi] = status_data
+              -- add to sorting tables
+              local lookup = sort_lookup[status]
+              if lookup then
+                lookup[#lookup+1] = train_id
+              else
+                sort_lookup[status] = {train_id}
+              end
+              table_insert(sort_values, status)
             end
-            table_insert(sort_values, status)
           end
           table_sort(sort_values)
           local result = {}
@@ -339,7 +347,7 @@ local function sort_alerts(data)
   }
 
   local alerts = data.alerts
-  
+
   -- remove alerts
   local to_delete = global.data and global.data.alerts_to_delete or {}
   for id,_ in pairs(to_delete) do
