@@ -60,17 +60,29 @@ function util.train.get_status_string(train_data, translations)
     if train_data.returning_to_depot then
       return translations['returning-to-depot'], {{'bold_label', translations['returning-to-depot']}}
     else
-      return
-        translations[train_data.pickupDone and 'delivering-to' or 'fetching-from']..':^^'..train_data.to,
-        {{'label', translations[train_data.pickupDone and 'delivering-to' or 'fetching-from']..':'}, {'bold_label', train_data.to}}
+      if train_data.pickupDone then
+        return
+          translations['delivering-to']..':^^'..train_data.to,
+          {{'label', translations['delivering-to']..':'}, {'bold_label', train_data.to}}
+      else
+        return
+          translations['fetching-from']..':^^'..train_data.from,
+          {{'label', translations['fetching-from']..':'}, {'bold_label', train_data.from}}
+      end
     end
   elseif state == def.wait_station then
     if train_data.surface or train_data.returning_to_depot then
       return translations['parked-at-depot'], {{'bold_green_label', translations['parked-at-depot']}}
     else
-      return
-        translations[train_data.pickupDone and 'unloading-at' or 'loading-at']..':^^'..(train_data.from or train_data.to),
-        {{'label', translations[train_data.pickupDone and 'unloading-at' or 'loading-at']..':'}, {'bold_label', train_data.from or train_data.to}}
+      if train_data.pickupDone then
+        return
+          translations['unloading-at']..':^^'..train_data.to,
+          {{'label', translations['unloading-at']..':'}, {'bold_label', train_data.to}}
+      else
+        return
+          translations['loading-at']..':^^'..train_data.from,
+          {{'label', translations['loading-at']..':'}, {'bold_label', train_data.from}}
+      end
     end
   else
     return 'N/A', {{'bold_red_label', 'N/A'}}
