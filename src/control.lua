@@ -11,13 +11,17 @@ local alert_popup_gui = require('gui.alert-popup')
 local data_manager = require('scripts.data-manager')
 local main_gui = require('gui.main')
 
+-- locals
+local string_find = string.find
+local string_gsub = string.gsub
+
 -- globals
 function UPDATE_MAIN_GUI(player, player_table, state_changes)
   main_gui.update(player, player_table, state_changes)
 end
 
 -- -----------------------------------------------------------------------------
--- UTILITIES
+-- TRANSLATIONS
 
 local function build_translation_data()
   local translation_data = {
@@ -52,6 +56,9 @@ local function run_player_translations(player)
   end
 end
 
+-- -----------------------------------------------------------------------------
+-- PLAYER DATA
+
 local function setup_player(player, index)
   local data = {
     dictionary = {},
@@ -68,12 +75,27 @@ local function setup_player(player, index)
 end
 
 local function destroy_player_guis(player, player_table)
-  main_gui.close(player, player_table)
-  main_gui.destroy(player, player_table)
-  alert_popup_gui.destroy_all(player, player_table)
+  if player_table.gui.main then
+    main_gui.close(player, player_table)
+    main_gui.destroy(player, player_table)
+  end
+  if player_table.gui.alert_popup then
+    alert_popup_gui.destroy(player, player_table)
+  end
 end
 
--- completely close all GUIs and retranslate
+local function update_player_settings(player, player_table)
+  local settings = {}
+  for name,t in pairs(player.mod_settings) do
+    if string_find(name, '^ltnm%-') then
+      name = string_gsub(name, 'ltnm%-', '')
+      settings[string_gsub(name, '%-', '_')] = t.value
+    end
+  end
+  player_table.settings = settings
+end
+
+-- completely close all GUIs, update settings, and retranslate
 local function refresh_player_data(player, player_table)
   -- destroy GUIs
   destroy_player_guis(player, player_table)
@@ -81,6 +103,9 @@ local function refresh_player_data(player, player_table)
   -- set shortcut state
   player_table.flags.translations_finished = false
   player.set_shortcut_available('ltnm-toggle-gui', false)
+
+  -- update settings
+  update_player_settings(player, player_table)
 
   -- run translations
   if player.connected then
@@ -125,10 +150,7 @@ event.on_init(function()
   build_translation_data()
   for i,p in pairs(game.players) do
     setup_player(p, i)
-    if p.connected then
-      global.players[i].flags.translate_on_join = false
-      run_player_translations(p)
-    end
+    refresh_player_data(p, global.players[i])
   end
   data_manager.setup_events()
   event.enable_group('ltn')
@@ -151,6 +173,14 @@ event.on_player_joined_game(function(e)
   if player_table.flags.translate_on_join then
     player_table.flags.translate_on_join = false
     run_player_translations(game.get_player(e.player_index))
+  end
+end)
+
+event.on_runtime_mod_setting_changed(function(e)
+  if string_find(e.setting, '^ltnm%-') then
+    for i,p in pairs(game.players) do
+      update_player_settings(p, global.players[i])
+    end
   end
 end)
 
