@@ -5,7 +5,6 @@
 local event = require('__RaiLuaLib__.lualib.event')
 local migration = require('__RaiLuaLib__.lualib.migration')
 local translation = require('__RaiLuaLib__.lualib.translation')
-local util = require('scripts.util')
 
 -- scripts
 local alert_popup_gui = require('gui.alert-popup')
@@ -62,9 +61,7 @@ local function setup_player(player, index)
       translate_on_join = true,
       translations_finished = false
     },
-    gui = {
-      alert_popup = {_index=1}
-    }
+    gui = {}
   }
   player.set_shortcut_available('ltnm-toggle-gui', false)
   global.players[index] = data
