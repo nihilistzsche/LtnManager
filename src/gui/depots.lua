@@ -3,7 +3,6 @@
 -- A tab of the main GUI
 
 -- dependencies
-local constants = require('scripts.constants')
 local event = require('__RaiLuaLib__.lualib.event')
 local gui = require('__RaiLuaLib__.lualib.gui')
 
@@ -71,13 +70,14 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
       local elems = gui.build(buttons_pane, {
         {type='button', name='ltnm_depot_button_'..name, style=button_style, handlers='depots.depot_button', save_as='button', children={
           {type='flow', ignored_by_interaction=true, direction='vertical', children={
-            {type='label', style='caption_label', style_mods={font_color={28, 28, 28}}, caption=name, save_as='name_label'},
+            {type='label', style='ltnm_depot_button_caption_label', caption=name, mods={enabled=false}, save_as='labels.name'},
             {type='flow', direction='horizontal', children={
-              {type='label', style='bold_label', style_mods={font_color={28, 28, 28}}, caption={'', {'ltnm-gui.trains'}, ':'}, save_as='bold_labels.trains'},
-              {type='label', style_mods={font_color={}}, caption=t.available_trains..'/'..t.num_trains, save_as='standard_labels.trains'}
+              {type='label', style='ltnm_depot_button_bold_label', caption={'', {'ltnm-gui.trains'}, ':'}, mods={enabled=false}, save_as='labels.trains'},
+              {type='label', style='ltnm_depot_button_label', caption=t.available_trains..'/'..t.num_trains, mods={enabled=false},
+                save_as='labels.train_count'}
             }},
             {type='flow', style_mods={vertical_align='center', horizontal_spacing=6}, save_as='status_flow', children={
-              {type='label', style='bold_label', style_mods={font_color={28, 28, 28}}, caption={'', {'ltnm-gui.status'}, ':'}, save_as='bold_labels.status'}
+              {type='label', style='ltnm_depot_button_bold_label', caption={'', {'ltnm-gui.status'}, ':'}, mods={enabled=false}, save_as='labels.status'}
             }}
           }}
         }}
@@ -90,7 +90,8 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
       local status_flow = elems.status_flow
       for status_name, status_count in pairs(statuses) do
         local output = gui.build(status_flow, {gui.templates.status_indicator('indicator', status_name, status_count)})
-        elems.standard_labels[status_name] = output.indicator_label
+        output.indicator_label.enabled = false
+        elems.labels[status_name] = output.indicator_label
       end
 
       -- add elems to button table
@@ -124,23 +125,15 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
       if previous_selection then
         local button_data = depot_data.buttons[previous_selection]
         button_data.button.enabled = true
-        button_data.name_label.style.font_color = constants.bold_dark_font_color
-        for _,elem in pairs(button_data.bold_labels) do
-          elem.style.font_color = constants.bold_dark_font_color
-        end
-        for _,elem in pairs(button_data.standard_labels) do
-          elem.style.font_color = constants.default_dark_font_color
+        for _,elem in pairs(button_data.labels) do
+          elem.enabled = false
         end
       end
       -- set new selection to active style
       local button_data = depot_data.buttons[new_selection]
       button_data.button.enabled = false
-      button_data.name_label.style.font_color = constants.heading_font_color
-      for _,elem in pairs(button_data.bold_labels) do
-        elem.style.font_color = constants.default_font_color
-      end
-      for _,elem in pairs(button_data.standard_labels) do
-        elem.style.font_color = constants.default_font_color
+      for _,elem in pairs(button_data.labels) do
+        elem.enabled = true
       end
       -- update selection in global
       depot_data.selected = new_selection

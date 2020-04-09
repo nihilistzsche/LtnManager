@@ -531,6 +531,24 @@ styles.ltnm_hoverable_label = {
   font = 'default'
 }
 
+styles.ltnm_depot_button_caption_label = {
+  type = 'label_style',
+  parent = 'caption_label',
+  disabled_font_color = button_default_bold_font_color
+}
+
+styles.ltnm_depot_button_bold_label = {
+  type = 'label_style',
+  parent = 'bold_label',
+  disabled_font_color = button_default_bold_font_color
+}
+
+styles.ltnm_depot_button_label = {
+  type = 'label_style',
+  parent = 'label',
+  disabled_font_color = button_default_font_color
+}
+
 -- -----------------------------------------------------------------------------
 -- LINE STYLES
 

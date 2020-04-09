@@ -35,7 +35,7 @@ gui.templates:extend{
   status_indicator = function(name, color, value)
     return {type='flow', style_mods={vertical_align='center'}, children={
       {type='sprite', style='ltnm_status_icon', sprite='ltnm_indicator_'..color, save_as=name..'_circle'},
-      {type='label', caption=value, save_as=name..'_label'}
+      {type='label', style='ltnm_depot_button_label', caption=value, save_as=name..'_label'}
     }}
   end
 }

@@ -49,8 +49,8 @@ function alert_popup_gui.create_or_update(player, player_table, data)
       {type='button', style='red_button', style_mods={width=150, height=56}, tooltip={'ltnm-gui.alert-popup-tooltip'},
         mouse_button_filter={'left', 'right'}, handlers='alert_popup.button', save_as='button', children={
           {type='flow', direction='vertical', mods={ignored_by_interaction=true}, children={
-            {type='label', style='bold_label', style_mods={font_color={28, 28, 28}}, caption={'ltnm-gui.new-alert'}},
-            {type='label', style_mods={font_color={}}, save_as='label'}
+            {type='label', style='ltnm_depot_button_bold_label', mods={enabled=false}, caption={'ltnm-gui.new-alert'}},
+            {type='label', style='ltnm_depot_button_label', mods={enabled=false}, save_as='label'}
           }}
         }
       }

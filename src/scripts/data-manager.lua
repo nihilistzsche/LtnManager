@@ -465,7 +465,11 @@ end
 
 local function on_dispatcher_updated(e)
   local stations = global.working_data.stations
-  if not stations then error('LTN event desync: did not receive stations in time!') end
+  if not stations then
+    log('LTN event desync: did not receive stations in time! Skipping iteration.')
+    global.working_data.stations = nil
+    return
+  end
 
   -- deregister events for this update cycle
   event.disable('ltn_on_stops_updated')
