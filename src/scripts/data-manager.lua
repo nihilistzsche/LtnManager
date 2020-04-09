@@ -442,9 +442,9 @@ end
 local function sort_alerts(data)
   -- sorting tables
   local sort = {
-    depot = {lookup={}, values={}},
-    route = {lookup={}, values={}},
     time = {lookup={}, values={}},
+    id = {lookup={}, values={}},
+    route = {lookup={}, values={}},
     type = {lookup={}, values={}}
   }
 
@@ -452,8 +452,8 @@ local function sort_alerts(data)
   for i,entry in ipairs(data.alerts) do
     for sort_type,sort_table in pairs(sort) do
       local value
-      if sort_type == 'depot' then
-        value = entry.train.depot
+      if sort_type == 'id' then
+        value = entry.train.id
       elseif sort_type == 'route' then
         value = entry.train.from..' -> '..entry.train.to
       else
@@ -617,7 +617,7 @@ local function on_delivery_pickup_complete(e)
         pickup_done = train.pickupDone or false
       },
       planned_shipment = e.planned_shipment,
-      actual_shipment = e.planned_shipment
+      actual_shipment = e.actual_shipment
     }
     global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type='incorrect_pickup'}
   end
@@ -663,8 +663,8 @@ local function on_delivery_completed(e)
         to = train.to,
         depot = train.depot
       },
-      planned_shipment = e.planned_shipment,
-      actual_shipment = e.planned_shipment
+      shipment = e.shipment,
+      leftovers = contents
     }
     global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type='incomplete_delivery'}
   end

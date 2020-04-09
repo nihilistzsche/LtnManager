@@ -18,6 +18,26 @@ local alerts_gui = {}
 -- -----------------------------------------------------------------------------
 -- GUI DATA
 
+gui.templates:extend{
+  alerts = {
+    materials_table = function(parent, style, materials, material_translations)
+      local table_add = gui.build(parent, {
+        {type='frame', style='ltnm_dark_content_frame_in_light_frame', children={
+          {type='scroll-pane', style='ltnm_train_slot_table_scroll_pane', children={
+            {type='table', style='ltnm_small_slot_table', column_count=4, save_as='table'}
+          }}
+        }}
+      }).table.add
+      local mi = 0
+      for name,count in pairs(materials) do
+        mi = mi + 1
+        table_add{type='sprite-button', name='ltnm_material_button_'..mi, style='ltnm_small_slot_button_'..style, sprite=string_gsub(name, ',', '/'),
+          number=count, tooltip=material_translations[name]}
+      end
+    end
+  }
+}
+
 gui.handlers:extend{
   alerts = {
     sort_checkbox = {
@@ -37,14 +57,8 @@ gui.handlers:extend{
           gui_data['sort_'..clicked_type] = e.element.state
         end
         -- update GUI contents
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {alerts_list=true})
+        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {alerts=true})
       end
-    },
-    alert_type_label = {
-      on_gui_click = {handler=function(e)
-        local alert_id = string_gsub(e.element.name, 'ltnm_alert_type_label_', '')
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), global.players[e.player_index], {selected_alert=alert_id})
-      end, gui_filters='ltnm_alert_type_label_', options={match_filter_strings=true}}
     }
   }
 }
@@ -53,8 +67,7 @@ gui.handlers:extend{
 -- FUNCTIONS
 
 function alerts_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
-  -- ALERTS LIST
-  if state_changes.alerts_list then
+  if state_changes.alerts then
     local alerts_table = gui_data.alerts.table
     alerts_table.clear()
 
@@ -69,71 +82,38 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
       local finish = sort_value and #sorted_alerts or 1
       local delta = sort_value and 1 or -1
 
-      local selected = tonumber(gui_data.alerts.selected or 0)
-
       for i=start,finish,delta do
         local alert_id = sorted_alerts[i]
-        local entry = alerts[alert_id]
-        local enabled = not (selected == alert_id)
-        gui.build(alerts_table, {
-          {type='label', name='ltnm_alert_time_label_'..alert_id, style='ltnm_hoverable_label', style_mods={width=64}, mods={ignored_by_interaction=true,
-            enabled=enabled}, caption=util.ticks_to_time(entry.time)},
-          {type='label', name='ltnm_alert_type_label_'..alert_id, style='ltnm_hoverable_bold_label', style_mods={width=212}, mods={enabled=enabled},
-            caption={'ltnm-gui.alert-'..entry.type}}
+        local alert_data = alerts[alert_id]
+        local elems = gui.build(alerts_table, {
+          {type='label', style_mods={width=64}, caption=util.ticks_to_time(alert_data.time)},
+          {type='label', style_mods={width=26, horizontal_align='center'}, caption=alert_data.train.id},
+          {type='flow', style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical', children={
+            {type='label', style='bold_label', caption=alert_data.train.from},
+            {type='flow', children={
+              {type='label', style='caption_label', caption='->'},
+              {type='label', style='bold_label', caption=alert_data.train.to}
+            }}
+          }},
+          {type='label', style='bold_label', style_mods={width=160}, caption={'ltnm-gui.alert-'..alert_data.type},
+            tooltip={'ltnm-gui.alert-'..alert_data.type..'-description'}},
+          {type='flow', style_mods={vertical_spacing=8}, direction='vertical', save_as='tables_flow'},
+          {type='flow', children={
+            {type='frame', style='ltnm_dark_content_frame_in_light_frame', style_mods={padding=0}, children={
+              {type='sprite-button', name='ltnm_open_train_'..alert_data.train.id, style='ltnm_inset_tool_button', sprite='utility/preset',
+                tooltip={'ltnm-gui.open-train-gui'}},
+            }},
+            {type='frame', style='ltnm_dark_content_frame_in_light_frame', style_mods={padding=0}, children={
+              {type='sprite-button', style='ltnm_inset_red_icon_button', sprite='utility/trash', tooltip={'ltnm-gui.clear-alert'}}
+            }}
+          }}
         })
+        gui.templates.alerts.materials_table(elems.tables_flow, 'green', alert_data.shipment or alert_data.planned_shipment, material_translations)
+        if alert_data.actual_shipment or alert_data.leftovers then
+          gui.templates.alerts.materials_table(elems.tables_flow, 'red', alert_data.actual_shipment or alert_data.leftovers, material_translations)
+        end
       end
     end
-  end
-
-  -- SELECTED ALERT
-  if state_changes.selected_alert then
-    local alert_id = state_changes.selected_alert
-    local alert_data = data.alerts[tonumber(alert_id)]
-    local alert_type = alert_data.type
-    local pane = gui_data.alerts.info_pane
-    pane.clear()
-
-    local list_table = gui_data.alerts.table
-    local previous_selection = gui_data.alerts.selected
-
-    -- reset previous selection style
-    if previous_selection then
-      list_table['ltnm_alert_time_label_'..previous_selection].enabled = true
-      list_table['ltnm_alert_type_label_'..previous_selection].enabled = true
-    end
-
-    -- set new selection style
-    list_table['ltnm_alert_time_label_'..alert_id].enabled = false
-    list_table['ltnm_alert_type_label_'..alert_id].enabled = false
-
-    -- update title
-    gui_data.alerts.info_title.caption = {'', {'ltnm-gui.alert-'..alert_type}, ' @ '..util.ticks_to_time(alert_data.time)}
-
-    gui.build(pane, {
-      -- description
-      {type='frame', style='bordered_frame', children={
-        {type='label', style='ltnm_paragraph_label', caption={'ltnm-gui.alert-'..alert_type..'-description'}}
-      }},
-      -- train
-      {type='label', style='subheader_caption_label', caption={'ltnm-gui.train'}},
-      {type='flow', direction='horizontal', children={
-
-      }}
-    })
-
-
-    -- alert-specific stuff
-    if alert_type == 'incomplete_pickup' then
-
-    elseif alert_type == 'incomplete_delivery' then
-
-    else
-      
-    end
-    local breakpoint
-
-    -- update selection in global
-    gui_data.alerts.selected = state_changes.selected_alert
   end
 end
 
@@ -141,25 +121,22 @@ end
 
 alerts_gui.base_template = {type='flow', style_mods={horizontal_spacing=12}, mods={visible=false}, save_as='tabbed_pane.contents.alerts', children={
   -- alerts list
-  {type='frame', style='ltnm_light_content_frame', style_mods={width=312}, direction='vertical', children={
+  {type='frame', style='ltnm_light_content_frame', direction='vertical', children={
     {type='frame', style='ltnm_toolbar_frame', children={
       {type='checkbox', name='ltnm_sort_alerts_time', style='ltnm_sort_checkbox_active', style_mods={left_margin=8, width=64}, state=false,
         caption={'ltnm-gui.time'}, handlers='alerts.sort_checkbox', save_as='alerts.time_sort_checkbox'},
-      {type='checkbox', name='ltnm_sort_alerts_type', style='ltnm_sort_checkbox_inactive', style_mods={width=220}, state=false,
-        caption={'ltnm-gui.alert'}, handlers='alerts.sort_checkbox', save_as='alerts.type_sort_checkbox'}
-    }},
-    {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={vertically_stretchable=true}, children={
-      {type='table', style='ltnm_rows_table', column_count=2, save_as='alerts.table'}
-    }}
-  }},
-  -- information panel
-  {type='frame', style='ltnm_light_content_frame', style_mods={horizontally_stretchable=true}, direction='vertical', children={
-    {type='frame', style='ltnm_toolbar_frame', children={
-      {type='label', style='subheader_caption_label', caption={'ltnm-gui.select-an-alert'}, save_as='alerts.info_title'},
+      {type='checkbox', name='ltnm_sort_alerts_id', style='ltnm_sort_checkbox_inactive', state=true, caption={'ltnm-gui.id'}, handlers='alerts.sort_checkbox',
+        save_as='alerts.id_sort_checkbox'},
+      {type='checkbox', name='ltnm_sort_alerts_route', style='ltnm_sort_checkbox_inactive', state=true, caption={'ltnm-gui.route'},
+        handlers='alerts.sort_checkbox', save_as='alerts.route_sort_checkbox'},
       {template='pushers.horizontal'},
-      {type='sprite-button', style='red_icon_button', sprite='utility/trash'}
+      {type='checkbox', name='ltnm_sort_alerts_type', style='ltnm_sort_checkbox_inactive', style_mods={width=160}, state=true,
+        caption={'ltnm-gui.alert'}, handlers='alerts.sort_checkbox', save_as='alerts.type_sort_checkbox'},
+      {type='empty-widget', style_mods={width=237, height=15}}
     }},
-    {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={vertically_stretchable=true, padding=8}, save_as='alerts.info_pane'}
+    {type='scroll-pane', style='ltnm_blank_scroll_pane', style_mods={vertically_stretchable=true}, vertical_scroll_policy='always', children={
+      {type='table', style='ltnm_rows_table', column_count=6, save_as='alerts.table'}
+    }}
   }}
 }}
 

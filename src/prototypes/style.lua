@@ -165,6 +165,28 @@ styles.ltnm_active_frame_action_button = {
   }
 }
 
+styles.ltnm_inset_tool_button = {
+  type = 'button_style',
+  parent = 'tool_button',
+  hovered_graphical_set = {
+    base = {position = {34, 17}, corner_size = 8},
+    shadow = default_dirt,
+    -- no glow, since it is inset
+    -- glow = default_glow(default_glow_color, 0.5)
+  },
+}
+
+styles.ltnm_inset_red_icon_button = {
+  type = 'button_style',
+  parent = 'red_icon_button',
+  hovered_graphical_set = {
+    base = {position = {170, 17}, corner_size = 8},
+    shadow = default_dirt,
+    -- no glow, since it is inset
+    -- glow = default_glow(red_button_glow_color, 0.5)
+  },
+}
+
 -- -----------------------------------------------------------------------------
 -- CHECKBOX STYLES
 

@@ -164,7 +164,6 @@ function main_gui.create(player, player_table)
 
   -- other handlers
   event.enable('gui.main.ltnm-search', player.index)
-  event.enable_group('gui.alerts.alert_type_label', player.index)
   event.enable_group('gui.main.material_button', player.index)
   event.enable_group('gui.depots.open_train_button', player.index, 'ltnm_open_train_')
   event.enable_group('gui.stations.open_station_button', player.index, 'ltnm_open_station_')
@@ -194,6 +193,8 @@ function main_gui.create(player, player_table)
 
   gui_data.alerts.active_sort = 'time'
   gui_data.alerts.sort_time = false
+  gui_data.alerts.sort_id = true
+  gui_data.alerts.sort_route = true
   gui_data.alerts.sort_type = true
 
   -- dragging and centering
@@ -261,7 +262,7 @@ function main_gui.update_active_tab(player, player_table, name)
   elseif name == 'history' then
     changes.history = true
   elseif name == 'alerts' then
-    changes.alerts_list = true
+    changes.alerts = true
   end
   main_gui.update(player, player_table, changes)
 end
