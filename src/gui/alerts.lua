@@ -57,6 +57,14 @@ gui.handlers:extend{
         -- update GUI contents
         UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {alerts=true})
       end
+    },
+    clear_alert_button = {
+      on_gui_click = {handler=function(e)
+        local _,_,alert_id = string_find(e.element.name, '^ltnm_clear_alert_(.-)$')
+        alert_id = tonumber(alert_id)
+        global.data.alerts_to_delete[alert_id] = true
+        UPDATE_MAIN_GUI(game.get_player(e.player_index), global.players[e.player_index], {alerts=true})
+      end, gui_filters='ltnm_clear_alert_', options={match_filter_strings=true}}
     }
   }
 }
@@ -80,37 +88,43 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
       local finish = sort_value and #sorted_alerts or 1
       local delta = sort_value and 1 or -1
 
+      local to_be_deleted = global.data.alerts_to_delete
+
       for i=start,finish,delta do
         local alert_id = sorted_alerts[i]
-        local alert_data = alerts[alert_id]
-        local elems = gui.build(alerts_table, {
-          {type='label', style_mods={width=64}, caption=util.ticks_to_time(alert_data.time)},
-          {type='label', style_mods={width=26, horizontal_align='center'}, caption=alert_data.train.network_id},
-          {type='flow', style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical', children={
-            {type='label', name='ltnm_view_station_'..alert_data.train.from_id, style='hoverable_bold_label', caption=alert_data.train.from,
-              tooltip={'ltnm-gui.view-station-on-map'}},
-            {type='flow', children={
-              {type='label', style='caption_label', caption='->'},
-              {type='label', name='ltnm_view_station_'..alert_data.train.to_id, style='hoverable_bold_label', caption=alert_data.train.to,
-                tooltip={'ltnm-gui.view-station-on-map'}}
-            }}
-          }},
-          {type='label', style='bold_label', style_mods={width=160}, caption={'ltnm-gui.alert-'..alert_data.type},
-            tooltip={'ltnm-gui.alert-'..alert_data.type..'-description'}},
-          {type='flow', style_mods={vertical_spacing=8}, direction='vertical', save_as='tables_flow'},
-          {type='flow', children={
-            {type='frame', style='ltnm_dark_content_frame_in_light_frame', style_mods={padding=0}, children={
-              {type='sprite-button', name='ltnm_open_train_'..alert_data.train.id, style='ltnm_inset_tool_button', sprite='utility/preset',
-                tooltip={'ltnm-gui.open-train-gui'}},
+        -- exclude if the alert is to be deleted
+        if not to_be_deleted[alert_id] then
+          local alert_data = alerts[alert_id]
+          local elems = gui.build(alerts_table, {
+            {type='label', style_mods={width=64}, caption=util.ticks_to_time(alert_data.time)},
+            {type='label', style_mods={width=26, horizontal_align='center'}, caption=alert_data.train.network_id},
+            {type='flow', style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical', children={
+              {type='label', name='ltnm_view_station_'..alert_data.train.from_id, style='hoverable_bold_label', caption=alert_data.train.from,
+                tooltip={'ltnm-gui.view-station-on-map'}},
+              {type='flow', children={
+                {type='label', style='caption_label', caption='->'},
+                {type='label', name='ltnm_view_station_'..alert_data.train.to_id, style='hoverable_bold_label', caption=alert_data.train.to,
+                  tooltip={'ltnm-gui.view-station-on-map'}}
+              }}
             }},
-            {type='frame', style='ltnm_dark_content_frame_in_light_frame', style_mods={padding=0}, children={
-              {type='sprite-button', style='ltnm_inset_red_icon_button', sprite='utility/trash', tooltip={'ltnm-gui.clear-alert'}}
+            {type='label', style='bold_label', style_mods={width=160}, caption={'ltnm-gui.alert-'..alert_data.type},
+              tooltip={'ltnm-gui.alert-'..alert_data.type..'-description'}},
+            {type='flow', style_mods={vertical_spacing=8}, direction='vertical', save_as='tables_flow'},
+            {type='flow', children={
+              {type='frame', style='ltnm_dark_content_frame_in_light_frame', style_mods={padding=0}, children={
+                {type='sprite-button', name='ltnm_open_train_'..alert_data.train.id, style='ltnm_inset_tool_button', sprite='utility/preset',
+                  tooltip={'ltnm-gui.open-train-gui'}},
+              }},
+              {type='frame', style='ltnm_dark_content_frame_in_light_frame', style_mods={padding=0}, children={
+                {type='sprite-button', name='ltnm_clear_alert_'..alert_id, style='ltnm_inset_red_icon_button', sprite='utility/trash',
+                  tooltip={'ltnm-gui.clear-alert'}}
+              }}
             }}
-          }}
-        })
-        gui.templates.alerts.materials_table(elems.tables_flow, 'green', alert_data.shipment or alert_data.planned_shipment, material_translations)
-        if alert_data.actual_shipment or alert_data.leftovers then
-          gui.templates.alerts.materials_table(elems.tables_flow, 'red', alert_data.actual_shipment or alert_data.leftovers, material_translations)
+          })
+          gui.templates.alerts.materials_table(elems.tables_flow, 'green', alert_data.shipment or alert_data.planned_shipment, material_translations)
+          if alert_data.actual_shipment or alert_data.leftovers then
+            gui.templates.alerts.materials_table(elems.tables_flow, 'red', alert_data.actual_shipment or alert_data.leftovers, material_translations)
+          end
         end
       end
     end

@@ -448,24 +448,34 @@ local function sort_alerts(data)
     type = {lookup={}, values={}}
   }
 
+  local alerts = data.alerts
+  
+  -- remove alerts
+  local to_delete = global.data and global.data.alerts_to_delete or {}
+  for id,_ in pairs(to_delete) do
+    alerts[id] = nil
+  end
+
   -- iterate history to fill sorting tables
-  for i,entry in ipairs(data.alerts) do
-    for sort_type,sort_table in pairs(sort) do
-      local value
-      if sort_type == 'network_id' then
-        value = entry.train.network_id
-      elseif sort_type == 'route' then
-        value = entry.train.from..' -> '..entry.train.to
-      else
-        value = entry[sort_type]
+  for i,entry in pairs(data.alerts) do
+    if i ~= '_index' then
+      for sort_type,sort_table in pairs(sort) do
+        local value
+        if sort_type == 'network_id' then
+          value = entry.train.network_id
+        elseif sort_type == 'route' then
+          value = entry.train.from..' -> '..entry.train.to
+        else
+          value = entry[sort_type]
+        end
+        local lookup = sort_table.lookup[value]
+        if lookup then
+          lookup[#lookup+1] = i
+        else
+          sort_table.lookup[value] = {i}
+        end
+        sort_table.values[#sort_table.values+1] = value
       end
-      local lookup = sort_table.lookup[value]
-      if lookup then
-        lookup[#lookup+1] = i
-      else
-        sort_table.lookup[value] = {i}
-      end
-      sort_table.values[#sort_table.values+1] = value
     end
   end
 
@@ -526,7 +536,8 @@ local function iterate_data()
       sorted_history = data.sorted_history,
       sorted_alerts = data.sorted_alerts,
       -- other
-      num_stations = data.num_stations
+      num_stations = data.num_stations,
+      alerts_to_delete = {}
     }
 
     -- create alert popups

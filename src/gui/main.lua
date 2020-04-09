@@ -179,6 +179,7 @@ function main_gui.create(player, player_table)
   event.enable_group('gui.main.open_train_button', player.index)
   event.enable_group('gui.main.view_station_button', player.index)
   event.enable_group('gui.main.material_button', player.index)
+  event.enable_group('gui.alerts.clear_alert_button', player.index)
 
   -- default settings
   gui_data.window.pinned = false
