@@ -280,8 +280,10 @@ function main_gui.update_active_tab(player, player_table, name)
   main_gui.update(player, player_table, changes)
 end
 
-function main_gui.open(player, player_table)
-  main_gui.update_active_tab(player, player_table)
+function main_gui.open(player, player_table, skip_update)
+  if not skip_update then
+    main_gui.update_active_tab(player, player_table)
+  end
 
   if not player_table.gui.main.window.pinned then
     player.opened = player_table.gui.main.window.frame

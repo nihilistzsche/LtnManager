@@ -25,7 +25,6 @@ gui.handlers:extend{
       on_gui_click = function(e)
         local player = game.get_player(e.player_index)
         local player_table = global.players[e.player_index]
-        local gui_data = player_table.gui.alert_popup
 
         if e.button == defines.mouse_button_type.left then
           -- change tab and select correct alert
@@ -59,7 +58,6 @@ function alert_popup_gui.create_or_update(player, player_table, data)
     player_table.gui.alert_popup = gui_data
   end
   gui_data.label.caption = {'ltnm-gui.alert-'..data.type}
-  gui_data.id = data.id
 end
 
 function alert_popup_gui.destroy(player, player_table)
