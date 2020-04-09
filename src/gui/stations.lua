@@ -129,8 +129,8 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
       local signals = t.input.get_merged_signals()
       table_add = elems.signals_table.add
       local signals_rows = 0
-      for i=1,#signals do
-        local signal = signals[i]
+      for si=1,#signals do
+        local signal = signals[si]
         local name = signal.signal.name
         if name ~= 'ltn-network-id' and string_find(name, '^ltn%-') then
           signals_rows = signals_rows + 1
