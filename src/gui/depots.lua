@@ -205,9 +205,10 @@ depots_gui.base_template = {type='flow', style_mods={horizontal_spacing=12}, mod
     -- toolbar
     {type='frame', style='ltnm_toolbar_frame', children={
       {type='checkbox', name='ltnm_sort_train_composition', style='ltnm_sort_checkbox_active', style_mods={left_margin=8, width=120},
-        caption={'ltnm-gui.composition'}, state=true, handlers='depots.sort_checkbox', save_as='depots.composition_sort_checkbox'},
-      {type='checkbox', name='ltnm_sort_train_status', style='ltnm_sort_checkbox_inactive', caption={'ltnm-gui.train-status'}, state=true,
-        handlers='depots.sort_checkbox', save_as='depots.status_sort_checkbox'},
+        caption={'ltnm-gui.composition'}, tooltip={'ltnm-gui.train-composition-tooltip'}, state=true, handlers='depots.sort_checkbox',
+        save_as='depots.composition_sort_checkbox'},
+      {type='checkbox', name='ltnm_sort_train_status', style='ltnm_sort_checkbox_inactive', caption={'ltnm-gui.train-status'},
+        tooltip={'ltnm-gui.train-status-tooltip'}, state=true, handlers='depots.sort_checkbox', save_as='depots.status_sort_checkbox'},
       {template='pushers.horizontal'},
       {type='label', style='caption_label', style_mods={width=144}, caption={'ltnm-gui.shipment'}},
       {type='empty-widget', style_mods={width=6}}

@@ -140,7 +140,7 @@ alerts_gui.base_template = {type='flow', style_mods={horizontal_spacing=12}, mod
       {type='checkbox', name='ltnm_sort_alerts_time', style='ltnm_sort_checkbox_active', style_mods={left_margin=8, width=64}, state=false,
         caption={'ltnm-gui.time'}, handlers='alerts.sort_checkbox', save_as='alerts.time_sort_checkbox'},
       {type='checkbox', name='ltnm_sort_alerts_network_id', style='ltnm_sort_checkbox_inactive', state=true, caption={'ltnm-gui.id'},
-        handlers='alerts.sort_checkbox', save_as='alerts.network_id_sort_checkbox'},
+        tooltip={'ltnm-gui.history-network-id-tooltip'}, handlers='alerts.sort_checkbox', save_as='alerts.network_id_sort_checkbox'},
       {type='checkbox', name='ltnm_sort_alerts_route', style='ltnm_sort_checkbox_inactive', state=true, caption={'ltnm-gui.route'},
         handlers='alerts.sort_checkbox', save_as='alerts.route_sort_checkbox'},
       {template='pushers.horizontal'},

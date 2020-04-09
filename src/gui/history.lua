@@ -117,7 +117,7 @@ history_gui.base_template = {type='frame', style='ltnm_light_content_frame', dir
         handlers='history.sort_checkbox', save_as='history.route_sort_checkbox'},
       {template='pushers.horizontal'},
       {type='checkbox', name='ltnm_sort_history_network_id', style='ltnm_sort_checkbox_inactive', style_mods={right_margin=8}, state=true,
-        caption={'ltnm-gui.id'}, handlers='history.sort_checkbox', save_as='history.network_id_sort_checkbox'},
+        caption={'ltnm-gui.id'}, tooltip={'ltnm-gui.history-network-id-tooltip'}, handlers='history.sort_checkbox', save_as='history.network_id_sort_checkbox'},
       {type='checkbox', name='ltnm_sort_history_runtime', style='ltnm_sort_checkbox_inactive', style_mods={right_margin=8}, state=true,
         caption={'ltnm-gui.runtime'}, handlers='history.sort_checkbox', save_as='history.runtime_sort_checkbox'},
       {type='checkbox', name='ltnm_sort_history_finished', style='ltnm_sort_checkbox_active', style_mods={right_margin=8}, state=false,
