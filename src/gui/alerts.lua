@@ -85,7 +85,7 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
         local alert_data = alerts[alert_id]
         local elems = gui.build(alerts_table, {
           {type='label', style_mods={width=64}, caption=util.ticks_to_time(alert_data.time)},
-          {type='label', style_mods={width=26, horizontal_align='center'}, caption=alert_data.train.id},
+          {type='label', style_mods={width=26, horizontal_align='center'}, caption=alert_data.train.network_id},
           {type='flow', style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction='vertical', children={
             {type='label', name='ltnm_view_station_'..alert_data.train.from_id, style='hoverable_bold_label', caption=alert_data.train.from,
               tooltip={'ltnm-gui.view-station-on-map'}},
@@ -125,8 +125,8 @@ alerts_gui.base_template = {type='flow', style_mods={horizontal_spacing=12}, mod
     {type='frame', style='ltnm_toolbar_frame', children={
       {type='checkbox', name='ltnm_sort_alerts_time', style='ltnm_sort_checkbox_active', style_mods={left_margin=8, width=64}, state=false,
         caption={'ltnm-gui.time'}, handlers='alerts.sort_checkbox', save_as='alerts.time_sort_checkbox'},
-      {type='checkbox', name='ltnm_sort_alerts_id', style='ltnm_sort_checkbox_inactive', state=true, caption={'ltnm-gui.id'}, handlers='alerts.sort_checkbox',
-        save_as='alerts.id_sort_checkbox'},
+      {type='checkbox', name='ltnm_sort_alerts_network_id', style='ltnm_sort_checkbox_inactive', state=true, caption={'ltnm-gui.id'},
+        handlers='alerts.sort_checkbox', save_as='alerts.network_id_sort_checkbox'},
       {type='checkbox', name='ltnm_sort_alerts_route', style='ltnm_sort_checkbox_inactive', state=true, caption={'ltnm-gui.route'},
         handlers='alerts.sort_checkbox', save_as='alerts.route_sort_checkbox'},
       {template='pushers.horizontal'},

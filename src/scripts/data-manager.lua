@@ -442,9 +442,9 @@ end
 local function sort_alerts(data)
   -- sorting tables
   local sort = {
-    time = {lookup={}, values={}},
-    id = {lookup={}, values={}},
+    network_id = {lookup={}, values={}},
     route = {lookup={}, values={}},
+    time = {lookup={}, values={}},
     type = {lookup={}, values={}}
   }
 
@@ -452,8 +452,8 @@ local function sort_alerts(data)
   for i,entry in ipairs(data.alerts) do
     for sort_type,sort_table in pairs(sort) do
       local value
-      if sort_type == 'id' then
-        value = entry.train.id
+      if sort_type == 'network_id' then
+        value = entry.train.network_id
       elseif sort_type == 'route' then
         value = entry.train.from..' -> '..entry.train.to
       else
@@ -610,13 +610,14 @@ local function on_delivery_pickup_complete(e)
       time = game.tick,
       type = 'incorrect_pickup',
       train = {
-        id = e.train_id,
+        depot = train.depot,
         from = train.from,
         from_id = train.from_id,
+        id = e.train_id,
+        network_id = train.network_id,
+        pickup_done = train.pickupDone or false,
         to = train.to,
-        to_id = train.to_id,
-        depot = train.depot,
-        pickup_done = train.pickupDone or false
+        to_id = train.to_id
       },
       planned_shipment = e.planned_shipment,
       actual_shipment = e.actual_shipment
@@ -660,12 +661,13 @@ local function on_delivery_completed(e)
       time = game.tick,
       type = 'incomplete_delivery',
       train = {
-        id = e.train_id,
+        depot = train.depot,
         from = train.from,
         from_id = train.from_id,
+        id = e.train_id,
+        network_id = train.network_id,
         to = train.to,
-        to_id = train.to_id,
-        depot = train.depot
+        to_id = train.to_id
       },
       shipment = e.shipment,
       leftovers = contents
@@ -696,12 +698,13 @@ local function on_delivery_failed(e)
     time = game.tick,
     type = alert_type,
     train = {
-      id = e.train_id,
+      depot = train.depot,
       from = train.from,
       from_id = train.from_id,
+      id = e.train_id,
+      network_id = train.network_id,
       to = train.to,
-      to_id = train.to_id,
-      depot = train.depot
+      to_id = train.to_id
     },
     shipment = train.shipment
   }
