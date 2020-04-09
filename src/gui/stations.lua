@@ -48,6 +48,8 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
     local stations_table = gui_data.stations.table
     stations_table.clear()
 
+    local trains = data.trains
+
     local active_sort = gui_data.stations.active_sort
     local sort_value = gui_data.stations['sort_'..active_sort]
     local stations = data.stations
@@ -56,7 +58,8 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
     local finish = sort_value and #sorted_stations or 1
     local delta = sort_value and 1 or -1
     for i=start,finish,delta do
-      local t = stations[sorted_stations[i]]
+      local station_id = sorted_stations[i]
+      local t = stations[station_id]
       -- build GUI structure
       local elems = gui.build(stations_table, {
         {type='label', name='ltnm_view_station_'..sorted_stations[i], style='hoverable_bold_label', style_mods={horizontally_stretchable=true},
@@ -101,19 +104,26 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
 
       -- add active shipments
       local shipments = t.activeDeliveries
-      table_add = elems.shipments_table.add
-      local shipments_rows = 0
-      local mi = 0
-      for i=1,#shipments do
-        local shipment = data.trains[shipments[i]].shipment
-        for name,count in pairs(shipment) do
-          mi = mi + 1
-          shipments_rows = shipments_rows + 1
-          table_add{type='sprite-button', name='ltnm_material_button_'..mi, style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'),
-            number=count, tooltip=material_translations[name]}
+      local shipments_len = #shipments
+      if shipments_len > 0 then
+        table_add = elems.shipments_table.add
+        local shipments_rows = 0
+        mi = 0
+        for si=1,#shipments do
+          local train = trains[shipments[si]]
+          local shipment = train.shipment
+          local style = (train.from_id == station_id and 'red' or 'green')
+          for name,count in pairs(shipment) do
+            mi = mi + 1
+            shipments_rows = shipments_rows + 1
+            table_add{type='sprite-button', name='ltnm_material_button_'..mi, style='ltnm_small_slot_button_'..style, sprite=string_gsub(name, ',', '/'),
+              number=count, tooltip=material_translations[name]}
+          end
         end
+        shipments_rows = math.ceil(shipments_rows / 4) -- number of columns
+      else
+        shipments_rows = 0
       end
-      shipments_rows = math.ceil(shipments_rows / 4) -- number of columns
 
       -- add control signals
       local signals = t.input.get_merged_signals()
