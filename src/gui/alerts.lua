@@ -69,12 +69,17 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
       local finish = sort_value and #sorted_alerts or 1
       local delta = sort_value and 1 or -1
 
+      local selected = tonumber(gui_data.alerts.selected or 0)
+
       for i=start,finish,delta do
         local alert_id = sorted_alerts[i]
         local entry = alerts[alert_id]
+        local enabled = not (selected == alert_id)
         gui.build(alerts_table, {
-          {type='label', style_mods={width=64}, caption=util.ticks_to_time(entry.time)},
-          {type='label', name='ltnm_alert_type_label_'..alert_id, style='hoverable_bold_label', style_mods={width=212}, caption={'ltnm-gui.alert-'..entry.type}}
+          {type='label', name='ltnm_alert_time_label_'..alert_id, style='ltnm_hoverable_label', style_mods={width=64}, mods={ignored_by_interaction=true,
+            enabled=enabled}, caption=util.ticks_to_time(entry.time)},
+          {type='label', name='ltnm_alert_type_label_'..alert_id, style='ltnm_hoverable_bold_label', style_mods={width=212}, mods={enabled=enabled},
+            caption={'ltnm-gui.alert-'..entry.type}}
         })
       end
     end
@@ -82,13 +87,27 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
 
   -- SELECTED ALERT
   if state_changes.selected_alert then
-    local alert_data = data.alerts[tonumber(state_changes.selected_alert)]
+    local alert_id = state_changes.selected_alert
+    local alert_data = data.alerts[tonumber(alert_id)]
     local alert_type = alert_data.type
     local pane = gui_data.alerts.info_pane
     pane.clear()
 
+    local list_table = gui_data.alerts.table
+    local previous_selection = gui_data.alerts.selected
+
+    -- reset previous selection style
+    if previous_selection then
+      list_table['ltnm_alert_time_label_'..previous_selection].enabled = true
+      list_table['ltnm_alert_type_label_'..previous_selection].enabled = true
+    end
+
+    -- set new selection style
+    list_table['ltnm_alert_time_label_'..alert_id].enabled = false
+    list_table['ltnm_alert_type_label_'..alert_id].enabled = false
+
     -- update title
-    gui_data.alerts.info_title.caption = {'ltnm-gui.alert-'..alert_type}
+    gui_data.alerts.info_title.caption = {'', {'ltnm-gui.alert-'..alert_type}, ' @ '..util.ticks_to_time(alert_data.time)}
 
     gui.build(pane, {
       -- description
@@ -97,7 +116,9 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
       }},
       -- train
       {type='label', style='subheader_caption_label', caption={'ltnm-gui.train'}},
-      {type='flow', direction='horizontal'}
+      {type='flow', direction='horizontal', children={
+
+      }}
     })
 
 
@@ -110,6 +131,9 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
       
     end
     local breakpoint
+
+    -- update selection in global
+    gui_data.alerts.selected = state_changes.selected_alert
   end
 end
 
