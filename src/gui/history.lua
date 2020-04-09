@@ -3,8 +3,6 @@
 -- A tab of the main GUI
 
 -- dependencies
-local constants = require('scripts.constants')
-local event = require('__RaiLuaLib__.lualib.event')
 local gui = require('__RaiLuaLib__.lualib.gui')
 local util = require('scripts.util')
 

@@ -6,7 +6,6 @@
 local event = require('__RaiLuaLib__.lualib.event')
 local gui = require('__RaiLuaLib__.lualib.gui')
 local mod_gui = require('mod-gui')
-local util = require('scripts.util')
 
 -- locals
 local string_gsub = string.gsub
@@ -99,7 +98,9 @@ end
 
 function alert_popup_gui.destroy_all(player, player_table)
   for gui_index,_ in pairs(player_table.gui.alert_popup) do
-    alert_popup_gui.destroy(player, player_table, gui_index)
+    if gui_index ~= '_index' then
+      alert_popup_gui.destroy(player, player_table, gui_index)
+    end
   end
 end
 

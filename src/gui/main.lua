@@ -3,19 +3,13 @@
 -- The main GUI for the mod
 
 -- dependencies
-local constants = require('scripts.constants')
 local event = require('__RaiLuaLib__.lualib.event')
 local gui = require('__RaiLuaLib__.lualib.gui')
-local util = require('scripts.util')
 
 -- local profiler = require('__profiler__/profiler.lua')
 
 -- locals
-local bit32_btest = bit32.btest
-local string_find = string.find
 local string_gsub = string.gsub
-local string_lower = string.lower
-local string_match = string.match
 
 -- tabs
 local tabs = {}
@@ -115,7 +109,7 @@ gui.handlers:extend{
         local player_table = global.players[e.player_index]
         player.zoom_to_world(global.data.stations[tonumber(station_id)].entity.position, 0.5)
         if not player_table.gui.main.window.pinned then
-          main_gui.close(player, player_table, true)
+          main_gui.close(player, player_table)
         end
       end, gui_filters='ltnm_view_station_', options={match_filter_strings=true}}
     },
@@ -301,10 +295,10 @@ end
 function main_gui.close(player, player_table, set_closed)
   player_table.flags.gui_open = false
   player_table.gui.main.window.frame.visible = false
-
+  
   player.set_shortcut_toggled('ltnm-toggle-gui', false)
-
-  if set_closed then player.opened = nil end
+  
+  player.opened = nil
 end
 
 function main_gui.toggle(player, player_table)
