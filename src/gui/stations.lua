@@ -121,9 +121,9 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
       -- add active shipments
       local shipments = t.activeDeliveries
       local shipments_len = #shipments
+      local shipments_rows = 0
       if shipments_len > 0 then
         table_add = elems.shipments_table.add
-        local shipments_rows = 0
         mi = 0
         for si=1,#shipments do
           local train = trains[shipments[si]]

@@ -22,6 +22,7 @@ end
 function util.comma_value(input)
   input = math.floor(input)
   local formatted = input
+  local k
   while true do
     formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", "%1,%2")
     if (k==0) then
