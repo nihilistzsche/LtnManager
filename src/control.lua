@@ -238,7 +238,11 @@ commands.add_command("LtnManager", " [parameter]\nrefresh_player_data - close an
 -- MIGRATIONS
 
 -- table of migration functions
-local migrations = {}
+local migrations = {
+  ["0.1.3"] = function()
+    event.enable('on_train_created')
+  end
+}
 
 event.on_configuration_changed(function(e)
   if migration.on_config_changed(e, migrations) then
