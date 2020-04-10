@@ -6,6 +6,7 @@ Date: ????
   Changes:
     - Station "control signals" display shows network ID signal
   Bugfixes:
+    - Fixed a crash when re-opening the GUI to a material that no longer exists in the network
     - Fixed a crash when setting an LTN reader signal on a station
     - Fixed logic for "incorrect pickup" alert, and re-enabled the alert
     - Fixed station ID duplication in depots causing an extra status to be displayed

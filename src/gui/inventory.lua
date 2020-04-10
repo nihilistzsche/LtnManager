@@ -190,77 +190,63 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
     local locations_pane = inventory_gui_data.locations_scroll_pane
     locations_pane.clear()
     local locations = data.material_locations[state_changes.selected_material]
-    local location_template = gui.templates.inventory.small_slot_table_with_label
+    if locations then
+      local location_template = gui.templates.inventory.small_slot_table_with_label
 
-    -- stations
-    local empty = 0
-    local selected_network_id = inventory_gui_data.selected_network_id
-    local stations = data.stations
-    local station_ids = locations.stations
-    if #station_ids > 0 then
-      local label = locations_pane.add{type="label", style="ltnm_material_locations_label", caption={"ltnm-gui.stations"}}
-      local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
-      for i=1,#station_ids do
-        local station = stations[station_ids[i]]
-        if bit32_btest(station.network_id, selected_network_id) then
-          local materials = {}
-          for mode,color in pairs{provided="green", requested="red"} do
-            local contents = station[mode]
-            if contents then
-              materials[#materials+1] = {color, contents}
+      -- stations
+      local selected_network_id = inventory_gui_data.selected_network_id
+      local stations = data.stations
+      local station_ids = locations.stations
+      if #station_ids > 0 then
+        local label = locations_pane.add{type="label", style="ltnm_material_locations_label", caption={"ltnm-gui.stations"}}
+        local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
+        for i=1,#station_ids do
+          local station = stations[station_ids[i]]
+          if bit32_btest(station.network_id, selected_network_id) then
+            local materials = {}
+            for mode,color in pairs{provided="green", requested="red"} do
+              local contents = station[mode]
+              if contents then
+                materials[#materials+1] = {color, contents}
+              end
             end
+            location_template(
+              table,
+              {{"hoverable_bold_label", station.entity.backer_name, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..station_ids[i]}},
+              materials,
+              material_translations
+            )
           end
-          location_template(
-            table,
-            {{"hoverable_bold_label", station.entity.backer_name, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..station_ids[i]}},
-            materials,
-            material_translations
-          )
+        end
+        if #table.children == 0 then
+          label.destroy()
+          table.destroy()
         end
       end
-      if #table.children == 0 then
-        empty = empty + 1
-        label.destroy()
-        table.destroy()
-      end
-    else
-      empty = empty + 1
-    end
 
-    -- trains
-    local trains = data.trains
-    local train_ids = locations.trains
-    if #train_ids > 0 then
-      local label = locations_pane.add{type="label", style="ltnm_material_locations_label", caption={"ltnm-gui.trains"}}
-      local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
-      for i=1,#train_ids do
-        local train = trains[train_ids[i]]
-        if bit32_btest(train.network_id, selected_network_id) then
-          local materials = {}
-          if train.shipment then
-            materials = {{"blue", train.shipment}}
+      -- trains
+      local trains = data.trains
+      local train_ids = locations.trains
+      if #train_ids > 0 then
+        local label = locations_pane.add{type="label", style="ltnm_material_locations_label", caption={"ltnm-gui.trains"}}
+        local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
+        for i=1,#train_ids do
+          local train = trains[train_ids[i]]
+          if bit32_btest(train.network_id, selected_network_id) then
+            local materials = {}
+            if train.shipment then
+              materials = {{"blue", train.shipment}}
+            end
+            location_template(table, {{"hoverable_bold_label", train.from, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..train.from_id},
+              {"caption_label", "->"}, {"hoverable_bold_label", train.to, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..train.to_id}}, materials,
+              material_translations)
           end
-          location_template(table, {{"hoverable_bold_label", train.from, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..train.from_id},
-            {"caption_label", "->"}, {"hoverable_bold_label", train.to, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..train.to_id}}, materials,
-            material_translations)
+        end
+        if #table.children == 0 then
+          label.destroy()
+          table.destroy()
         end
       end
-      if #table.children == 0 then
-        empty = empty + 1
-        label.destroy()
-        table.destroy()
-      end
-    else
-      empty = empty + 1
-    end
-
-    -- placeholder
-    if empty == 2 then
-      gui.build(locations_pane, {
-        {type="flow", style_mods={horizontally_stretchable=true, vertically_stretchable=true, horizontal_align="center", vertical_align="center"}, children={
-          {type="label", caption={"ltnm-gui.nothing-to-see-here"}}
-        }}
-      })
     end
   end
 end
