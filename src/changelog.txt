@@ -11,6 +11,7 @@ Date: ????
     - Fixed logic for "incorrect pickup" alert, and re-enabled the alert
     - Fixed station ID duplication in depots causing an extra status to be displayed
     - Fixed that long train compositions were not being clipped
+    - Fixed that the first station in each network would display all materials for that network
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.2
 Date: 2020-04-10
