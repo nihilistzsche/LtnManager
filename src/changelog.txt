@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.1.2
+Date: ????
+  Changes:
+    - Completely disabled "incorrect pickup" alerts until I find a good way to account for margins of error
+---------------------------------------------------------------------------------------------------
 Version: 0.1.1
 Date: 2020-04-10
   Changes:

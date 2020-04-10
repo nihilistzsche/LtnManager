@@ -530,31 +530,33 @@ end
 local function on_delivery_pickup_complete(e)
   if not global.data then return end
 
-  -- add an error if the actual shipment doesn't match the planned shipment
-  if not compare_shipments(e.planned_shipment, e.actual_shipment) then
-    -- save train data so it will persist after the delivery is through
-    local train = global.data.trains[e.train_id]
-    if not train then error('Could not find train of ID: '..e.train_id) end
-    local alerts = global.working_data.alerts
-    alerts._index = alerts._index + 1
-    alerts[alerts._index] = {
-      time = game.tick,
-      type = 'incorrect_pickup',
-      train = {
-        depot = train.depot,
-        from = train.from,
-        from_id = train.from_id,
-        id = e.train_id,
-        network_id = train.network_id,
-        pickup_done = train.pickupDone or false,
-        to = train.to,
-        to_id = train.to_id
-      },
-      planned_shipment = e.planned_shipment,
-      actual_shipment = e.actual_shipment
-    }
-    global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type='incorrect_pickup'}
-  end
+  -- BELOW: need to find a way to account for margins of error. inserters will always try to move a full stack, pumps are fast.
+
+  -- -- add an error if the actual shipment doesn't match the planned shipment
+  -- if not compare_shipments(e.planned_shipment, e.actual_shipment) then
+  --   -- save train data so it will persist after the delivery is through
+  --   local train = global.data.trains[e.train_id]
+  --   if not train then error('Could not find train of ID: '..e.train_id) end
+  --   local alerts = global.working_data.alerts
+  --   alerts._index = alerts._index + 1
+  --   alerts[alerts._index] = {
+  --     time = game.tick,
+  --     type = 'incorrect_pickup',
+  --     train = {
+  --       depot = train.depot,
+  --       from = train.from,
+  --       from_id = train.from_id,
+  --       id = e.train_id,
+  --       network_id = train.network_id,
+  --       pickup_done = train.pickupDone or false,
+  --       to = train.to,
+  --       to_id = train.to_id
+  --     },
+  --     planned_shipment = e.planned_shipment,
+  --     actual_shipment = e.actual_shipment
+  --   }
+  --   global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type='incorrect_pickup'}
+  -- end
 end
 
 local function on_delivery_completed(e)
