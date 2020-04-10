@@ -9,6 +9,22 @@ local gui = require('__RaiLuaLib__.lualib.gui')
 local string_find = string.find
 local string_gsub = string.gsub
 
+local ltn_virtual_signals = {
+  ['ltn-depot'] = true,
+  ['ltn-network-id'] = true,
+  ['ltn-min-train-length'] = true,
+  ['ltn-max-train-length'] = true,
+  ['ltn-max-trains'] = true,
+  ['ltn-provider-threshold'] = true,
+  ['ltn-provider-stack-threshold'] = true,
+  ['ltn-provider-priority'] = true,
+  ['ltn-locked-slots'] = true,
+  ['ltn-requester-threshold'] = true,
+  ['ltn-requester-stack-threshold'] = true,
+  ['ltn-requester-priority'] = true,
+  ['ltn-disable-warnings'] = true
+}
+
 -- object
 local stations_gui = {}
 
@@ -132,7 +148,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
       for si=1,#signals do
         local signal = signals[si]
         local name = signal.signal.name
-        if name ~= 'ltn-network-id' and string_find(name, '^ltn%-') then
+        if ltn_virtual_signals[name] then
           signals_rows = signals_rows + 1
           table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite='virtual-signal/'..name, number=signal.count,
             tooltip={'', {'virtual-signal-name.'..name}, '\n'..util.comma_value(signal.count)}}.enabled = false
