@@ -6,6 +6,7 @@ Date: ????
   Changes:
     - Station "control signals" display shows network ID signal
   Bugfixes:
+    - Fixed logic for "incorrect pickup" alert, and re-enabled the alert
     - Fixed a crash when setting an LTN reader signal on a station
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.2

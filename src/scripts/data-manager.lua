@@ -22,21 +22,6 @@ local alert_popup_gui = require("gui.alert-popup")
 local data_manager = {}
 
 -- -----------------------------------------------------------------------------
--- UTILITIES
-
--- custom compare function - floor all counts to remove fluid imprecision
-local function compare_shipments(t1, t2)
-  if t1 == t2 then return true end
-  for name,count in pairs(t1) do
-    if math_floor(count) ~= math_floor(t2[name] or -1) then return false end
-  end
-  for name,_ in pairs(t2) do
-    if t1[name] == nil then return false end
-  end
-  return true
-end
-
--- -----------------------------------------------------------------------------
 -- PROCESSING FUNCTIONS
 
 local function iterate_stations(data)
@@ -453,7 +438,8 @@ local function iterate_data()
       sorted_alerts = data.sorted_alerts,
       -- other
       num_stations = data.num_stations,
-      alerts_to_delete = {}
+      alerts_to_delete = {},
+      invalidated_trains = {}
     }
 
     -- create alert popups
@@ -530,33 +516,33 @@ end
 local function on_delivery_pickup_complete(e)
   if not global.data then return end
 
-  -- BELOW: need to find a way to account for margins of error. inserters will always try to move a full stack, pumps are fast.
-
-  -- -- add an error if the actual shipment doesn't match the planned shipment
-  -- if not compare_shipments(e.planned_shipment, e.actual_shipment) then
-  --   -- save train data so it will persist after the delivery is through
-  --   local train = global.data.trains[e.train_id]
-  --   if not train then error("Could not find train of ID: "..e.train_id) end
-  --   local alerts = global.working_data.alerts
-  --   alerts._index = alerts._index + 1
-  --   alerts[alerts._index] = {
-  --     time = game.tick,
-  --     type = "incorrect_pickup",
-  --     train = {
-  --       depot = train.depot,
-  --       from = train.from,
-  --       from_id = train.from_id,
-  --       id = e.train_id,
-  --       network_id = train.network_id,
-  --       pickup_done = train.pickupDone or false,
-  --       to = train.to,
-  --       to_id = train.to_id
-  --     },
-  --     planned_shipment = e.planned_shipment,
-  --     actual_shipment = e.actual_shipment
-  --   }
-  --   global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type="incorrect_pickup"}
-  -- end
+  -- compare shipments to see if something was loaded incorrectly
+  for name,count in pairs(e.actual_shipment) do
+    if not e.planned_shipment[name] or e.planned_shipment[name] > count then
+      -- save train data so it will persist after the delivery is through
+      local train = global.data.trains[e.train_id]
+      if not train then error("Could not find train of ID: "..e.train_id) end
+      local alerts = global.working_data.alerts
+      alerts._index = alerts._index + 1
+      alerts[alerts._index] = {
+        time = game.tick,
+        type = "incorrect_pickup",
+        train = {
+          depot = train.depot,
+          from = train.from,
+          from_id = train.from_id,
+          id = e.train_id,
+          network_id = train.network_id,
+          pickup_done = train.pickupDone or false,
+          to = train.to,
+          to_id = train.to_id
+        },
+        planned_shipment = e.planned_shipment,
+        actual_shipment = e.actual_shipment
+      }
+      global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type="incorrect_pickup"}
+    end
+  end
 end
 
 local function on_delivery_completed(e)
