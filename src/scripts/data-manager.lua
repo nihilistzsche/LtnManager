@@ -141,7 +141,7 @@ local function iterate_stations(data)
     end
   end
 
-  data.index = end_index
+  data.index = end_index + 1
 end
 
 local function process_in_transit_materials(data)
