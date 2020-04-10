@@ -113,7 +113,7 @@ local function iterate_stations(data)
         local materials = data[mode.."_by_stop"][station_id]
         if materials then
           -- add to station
-          station[mode] = materials
+          station[mode] = table.deepcopy(materials)
           -- add to network
           local inv = inventory[mode][network_id]
           if not inv then
