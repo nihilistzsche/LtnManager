@@ -99,7 +99,13 @@ gui.handlers:extend{
     open_train_button = {
       on_gui_click = {handler=function(e)
         local train_id = string_gsub(e.element.name, "ltnm_open_train_", "")
-        game.get_player(e.player_index).opened = global.data.trains[tonumber(train_id)].main_locomotive
+        train_id = tonumber(train_id)
+        local train = global.data.trains[train_id]
+        if train then
+          game.get_player(e.player_index).opened = train.main_locomotive
+        else
+          game.get_player(e.player_index).print{"ltnm-message.train-invalid-refresh-gui"}
+        end
       end, gui_filters="ltnm_open_train_", options={match_filter_strings=true}}
     },
     view_station_button = {

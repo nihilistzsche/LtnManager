@@ -606,7 +606,9 @@ local function on_delivery_failed(e)
   alerts._index = alerts._index + 1
   local alert_type
 
-  local train = global.data.trains[e.train_id]
+  local trains = global.data.trains
+
+  local train = trains[e.train_id] or trains[global.data.invalidated_trains[e.train_id]]
   if train.train.valid then
     alert_type = "delivery_timed_out"
   else
@@ -630,6 +632,31 @@ local function on_delivery_failed(e)
   global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type=alert_type}
 end
 
+local function on_train_created(e)
+  if not global.data then return end
+  local trains = global.data.trains
+  local invalidated_trains = global.data.invalidated_trains
+  local new_train = e.train
+  local new_id = new_train.id
+  -- migrate train IDs and information
+  for i=1,2 do
+    local old_id = e["old_train_id_"..i]
+    if old_id then
+      local train_data = trains[old_id]
+      if train_data or invalidated_trains[old_id] then
+        -- add a mapping for alerts
+        invalidated_trains[new_id] = invalidated_trains[old_id] or old_id
+        invalidated_trains[old_id] = nil
+      end
+      if train_data then
+        -- replace train and main_locomotive, the actual IDs and such will be updated on the next LTN update cycle
+        train_data.train = new_train
+        train_data.main_locomotive = util.train.get_main_locomotive(new_train)
+      end
+    end
+  end
+end
+
 -- -----------------------------------------------------------------------------
 -- EVENT REGISTRATION
 
@@ -651,6 +678,7 @@ function data_manager.setup_events()
     ltn_event_ids[id] = remote.call("logistic-train-network", id)
     events["ltn_"..id] = {id=ltn_event_ids[id], handler=handler, group="ltn"}
   end
+  events.on_train_created = {id=defines.events.on_train_created, handler=on_train_created, group="ltn"}
   events.iterate_ltn_data = {id=defines.events.on_tick, handler=iterate_data, options={skip_validation=true}}
   event.register_conditional(events)
 end
