@@ -9,6 +9,7 @@ local gui = require("__RaiLuaLib__.lualib.gui")
 -- locals
 local string_find = string.find
 local string_gsub = string.gsub
+local string_len = string.len
 
 -- object
 local depots_gui = {}
@@ -164,8 +165,8 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
       local train = data.trains[train_id]
       -- build GUI structure
       local elems = gui.build(trains_table, {
-        {type="label", name="ltnm_open_train_"..train_id, style="hoverable_bold_label", style_mods={top_margin=-2}, caption=train.composition,
-          tooltip={"ltnm-gui.open-train-gui"}},
+        {type="label", name="ltnm_open_train_"..train_id, style="hoverable_bold_label", style_mods={top_margin=-2, width=120}, caption=train.composition,
+          tooltip={"", string_len(train.composition) > 16 and train.composition.."\n" or "", {"ltnm-gui.open-train-gui"}}},
         {type="flow", style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction="vertical",
           save_as="status_flow"},
         {type="frame", style="ltnm_dark_content_frame_in_light_frame", children={
