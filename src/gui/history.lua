@@ -98,7 +98,7 @@ function history_gui.update(player, player_table, state_changes, gui_data, data,
         for name,count in pairs(entry.actual_shipment or entry.shipment) do
           mi = mi + 1
           table_add{type='sprite-button', name='ltnm_material_button_'..mi, style='ltnm_small_slot_button_dark_grey', sprite=string_gsub(name, ',', '/'),
-            number=count, tooltip=material_translations[name]}
+            number=count, tooltip=material_translations[name]..'\n'..util.comma_value(count)}
         end
       end
     end

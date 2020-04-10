@@ -20,6 +20,7 @@ end
 -- add commas to separate thousands
 -- from lua-users.org: http://lua-users.org/wiki/FormattingNumbers
 function util.comma_value(input)
+  input = math.floor(input)
   local formatted = input
   while true do
     formatted, k = string.gsub(formatted, '^(-?%d+)(%d%d%d)', '%1,%2')

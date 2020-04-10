@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.2
 Date: ????
+  Features:
+    - Added amounts to material button tooltips
   Changes:
     - Completely disabled "incorrect pickup" alerts until I find a good way to account for margins of error
 ---------------------------------------------------------------------------------------------------

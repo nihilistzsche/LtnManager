@@ -186,7 +186,7 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
         for name,count in pairs(train.shipment) do
           i = i + 1
           contents_table.add{type='sprite-button', name='ltnm_material_button_'..i, style='ltnm_small_slot_button_dark_grey',
-            sprite=string_gsub(name, ',', '/'), number=count, tooltip=material_translations[name]}
+            sprite=string_gsub(name, ',', '/'), number=count, tooltip=material_translations[name]..'\n'..util.comma_value(count)}
         end
       end
     end

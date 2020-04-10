@@ -66,7 +66,7 @@ gui.templates:extend{
         for name,count in pairs(t[2]) do
           i = i + 1
           table_add{type='sprite-button', name='ltnm_material_button_'..i, style=style, sprite=string_gsub(name, ',', '/'), number=count,
-            tooltip=translations[name]}
+            tooltip=translations[name]..'\n'..util.comma_value(count)}
         end
       end
       return elems
@@ -142,7 +142,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
       for name,count in pairs(combined_materials) do
         i = i + 1
         elems[name] = add{type='sprite-button', name='ltnm_material_button_'..i, style='ltnm_slot_button_'..color, sprite=string_gsub(name, ',', '/'),
-          number=count, tooltip=material_translations[name]}
+          number=count, tooltip=material_translations[name]..'\n'..util.comma_value(count)}
       end
       buttons[type] = elems
     end

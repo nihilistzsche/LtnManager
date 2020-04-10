@@ -96,7 +96,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
             mi = mi + 1
             provided_requested_rows = provided_requested_rows + 1
             table_add{type='sprite-button', name='ltnm_material_button_'..mi, style='ltnm_small_slot_button_'..color, sprite=string_gsub(name, ',', '/'),
-              number=count, tooltip=material_translations[name]}
+              number=count, tooltip=material_translations[name]..'\n'..util.comma_value(count)}
           end
         end
       end
@@ -117,7 +117,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
             mi = mi + 1
             shipments_rows = shipments_rows + 1
             table_add{type='sprite-button', name='ltnm_material_button_'..mi, style='ltnm_small_slot_button_'..style, sprite=string_gsub(name, ',', '/'),
-              number=count, tooltip=material_translations[name]}
+              number=count, tooltip=material_translations[name]..'\n'..util.comma_value(count)}
           end
         end
         shipments_rows = math.ceil(shipments_rows / 4) -- number of columns
@@ -135,7 +135,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
         if name ~= 'ltn-network-id' and string_find(name, '^ltn%-') then
           signals_rows = signals_rows + 1
           table_add{type='sprite-button', style='ltnm_small_slot_button_dark_grey', sprite='virtual-signal/'..name, number=signal.count,
-            tooltip={'virtual-signal-name.'..name}}.enabled = false
+            tooltip={'', {'virtual-signal-name.'..name}, '\n'..util.comma_value(signal.count)}}.enabled = false
         end
       end
       signals_rows = math.ceil(signals_rows / 4) -- number of columns
