@@ -1,6 +1,10 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.3
 Date: ????
+  Features:
+    - Added "/LtnManager" command for various debugging purposes, use "/h LtnManager" to see possible usecases
+  Changes:
+    - Station "control signals" display shows network ID signal
   Bugfixes:
     - Fixed a crash when setting an LTN reader signal on a station
 ---------------------------------------------------------------------------------------------------

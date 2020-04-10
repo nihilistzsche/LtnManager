@@ -225,6 +225,15 @@ event.register({'on_init', 'on_load'}, function()
   end)
 end)
 
+-- mod debugging / fixing commands
+commands.add_command('LtnManager', ' [parameter]\nrefresh_player_data - close and recreate all GUIs, retranslate dictionaries, and update settings',
+  function(e)
+    if e.parameter == 'refresh_player_data' then
+      refresh_player_data(game.get_player(e.player_index), global.players[e.player_index])
+    end
+  end
+)
+
 -- -----------------------------------------------------------------------------
 -- MIGRATIONS
 
