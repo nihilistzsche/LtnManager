@@ -442,6 +442,11 @@ local function iterate_data()
       invalidated_trains = {}
     }
 
+    -- avoid crashing
+    if global.working_data.alert_popups == nil then
+      global.working_data.alert_popups = {};
+    end
+
     -- create alert popups
     for _,t in pairs(global.working_data.alert_popups) do
       alert_popup_gui.create_for_all(t)
