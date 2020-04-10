@@ -4,8 +4,8 @@
 -- This script is the only place to touch LTN data, the rest of the mod uses the data that this script produces.
 
 -- dependencies
-local event = require('__RaiLuaLib__.lualib.event')
-local util = require('scripts.util')
+local event = require("__RaiLuaLib__.lualib.event")
+local util = require("scripts.util")
 
 -- locals
 local math_floor = math.floor
@@ -16,7 +16,7 @@ local table_sort = table.sort
 local ltn_event_ids = {}
 
 -- scripts
-local alert_popup_gui = require('gui.alert-popup')
+local alert_popup_gui = require("gui.alert-popup")
 
 -- object
 local data_manager = {}
@@ -55,13 +55,13 @@ local function iterate_stations(data)
   local available_trains = data.available_trains
 
   local index = data.index
-  local num_to_iterate = settings.global['ltnm-stations-per-tick'].value
+  local num_to_iterate = settings.global["ltnm-stations-per-tick"].value
   local end_index = index + num_to_iterate
 
   for i=index,end_index do
     local station_id = station_ids[i]
     local station = stations[station_id]
-    if not station then error('Station ID mismatch') end
+    if not station then error("Station ID mismatch") end
 
     if station.entity.valid and station.input.valid then
       local network_id = station.network_id
@@ -124,8 +124,8 @@ local function iterate_stations(data)
       end
 
       -- process station materials
-      for _,mode in ipairs{'provided', 'requested'} do
-        local materials = data[mode..'_by_stop'][station_id]
+      for _,mode in ipairs{"provided", "requested"} do
+        local materials = data[mode.."_by_stop"][station_id]
         if materials then
           -- add to station
           station[mode] = materials
@@ -269,7 +269,7 @@ local function sort_stations(data)
         local station = {
           name = station_data.entity.backer_name,
           network_id = station_data.network_id,
-          status = station_data.status.name..'_'..station_data.status.count
+          status = station_data.status.name.."_"..station_data.status.count
         }
         -- sort data
         for key,t in pairs(sort) do
@@ -320,8 +320,8 @@ local function sort_history(data)
   for i,entry in ipairs(data.history) do
     for sort_type,sort_table in pairs(sort) do
       local value
-      if sort_type == 'route' then
-        value = entry.from..' -> '..entry.to
+      if sort_type == "route" then
+        value = entry.from.." -> "..entry.to
       else
         value = entry[sort_type]
       end
@@ -374,13 +374,13 @@ local function sort_alerts(data)
 
   -- iterate history to fill sorting tables
   for i,entry in pairs(data.alerts) do
-    if i ~= '_index' then
+    if i ~= "_index" then
       for sort_type,sort_table in pairs(sort) do
         local value
-        if sort_type == 'network_id' then
+        if sort_type == "network_id" then
           value = entry.train.network_id
-        elseif sort_type == 'route' then
-          value = entry.train.from..' -> '..entry.train.to
+        elseif sort_type == "route" then
+          value = entry.train.from.." -> "..entry.train.to
         else
           value = entry[sort_type]
         end
@@ -469,9 +469,9 @@ local function iterate_data()
     }
 
     -- reset events
-    event.enable('ltn_on_stops_updated')
-    event.enable('ltn_on_dispatcher_updated')
-    event.disable('iterate_ltn_data')
+    event.enable("ltn_on_stops_updated")
+    event.enable("ltn_on_dispatcher_updated")
+    event.disable("iterate_ltn_data")
   end
 end
 
@@ -482,14 +482,14 @@ end
 local function on_dispatcher_updated(e)
   local stations = global.working_data.stations
   if not stations then
-    log('LTN event desync: did not receive stations in time! Skipping iteration.')
+    log("LTN event desync: did not receive stations in time! Skipping iteration.")
     global.working_data.stations = nil
     return
   end
 
   -- deregister events for this update cycle
-  event.disable('ltn_on_stops_updated')
-  event.disable('ltn_on_dispatcher_updated')
+  event.disable("ltn_on_stops_updated")
+  event.disable("ltn_on_dispatcher_updated")
 
   -- set up data tables
   local station_ids = {}
@@ -524,7 +524,7 @@ local function on_dispatcher_updated(e)
   data.index = 1
 
   -- enable data iteration handler
-  event.enable('iterate_ltn_data')
+  event.enable("iterate_ltn_data")
 end
 
 local function on_delivery_pickup_complete(e)
@@ -536,12 +536,12 @@ local function on_delivery_pickup_complete(e)
   -- if not compare_shipments(e.planned_shipment, e.actual_shipment) then
   --   -- save train data so it will persist after the delivery is through
   --   local train = global.data.trains[e.train_id]
-  --   if not train then error('Could not find train of ID: '..e.train_id) end
+  --   if not train then error("Could not find train of ID: "..e.train_id) end
   --   local alerts = global.working_data.alerts
   --   alerts._index = alerts._index + 1
   --   alerts[alerts._index] = {
   --     time = game.tick,
-  --     type = 'incorrect_pickup',
+  --     type = "incorrect_pickup",
   --     train = {
   --       depot = train.depot,
   --       from = train.from,
@@ -555,18 +555,18 @@ local function on_delivery_pickup_complete(e)
   --     planned_shipment = e.planned_shipment,
   --     actual_shipment = e.actual_shipment
   --   }
-  --   global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type='incorrect_pickup'}
+  --   global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type="incorrect_pickup"}
   -- end
 end
 
 local function on_delivery_completed(e)
   if not global.data then return end
   local train = global.data.trains[e.train_id]
-  if not train then error('Could not find train of ID: '..e.train_id) end
+  if not train then error("Could not find train of ID: "..e.train_id) end
 
   -- add to delivery history
   table.insert(global.working_data.history, 1, {
-    type = 'delivery',
+    type = "delivery",
     from = train.from,
     to = train.to,
     from_id = train.from_id,
@@ -582,17 +582,17 @@ local function on_delivery_completed(e)
   -- detect incomplete deliveries
   local contents = {}
   for n,c in pairs(train.train.get_contents()) do
-    contents['item,'..n] = c
+    contents["item,"..n] = c
   end
   for n,c in pairs(train.train.get_fluid_contents()) do
-    contents['fluid,'..n] = c
+    contents["fluid,"..n] = c
   end
   if table_size(contents) > 0 then
     local alerts = global.working_data.alerts
     alerts._index = alerts._index + 1
     alerts[alerts._index] = {
       time = game.tick,
-      type = 'incomplete_delivery',
+      type = "incomplete_delivery",
       train = {
         depot = train.depot,
         from = train.from,
@@ -605,7 +605,7 @@ local function on_delivery_completed(e)
       shipment = e.shipment,
       leftovers = contents
     }
-    global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type='incomplete_delivery'}
+    global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type="incomplete_delivery"}
   end
 end
 
@@ -622,9 +622,9 @@ local function on_delivery_failed(e)
 
   local train = global.data.trains[e.train_id]
   if train.train.valid then
-    alert_type = 'delivery_timed_out'
+    alert_type = "delivery_timed_out"
   else
-    alert_type = 'train_invalidated'
+    alert_type = "train_invalidated"
   end
 
   alerts[alerts._index] = {
@@ -657,13 +657,13 @@ local ltn_handlers = {
 }
 
 function data_manager.setup_events()
-  if not remote.interfaces['logistic-train-network'] then
-    error('Could not establish connection to LTN!')
+  if not remote.interfaces["logistic-train-network"] then
+    error("Could not establish connection to LTN!")
   end
   local events = {}
   for id,handler in pairs(ltn_handlers) do
-    ltn_event_ids[id] = remote.call('logistic-train-network', id)
-    events['ltn_'..id] = {id=ltn_event_ids[id], handler=handler, group='ltn'}
+    ltn_event_ids[id] = remote.call("logistic-train-network", id)
+    events["ltn_"..id] = {id=ltn_event_ids[id], handler=handler, group="ltn"}
   end
   events.iterate_ltn_data = {id=defines.events.on_tick, handler=iterate_data, options={skip_validation=true}}
   event.register_conditional(events)

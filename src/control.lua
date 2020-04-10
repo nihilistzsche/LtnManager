@@ -2,14 +2,14 @@
 -- CONTROL SCRIPTING
 
 -- dependencies
-local event = require('__RaiLuaLib__.lualib.event')
-local migration = require('__RaiLuaLib__.lualib.migration')
-local translation = require('__RaiLuaLib__.lualib.translation')
+local event = require("__RaiLuaLib__.lualib.event")
+local migration = require("__RaiLuaLib__.lualib.migration")
+local translation = require("__RaiLuaLib__.lualib.translation")
 
 -- scripts
-local alert_popup_gui = require('gui.alert-popup')
-local data_manager = require('scripts.data-manager')
-local main_gui = require('gui.main')
+local alert_popup_gui = require("gui.alert-popup")
+local data_manager = require("scripts.data-manager")
+local main_gui = require("gui.main")
 
 -- locals
 local string_find = string.find
@@ -28,30 +28,30 @@ local function build_translation_data()
     materials = {}
   }
   -- materials
-  for _,type in ipairs{'fluid', 'item'} do
-    local prefix = type..','
-    for name,prototype in pairs(game[type..'_prototypes']) do
+  for _,type in ipairs{"fluid", "item"} do
+    local prefix = type..","
+    for name,prototype in pairs(game[type.."_prototypes"]) do
       translation_data.materials[#translation_data.materials+1] = {internal=prefix..name, localised=prototype.localised_name}
     end
   end
   -- gui
   translation_data.gui = {
     -- train status
-    {internal='delivering-to', localised={'ltnm-gui.delivering-to'}},
-    {internal='fetching-from', localised={'ltnm-gui.fetching-from'}},
-    {internal='loading-at', localised={'ltnm-gui.loading-at'}},
-    {internal='parked-at-depot', localised={'ltnm-gui.parked-at-depot'}},
-    {internal='returning-to-depot', localised={'ltnm-gui.returning-to-depot'}},
-    {internal='unloading-at', localised={'ltnm-gui.unloading-at'}},
+    {internal="delivering-to", localised={"ltnm-gui.delivering-to"}},
+    {internal="fetching-from", localised={"ltnm-gui.fetching-from"}},
+    {internal="loading-at", localised={"ltnm-gui.loading-at"}},
+    {internal="parked-at-depot", localised={"ltnm-gui.parked-at-depot"}},
+    {internal="returning-to-depot", localised={"ltnm-gui.returning-to-depot"}},
+    {internal="unloading-at", localised={"ltnm-gui.unloading-at"}},
     -- other
-    {internal='search', localised={'ltnm-gui.search'}}
+    {internal="search", localised={"ltnm-gui.search"}}
   }
   global.__lualib.translation.translation_data = translation_data
 end
 
 local function run_player_translations(player)
   local translation_data = global.__lualib.translation.translation_data
-  for _,name in ipairs{'materials', 'gui'} do
+  for _,name in ipairs{"materials", "gui"} do
     translation.start(player, name, translation_data[name], {include_failed_translations=true})
   end
 end
@@ -70,7 +70,7 @@ local function setup_player(player, index)
     },
     gui = {}
   }
-  player.set_shortcut_available('ltnm-toggle-gui', false)
+  player.set_shortcut_available("ltnm-toggle-gui", false)
   global.players[index] = data
 end
 
@@ -87,9 +87,9 @@ end
 local function update_player_settings(player, player_table)
   local settings = {}
   for name,t in pairs(player.mod_settings) do
-    if string_find(name, '^ltnm%-') then
-      name = string_gsub(name, 'ltnm%-', '')
-      settings[string_gsub(name, '%-', '_')] = t.value
+    if string_find(name, "^ltnm%-") then
+      name = string_gsub(name, "ltnm%-", "")
+      settings[string_gsub(name, "%-", "_")] = t.value
     end
   end
   player_table.settings = settings
@@ -102,7 +102,7 @@ local function refresh_player_data(player, player_table)
   
   -- set shortcut state
   player_table.flags.translations_finished = false
-  player.set_shortcut_available('ltnm-toggle-gui', false)
+  player.set_shortcut_available("ltnm-toggle-gui", false)
 
   -- update settings
   update_player_settings(player, player_table)
@@ -123,8 +123,8 @@ local function enable_gui(e)
     local player = game.get_player(i)
     main_gui.create(player, players[i])
     players[i].flags.can_open_gui = true
-    player.set_shortcut_available('ltnm-toggle-gui', true)
-    event.disable('enable_gui_on_next_ltn_update', i)
+    player.set_shortcut_available("ltnm-toggle-gui", true)
+    event.disable("enable_gui_on_next_ltn_update", i)
   end
 end
 
@@ -153,7 +153,7 @@ event.on_init(function()
     refresh_player_data(p, global.players[i])
   end
   data_manager.setup_events()
-  event.enable_group('ltn')
+  event.enable_group("ltn")
 end)
 
 event.on_load(function()
@@ -177,21 +177,21 @@ event.on_player_joined_game(function(e)
 end)
 
 event.on_runtime_mod_setting_changed(function(e)
-  if string_find(e.setting, '^ltnm%-') then
+  if string_find(e.setting, "^ltnm%-") then
     for i,p in pairs(game.players) do
       update_player_settings(p, global.players[i])
     end
   end
 end)
 
-event.register({defines.events.on_lua_shortcut, 'ltnm-toggle-gui'}, function(e)
-  if e.input_name or (e.prototype_name == 'ltnm-toggle-gui') then
+event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
+  if e.input_name or (e.prototype_name == "ltnm-toggle-gui") then
     local player = game.get_player(e.player_index)
     local player_table = global.players[e.player_index]
     if player_table.flags.can_open_gui then
       main_gui.toggle(player, player_table)
     else
-      player.print{'ltnm-message.cannot-open-gui'}
+      player.print{"ltnm-message.cannot-open-gui"}
     end
   end
 end)
@@ -208,12 +208,12 @@ event.register(translation.finish_event, function(e)
   if global.__lualib.translation.players[e.player_index].active_translations_count == 0 then
     -- enable opening the GUI on the next LTN update cycle
     player_table.flags.translations_finished = true
-    event.enable('enable_gui_on_next_ltn_update', e.player_index)
+    event.enable("enable_gui_on_next_ltn_update", e.player_index)
   end
 end)
 
 -- LTN and retranslate events don't exist in the root scope, so register them in bootstrap
-event.register({'on_init', 'on_load'}, function()
+event.register({"on_init", "on_load"}, function()
   event.register_conditional{
     enable_gui_on_next_ltn_update = {id=data_manager.ltn_event_ids.on_dispatcher_updated, handler=enable_gui},
     auto_refresh = {id=-300, handler=auto_update_guis}
@@ -226,9 +226,9 @@ event.register({'on_init', 'on_load'}, function()
 end)
 
 -- mod debugging / fixing commands
-commands.add_command('LtnManager', ' [parameter]\nrefresh_player_data - close and recreate all GUIs, retranslate dictionaries, and update settings',
+commands.add_command("LtnManager", " [parameter]\nrefresh_player_data - close and recreate all GUIs, retranslate dictionaries, and update settings",
   function(e)
-    if e.parameter == 'refresh_player_data' then
+    if e.parameter == "refresh_player_data" then
       refresh_player_data(game.get_player(e.player_index), global.players[e.player_index])
     end
   end

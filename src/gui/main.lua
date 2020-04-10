@@ -3,18 +3,18 @@
 -- The main GUI for the mod
 
 -- dependencies
-local event = require('__RaiLuaLib__.lualib.event')
-local gui = require('__RaiLuaLib__.lualib.gui')
+local event = require("__RaiLuaLib__.lualib.event")
+local gui = require("__RaiLuaLib__.lualib.gui")
 
--- local profiler = require('__profiler__/profiler.lua')
+-- local profiler = require("__profiler__/profiler.lua")
 
 -- locals
 local string_gsub = string.gsub
 
 -- tabs
 local tabs = {}
-for _,name in ipairs{'depots', 'stations', 'inventory', 'history', 'alerts'} do
-  tabs[name] = require('gui.'..name)
+for _,name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
+  tabs[name] = require("gui."..name)
 end
 
 -- object
@@ -25,17 +25,17 @@ local main_gui = {}
 
 gui.templates:extend{
   pushers = {
-    horizontal = {type='empty-widget', style_mods={horizontally_stretchable=true}},
-    vertical = {type='empty-widget', style_mods={vertically_stretchable=true}},
-    both = {type='empty-widget', style_mods={horizontally_stretchable=true, vertically_stretchable=true}}
+    horizontal = {type="empty-widget", style_mods={horizontally_stretchable=true}},
+    vertical = {type="empty-widget", style_mods={vertically_stretchable=true}},
+    both = {type="empty-widget", style_mods={horizontally_stretchable=true, vertically_stretchable=true}}
   },
-  close_button = {type='sprite-button', style='ltnm_frame_action_button', sprite='utility/close_white', hovered_sprite='utility/close_black',
-    clicked_sprite='utility/close_black', mouse_button_filter={'left'}, handlers='main.titlebar.close_button', save_as='titlebar.close_button'},
-  mock_frame_tab = {type='button', style='ltnm_mock_frame_tab', mouse_button_filter={'left'}, handlers='main.titlebar.frame_tab'},
+  close_button = {type="sprite-button", style="ltnm_frame_action_button", sprite="utility/close_white", hovered_sprite="utility/close_black",
+    clicked_sprite="utility/close_black", mouse_button_filter={"left"}, handlers="main.titlebar.close_button", save_as="titlebar.close_button"},
+  mock_frame_tab = {type="button", style="ltnm_mock_frame_tab", mouse_button_filter={"left"}, handlers="main.titlebar.frame_tab"},
   status_indicator = function(name, color, value)
-    return {type='flow', style_mods={vertical_align='center'}, children={
-      {type='sprite', style='ltnm_status_icon', sprite='ltnm_indicator_'..color, save_as=name..'_circle'},
-      {type='label', style='ltnm_depot_button_label', caption=value, save_as=name..'_label'}
+    return {type="flow", style_mods={vertical_align="center"}, children={
+      {type="sprite", style="ltnm_status_icon", sprite="ltnm_indicator_"..color, save_as=name.."_circle"},
+      {type="label", style="ltnm_depot_button_label", caption=value, save_as=name.."_label"}
     }}
   end
 }
@@ -53,7 +53,7 @@ gui.handlers:extend{
     titlebar = {
       frame_tab = {
         on_gui_click = function(e)
-          local name = e.default_tab or string_gsub(e.element.caption[1], 'ltnm%-gui%.', '')
+          local name = e.default_tab or string_gsub(e.element.caption[1], "ltnm%-gui%.", "")
           main_gui.update_active_tab(game.get_player(e.player_index), global.players[e.player_index], name)
         end
       },
@@ -63,12 +63,12 @@ gui.handlers:extend{
           local player_table = global.players[e.player_index]
           local window_data = player_table.gui.main.window
           if window_data.pinned then
-            e.element.style = 'ltnm_frame_action_button'
+            e.element.style = "ltnm_frame_action_button"
             window_data.pinned = false
             window_data.frame.force_auto_center()
             player.opened = window_data.frame
           else
-            e.element.style = 'ltnm_active_frame_action_button'
+            e.element.style = "ltnm_active_frame_action_button"
             window_data.pinned = true
             window_data.frame.auto_center = false
             player.opened = nil
@@ -78,12 +78,12 @@ gui.handlers:extend{
       refresh_button = {
         on_gui_click = function(e)
           if e.shift then
-            if event.is_enabled('auto_refresh', e.player_index) then
-              event.disable('auto_refresh', e.player_index)
-              e.element.style = 'ltnm_frame_action_button'
+            if event.is_enabled("auto_refresh", e.player_index) then
+              event.disable("auto_refresh", e.player_index)
+              e.element.style = "ltnm_frame_action_button"
             else
-              event.enable('auto_refresh', e.player_index)
-              e.element.style = 'ltnm_active_frame_action_button'
+              event.enable("auto_refresh", e.player_index)
+              e.element.style = "ltnm_active_frame_action_button"
             end
           else
             main_gui.update_active_tab(game.get_player(e.player_index), global.players[e.player_index])
@@ -98,38 +98,38 @@ gui.handlers:extend{
     },
     open_train_button = {
       on_gui_click = {handler=function(e)
-        local train_id = string_gsub(e.element.name, 'ltnm_open_train_', '')
+        local train_id = string_gsub(e.element.name, "ltnm_open_train_", "")
         game.get_player(e.player_index).opened = global.data.trains[tonumber(train_id)].main_locomotive
-      end, gui_filters='ltnm_open_train_', options={match_filter_strings=true}}
+      end, gui_filters="ltnm_open_train_", options={match_filter_strings=true}}
     },
     view_station_button = {
       on_gui_click = {handler=function(e)
-        local station_id = string_gsub(e.element.name, 'ltnm_view_station_', '')
+        local station_id = string_gsub(e.element.name, "ltnm_view_station_", "")
         local player = game.get_player(e.player_index)
         local player_table = global.players[e.player_index]
         player.zoom_to_world(global.data.stations[tonumber(station_id)].entity.position, 0.5)
         if not player_table.gui.main.window.pinned then
           main_gui.close(player, player_table)
         end
-      end, gui_filters='ltnm_view_station_', options={match_filter_strings=true}}
+      end, gui_filters="ltnm_view_station_", options={match_filter_strings=true}}
     },
     material_button = {
       on_gui_click = {handler=function(e)
         local player_table = global.players[e.player_index]
-        local on_inventory_tab = player_table.gui.main.tabbed_pane.selected == 'inventory'
+        local on_inventory_tab = player_table.gui.main.tabbed_pane.selected == "inventory"
         main_gui.update(game.get_player(e.player_index), player_table, {
-          active_tab = (not on_inventory_tab) and 'inventory',
+          active_tab = (not on_inventory_tab) and "inventory",
           inventory_contents = (not on_inventory_tab) and true,
-          selected_material = string_gsub(e.element.sprite, '/', ',')}
+          selected_material = string_gsub(e.element.sprite, "/", ",")}
         )
-      end, gui_filters='ltnm_material_button_', options={match_filter_strings=true}}
+      end, gui_filters="ltnm_material_button_", options={match_filter_strings=true}}
     },
-    ['ltnm-search'] = function(e)
+    ["ltnm-search"] = function(e)
       local player_table = global.players[e.player_index]
       if not player_table.flags.gui_open then return end
       local gui_data = player_table.gui.main
       local active_tab = gui_data.tabbed_pane.selected
-      if active_tab == 'inventory' then
+      if active_tab == "inventory" then
         -- focus textfield
         gui_data.inventory.search_textfield.focus()
         -- select all text if on default
@@ -145,26 +145,26 @@ gui.handlers:extend{
 function main_gui.create(player, player_table)
   -- create base GUI structure
   local gui_data = gui.build(player.gui.screen, {
-    {type='frame', style='ltnm_empty_frame', direction='vertical', handlers='main.window', save_as='window.frame', children={
+    {type="frame", style="ltnm_empty_frame", direction="vertical", handlers="main.window", save_as="window.frame", children={
       -- TITLEBAR
-      {type='flow', style_mods={horizontal_spacing=0}, direction='horizontal', children={
-        {template='mock_frame_tab', caption={'ltnm-gui.depots'}, save_as='tabbed_pane.tabs.depots'},
-        {template='mock_frame_tab', caption={'ltnm-gui.stations'}, save_as='tabbed_pane.tabs.stations'},
-        {template='mock_frame_tab', caption={'ltnm-gui.inventory'}, save_as='tabbed_pane.tabs.inventory'},
-        {template='mock_frame_tab', caption={'ltnm-gui.history'}, save_as='tabbed_pane.tabs.history'},
-        {template='mock_frame_tab', caption={'ltnm-gui.alerts'}, save_as='tabbed_pane.tabs.alerts'},
-        {type='frame', style='ltnm_main_frame_header', children={
-          {type='empty-widget', style='draggable_space_header', style_mods={horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
-            save_as='titlebar.drag_handle'},
-          {type='sprite-button', style='ltnm_frame_action_button', sprite='ltnm_pin_white', hovered_sprite='ltnm_pin_black', clicked_sprite='ltnm_pin_black',
-            tooltip={'ltnm-gui.keep-open'}, mouse_button_filter={'left'}, handlers='main.titlebar.pin_button', save_as='titlebar.pin_button'},
-          {type='sprite-button', style='ltnm_frame_action_button', sprite='ltnm_refresh_white', hovered_sprite='ltnm_refresh_black',
-            clicked_sprite='ltnm_refresh_black', tooltip={'ltnm-gui.refresh-button-tooltip'}, mouse_button_filter={'left'},
-            handlers='main.titlebar.refresh_button', save_as='titlebar.refresh_button'},
-          {template='close_button'}
+      {type="flow", style_mods={horizontal_spacing=0}, direction="horizontal", children={
+        {template="mock_frame_tab", caption={"ltnm-gui.depots"}, save_as="tabbed_pane.tabs.depots"},
+        {template="mock_frame_tab", caption={"ltnm-gui.stations"}, save_as="tabbed_pane.tabs.stations"},
+        {template="mock_frame_tab", caption={"ltnm-gui.inventory"}, save_as="tabbed_pane.tabs.inventory"},
+        {template="mock_frame_tab", caption={"ltnm-gui.history"}, save_as="tabbed_pane.tabs.history"},
+        {template="mock_frame_tab", caption={"ltnm-gui.alerts"}, save_as="tabbed_pane.tabs.alerts"},
+        {type="frame", style="ltnm_main_frame_header", children={
+          {type="empty-widget", style="draggable_space_header", style_mods={horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
+            save_as="titlebar.drag_handle"},
+          {type="sprite-button", style="ltnm_frame_action_button", sprite="ltnm_pin_white", hovered_sprite="ltnm_pin_black", clicked_sprite="ltnm_pin_black",
+            tooltip={"ltnm-gui.keep-open"}, mouse_button_filter={"left"}, handlers="main.titlebar.pin_button", save_as="titlebar.pin_button"},
+          {type="sprite-button", style="ltnm_frame_action_button", sprite="ltnm_refresh_white", hovered_sprite="ltnm_refresh_black",
+            clicked_sprite="ltnm_refresh_black", tooltip={"ltnm-gui.refresh-button-tooltip"}, mouse_button_filter={"left"},
+            handlers="main.titlebar.refresh_button", save_as="titlebar.refresh_button"},
+          {template="close_button"}
         }}
       }},
-      {type='frame', style='ltnm_main_frame_content', children={
+      {type="frame", style="ltnm_main_frame_content", children={
         tabs.depots.base_template,
         tabs.stations.base_template,
         tabs.inventory.base_template,
@@ -175,36 +175,36 @@ function main_gui.create(player, player_table)
   })
 
   -- other handlers
-  event.enable('gui.main.ltnm-search', player.index)
-  event.enable_group('gui.main.open_train_button', player.index)
-  event.enable_group('gui.main.view_station_button', player.index)
-  event.enable_group('gui.main.material_button', player.index)
-  event.enable_group('gui.alerts.clear_alert_button', player.index)
+  event.enable("gui.main.ltnm-search", player.index)
+  event.enable_group("gui.main.open_train_button", player.index)
+  event.enable_group("gui.main.view_station_button", player.index)
+  event.enable_group("gui.main.material_button", player.index)
+  event.enable_group("gui.alerts.clear_alert_button", player.index)
 
   -- default settings
   gui_data.window.pinned = false
 
-  gui_data.tabbed_pane.selected = 'depots'
+  gui_data.tabbed_pane.selected = "depots"
 
-  gui_data.depots.active_sort = 'composition'
+  gui_data.depots.active_sort = "composition"
   gui_data.depots.sort_composition = true
   gui_data.depots.sort_status = true
 
-  gui_data.stations.active_sort = 'name'
+  gui_data.stations.active_sort = "name"
   gui_data.stations.sort_name = true
   gui_data.stations.sort_network_id = true
   gui_data.stations.sort_status = true
 
   gui_data.inventory.selected_network_id = -1
-  gui_data.inventory.search_query = ''
+  gui_data.inventory.search_query = ""
 
-  gui_data.history.active_sort = 'finished'
+  gui_data.history.active_sort = "finished"
   gui_data.history.sort_depot = true
   gui_data.history.sort_route = true
   gui_data.history.sort_runtime = true
   gui_data.history.sort_finished = false
 
-  gui_data.alerts.active_sort = 'time'
+  gui_data.alerts.active_sort = "time"
   gui_data.alerts.sort_time = false
   gui_data.alerts.sort_id = true
   gui_data.alerts.sort_route = true
@@ -223,13 +223,13 @@ end
 
 -- completely destroys the GUI
 function main_gui.destroy(player, player_table)
-  event.disable_group('gui.main', player.index)
+  event.disable_group("gui.main", player.index)
   player_table.gui.main.window.frame.destroy()
   player_table.gui.main = nil
 
   player_table.flags.gui_open = false
   player_table.flags.can_open_gui = false
-  player.set_shortcut_available('ltnm-toggle-gui', false)
+  player.set_shortcut_available("ltnm-toggle-gui", false)
 end
 
 -- -------------------------------------
@@ -265,16 +265,16 @@ end
 function main_gui.update_active_tab(player, player_table, name)
   name = name or player_table.gui.main.tabbed_pane.selected
   local changes = {active_tab=name}
-  if name == 'depots' then
+  if name == "depots" then
     changes.depot_buttons = true
     changes.selected_depot = player_table.gui.main.depots.selected or true
-  elseif name == 'stations' then
+  elseif name == "stations" then
     changes.stations_list = true
-  elseif name == 'inventory' then
+  elseif name == "inventory" then
     changes.inventory_contents = true
-  elseif name == 'history' then
+  elseif name == "history" then
     changes.history = true
-  elseif name == 'alerts' then
+  elseif name == "alerts" then
     changes.alerts = true
   end
   main_gui.update(player, player_table, changes)
@@ -292,14 +292,14 @@ function main_gui.open(player, player_table, skip_update)
   player_table.flags.gui_open = true
   player_table.gui.main.window.frame.visible = true
 
-  player.set_shortcut_toggled('ltnm-toggle-gui', true)
+  player.set_shortcut_toggled("ltnm-toggle-gui", true)
 end
 
 function main_gui.close(player, player_table, set_closed)
   player_table.flags.gui_open = false
   player_table.gui.main.window.frame.visible = false
   
-  player.set_shortcut_toggled('ltnm-toggle-gui', false)
+  player.set_shortcut_toggled("ltnm-toggle-gui", false)
   
   player.opened = nil
 end
