@@ -8,6 +8,7 @@ local event = require('__RaiLuaLib__.lualib.event')
 local util = require('scripts.util')
 
 -- locals
+local math_floor = math.floor
 local table_insert = table.insert
 local table_remove = table.remove
 local table_sort = table.sort
@@ -19,6 +20,21 @@ local alert_popup_gui = require('gui.alert-popup')
 
 -- object
 local data_manager = {}
+
+-- -----------------------------------------------------------------------------
+-- UTILITIES
+
+-- custom compare function - floor all counts to remove fluid imprecision
+local function compare_shipments(t1, t2)
+  if t1 == t2 then return true end
+  for name,count in pairs(t1) do
+    if math_floor(count) ~= math_floor(t2[name] or -1) then return false end
+  end
+  for name,_ in pairs(t2) do
+    if t1[name] == nil then return false end
+  end
+  return true
+end
 
 -- -----------------------------------------------------------------------------
 -- PROCESSING FUNCTIONS
@@ -515,7 +531,7 @@ local function on_delivery_pickup_complete(e)
   if not global.data then return end
 
   -- add an error if the actual shipment doesn't match the planned shipment
-  if not table.compare(e.planned_shipment, e.actual_shipment) then
+  if not compare_shipments(e.planned_shipment, e.actual_shipment) then
     -- save train data so it will persist after the delivery is through
     local train = global.data.trains[e.train_id]
     if not train then error('Could not find train of ID: '..e.train_id) end

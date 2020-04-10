@@ -2,6 +2,7 @@
 Version: 0.1.1
 Date: ????
   Changes:
+    - Fluid shipments are now rounded down to account for floating-point imprecision
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 2020-04-09
