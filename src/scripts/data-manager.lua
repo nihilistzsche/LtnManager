@@ -457,6 +457,9 @@ local function iterate_data()
     }
 
     -- create alert popups
+    if global.working_data.alert_popups == nil then
+      global.working_data.alert_popups = {};
+    end
     for _,t in pairs(global.working_data.alert_popups) do
       alert_popup_gui.create_for_all(t)
     end
