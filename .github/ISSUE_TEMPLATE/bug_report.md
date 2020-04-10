@@ -11,7 +11,7 @@ assignees: ''
 A clear and concise description of what the bug is. If the bug was a crash, include a screenshot or a copy of the crash text.
 
 **Save file**
-Post a link to the save file where the error occured. Use a file service such as Google Drive or Dropbox. If these aren't available, PM me (Raiguard) on the Factorio forums, or on Discord (Raiguard#7402).
+Upload the save file where the bug occured. If the file is too large for GitHub, use a file service such as Google Drive or Dropbox. If these aren't available, PM me (Raiguard) on the Factorio forums, or on Discord (Raiguard#7402).
 
 **To Reproduce**
 Steps to reproduce the behavior:
