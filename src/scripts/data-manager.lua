@@ -518,7 +518,7 @@ local function on_delivery_pickup_complete(e)
 
   -- compare shipments to see if something was loaded incorrectly
   for name,count in pairs(e.actual_shipment) do
-    if not e.planned_shipment[name] or e.planned_shipment[name] > count then
+    if not e.planned_shipment[name] or math_floor(e.planned_shipment[name]) > math_floor(count) then
       -- save train data so it will persist after the delivery is through
       local train = global.data.trains[e.train_id]
       if not train then error("Could not find train of ID: "..e.train_id) end
