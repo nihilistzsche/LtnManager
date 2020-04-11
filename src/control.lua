@@ -96,7 +96,7 @@ local function update_player_settings(player, player_table)
 end
 
 -- completely close all GUIs, update settings, and retranslate
-local function refresh_player_data(player, player_table)
+local function refresh_player_data(player, player_table, on_created)
   -- destroy GUIs
   destroy_player_guis(player, player_table)
   
@@ -108,7 +108,7 @@ local function refresh_player_data(player, player_table)
   update_player_settings(player, player_table)
 
   -- run translations
-  if player.connected then
+  if not on_created and player.connected then
     run_player_translations(player)
   end
 end
@@ -161,7 +161,9 @@ event.on_load(function()
 end)
 
 event.on_player_created(function(e)
-  setup_player(game.get_player(e.player_index), e.player_index)
+  local player = game.get_player(e.player_index)
+  setup_player(player, e.player_index)
+  refresh_player_data(player, global.players[e.player_index], true)
 end)
 
 event.on_player_removed(function(e)
