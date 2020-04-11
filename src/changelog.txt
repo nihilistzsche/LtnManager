@@ -1,7 +1,9 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.5
 Date: ????
-  Changes:
+  Bugfixes:
+    - Fixed a crash when an alert is thrown after starting a new game
+    - Fixed that the mod would try to use non-color virtual signals to display the station's status
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.4
 Date: 2020-04-10
