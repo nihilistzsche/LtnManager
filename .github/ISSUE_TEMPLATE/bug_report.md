@@ -13,6 +13,8 @@ A clear and concise description of what the bug is. If the bug was a crash, incl
 **Save file**
 Upload the save file where the bug occured. If the file is too large for GitHub, use a file service such as Google Drive or Dropbox. If these aren't available, PM me (Raiguard) on the Factorio forums, or on Discord (Raiguard#7402).
 
+If you can consistently reproduce the error from a new save, please upload the original save anyways, just in case.
+
 **To Reproduce**
 Steps to reproduce the behavior:
 1. Go to '...'
