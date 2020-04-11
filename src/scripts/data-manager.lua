@@ -61,7 +61,7 @@ local function iterate_stations(data)
       end
 
       -- get status
-      local signal = station.lampControl.get_circuit_network(defines.wire_type.red).signals[1]
+      local signal = station.lampControl.get_control_behavior().get_signal(1)
       station.status = {name=signal.signal.name, count=signal.count}
 
       -- get station trains
