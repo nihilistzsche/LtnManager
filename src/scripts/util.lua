@@ -56,7 +56,7 @@ util.train.get_composition_string = util.train.get_train_composition_string
 -- create a string naming the status of the train
 -- first return is the string used for sorting, second return is the formatted string data for display
 function util.train.get_status_string(train_data, translations)
-  local state = train_data.train.state
+  local state = train_data.state
   local def = defines.train_state
   if state == def.on_the_path or state == def.arrive_signal or state == def.wait_signal or state == def.arrive_station then
     if train_data.returning_to_depot then
@@ -67,9 +67,13 @@ function util.train.get_status_string(train_data, translations)
           translations["delivering-to"]..":^^"..train_data.to,
           {{"label", translations["delivering-to"]..":"}, {"bold_label", train_data.to}}
       else
-        return
-          translations["fetching-from"]..":^^"..train_data.from,
-          {{"label", translations["fetching-from"]..":"}, {"bold_label", train_data.from}}
+        if not train_data.from then
+          return "N/A", {{"bold_red_label", "N/A"}}
+        else
+          return
+            translations["fetching-from"]..":^^"..train_data.from,
+            {{"label", translations["fetching-from"]..":"}, {"bold_label", train_data.from}}
+        end
       end
     end
   elseif state == def.wait_station then

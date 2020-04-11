@@ -1,7 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.6
 Date: ????
-  Changes:
+  Bugfixes:
+    - Fixed a crash with the train status function where it would use the train's current status instead of the status stored during iteration
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.5
 Date: 2020-04-11
