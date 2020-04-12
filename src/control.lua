@@ -14,6 +14,7 @@ local main_gui = require("gui.main")
 -- locals
 local string_find = string.find
 local string_gsub = string.gsub
+local string_sub = string.sub
 
 -- globals
 function UPDATE_MAIN_GUI(player, player_table, state_changes)
@@ -181,7 +182,7 @@ event.on_player_joined_game(function(e)
 end)
 
 event.on_runtime_mod_setting_changed(function(e)
-  if string_find(e.setting, "^ltnm%-") then
+  if string_sub(e.setting, 1, 5) == "ltnm-" then
     for i,p in pairs(game.players) do
       update_player_settings(p, global.players[i])
     end
