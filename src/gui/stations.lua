@@ -116,7 +116,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
           end
         end
       end
-      provided_requested_rows = math.ceil(provided_requested_rows / 6) -- number of columns
+      provided_requested_rows = math.ceil(provided_requested_rows / 6) -- number of rows
 
       -- add active shipments
       local shipments = t.activeDeliveries
@@ -136,7 +136,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
               number=count, tooltip=material_translations[name].."\n"..util.comma_value(count)}
           end
         end
-        shipments_rows = math.ceil(shipments_rows / 4) -- number of columns
+        shipments_rows = math.ceil(shipments_rows / 4) -- number of rows
       else
         shipments_rows = 0
       end
@@ -154,7 +154,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
             tooltip={"", {"virtual-signal-name."..name}, "\n"..util.comma_value(signal.count)}}.enabled = false
         end
       end
-      signals_rows = math.ceil(signals_rows / 4) -- number of columns
+      signals_rows = math.ceil(signals_rows / 4) -- number of rows
 
       local num_rows = math.max(provided_requested_rows, shipments_rows, signals_rows)
 
