@@ -1,7 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.7
-Date: ????
-  Changes:
+Date: 2020-04-12
+  Bugfixes:
+    - Fixed that translations wouldn't be automatically performed after joining a multiplayer game after a mod change
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.6
 Date: 2020-04-11
