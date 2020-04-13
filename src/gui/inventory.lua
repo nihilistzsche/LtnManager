@@ -114,6 +114,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
     inventory_gui_data.material_buttons = {}
     inventory_gui_data.contents = {}
     local buttons = inventory_gui_data.material_buttons
+    local query = string_lower(inventory_gui_data.search_textfield.text)
     for type,color in pairs{provided="green", requested="red", in_transit="blue"} do
       -- combine contents of each matching network
       local combined_materials = {}
@@ -123,10 +124,9 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
         end
       end
       -- filter by material name
-      local query = string_lower(inventory_gui_data.search_textfield.text)
-      if query ~= "" and query ~= string_lower(player_table.dictionary.gui.translations.search) then
+      if query ~= "" then
         for name,_ in pairs(combined_materials) do
-          if not string_match(material_translations[name], query) then
+          if not string_find(string_lower(material_translations[name]), query) then
             combined_materials[name] = nil
           end
         end
