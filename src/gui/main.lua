@@ -187,6 +187,13 @@ function main_gui.create(player, player_table)
   event.enable_group("gui.main.material_button", player.index)
   event.enable_group("gui.alerts.clear_alert_button", player.index)
 
+  -- auto-refresh
+  if event.is_enabled("auto_refresh", player.index) then
+    gui_data.titlebar.refresh_button.style = "ltnm_active_frame_action_button"
+  else
+    gui_data.titlebar.refresh_button.style = "ltnm_frame_action_button"
+  end
+
   -- default settings
   gui_data.window.pinned = false
 

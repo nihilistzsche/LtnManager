@@ -5,7 +5,8 @@ Date: ????
     - Updated to LTN API v1.13.1
     - Removed unused dictionary lookup and sorted translation tables from global, vastly speeding up autosave time
   Bugfixes:
-    - Fixed that inventory search would never match the first letter correctly
+    - Fixed that inventory search would never match the query to uppercase letters
+    - Fixed that the auto-refresh button state would always be "off" after recreating the GUI
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.7
 Date: 2020-04-12
