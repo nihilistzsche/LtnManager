@@ -11,6 +11,7 @@ local string_gsub = string.gsub
 
 local ltn_virtual_signals = {
   ["ltn-depot"] = true,
+  ["ltn-depot-priority"] = true,
   ["ltn-network-id"] = true,
   ["ltn-min-train-length"] = true,
   ["ltn-max-train-length"] = true,
@@ -119,7 +120,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
       provided_requested_rows = math.ceil(provided_requested_rows / 6) -- number of rows
 
       -- add active shipments
-      local shipments = t.activeDeliveries
+      local shipments = t.active_deliveries
       local shipments_len = #shipments
       local shipments_rows = 0
       if shipments_len > 0 then

@@ -61,7 +61,7 @@ local function iterate_stations(data)
       end
 
       -- get status
-      local signal = station.lampControl.get_control_behavior().get_signal(1)
+      local signal = station.lamp_control.get_control_behavior().get_signal(1)
       station.status = {name=signal.signal.name, count=signal.count}
 
       -- get station trains
@@ -98,7 +98,7 @@ local function iterate_stations(data)
       end
 
       -- add station and trains to depot
-      if station.isDepot then
+      if station.is_depot then
         local depot = depots[station_name]
         if depot then
           depot.stations[#depot.stations+1] = station_id
@@ -249,7 +249,7 @@ local function sort_stations(data)
   -- iterate stations
   for station_id,station_data in pairs(data.stations) do
     if station_data.entity.valid then
-      if not station_data.isDepot then
+      if not station_data.is_depot then
         -- organize station data
         local station = {
           name = station_data.entity.backer_name,

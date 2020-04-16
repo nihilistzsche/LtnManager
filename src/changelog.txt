@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.8
 Date: ????
+  Changes:
+    - Updated to LTN API v1.13.1
   Bugfixes:
     - Fixed that inventory search would never match the first letter correctly
 ---------------------------------------------------------------------------------------------------
