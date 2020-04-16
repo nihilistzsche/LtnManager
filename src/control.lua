@@ -88,7 +88,7 @@ end
 local function update_player_settings(player, player_table)
   local settings = {}
   for name,t in pairs(player.mod_settings) do
-    if string_find(name, "^ltnm%-") then
+    if string_sub(name, 1,5) == "ltnm-" then
       name = string_gsub(name, "ltnm%-", "")
       settings[string_gsub(name, "%-", "_")] = t.value
     end
@@ -100,7 +100,7 @@ end
 local function refresh_player_data(player, player_table)
   -- destroy GUIs
   destroy_player_guis(player, player_table)
-  
+
   -- set shortcut state
   player_table.flags.translations_finished = false
   player.set_shortcut_available("ltnm-toggle-gui", false)
@@ -109,6 +109,7 @@ local function refresh_player_data(player, player_table)
   update_player_settings(player, player_table)
 
   -- run translations
+  player_table.dictionary = {}
   if player.connected then
     run_player_translations(player)
   else
@@ -205,8 +206,6 @@ event.register(translation.finish_event, function(e)
   local player_table = global.players[e.player_index]
   -- add to player table
   player_table.dictionary[e.dictionary_name] = {
-    lookup = e.lookup,
-    sorted_translations = e.sorted_translations,
     translations = e.translations
   }
   -- if this player is done translating

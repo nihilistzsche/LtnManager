@@ -3,6 +3,7 @@ Version: 0.1.8
 Date: ????
   Changes:
     - Updated to LTN API v1.13.1
+    - Removed unused dictionary lookup and sorted translation tables from global, vastly speeding up autosave time
   Bugfixes:
     - Fixed that inventory search would never match the first letter correctly
 ---------------------------------------------------------------------------------------------------
