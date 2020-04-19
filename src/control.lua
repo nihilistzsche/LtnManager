@@ -256,7 +256,7 @@ event.on_configuration_changed(function(e)
     for i,p in pairs(game.players) do
       refresh_player_data(p, global.players[i])
     end
-    -- remove LTN data table until next iteration
-    global.data = nil
+    -- reset LTN data iteration
+    data_manager.reset()
   end
 end)

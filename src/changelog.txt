@@ -1,7 +1,9 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.9
 Date: ????
-  Changes:
+  Bugfixes:
+    - Fixed LTN version dependency
+    - Fixed a crash when trying to process old LTN data after a mod configuration change
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.8
 Date: 2020-04-16

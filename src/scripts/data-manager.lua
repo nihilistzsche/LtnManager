@@ -688,6 +688,21 @@ function data_manager.setup_events()
   event.register_conditional(events)
 end
 
+function data_manager.reset()
+  -- delete data
+  global.data = nil
+  global.working_data = {
+    history = global.working_data.history,
+    alerts = global.working_data.alerts,
+    alert_popups = {}
+  }
+  
+  -- reset events
+  event.enable("ltn_on_stops_updated")
+  event.enable("ltn_on_dispatcher_updated")
+  event.disable("iterate_ltn_data")
+end
+
 -- -----------------------------------------------------------------------------
 
 data_manager.ltn_event_ids = ltn_event_ids
