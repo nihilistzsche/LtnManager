@@ -109,7 +109,7 @@ local function iterate_stations(data)
       end
 
       -- process station materials
-      for _,mode in ipairs{"provided", "requested"} do
+      for _, mode in ipairs{"provided", "requested"} do
         local materials = data[mode.."_by_stop"][station_id]
         if materials then
           -- add to station
@@ -122,7 +122,7 @@ local function iterate_stations(data)
             inv = util.add_materials(materials, inv)
           end
           -- add to lookup
-          for name,_ in pairs(materials) do
+          for name in pairs(materials) do
             local locations = material_locations[name]
             if not locations then
               material_locations[name] = {stations={station_id}, trains={}}
@@ -147,11 +147,11 @@ end
 local function process_in_transit_materials(data)
   local in_transit = data.inventory.in_transit
   local material_locations = data.material_locations
-  for id,t in pairs(data.deliveries) do
+  for id, t in pairs(data.deliveries) do
     -- add to in transit inventory
     in_transit[t.network_id] = util.add_materials(t.shipment, in_transit[t.network_id] or {})
     -- sort materials into locations
-    for name,count in pairs(t.shipment) do
+    for name, count in pairs(t.shipment) do
       local locations = material_locations[name]
       if not locations then
         material_locations[name] = {stations={}, trains={id}}
@@ -166,14 +166,14 @@ end
 local function sort_depot_trains(data)
   local players = global.players
   local trains = data.trains
-  for n,depot in pairs(data.depots) do
+  for n, depot in pairs(data.depots) do
     local depot_trains = {}
 
     -- sort by composition - same for all players
     do
       local sort_lookup = {}
       local sort_values = {}
-      for _,train_id in ipairs(depot.trains_temp) do
+      for _, train_id in ipairs(depot.trains_temp) do
         local train = data.trains[train_id]
         if train.train.valid then
           local lookup = sort_lookup[train.composition]
@@ -187,7 +187,7 @@ local function sort_depot_trains(data)
       end
       table_sort(sort_values)
       local result = {}
-      for i,value in ipairs(sort_values) do
+      for i, value in ipairs(sort_values) do
         result[i] = table_remove(sort_lookup[value])
       end
       depot_trains.composition = result
@@ -196,7 +196,7 @@ local function sort_depot_trains(data)
     -- sort by status - player-specific based on language
     do
       local results_by_player = {}
-      for pi,_ in pairs(game.players) do
+      for pi in pairs(game.players) do
         local player_table = players[pi]
         -- only bother if they can actually open the GUI
         if player_table.flags.translations_finished then
@@ -204,7 +204,7 @@ local function sort_depot_trains(data)
           local sort_values = {}
           local translations = player_table.dictionary.gui.translations
           -- sort trains
-          for _,train_id in ipairs(depot.trains_temp) do
+          for _, train_id in ipairs(depot.trains_temp) do
             local train = trains[train_id]
             if train.train.valid then
               local status, status_data = util.train.get_status_string(train, translations)
@@ -222,7 +222,7 @@ local function sort_depot_trains(data)
           end
           table_sort(sort_values)
           local result = {}
-          for i,value in ipairs(sort_values) do
+          for i, value in ipairs(sort_values) do
             result[i] = table_remove(sort_lookup[value])
           end
           results_by_player[pi] = result
@@ -247,7 +247,7 @@ local function sort_stations(data)
   }
 
   -- iterate stations
-  for station_id,station_data in pairs(data.stations) do
+  for station_id, station_data in pairs(data.stations) do
     if station_data.entity.valid then
       if not station_data.is_depot then
         -- organize station data
@@ -257,7 +257,7 @@ local function sort_stations(data)
           status = station_data.status.name.."_"..station_data.status.count
         }
         -- sort data
-        for key,t in pairs(sort) do
+        for key, t in pairs(sort) do
           local value = station[key]
           local lookup = t.lookup[value]
           if lookup then
@@ -273,12 +273,12 @@ local function sort_stations(data)
 
   -- sort data
   local results = {}
-  for key,t in pairs(sort) do
+  for key, t in pairs(sort) do
     local result = {}
     local lookup = t.lookup
     local values = t.values
     table_sort(values)
-    for i,value in ipairs(values) do
+    for i, value in ipairs(values) do
       result[i] = table_remove(lookup[value])
     end
     results[key] = result
@@ -302,8 +302,8 @@ local function sort_history(data)
   }
 
   -- iterate history to fill sorting tables
-  for i,entry in ipairs(data.history) do
-    for sort_type,sort_table in pairs(sort) do
+  for i, entry in ipairs(data.history) do
+    for sort_type, sort_table in pairs(sort) do
       local value
       if sort_type == "route" then
         value = entry.from.." -> "..entry.to
@@ -322,12 +322,12 @@ local function sort_history(data)
 
   -- sort and output
   local output = {}
-  for sort_type,sort_table in pairs(sort) do
+  for sort_type, sort_table in pairs(sort) do
     local lookup = sort_table.lookup
     local values = sort_table.values
     local out = {}
     table_sort(values)
-    for i,value in ipairs(values) do
+    for i, value in ipairs(values) do
       out[i] = table_remove(lookup[value])
     end
     output[sort_type] = out
@@ -353,14 +353,14 @@ local function sort_alerts(data)
 
   -- remove alerts
   local to_delete = global.data and global.data.alerts_to_delete or {}
-  for id,_ in pairs(to_delete) do
+  for id in pairs(to_delete) do
     alerts[id] = nil
   end
 
   -- iterate history to fill sorting tables
-  for i,entry in pairs(data.alerts) do
+  for i, entry in pairs(data.alerts) do
     if i ~= "_index" then
-      for sort_type,sort_table in pairs(sort) do
+      for sort_type, sort_table in pairs(sort) do
         local value
         if sort_type == "network_id" then
           value = entry.train.network_id
@@ -382,12 +382,12 @@ local function sort_alerts(data)
 
   -- sort and output
   local output = {}
-  for sort_type,sort_table in pairs(sort) do
+  for sort_type, sort_table in pairs(sort) do
     local lookup = sort_table.lookup
     local values = sort_table.values
     local out = {}
     table_sort(values)
-    for i,value in ipairs(values) do
+    for i, value in ipairs(values) do
       out[i] = table_remove(lookup[value])
     end
     output[sort_type] = out
@@ -448,7 +448,7 @@ local function iterate_data()
     end
 
     -- create alert popups
-    for _,t in pairs(global.working_data.alert_popups) do
+    for _, t in pairs(global.working_data.alert_popups) do
       alert_popup_gui.create_for_all(t)
     end
 
@@ -485,7 +485,7 @@ local function on_dispatcher_updated(e)
   -- set up data tables
   local station_ids = {}
   local station_index = 0
-  for station_id,_ in pairs(stations) do
+  for station_id in pairs(stations) do
     station_index = station_index + 1
     station_ids[station_index] = station_id
   end
@@ -522,7 +522,7 @@ local function on_delivery_pickup_complete(e)
   if not global.data then return end
 
   -- compare shipments to see if something was loaded incorrectly
-  for name,count in pairs(e.actual_shipment) do
+  for name, count in pairs(e.actual_shipment) do
     if not e.planned_shipment[name] or math_floor(e.planned_shipment[name]) > math_floor(count) then
       -- save train data so it will persist after the delivery is through
       local train = global.data.trains[e.train_id]
@@ -572,10 +572,10 @@ local function on_delivery_completed(e)
 
   -- detect incomplete deliveries
   local contents = {}
-  for n,c in pairs(train.train.get_contents()) do
+  for n, c in pairs(train.train.get_contents()) do
     contents["item,"..n] = c
   end
-  for n,c in pairs(train.train.get_fluid_contents()) do
+  for n, c in pairs(train.train.get_fluid_contents()) do
     contents["fluid,"..n] = c
   end
   if table_size(contents) > 0 then
@@ -679,7 +679,7 @@ function data_manager.setup_events()
     error("Could not establish connection to LTN!")
   end
   local events = {}
-  for id,handler in pairs(ltn_handlers) do
+  for id, handler in pairs(ltn_handlers) do
     ltn_event_ids[id] = remote.call("logistic-train-network", id)
     events["ltn_"..id] = {id=ltn_event_ids[id], handler=handler, group="ltn"}
   end

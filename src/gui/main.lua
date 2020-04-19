@@ -13,7 +13,7 @@ local string_gsub = string.gsub
 
 -- tabs
 local tabs = {}
-for _,name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
+for _, name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
   tabs[name] = require("gui."..name)
 end
 
@@ -277,7 +277,7 @@ function main_gui.update(player, player_table, state_changes)
   end
 
   -- TABS
-  for _,tab in pairs(tabs) do
+  for _, tab in pairs(tabs) do
     tab.update(player, player_table, state_changes, gui_data, data, material_translations)
   end
 end

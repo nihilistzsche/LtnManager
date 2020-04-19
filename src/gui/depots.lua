@@ -66,7 +66,7 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
     local button_style = table_size(data.depots) > 7 and "ltnm_depot_button_for_scrollbar" or "ltnm_depot_button"
 
     -- build all buttons as if they're inactive
-    for name,t in pairs(data.depots) do
+    for name, t in pairs(data.depots) do
       button_index = button_index + 1
       local elems = gui.build(buttons_pane, {
         {type="button", name="ltnm_depot_button_"..name, style=button_style, handlers="depots.depot_button", save_as="button", children={
@@ -84,7 +84,7 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
         }}
       })
       local statuses = {}
-      for _,station_id in ipairs(t.stations) do
+      for _, station_id in ipairs(t.stations) do
         local status = data.stations[station_id].status
         statuses[status.name] = (statuses[status.name] or 0) + status.count
       end
@@ -126,14 +126,14 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
       if previous_selection then
         local button_data = depot_data.buttons[previous_selection]
         button_data.button.enabled = true
-        for _,elem in pairs(button_data.labels) do
+        for _, elem in pairs(button_data.labels) do
           elem.enabled = false
         end
       end
       -- set new selection to active style
       local button_data = depot_data.buttons[new_selection]
       button_data.button.enabled = false
-      for _,elem in pairs(button_data.labels) do
+      for _, elem in pairs(button_data.labels) do
         elem.enabled = true
       end
       -- update selection in global
@@ -177,14 +177,14 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
       })
       -- train status
       local status_flow_add = elems.status_flow.add
-      for _,t in ipairs(train.status[player.index]) do
+      for _, t in ipairs(train.status[player.index]) do
         status_flow_add{type="label", style=t[1], caption=t[2]}
       end
       -- contents table
       if train.shipment then
         local contents_table = elems.contents_table
         local i = 0
-        for name,count in pairs(train.shipment) do
+        for name, count in pairs(train.shipment) do
           i = i + 1
           contents_table.add{type="sprite-button", name="ltnm_material_button_"..i, style="ltnm_small_slot_button_dark_grey",
             sprite=string_gsub(name, ",", "/"), number=count, tooltip=material_translations[name].."\n"..util.comma_value(count)}

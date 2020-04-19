@@ -43,7 +43,7 @@ local slot_button_data = {
   {name="blue", y=320, glow={34,181,255,128}},
 }
 
-for _,data in ipairs(slot_button_data) do
+for _, data in ipairs(slot_button_data) do
   styles["ltnm_slot_button_"..data.name] = slot_button(data.y, data.glow)
   styles["ltnm_small_slot_button_"..data.name] = slot_button(data.y, data.glow, nil, 36)
   styles["ltnm_active_slot_button_"..data.name] = slot_button(data.y, data.glow, 80)

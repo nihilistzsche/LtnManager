@@ -44,7 +44,7 @@ gui.handlers:extend{
         global.data.history = {}
         global.working_data.history = {}
         local sorted_history = global.data.sorted_history
-        for key,_ in pairs(sorted_history) do
+        for key in pairs(sorted_history) do
           sorted_history[key] = {}
         end
         UPDATE_MAIN_GUI(game.get_player(e.player_index), global.players[e.player_index], {history=true})
@@ -95,7 +95,7 @@ function history_gui.update(player, player_table, state_changes, gui_data, data,
           }}
         }).table.add
         local mi = 0
-        for name,count in pairs(entry.actual_shipment or entry.shipment) do
+        for name, count in pairs(entry.actual_shipment or entry.shipment) do
           mi = mi + 1
           table_add{type="sprite-button", name="ltnm_material_button_"..mi, style="ltnm_small_slot_button_dark_grey", sprite=string_gsub(name, ",", "/"),
             number=count, tooltip=material_translations[name].."\n"..util.comma_value(count)}

@@ -106,10 +106,10 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
       local table_add = elems.provided_requested_table.add
       local provided_requested_rows = 0
       local mi = 0
-      for key,color in pairs{provided="green", requested="red"} do
+      for key, color in pairs{provided="green", requested="red"} do
         local materials = t[key]
         if materials then
-          for name,count in pairs(materials) do
+          for name, count in pairs(materials) do
             mi = mi + 1
             provided_requested_rows = provided_requested_rows + 1
             table_add{type="sprite-button", name="ltnm_material_button_"..mi, style="ltnm_small_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
@@ -130,7 +130,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
           local train = trains[shipments[si]]
           local shipment = train.shipment
           local style = (train.from_id == station_id and "red" or "green")
-          for name,count in pairs(shipment) do
+          for name, count in pairs(shipment) do
             mi = mi + 1
             shipments_rows = shipments_rows + 1
             table_add{type="sprite-button", name="ltnm_material_button_"..mi, style="ltnm_small_slot_button_"..style, sprite=string_gsub(name, ",", "/"),

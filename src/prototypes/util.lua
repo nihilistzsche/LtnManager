@@ -14,7 +14,7 @@ function util.mipped_icon(name, position, filename, size, mipmap_count, mods)
     flags = {"icon"}
   }
   if mods then
-    for k,v in pairs(mods) do
+    for k, v in pairs(mods) do
       def[k] = v
     end
   end

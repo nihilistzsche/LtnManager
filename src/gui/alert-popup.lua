@@ -68,7 +68,7 @@ end
 
 function alert_popup_gui.create_for_all(data)
   local players = global.players
-  for _,player in ipairs(game.connected_players) do
+  for _, player in ipairs(game.connected_players) do
     local player_table = players[player.index]
     if player_table.flags.can_open_gui and player_table.settings.show_alert_popups then
       alert_popup_gui.create_or_update(player, players[player.index], data)

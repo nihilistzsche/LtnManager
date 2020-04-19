@@ -5,7 +5,7 @@ local util = require("prototypes.util")
 
 -- station status indicators
 local indicator_sprites = {}
-for i,t in ipairs(data.raw.lamp["small-lamp"].signal_to_color_mapping) do
+for i, t in ipairs(data.raw.lamp["small-lamp"].signal_to_color_mapping) do
   indicator_sprites[i] = {
     type = "sprite",
     name = "ltnm_indicator_"..t.name,

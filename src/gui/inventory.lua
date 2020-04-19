@@ -53,7 +53,7 @@ gui.templates:extend{
       -- populate labels
       local flow = elems.labels_flow
       local flow_add = flow.add
-      for _,t in ipairs(labels) do
+      for _, t in ipairs(labels) do
         flow_add{type="label", style=t[1], caption=t[2], tooltip=t[3], name=t[4]}
         flow_add{type="empty-widget"}.style.horizontally_stretchable = true
       end
@@ -61,9 +61,9 @@ gui.templates:extend{
       -- populate materials
       local table_add = elems.table.add
       local i = 0
-      for _,t in ipairs(materials) do
+      for _, t in ipairs(materials) do
         local style = "ltnm_small_slot_button_"..t[1]
-        for name,count in pairs(t[2]) do
+        for name, count in pairs(t[2]) do
           i = i + 1
           table_add{type="sprite-button", name="ltnm_material_button_"..i, style=style, sprite=string_gsub(name, ",", "/"), number=count,
             tooltip=translations[name].."\n"..util.comma_value(count)}
@@ -115,17 +115,17 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
     inventory_gui_data.contents = {}
     local buttons = inventory_gui_data.material_buttons
     local query = string_lower(inventory_gui_data.search_textfield.text)
-    for type,color in pairs{provided="green", requested="red", in_transit="blue"} do
+    for type, color in pairs{provided="green", requested="red", in_transit="blue"} do
       -- combine contents of each matching network
       local combined_materials = {}
-      for network_id,materials in pairs(inventory[type]) do
+      for network_id, materials in pairs(inventory[type]) do
         if bit32_btest(network_id, selected_network_id) then
           combined_materials = util.add_materials(materials, combined_materials)
         end
       end
       -- filter by material name
       if query ~= "" then
-        for name,_ in pairs(combined_materials) do
+        for name in pairs(combined_materials) do
           if not string_find(string_lower(material_translations[name]), query) then
             combined_materials[name] = nil
           end
@@ -139,7 +139,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
       local add = table.add
       local elems = {}
       local i = 0
-      for name,count in pairs(combined_materials) do
+      for name, count in pairs(combined_materials) do
         i = i + 1
         elems[name] = add{type="sprite-button", name="ltnm_material_button_"..i, style="ltnm_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
           number=count, tooltip=material_translations[name].."\n"..util.comma_value(count)}
@@ -155,7 +155,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
   if state_changes.selected_material then
     -- set selected button glow
     local inventory_gui_data = gui_data.inventory
-    for _,type in ipairs{"provided", "requested", "in_transit"} do
+    for _, type in ipairs{"provided", "requested", "in_transit"} do
       local buttons = inventory_gui_data.material_buttons[type]
       -- deselect previous button
       local button = buttons[inventory_gui_data.selected]
@@ -182,7 +182,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
 
     -- material counts
     local contents = inventory_gui_data.contents
-    for _,type in ipairs{"provided", "requested", "in_transit"} do
+    for _, type in ipairs{"provided", "requested", "in_transit"} do
       info_pane[type.."_value"].caption = util.comma_value(contents[type][inventory_gui_data.selected] or 0)
     end
 
@@ -204,7 +204,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
           local station = stations[station_ids[i]]
           if bit32_btest(station.network_id, selected_network_id) then
             local materials = {}
-            for mode,color in pairs{provided="green", requested="red"} do
+            for mode, color in pairs{provided="green", requested="red"} do
               local contents = station[mode]
               if contents then
                 materials[#materials+1] = {color, contents}

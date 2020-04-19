@@ -25,33 +25,30 @@ end
 
 local function build_translation_data()
   local translation_data = {
+    gui = {
+      -- train status
+      {internal="delivering-to", localised={"ltnm-gui.delivering-to"}},
+      {internal="fetching-from", localised={"ltnm-gui.fetching-from"}},
+      {internal="loading-at", localised={"ltnm-gui.loading-at"}},
+      {internal="parked-at-depot", localised={"ltnm-gui.parked-at-depot"}},
+      {internal="returning-to-depot", localised={"ltnm-gui.returning-to-depot"}},
+      {internal="unloading-at", localised={"ltnm-gui.unloading-at"}}
+    },
     materials = {}
   }
   -- materials
-  for _,type in ipairs{"fluid", "item"} do
+  for _, type in ipairs{"fluid", "item"} do
     local prefix = type..","
-    for name,prototype in pairs(game[type.."_prototypes"]) do
+    for name, prototype in pairs(game[type.."_prototypes"]) do
       translation_data.materials[#translation_data.materials+1] = {internal=prefix..name, localised=prototype.localised_name}
     end
   end
-  -- gui
-  translation_data.gui = {
-    -- train status
-    {internal="delivering-to", localised={"ltnm-gui.delivering-to"}},
-    {internal="fetching-from", localised={"ltnm-gui.fetching-from"}},
-    {internal="loading-at", localised={"ltnm-gui.loading-at"}},
-    {internal="parked-at-depot", localised={"ltnm-gui.parked-at-depot"}},
-    {internal="returning-to-depot", localised={"ltnm-gui.returning-to-depot"}},
-    {internal="unloading-at", localised={"ltnm-gui.unloading-at"}},
-    -- other
-    {internal="search", localised={"ltnm-gui.search"}}
-  }
   global.__lualib.translation.translation_data = translation_data
 end
 
 local function run_player_translations(player)
   local translation_data = global.__lualib.translation.translation_data
-  for _,name in ipairs{"materials", "gui"} do
+  for _, name in ipairs{"materials", "gui"} do
     translation.start(player, name, translation_data[name], {include_failed_translations=true})
   end
 end
@@ -86,7 +83,7 @@ end
 
 local function update_player_settings(player, player_table)
   local settings = {}
-  for name,t in pairs(player.mod_settings) do
+  for name, t in pairs(player.mod_settings) do
     if string_sub(name, 1,5) == "ltnm-" then
       name = string_gsub(name, "ltnm%-", "")
       settings[string_gsub(name, "%-", "_")] = t.value
@@ -122,7 +119,7 @@ end
 -- tied to LTN on_dispatcher_updated
 local function enable_gui(e)
   local players = global.players
-  for _,i in pairs(e.registered_players) do
+  for _, i in pairs(e.registered_players) do
     local player = game.get_player(i)
     main_gui.create(player, players[i])
     players[i].flags.can_open_gui = true
@@ -134,7 +131,7 @@ end
 -- auto-update GUIs for all registered players
 local function auto_update_guis(e)
   local players = global.players
-  for _,i in ipairs(e.registered_players) do
+  for _, i in ipairs(e.registered_players) do
     local player_table = players[i]
     -- only update if they have the GUI open
     if player_table.flags.gui_open then
@@ -151,7 +148,7 @@ event.on_init(function()
   global.players = {}
   global.working_data = {history={}, alerts={_index=0}, alert_popups={}}
   build_translation_data()
-  for i,p in pairs(game.players) do
+  for i, p in pairs(game.players) do
     setup_player(p, i)
     refresh_player_data(p, global.players[i])
   end
@@ -183,7 +180,7 @@ end)
 
 event.on_runtime_mod_setting_changed(function(e)
   if string_sub(e.setting, 1, 5) == "ltnm-" then
-    for i,p in pairs(game.players) do
+    for i, p in pairs(game.players) do
       update_player_settings(p, global.players[i])
     end
   end
@@ -252,7 +249,7 @@ event.on_configuration_changed(function(e)
     -- update translation data
     build_translation_data()
     -- refresh all player information
-    for i,p in pairs(game.players) do
+    for i, p in pairs(game.players) do
       refresh_player_data(p, global.players[i])
     end
     -- reset LTN data iteration
