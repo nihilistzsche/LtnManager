@@ -3,6 +3,7 @@ Version: 0.1.9
 Date: 2020-04-19
   Bugfixes:
     - Fixed LTN version dependency
+    - Fixed a crash when trying to open a station that no longer exists
     - Fixed a crash when trying to process old LTN data after a mod configuration change
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.8

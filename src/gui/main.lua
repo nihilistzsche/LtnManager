@@ -318,9 +318,9 @@ end
 function main_gui.close(player, player_table, set_closed)
   player_table.flags.gui_open = false
   player_table.gui.main.window.frame.visible = false
-  
+
   player.set_shortcut_toggled("ltnm-toggle-gui", false)
-  
+
   player.opened = nil
 end
 
