@@ -113,9 +113,16 @@ gui.handlers:extend{
         local station_id = string_gsub(e.element.name, "ltnm_view_station_", "")
         local player = game.get_player(e.player_index)
         local player_table = global.players[e.player_index]
-        player.zoom_to_world(global.data.stations[tonumber(station_id)].entity.position, 0.5)
-        if not player_table.gui.main.window.pinned then
-          main_gui.close(player, player_table)
+
+        -- check station validity
+        local station_data = global.data.stations[tonumber(station_id)]
+        if station_data and station_data.entity.valid then
+          player.zoom_to_world(station_data.entity.position, 0.5)
+          if not player_table.gui.main.window.pinned then
+            main_gui.close(player, player_table)
+          end
+        else
+          player.print{"ltnm-message.station-invalid"}
         end
       end, gui_filters="ltnm_view_station_", options={match_filter_strings=true}}
     },
