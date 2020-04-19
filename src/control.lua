@@ -12,7 +12,6 @@ local data_manager = require("scripts.data-manager")
 local main_gui = require("gui.main")
 
 -- locals
-local string_find = string.find
 local string_gsub = string.gsub
 local string_sub = string.sub
 
