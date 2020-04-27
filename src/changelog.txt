@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.10
-Date: ????
+Date: 2020-04-27
   Changes:
     - The entire inventory screen will refresh when you select a material, to fix stats inconsistencies
   Bugfixes:
