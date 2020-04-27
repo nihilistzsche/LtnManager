@@ -614,27 +614,29 @@ local function on_delivery_failed(e)
   local trains = global.data.trains
 
   local train = trains[e.train_id] or trains[global.data.invalidated_trains[e.train_id]]
-  if train.train.valid then
-    alert_type = "delivery_timed_out"
-  else
-    alert_type = "train_invalidated"
-  end
+  if train then
+    if train.train.valid then
+      alert_type = "delivery_timed_out"
+    else
+      alert_type = "train_invalidated"
+    end
 
-  alerts[alerts._index] = {
-    time = game.tick,
-    type = alert_type,
-    train = {
-      depot = train.depot,
-      from = train.from,
-      from_id = train.from_id,
-      id = e.train_id,
-      network_id = train.network_id,
-      to = train.to,
-      to_id = train.to_id
-    },
-    shipment = train.shipment
-  }
-  global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type=alert_type}
+    alerts[alerts._index] = {
+      time = game.tick,
+      type = alert_type,
+      train = {
+        depot = train.depot,
+        from = train.from,
+        from_id = train.from_id,
+        id = e.train_id,
+        network_id = train.network_id,
+        to = train.to,
+        to_id = train.to_id
+      },
+      shipment = train.shipment
+    }
+    global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type=alert_type}
+  end
 end
 
 local function on_train_created(e)
@@ -696,7 +698,7 @@ function data_manager.reset()
     alerts = global.working_data.alerts,
     alert_popups = {}
   }
-  
+
   -- reset events
   event.enable("ltn_on_stops_updated")
   event.enable("ltn_on_dispatcher_updated")
