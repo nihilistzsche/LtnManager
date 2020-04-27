@@ -132,8 +132,7 @@ gui.handlers:extend{
         local on_inventory_tab = player_table.gui.main.tabbed_pane.selected == "inventory"
         main_gui.update(game.get_player(e.player_index), player_table, {
           active_tab = (not on_inventory_tab) and "inventory",
-          inventory_contents = (not on_inventory_tab) and true,
-          selected_material = string_gsub(e.element.sprite, "/", ",")}
+          inventory = string_gsub(e.element.sprite, "/", ",")}
         )
       end, gui_filters="ltnm_material_button_", options={match_filter_strings=true}}
     },
@@ -291,7 +290,7 @@ function main_gui.update_active_tab(player, player_table, name)
   elseif name == "stations" then
     changes.stations_list = true
   elseif name == "inventory" then
-    changes.inventory_contents = true
+    changes.inventory = true
   elseif name == "history" then
     changes.history = true
   elseif name == "alerts" then

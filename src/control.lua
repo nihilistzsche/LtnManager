@@ -1,8 +1,6 @@
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- CONTROL SCRIPTING
 
-pcall(require, "__debugadapter__/debugadapter.lua")
-
 -- dependencies
 local event = require("__RaiLuaLib__.lualib.event")
 local migration = require("__RaiLuaLib__.lualib.migration")
@@ -101,6 +99,7 @@ local function refresh_player_data(player, player_table)
 
   -- set shortcut state
   player_table.flags.translations_finished = false
+  player.set_shortcut_toggled("ltnm-toggle-gui", false)
   player.set_shortcut_available("ltnm-toggle-gui", false)
 
   -- update settings

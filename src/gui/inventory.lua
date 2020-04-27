@@ -81,7 +81,7 @@ gui.handlers:extend{
         local player_table = global.players[e.player_index]
         local gui_data = player_table.gui.main.inventory
         gui_data.search_query = e.text
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {inventory_contents=true})
+        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {inventory=true})
       end,
       on_gui_click = function(e)
         -- select all text if it is the default
@@ -96,7 +96,7 @@ gui.handlers:extend{
         local gui_data = player_table.gui.main.inventory
         local input = tonumber(e.text) or -1
         gui_data.selected_network_id = input
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {inventory_contents=true})
+        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {inventory=true})
       end
     }
   }
@@ -106,8 +106,7 @@ gui.handlers:extend{
 -- FUNCTIONS
 
 function inventory_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
-  -- INVENTORY CONTENTS
-  if state_changes.inventory_contents then
+  if state_changes.inventory then
     local inventory = data.inventory
     local inventory_gui_data = gui_data.inventory
     local selected_network_id = inventory_gui_data.selected_network_id
@@ -147,104 +146,102 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
       buttons[type] = elems
     end
     -- remove previous selection since the buttons are no longer glowing
-    state_changes.selected_material = state_changes.selected_material or inventory_gui_data.selected
+    state_changes.inventory = type(state_changes.inventory) == "boolean" and inventory_gui_data.selected or state_changes.inventory
     inventory_gui_data.selected = nil
-  end
 
-  -- SELECTED MATERIAL
-  if state_changes.selected_material then
-    -- set selected button glow
-    local inventory_gui_data = gui_data.inventory
-    for _, type in ipairs{"provided", "requested", "in_transit"} do
-      local buttons = inventory_gui_data.material_buttons[type]
-      -- deselect previous button
-      local button = buttons[inventory_gui_data.selected]
-      if button then
-        button.style = string_gsub(button.style.name, "ltnm_active_", "ltnm_")
-        button.ignored_by_interaction = false
+    -- update selected material
+    if type(state_changes.inventory) == "string" then
+      -- set selected button glow
+      for _, type in ipairs{"provided", "requested", "in_transit"} do
+        local buttons = inventory_gui_data.material_buttons[type]
+        -- deselect previous button
+        local button = buttons[inventory_gui_data.selected]
+        if button then
+          button.style = string_gsub(button.style.name, "ltnm_active_", "ltnm_")
+          button.ignored_by_interaction = false
+        end
+        -- select new button
+        button = buttons[state_changes.inventory]
+        if button then
+          button.style = string_gsub(button.style.name, "ltnm_", "ltnm_active_")
+          button.ignored_by_interaction = true
+        end
       end
-      -- select new button
-      button = buttons[state_changes.selected_material]
-      if button then
-        button.style = string_gsub(button.style.name, "ltnm_", "ltnm_active_")
-        button.ignored_by_interaction = true
+
+      -- save selection to global
+      inventory_gui_data.selected = state_changes.inventory
+
+      -- basic material info
+      local _, _, material_type, material_name = string_find(state_changes.inventory, "(.*),(.*)")
+      local info_pane = inventory_gui_data.info_pane
+      info_pane.icon.sprite = material_type.."/"..material_name
+      info_pane.name.caption = game[material_type.."_prototypes"][material_name].localised_name
+
+      -- material counts
+      local contents = inventory_gui_data.contents
+      for _, type in ipairs{"provided", "requested", "in_transit"} do
+        info_pane[type.."_value"].caption = util.comma_value(contents[type][inventory_gui_data.selected] or 0)
       end
-    end
 
-    -- save selection to global
-    inventory_gui_data.selected = state_changes.selected_material
+      -- set up scroll pane and locals
+      local locations_pane = inventory_gui_data.locations_scroll_pane
+      locations_pane.clear()
+      local locations = data.material_locations[state_changes.inventory]
+      if locations then
+        local location_template = gui.templates.inventory.small_slot_table_with_label
 
-    -- basic material info
-    local _, _, material_type, material_name = string_find(state_changes.selected_material, "(.*),(.*)")
-    local info_pane = inventory_gui_data.info_pane
-    info_pane.icon.sprite = material_type.."/"..material_name
-    info_pane.name.caption = game[material_type.."_prototypes"][material_name].localised_name
-
-    -- material counts
-    local contents = inventory_gui_data.contents
-    for _, type in ipairs{"provided", "requested", "in_transit"} do
-      info_pane[type.."_value"].caption = util.comma_value(contents[type][inventory_gui_data.selected] or 0)
-    end
-
-    -- set up scroll pane and locals
-    local locations_pane = inventory_gui_data.locations_scroll_pane
-    locations_pane.clear()
-    local locations = data.material_locations[state_changes.selected_material]
-    if locations then
-      local location_template = gui.templates.inventory.small_slot_table_with_label
-
-      -- stations
-      local selected_network_id = inventory_gui_data.selected_network_id
-      local stations = data.stations
-      local station_ids = locations.stations
-      if #station_ids > 0 then
-        local label = locations_pane.add{type="label", style="ltnm_material_locations_label", caption={"ltnm-gui.stations"}}
-        local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
-        for i=1,#station_ids do
-          local station = stations[station_ids[i]]
-          if bit32_btest(station.network_id, selected_network_id) then
-            local materials = {}
-            for mode, color in pairs{provided="green", requested="red"} do
-              local contents = station[mode]
-              if contents then
-                materials[#materials+1] = {color, contents}
+        -- stations
+        local stations = data.stations
+        local station_ids = locations.stations
+        if #station_ids > 0 then
+          local label = locations_pane.add{type="label", style="ltnm_material_locations_label", caption={"ltnm-gui.stations"}}
+          local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
+          for i=1,#station_ids do
+            local station = stations[station_ids[i]]
+            if bit32_btest(station.network_id, selected_network_id) then
+              local materials = {}
+              for mode, color in pairs{provided="green", requested="red"} do
+                local contents = station[mode]
+                if contents then
+                  materials[#materials+1] = {color, contents}
+                end
               end
+              location_template(
+                table,
+                {{"hoverable_bold_label", station.entity.backer_name, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..station_ids[i]}},
+                materials,
+                material_translations
+              )
             end
-            location_template(
-              table,
-              {{"hoverable_bold_label", station.entity.backer_name, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..station_ids[i]}},
-              materials,
-              material_translations
-            )
+          end
+          if #table.children == 0 then
+            label.destroy()
+            table.destroy()
           end
         end
-        if #table.children == 0 then
-          label.destroy()
-          table.destroy()
-        end
-      end
 
-      -- trains
-      local trains = data.trains
-      local train_ids = locations.trains
-      if #train_ids > 0 then
-        local label = locations_pane.add{type="label", style="ltnm_material_locations_label", caption={"ltnm-gui.trains"}}
-        local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
-        for i=1,#train_ids do
-          local train = trains[train_ids[i]]
-          if bit32_btest(train.network_id, selected_network_id) then
-            local materials = {}
-            if train.shipment then
-              materials = {{"blue", train.shipment}}
+        -- trains
+        local trains = data.trains
+        local train_ids = locations.trains
+        if #train_ids > 0 then
+          local label = locations_pane.add{type="label", style="ltnm_material_locations_label", caption={"ltnm-gui.trains"}}
+          local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
+          for i=1,#train_ids do
+            local train = trains[train_ids[i]]
+            if bit32_btest(train.network_id, selected_network_id) then
+              local materials = {}
+              if train.shipment then
+                materials = {{"blue", train.shipment}}
+              end
+              location_template(table, {{"hoverable_bold_label", train.from, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..train.from_id},
+                {"caption_label", "->"}, {"hoverable_bold_label", train.to, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..train.to_id}}, materials,
+                material_translations)
             end
-            location_template(table, {{"hoverable_bold_label", train.from, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..train.from_id},
-              {"caption_label", "->"}, {"hoverable_bold_label", train.to, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..train.to_id}}, materials,
-              material_translations)
           end
-        end
-        if #table.children == 0 then
-          label.destroy()
-          table.destroy()
+          if #table.children == 0 then
+            label.destroy()
+            table.destroy()
+          end
         end
       end
     end

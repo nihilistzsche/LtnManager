@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.10
 Date: ????
+  Changes:
+    - The entire inventory screen will refresh when you select a material, to fix stats inconsistencies
   Bugfixes:
     - Band-aided a crash when a material's translation doesn't exist - it will show the internal name instead. Please report any sightings of internal names!
     - Fixed a crash when a train gets invalidated between LTN station and error processing
