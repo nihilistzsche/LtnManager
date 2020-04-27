@@ -142,7 +142,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
       for name, count in pairs(combined_materials) do
         i = i + 1
         elems[name] = add{type="sprite-button", name="ltnm_material_button_"..i, style="ltnm_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
-          number=count, tooltip=material_translations[name].."\n"..util.comma_value(count)}
+          number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
       end
       buttons[type] = elems
     end

@@ -113,7 +113,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
             mi = mi + 1
             provided_requested_rows = provided_requested_rows + 1
             table_add{type="sprite-button", name="ltnm_material_button_"..mi, style="ltnm_small_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
-              number=count, tooltip=material_translations[name].."\n"..util.comma_value(count)}
+              number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
           end
         end
       end
@@ -134,7 +134,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
             mi = mi + 1
             shipments_rows = shipments_rows + 1
             table_add{type="sprite-button", name="ltnm_material_button_"..mi, style="ltnm_small_slot_button_"..style, sprite=string_gsub(name, ",", "/"),
-              number=count, tooltip=material_translations[name].."\n"..util.comma_value(count)}
+              number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
           end
         end
         shipments_rows = math.ceil(shipments_rows / 4) -- number of rows

@@ -1,7 +1,7 @@
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- CONTROL SCRIPTING
 
--- pcall(require, "__debugadapter__/debugadapter.lua")
+pcall(require, "__debugadapter__/debugadapter.lua")
 
 -- dependencies
 local event = require("__RaiLuaLib__.lualib.event")

@@ -30,7 +30,7 @@ gui.templates:extend{
       for name, count in pairs(materials) do
         mi = mi + 1
         table_add{type="sprite-button", name="ltnm_material_button_"..mi, style="ltnm_small_slot_button_"..style, sprite=string_gsub(name, ",", "/"),
-          number=count, tooltip=material_translations[name].."\n"..util.comma_value(count)}
+          number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
       end
     end
   }
