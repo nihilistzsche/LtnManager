@@ -1,25 +1,15 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- LTN DATA MANAGER
--- Takes in data from LTN and parses it for use by the GUI
--- This script is the only place to touch LTN data, the rest of the mod uses the data that this script produces.
+local ltn_data = {}
 
--- dependencies
 local event = require("__RaiLuaLib__.lualib.event")
 local util = require("scripts.util")
 
--- locals
 local math_floor = math.floor
 local table_insert = table.insert
 local table_remove = table.remove
 local table_sort = table.sort
 
-local ltn_event_ids = {}
-
--- scripts
 local alert_popup_gui = require("gui.alert-popup")
 
--- object
-local data_manager = {}
 
 -- -----------------------------------------------------------------------------
 -- PROCESSING FUNCTIONS
@@ -667,7 +657,9 @@ end
 -- -----------------------------------------------------------------------------
 -- EVENT REGISTRATION
 
-local ltn_handlers = {
+ltn_data.event_ids = {}
+
+ltn_data.handlers = {
   on_stops_updated = on_stops_updated,
   on_dispatcher_updated = on_dispatcher_updated,
   on_dispatcher_no_train_found = on_dispatcher_no_train_found,
@@ -676,37 +668,33 @@ local ltn_handlers = {
   on_delivery_failed = on_delivery_failed
 }
 
-function data_manager.setup_events()
+function ltn_data.setup_events()
   if not remote.interfaces["logistic-train-network"] then
     error("Could not establish connection to LTN!")
   end
   local events = {}
-  for id, handler in pairs(ltn_handlers) do
-    ltn_event_ids[id] = remote.call("logistic-train-network", id)
-    events["ltn_"..id] = {id=ltn_event_ids[id], handler=handler, group="ltn"}
+  for id, handler in pairs(ltn_data.handlers) do
+    ltn_data.event_ids[id] = remote.call("logistic-train-network", id)
+    event.register(id, handler)
   end
   events.on_train_created = {id=defines.events.on_train_created, handler=on_train_created, group="ltn"}
   events.iterate_ltn_data = {id=defines.events.on_tick, handler=iterate_data, options={skip_validation=true}}
   event.register_conditional(events)
 end
 
-function data_manager.reset()
-  -- delete data
+function ltn_data.init()
   global.data = nil
-  global.working_data = {
-    history = global.working_data.history,
-    alerts = global.working_data.alerts,
-    alert_popups = {}
-  }
-
-  -- reset events
-  event.enable("ltn_on_stops_updated")
-  event.enable("ltn_on_dispatcher_updated")
-  event.disable("iterate_ltn_data")
+  if global.working_data then
+    global.working_data = {
+      history = global.working_data.history,
+      alerts = global.working_data.alerts,
+      alert_popups = {}
+    }
+  else
+    global.working_data = {history={}, alerts={_index=0}, alert_popups={}}
+  end
 end
 
 -- -----------------------------------------------------------------------------
 
-data_manager.ltn_event_ids = ltn_event_ids
-
-return data_manager
+return ltn_data
