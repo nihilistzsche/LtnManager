@@ -1,7 +1,7 @@
 local data = {}
 
-local alert_popup_gui = require("gui.alert-popup")
-local main_gui = require("gui.main")
+-- local alert_popup_gui = require("gui.alert-popup")
+-- local main_gui = require("gui.main")
 local translation = require("__flib__.control.translation")
 
 local string_gsub = string.gsub
@@ -59,7 +59,7 @@ function data.refresh_player(player, player_table)
   -- run translations
   player_table.dictionary = {}
   if player.connected then
-    data.start_translations(player)
+    data.start_translations(player.index)
   else
     player_table.flags.translate_on_join = true
   end
@@ -85,13 +85,13 @@ function data.build_translations()
       translation_data.materials[#translation_data.materials+1] = {internal=prefix..name, localised=prototype.localised_name}
     end
   end
-  global.__flib.translation.translation_data = translation_data
+  global.translation_data = translation_data
 end
 
-function data.start_translations(player)
-  local translation_data = global.__flib.translation.translation_data
+function data.start_translations(player_index)
+  local translation_data = global.translation_data
   for _, name in ipairs{"materials", "gui"} do
-    translation.start(player, name, translation_data[name], {include_failed_translations=true})
+    translation.start(player_index, name, translation_data[name], {include_failed_translations=true})
   end
 end
 

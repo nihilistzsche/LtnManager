@@ -1,6 +1,6 @@
 local ltn_data = {}
 
-local event = require("__RaiLuaLib__.lualib.event")
+local event = require("__flib__.control.event")
 local util = require("scripts.util")
 
 local math_floor = math.floor
@@ -8,7 +8,7 @@ local table_insert = table.insert
 local table_remove = table.remove
 local table_sort = table.sort
 
-local alert_popup_gui = require("gui.alert-popup")
+-- local alert_popup_gui = require("gui.alert-popup")
 
 
 -- -----------------------------------------------------------------------------
@@ -394,7 +394,7 @@ end
 -- HANDLERS
 
 -- called on_tick until data iteration is finished
-local function iterate_data()
+function ltn_data.iterate()
   local data = global.working_data
   local step = data.step
 
@@ -432,15 +432,15 @@ local function iterate_data()
       invalidated_trains = {}
     }
 
-    -- avoid crashing
-    if global.working_data.alert_popups == nil then
-      global.working_data.alert_popups = {};
-    end
+    -- -- avoid crashing
+    -- if global.working_data.alert_popups == nil then
+    --   global.working_data.alert_popups = {}
+    -- end
 
-    -- create alert popups
-    for _, t in pairs(global.working_data.alert_popups) do
-      alert_popup_gui.create_for_all(t)
-    end
+    -- -- create alert popups
+    -- for _, t in pairs(global.working_data.alert_popups) do
+    --   alert_popup_gui.create_for_all(t)
+    -- end
 
     -- reset working data
     global.working_data = {
@@ -449,10 +449,12 @@ local function iterate_data()
       alert_popups = {}
     }
 
+    global.flags.iterating_ltn_data = false
+
     -- reset events
-    event.enable("ltn_on_stops_updated")
-    event.enable("ltn_on_dispatcher_updated")
-    event.disable("iterate_ltn_data")
+    -- event.enable("ltn_on_stops_updated")
+    -- event.enable("ltn_on_dispatcher_updated")
+    -- event.disable("iterate_ltn_data")
   end
 end
 
@@ -469,8 +471,8 @@ local function on_dispatcher_updated(e)
   end
 
   -- deregister events for this update cycle
-  event.disable("ltn_on_stops_updated")
-  event.disable("ltn_on_dispatcher_updated")
+  event.register(ltn_data.event_ids.on_stops_updated, nil)
+  event.register(ltn_data.event_ids.on_dispatcher_updated, nil)
 
   -- set up data tables
   local station_ids = {}
@@ -505,7 +507,8 @@ local function on_dispatcher_updated(e)
   data.index = 1
 
   -- enable data iteration handler
-  event.enable("iterate_ltn_data")
+  global.flags.iterating_ltn_data = true
+  -- event.register()
 end
 
 local function on_delivery_pickup_complete(e)
@@ -673,13 +676,14 @@ function ltn_data.setup_events()
     error("Could not establish connection to LTN!")
   end
   local events = {}
-  for id, handler in pairs(ltn_data.handlers) do
-    ltn_data.event_ids[id] = remote.call("logistic-train-network", id)
+  for event_name, handler in pairs(ltn_data.handlers) do
+    local id = remote.call("logistic-train-network", event_name)
+    ltn_data.event_ids[event_name] = id
     event.register(id, handler)
   end
-  events.on_train_created = {id=defines.events.on_train_created, handler=on_train_created, group="ltn"}
-  events.iterate_ltn_data = {id=defines.events.on_tick, handler=iterate_data, options={skip_validation=true}}
-  event.register_conditional(events)
+  -- events.on_train_created = {id=defines.events.on_train_created, handler=on_train_created, group="ltn"}
+  -- events.iterate_ltn_data = {id=defines.events.on_tick, handler=iterate_data, options={skip_validation=true}}
+  -- event.register_conditional(events)
 end
 
 function ltn_data.init()
