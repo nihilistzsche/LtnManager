@@ -3,7 +3,7 @@
 -- A tab of the main GUI
 
 -- dependencies
-local gui = require("__RaiLuaLib__.lualib.gui")
+local gui = require("__flib__.control.gui")
 local util = require("scripts.util")
 
 -- locals
@@ -19,7 +19,7 @@ local inventory_gui = {}
 -- -----------------------------------------------------------------------------
 -- GUI DATA
 
-gui.templates:extend{
+gui.add_templates{
   inventory = {
     slot_table_with_label = function(name, rows)
       rows = rows or 4
@@ -74,7 +74,7 @@ gui.templates:extend{
   }
 }
 
-gui.handlers:extend{
+gui.add_handlers{
   inventory = {
     search_textfield = {
       on_gui_text_changed = function(e)

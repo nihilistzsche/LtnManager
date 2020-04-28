@@ -3,7 +3,7 @@
 -- A tab of the main GUI
 
 -- dependencies
-local gui = require("__RaiLuaLib__.lualib.gui")
+local gui = require("__flib__.control.gui")
 local util = require("scripts.util")
 
 -- locals
@@ -16,7 +16,7 @@ local alerts_gui = {}
 -- -----------------------------------------------------------------------------
 -- GUI DATA
 
-gui.templates:extend{
+gui.add_templates{
   alerts = {
     materials_table = function(parent, style, materials, material_translations)
       local table_add = gui.build(parent, {
@@ -36,7 +36,7 @@ gui.templates:extend{
   }
 }
 
-gui.handlers:extend{
+gui.add_handlers{
   alerts = {
     sort_checkbox = {
       on_gui_checked_state_changed = function(e)

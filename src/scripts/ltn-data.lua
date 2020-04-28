@@ -10,7 +10,7 @@ local table_insert = table.insert
 local table_remove = table.remove
 local table_sort = table.sort
 
--- local alert_popup_gui = require("gui.alert-popup")
+local alert_popup_gui = require("scripts.gui.alert-popup")
 
 -- -----------------------------------------------------------------------------
 -- PROCESSING FUNCTIONS

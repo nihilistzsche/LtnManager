@@ -3,15 +3,15 @@
 -- HUD to notify you when an alert is triggered
 
 -- dependencies
-local event = require("__RaiLuaLib__.lualib.event")
-local gui = require("__RaiLuaLib__.lualib.gui")
+-- local event = require("__RaiLuaLib__.lualib.event")
+local gui = require("__flib__.control.gui")
 local mod_gui = require("mod-gui")
 
 -- locals
 local string_gsub = string.gsub
 
 -- scripts
-local main_gui = require("gui.main")
+local main_gui = require("scripts.gui.main")
 
 -- object
 local alert_popup_gui = {}
@@ -19,7 +19,7 @@ local alert_popup_gui = {}
 -- -----------------------------------------------------------------------------
 -- GUI DATA
 
-gui.handlers:extend{
+gui.add_handlers{
   alert_popup = {
     button = {
       on_gui_click = function(e)
@@ -61,7 +61,7 @@ function alert_popup_gui.create_or_update(player, player_table, data)
 end
 
 function alert_popup_gui.destroy(player, player_table)
-  event.disable_group("gui.alert_popup", player.index)
+  -- event.disable_group("gui.alert_popup", player.index)
   player_table.gui.alert_popup.button.destroy()
   player_table.gui.alert_popup = nil
 end

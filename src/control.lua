@@ -4,9 +4,9 @@ local migration = require("__flib__.control.migration")
 local translation = require("__flib__.control.translation")
 
 local data = require("scripts.data")
--- local alert_popup_gui = require("gui.alert-popup")
+local alert_popup_gui = require("scripts.gui.alert-popup")
 local ltn_data = require("scripts.ltn-data")
--- local main_gui = require("gui.main")
+local main_gui = require("scripts.gui.main")
 local migrations = require("scripts.migrations")
 
 local string_gsub = string.gsub
@@ -92,8 +92,7 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
     local player = game.get_player(e.player_index)
     local player_table = global.players[e.player_index]
     if player_table.flags.can_open_gui then
-      -- main_gui.toggle(player, player_table)
-      log("Open main GUI")
+      main_gui.toggle(player, player_table)
     else
       player.print{"ltnm-message.cannot-open-gui"}
     end

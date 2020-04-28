@@ -3,8 +3,8 @@
 -- A tab of the main GUI
 
 -- dependencies
-local event = require("__RaiLuaLib__.lualib.event")
-local gui = require("__RaiLuaLib__.lualib.gui")
+-- local event = require("__RaiLuaLib__.lualib.event")
+local gui = require("__flib__.control.gui")
 
 -- locals
 local string_find = string.find
@@ -17,7 +17,7 @@ local depots_gui = {}
 -- -----------------------------------------------------------------------------
 -- GUI DATA
 
-gui.handlers:extend{
+gui.add_handlers{
   depots = {
     depot_button = {
       on_gui_click = function(e)
@@ -57,7 +57,7 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
     local buttons_pane = gui_data.depots.buttons_scroll_pane
     -- delete old buttons and disable handler
     buttons_pane.clear()
-    event.disable_group("gui.depots.depot_button", player.index)
+    -- event.disable_group("gui.depots.depot_button", player.index)
 
     local buttons_data = {}
 

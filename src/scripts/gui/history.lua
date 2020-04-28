@@ -3,7 +3,7 @@
 -- A tab of the main GUI
 
 -- dependencies
-local gui = require("__RaiLuaLib__.lualib.gui")
+local gui = require("__flib__.control.gui")
 local util = require("scripts.util")
 
 -- locals
@@ -16,7 +16,7 @@ local history_gui = {}
 -- -----------------------------------------------------------------------------
 -- GUI DATA
 
-gui.handlers:extend{
+gui.add_handlers{
   history = {
     sort_checkbox = {
       on_gui_checked_state_changed = function(e)

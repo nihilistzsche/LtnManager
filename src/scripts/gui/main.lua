@@ -1,29 +1,18 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- MAIN GUI
--- The main GUI for the mod
+local main_gui = {}
 
--- dependencies
-local event = require("__RaiLuaLib__.lualib.event")
-local gui = require("__RaiLuaLib__.lualib.gui")
+local gui = require("__flib__.control.gui")
 
--- local profiler = require("__profiler__/profiler.lua")
-
--- locals
-local string_gsub = string.gsub
-
--- tabs
 local tabs = {}
 for _, name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
-  tabs[name] = require("gui."..name)
+  tabs[name] = require("scripts.gui."..name)
 end
 
--- object
-local main_gui = {}
+local string_gsub = string.gsub
 
 -- -----------------------------------------------------------------------------
 -- GUI DATA
 
-gui.templates:extend{
+gui.add_templates{
   pushers = {
     horizontal = {type="empty-widget", style_mods={horizontally_stretchable=true}},
     vertical = {type="empty-widget", style_mods={vertically_stretchable=true}},
@@ -40,7 +29,7 @@ gui.templates:extend{
   end
 }
 
-gui.handlers:extend{
+gui.add_handlers{
   main={
     window = {
       on_gui_closed = function(e)
@@ -78,13 +67,13 @@ gui.handlers:extend{
       refresh_button = {
         on_gui_click = function(e)
           if e.shift then
-            if event.is_enabled("auto_refresh", e.player_index) then
-              event.disable("auto_refresh", e.player_index)
-              e.element.style = "ltnm_frame_action_button"
-            else
-              event.enable("auto_refresh", e.player_index)
-              e.element.style = "ltnm_active_frame_action_button"
-            end
+            -- if event.is_enabled("auto_refresh", e.player_index) then
+            --   event.disable("auto_refresh", e.player_index)
+            --   e.element.style = "ltnm_frame_action_button"
+            -- else
+            --   event.enable("auto_refresh", e.player_index)
+            --   e.element.style = "ltnm_active_frame_action_button"
+            -- end
           else
             main_gui.update_active_tab(game.get_player(e.player_index), global.players[e.player_index])
           end
@@ -156,7 +145,7 @@ gui.handlers:extend{
 
 function main_gui.create(player, player_table)
   -- create base GUI structure
-  local gui_data = gui.build(player.gui.screen, {
+  local gui_data, filters = gui.build(player.gui.screen, {
     {type="frame", style="ltnm_empty_frame", direction="vertical", handlers="main.window", save_as="window.frame", children={
       -- TITLEBAR
       {type="flow", style_mods={horizontal_spacing=0}, direction="horizontal", children={
@@ -186,19 +175,19 @@ function main_gui.create(player, player_table)
     }}
   })
 
-  -- other handlers
-  event.enable("gui.main.ltnm-search", player.index)
-  event.enable_group("gui.main.open_train_button", player.index)
-  event.enable_group("gui.main.view_station_button", player.index)
-  event.enable_group("gui.main.material_button", player.index)
-  event.enable_group("gui.alerts.clear_alert_button", player.index)
+  -- -- other handlers
+  -- event.enable("gui.main.ltnm-search", player.index)
+  -- event.enable_group("gui.main.open_train_button", player.index)
+  -- event.enable_group("gui.main.view_station_button", player.index)
+  -- event.enable_group("gui.main.material_button", player.index)
+  -- event.enable_group("gui.alerts.clear_alert_button", player.index)
 
-  -- auto-refresh
-  if event.is_enabled("auto_refresh", player.index) then
-    gui_data.titlebar.refresh_button.style = "ltnm_active_frame_action_button"
-  else
-    gui_data.titlebar.refresh_button.style = "ltnm_frame_action_button"
-  end
+  -- -- auto-refresh
+  -- if event.is_enabled("auto_refresh", player.index) then
+  --   gui_data.titlebar.refresh_button.style = "ltnm_active_frame_action_button"
+  -- else
+  --   gui_data.titlebar.refresh_button.style = "ltnm_frame_action_button"
+  -- end
 
   -- default settings
   gui_data.window.pinned = false
@@ -237,12 +226,13 @@ function main_gui.create(player, player_table)
   gui_data.window.frame.visible = false
 
   -- save data to global
+  gui_data.filters = filters
   player_table.gui.main = gui_data
 end
 
 -- completely destroys the GUI
 function main_gui.destroy(player, player_table)
-  event.disable_group("gui.main", player.index)
+  -- event.disable_group("gui.main", player.index)
   player_table.gui.main.window.frame.destroy()
   player_table.gui.main = nil
 

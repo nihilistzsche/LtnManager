@@ -1,7 +1,7 @@
 local data = {}
 
--- local alert_popup_gui = require("gui.alert-popup")
--- local main_gui = require("gui.main")
+local alert_popup_gui = require("scripts.gui.alert-popup")
+local main_gui = require("scripts.gui.main")
 local translation = require("__flib__.control.translation")
 
 local string_gsub = string.gsub
@@ -53,7 +53,7 @@ function data.refresh_player(player, player_table)
   player_table.flags.translations_finished = false
 
   -- set shortcut state
-  player.set_shortcut_toggled("ltnm-toggle-gui", false)
+  -- player.set_shortcut_toggled("ltnm-toggle-gui", false)
   player.set_shortcut_available("ltnm-toggle-gui", false)
 
   -- update settings
@@ -101,7 +101,7 @@ end
 function data.enable_gui(player_index, player_table)
   local player = game.get_player(player_index)
   player_table.flags.can_open_gui = true
-  -- main_gui.create(player, player_table)
+  main_gui.create(player, player_table)
   player.set_shortcut_available("ltnm-toggle-gui", true)
 end
 
