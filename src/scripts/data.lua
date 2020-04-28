@@ -23,13 +23,13 @@ function data.setup_player(player, index)
 end
 
 function data.destroy_player_guis(player, player_table)
-  if player_table.gui.main then
-    main_gui.close(player, player_table)
-    main_gui.destroy(player, player_table)
-  end
-  if player_table.gui.alert_popup then
-    alert_popup_gui.destroy(player, player_table)
-  end
+  -- if player_table.gui.main then
+  --   main_gui.close(player, player_table)
+  --   main_gui.destroy(player, player_table)
+  -- end
+  -- if player_table.gui.alert_popup then
+  --   alert_popup_gui.destroy(player, player_table)
+  -- end
 end
 
 function data.update_player_settings(player, player_table)
@@ -48,8 +48,11 @@ function data.refresh_player(player, player_table)
   -- destroy GUIs
   data.destroy_player_guis(player, player_table)
 
-  -- set shortcut state
+  -- set flags
+  player_table.flags.can_open_gui = false
   player_table.flags.translations_finished = false
+
+  -- set shortcut state
   player.set_shortcut_toggled("ltnm-toggle-gui", false)
   player.set_shortcut_available("ltnm-toggle-gui", false)
 
@@ -93,6 +96,13 @@ function data.start_translations(player_index)
   for _, name in ipairs{"materials", "gui"} do
     translation.start(player_index, name, translation_data[name], {include_failed_translations=true})
   end
+end
+
+function data.enable_gui(player_index, player_table)
+  local player = game.get_player(player_index)
+  player_table.flags.can_open_gui = true
+  -- main_gui.create(player, player_table)
+  player.set_shortcut_available("ltnm-toggle-gui", true)
 end
 
 -- INIT

@@ -19,7 +19,7 @@ end
 -- -----------------------------------------------------------------------------
 -- COMMANDS
 
-commands.add_command("LtnManager", " [parameter]\nrefresh_player_data - close and recreate all GUIs, retranslate dictionaries, and update settings",
+commands.add_command("LtnManager", {"ltnm-message.command-help"},
   function(e)
     if e.parameter == "refresh-player-data" then
       data.refresh_player(game.get_player(e.player_index), global.players[e.player_index])
@@ -92,7 +92,8 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
     local player = game.get_player(e.player_index)
     local player_table = global.players[e.player_index]
     if player_table.flags.can_open_gui then
-      main_gui.toggle(player, player_table)
+      -- main_gui.toggle(player, player_table)
+      log("Open main GUI")
     else
       player.print{"ltnm-message.cannot-open-gui"}
     end
@@ -116,7 +117,9 @@ event.on_tick(function()
   if flags.iterating_ltn_data then
     ltn_data.iterate()
   end
-  translation.translate_batch()
+  if global.__flib.translation.active_translations_count > 0 then
+    translation.translate_batch()
+  end
 end)
 
 -- TRANSLATIONS
