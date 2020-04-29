@@ -86,8 +86,8 @@ gui.add_handlers{
       },
     },
     open_train_button = {
-      on_gui_click = {handler=function(e)
-        local train_id = string_gsub(e.element.name, "ltnm_open_train_", "")
+      on_gui_click = function(e)
+        local train_id = string_gsub(e.element.name, "ltnm_open_train__", "")
         train_id = tonumber(train_id)
         local train = global.data.trains[train_id]
         if train then
@@ -95,11 +95,11 @@ gui.add_handlers{
         else
           game.get_player(e.player_index).print{"ltnm-message.train-invalid-refresh-gui"}
         end
-      end, gui_filters="ltnm_open_train_", options={match_filter_strings=true}}
+      end
     },
     view_station_button = {
-      on_gui_click = {handler=function(e)
-        local station_id = string_gsub(e.element.name, "ltnm_view_station_", "")
+      on_gui_click = function(e)
+        local station_id = string_gsub(e.element.name, "ltnm_view_station__", "")
         local player = game.get_player(e.player_index)
         local player_table = global.players[e.player_index]
 
@@ -113,17 +113,17 @@ gui.add_handlers{
         else
           player.print{"ltnm-message.station-invalid"}
         end
-      end, gui_filters="ltnm_view_station_", options={match_filter_strings=true}}
+      end
     },
     material_button = {
-      on_gui_click = {handler=function(e)
+      on_gui_click = function(e)
         local player_table = global.players[e.player_index]
         local on_inventory_tab = player_table.gui.main.tabbed_pane.selected == "inventory"
         main_gui.update(game.get_player(e.player_index), player_table, {
           active_tab = (not on_inventory_tab) and "inventory",
           inventory = string_gsub(e.element.sprite, "/", ",")}
         )
-      end, gui_filters="ltnm_material_button_", options={match_filter_strings=true}}
+      end
     },
     ["ltnm-search"] = function(e)
       local player_table = global.players[e.player_index]
@@ -171,12 +171,11 @@ function main_gui.create(player, player_table)
     }}
   })
 
-  -- -- other handlers
-  -- event.enable("gui.main.ltnm-search", player.index)
-  -- event.enable_group("gui.main.open_train_button", player.index)
-  -- event.enable_group("gui.main.view_station_button", player.index)
-  -- event.enable_group("gui.main.material_button", player.index)
-  -- event.enable_group("gui.alerts.clear_alert_button", player.index)
+  -- other handlers
+  gui.add_filters("main.open_train_button", player.index, {"ltnm_open_train"})
+  gui.add_filters("main.view_station_button", player.index, {"ltnm_view_station"})
+  gui.add_filters("main.material_button", player.index, {"ltnm_view_material"})
+  gui.add_filters("alerts.clear_alert_button", player.index, {"ltnm_clear_alert"})
 
   -- default settings
   gui_data.window.pinned = false
@@ -222,6 +221,7 @@ function main_gui.create(player, player_table)
     gui_data.titlebar.pin_button.style = "ltnm_active_frame_action_button"
   else
     gui_data.titlebar.pin_button.style = "ltnm_frame_action_button"
+    -- center window
     gui_data.window.frame.force_auto_center()
   end
 

@@ -7,7 +7,6 @@ local bit32_btest = bit32.btest
 local string_find = string.find
 local string_gsub = string.gsub
 local string_lower = string.lower
-local string_match = string.match
 
 gui.add_templates{
   inventory = {
@@ -55,7 +54,7 @@ gui.add_templates{
         local style = "ltnm_small_slot_button_"..t[1]
         for name, count in pairs(t[2]) do
           i = i + 1
-          table_add{type="sprite-button", name="ltnm_material_button_"..i, style=style, sprite=string_gsub(name, ",", "/"), number=count,
+          table_add{type="sprite-button", name="ltnm_view_material__"..i, style=style, sprite=string_gsub(name, ",", "/"), number=count,
             tooltip=translations[name].."\n"..util.comma_value(count)}
         end
       end
@@ -127,7 +126,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
       local i = 0
       for name, count in pairs(combined_materials) do
         i = i + 1
-        elems[name] = add{type="sprite-button", name="ltnm_material_button_"..i, style="ltnm_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
+        elems[name] = add{type="sprite-button", name="ltnm_view_material__"..i, style="ltnm_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
           number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
       end
       buttons[type] = elems
@@ -195,7 +194,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
               end
               location_template(
                 table,
-                {{"hoverable_bold_label", station.entity.backer_name, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..station_ids[i]}},
+                {{"hoverable_bold_label", station.entity.backer_name, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..station_ids[i]}},
                 materials,
                 material_translations
               )
@@ -220,8 +219,8 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
               if train.shipment then
                 materials = {{"blue", train.shipment}}
               end
-              location_template(table, {{"hoverable_bold_label", train.from, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..train.from_id},
-                {"caption_label", "->"}, {"hoverable_bold_label", train.to, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station_"..train.to_id}}, materials,
+              location_template(table, {{"hoverable_bold_label", train.from, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..train.from_id},
+                {"caption_label", "->"}, {"hoverable_bold_label", train.to, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..train.to_id}}, materials,
                 material_translations)
             end
           end

@@ -65,11 +65,11 @@ function history_gui.update(player, player_table, state_changes, gui_data, data,
         local table_add = gui.build(history_table, {
           {type="label", style="bold_label", style_mods={width=140}, caption=entry.depot},
           {type="flow", style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction="vertical", children={
-            {type="label", name="ltnm_view_station_"..entry.from_id, style="hoverable_bold_label", caption=entry.from,
+            {type="label", name="ltnm_view_station__"..entry.from_id, style="hoverable_bold_label", caption=entry.from,
               tooltip={"ltnm-gui.view-station-on-map"}},
             {type="flow", children={
               {type="label", style="caption_label", caption="->"},
-              {type="label", name="ltnm_view_station_"..entry.to_id, style="hoverable_bold_label", caption=entry.to, tooltip={"ltnm-gui.view-station-on-map"}}
+              {type="label", name="ltnm_view_station__"..entry.to_id, style="hoverable_bold_label", caption=entry.to, tooltip={"ltnm-gui.view-station-on-map"}}
             }}
           }},
           {type="label", style_mods={right_margin=8, width=16, horizontal_align="right"}, caption=entry.network_id},
@@ -84,7 +84,7 @@ function history_gui.update(player, player_table, state_changes, gui_data, data,
         local mi = 0
         for name, count in pairs(entry.actual_shipment or entry.shipment) do
           mi = mi + 1
-          table_add{type="sprite-button", name="ltnm_material_button_"..mi, style="ltnm_small_slot_button_dark_grey", sprite=string_gsub(name, ",", "/"),
+          table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_dark_grey", sprite=string_gsub(name, ",", "/"),
             number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
         end
       end

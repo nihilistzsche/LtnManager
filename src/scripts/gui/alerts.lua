@@ -19,7 +19,7 @@ gui.add_templates{
       local mi = 0
       for name, count in pairs(materials) do
         mi = mi + 1
-        table_add{type="sprite-button", name="ltnm_material_button_"..mi, style="ltnm_small_slot_button_"..style, sprite=string_gsub(name, ",", "/"),
+        table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_"..style, sprite=string_gsub(name, ",", "/"),
           number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
       end
     end
@@ -86,11 +86,11 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
             {type="label", style_mods={width=64}, caption=util.ticks_to_time(alert_data.time)},
             {type="label", style_mods={width=26, horizontal_align="center"}, caption=alert_data.train.network_id},
             {type="flow", style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction="vertical", children={
-              {type="label", name="ltnm_view_station_"..alert_data.train.from_id, style="hoverable_bold_label", caption=alert_data.train.from,
+              {type="label", name="ltnm_view_station__"..alert_data.train.from_id, style="hoverable_bold_label", caption=alert_data.train.from,
                 tooltip={"ltnm-gui.view-station-on-map"}},
               {type="flow", children={
                 {type="label", style="caption_label", caption="->"},
-                {type="label", name="ltnm_view_station_"..alert_data.train.to_id, style="hoverable_bold_label", caption=alert_data.train.to,
+                {type="label", name="ltnm_view_station__"..alert_data.train.to_id, style="hoverable_bold_label", caption=alert_data.train.to,
                   tooltip={"ltnm-gui.view-station-on-map"}}
               }}
             }},
@@ -99,7 +99,7 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
             {type="flow", style_mods={vertical_spacing=8}, direction="vertical", save_as="tables_flow"},
             {type="flow", children={
               {type="frame", style="ltnm_dark_content_frame_in_light_frame", style_mods={padding=0}, children={
-                {type="sprite-button", name="ltnm_open_train_"..alert_data.train.id, style="ltnm_inset_tool_button", sprite="utility/preset",
+                {type="sprite-button", name="ltnm_open_train__"..alert_data.train.id, style="ltnm_inset_tool_button", sprite="utility/preset",
                   tooltip={"ltnm-gui.open-train-gui"}},
               }},
               {type="frame", style="ltnm_dark_content_frame_in_light_frame", style_mods={padding=0}, children={

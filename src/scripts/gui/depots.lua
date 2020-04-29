@@ -151,7 +151,7 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
       local train = data.trains[train_id]
       -- build GUI structure
       local elems = gui.build(trains_table, {
-        {type="label", name="ltnm_open_train_"..train_id, style="hoverable_bold_label", style_mods={top_margin=-2, width=120}, caption=train.composition,
+        {type="label", name="ltnm_open_train__"..train_id, style="hoverable_bold_label", style_mods={top_margin=-2, width=120}, caption=train.composition,
           tooltip={"", string_len(train.composition) > 15 and train.composition.."\n" or "", {"ltnm-gui.open-train-gui"}}},
         {type="flow", style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction="vertical",
           save_as="status_flow"},
@@ -172,7 +172,7 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
         local i = 0
         for name, count in pairs(train.shipment) do
           i = i + 1
-          contents_table.add{type="sprite-button", name="ltnm_material_button_"..i, style="ltnm_small_slot_button_dark_grey",
+          contents_table.add{type="sprite-button", name="ltnm_view_material__"..i, style="ltnm_small_slot_button_dark_grey",
             sprite=string_gsub(name, ",", "/"), number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
         end
       end
