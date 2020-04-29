@@ -33,7 +33,7 @@ gui.add_handlers{
     window = {
       on_gui_closed = function(e)
         local player_table = global.players[e.player_index]
-        if not player_table.settings.keep_gui_open then
+        if not player_table.settings.keep_gui_open and not player_table.flags.opening_ltn_combinator then
           main_gui.close(game.get_player(e.player_index), player_table)
         end
       end
@@ -106,9 +106,17 @@ gui.add_handlers{
         -- check station validity
         local station_data = global.data.stations[tonumber(station_id)]
         if station_data and station_data.entity.valid then
-          player.zoom_to_world(station_data.entity.position, 0.5)
-          if not player_table.gui.main.window.pinned then
-            main_gui.close(player, player_table)
+          if e.shift then
+            -- open LTN combinator
+            if not remote.call("ltn-combinator", "open_ltn_combinator", e.player_index, station_data.lamp_control, true) then
+              player.print{"ltnm-gui.ltn-combinator-not-found"}
+            end
+          else
+            -- view station on map
+            player.zoom_to_world(station_data.entity.position, 0.5)
+            if not player_table.gui.main.window.pinned then
+              main_gui.close(player, player_table)
+            end
           end
         else
           player.print{"ltnm-message.station-invalid"}
