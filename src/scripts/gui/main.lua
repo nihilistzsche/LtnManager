@@ -235,7 +235,8 @@ end
 
 -- completely destroys the GUI
 function main_gui.destroy(player, player_table)
-  -- event.disable_group("gui.main", player.index)
+  -- TODO add a GUI module function for this
+  global.__flib.gui[player.index] = {}
   player_table.gui.main.window.frame.destroy()
   player_table.gui.main = nil
 
@@ -304,7 +305,7 @@ function main_gui.open(player, player_table, skip_update)
   player.set_shortcut_toggled("ltnm-toggle-gui", true)
 end
 
-function main_gui.close(player, player_table, set_closed)
+function main_gui.close(player, player_table)
   player_table.flags.gui_open = false
   player_table.gui.main.window.frame.visible = false
 

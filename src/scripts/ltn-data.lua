@@ -504,7 +504,6 @@ local function on_dispatcher_updated(e)
 
   -- enable data iteration handler
   global.flags.iterating_ltn_data = true
-  -- event.register()
 end
 
 local function on_delivery_pickup_complete(e)

@@ -40,10 +40,13 @@ gui.add_handlers{
 function depots_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
   -- DEPOT BUTTONS
   if state_changes.depot_buttons then
-    local buttons_pane = gui_data.depots.buttons_scroll_pane
+    local depots_gui_data = gui_data.depots
+    local buttons_pane = depots_gui_data.buttons_scroll_pane
     -- delete old buttons and disable handler
     buttons_pane.clear()
-    -- event.disable_group("gui.depots.depot_button", player.index)
+    if depots_gui_data.depot_button_filters then
+      gui.remove_filters(player.index, depots_gui_data.depot_button_filters)
+    end
 
     local buttons_data = {}
 
@@ -51,10 +54,12 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
 
     local button_style = table_size(data.depots) > 7 and "ltnm_depot_button_for_scrollbar" or "ltnm_depot_button"
 
+    local button_filters = {}
+
     -- build all buttons as if they're inactive
     for name, t in pairs(data.depots) do
       button_index = button_index + 1
-      local elems = gui.build(buttons_pane, {
+      local elems, filters = gui.build(buttons_pane, {
         {type="button", name="ltnm_depot_button_"..name, style=button_style, handlers="depots.depot_button", save_as="button", children={
           {type="flow", ignored_by_interaction=true, direction="vertical", children={
             {type="label", style="ltnm_depot_button_caption_label", caption=name, mods={enabled=false}, save_as="labels.name"},
@@ -81,49 +86,56 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
         elems.labels[status_name] = output.indicator_label
       end
 
+      -- add filter to filters table
+      for filter, event_name in pairs(filters) do
+        button_filters[filter] = event_name
+      end
+
       -- add elems to button table
       buttons_data[name] = elems
     end
 
-    gui_data.depots.amount = button_index
-    gui_data.depots.buttons = buttons_data
+    depots_gui_data.depot_button_filters = button_filters
+
+    depots_gui_data.amount = button_index
+    depots_gui_data.buttons = buttons_data
 
     -- set selected depot button
-    if data.depots[gui_data.depots.selected] then
-      state_changes.selected_depot = state_changes.selected_depot or gui_data.depots.selected
+    if data.depots[depots_gui_data.selected] then
+      state_changes.selected_depot = state_changes.selected_depot or depots_gui_data.selected
     else
       state_changes.selected_depot = true
-      gui_data.depots.selected = nil
+      depots_gui_data.selected = nil
     end
   end
 
   -- SELECTED DEPOT
   if state_changes.selected_depot then
-    local depot_data = gui_data.depots
+    local depots_gui_data = gui_data.depots
 
-    if depot_data.amount > 0 then
+    if depots_gui_data.amount > 0 then
       local new_selection = state_changes.selected_depot
       if new_selection == true then
         -- get the name of the first depot in the list
         _,_,new_selection = string_find(gui_data.depots.buttons_scroll_pane.children[1].name, "^ltnm_depot_button_(.*)$")
       end
       -- set previous selection to inactive style
-      local previous_selection = depot_data.selected
+      local previous_selection = depots_gui_data.selected
       if previous_selection then
-        local button_data = depot_data.buttons[previous_selection]
+        local button_data = depots_gui_data.buttons[previous_selection]
         button_data.button.enabled = true
         for _, elem in pairs(button_data.labels) do
           elem.enabled = false
         end
       end
       -- set new selection to active style
-      local button_data = depot_data.buttons[new_selection]
+      local button_data = depots_gui_data.buttons[new_selection]
       button_data.button.enabled = false
       for _, elem in pairs(button_data.labels) do
         elem.enabled = true
       end
       -- update selection in global
-      depot_data.selected = new_selection
+      depots_gui_data.selected = new_selection
       -- update trains list
       state_changes.depot_trains = true
     end

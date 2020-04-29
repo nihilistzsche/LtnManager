@@ -28,7 +28,8 @@ gui.add_handlers{
 function alert_popup_gui.create_or_update(player, player_table, data)
   local gui_data = player_table.gui.alert_popup
   if not gui_data then
-    gui_data = gui.build(mod_gui.get_frame_flow(player), {
+    local filters
+    gui_data, filters = gui.build(mod_gui.get_frame_flow(player), {
       {type="button", style="red_button", style_mods={width=150, height=56}, tooltip={"ltnm-gui.alert-popup-tooltip"},
         mouse_button_filter={"left", "right"}, handlers="alert_popup.button", save_as="button", children={
           {type="flow", direction="vertical", mods={ignored_by_interaction=true}, children={
@@ -38,14 +39,16 @@ function alert_popup_gui.create_or_update(player, player_table, data)
         }
       }
     })
+    gui_data.filters = filters
     player_table.gui.alert_popup = gui_data
   end
   gui_data.label.caption = {"ltnm-gui.alert-"..data.type}
 end
 
 function alert_popup_gui.destroy(player, player_table)
-  -- event.disable_group("gui.alert_popup", player.index)
-  player_table.gui.alert_popup.button.destroy()
+  local gui_data = player_table.gui.alert_popup
+  gui.remove_filters(player.index, gui_data.filters)
+  gui_data.button.destroy()
   player_table.gui.alert_popup = nil
 end
 
