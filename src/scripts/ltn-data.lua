@@ -677,15 +677,7 @@ end
 
 function ltn_data.init()
   global.data = nil
-  if global.working_data then
-    global.working_data = {
-      history = global.working_data.history,
-      alerts = global.working_data.alerts,
-      alert_popups = {}
-    }
-  else
-    global.working_data = {history={}, alerts={_index=0}, alert_popups={}}
-  end
+  global.working_data = {history={}, alerts={_index=0}, alert_popups={}}
 end
 
 -- -----------------------------------------------------------------------------

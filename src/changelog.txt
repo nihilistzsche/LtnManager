@@ -4,6 +4,7 @@ Date: ????
   Changes:
     - Refactored mod structure to improve performance
     - Switched from RaiLuaLib to FLib
+    - History and alerts will be cleared on mod configuration change, to avoid migration issues
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.10
 Date: 2020-04-27

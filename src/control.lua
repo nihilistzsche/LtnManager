@@ -61,8 +61,11 @@ event.on_configuration_changed(function(e)
   if migration.on_config_changed(e, migrations) then
     -- update translation data
     global_data.build_translations()
+    -- reset LTN data
+    ltn_data.init()
     -- refresh all player information
     for i, player in pairs(game.players) do
+      -- close open GUIs
       local player_table = global.players[i]
       if player_table.gui.main then
         main_gui.close(player, player_table)
@@ -71,10 +74,9 @@ event.on_configuration_changed(function(e)
       if player_table.gui.alert_popup then
         alert_popup_gui.destroy(player, player_table)
       end
+      -- refresh data
       player_data.refresh(player, player_table)
     end
-    -- reset LTN data iteration
-    ltn_data.reset()
   end
 end)
 
