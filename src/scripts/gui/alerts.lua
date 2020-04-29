@@ -1,20 +1,10 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- ALERTS GUI
--- A tab of the main GUI
+local alerts_gui = {}
 
--- dependencies
 local gui = require("__flib__.control.gui")
 local util = require("scripts.util")
 
--- locals
 local string_find = string.find
 local string_gsub = string.gsub
-
--- object
-local alerts_gui = {}
-
--- -----------------------------------------------------------------------------
--- GUI DATA
 
 gui.add_templates{
   alerts = {
@@ -68,9 +58,6 @@ gui.add_handlers{
     }
   }
 }
-
--- -----------------------------------------------------------------------------
--- FUNCTIONS
 
 function alerts_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
   if state_changes.alerts then
@@ -130,8 +117,6 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
     end
   end
 end
-
--- -----------------------------------------------------------------------------
 
 alerts_gui.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.alerts", children={
   -- alerts list

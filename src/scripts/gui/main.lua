@@ -11,9 +11,6 @@ end
 
 local string_gsub = string.gsub
 
--- -----------------------------------------------------------------------------
--- GUI DATA
-
 gui.add_templates{
   pushers = {
     horizontal = {type="empty-widget", style_mods={horizontally_stretchable=true}},
@@ -143,9 +140,6 @@ gui.add_handlers{
   }
 }
 
--- -----------------------------------------------------------------------------
--- GUI MANAGEMENT
-
 function main_gui.create(player, player_table)
   -- create base GUI structure
   local gui_data, filters = gui.build(player.gui.screen, {
@@ -249,9 +243,6 @@ function main_gui.destroy(player, player_table)
   player_table.flags.can_open_gui = false
   player.set_shortcut_available("ltnm-toggle-gui", false)
 end
-
--- -------------------------------------
--- STATE UPDATES
 
 -- updates the contents of the GUI
 function main_gui.update(player, player_table, state_changes)

@@ -1,23 +1,13 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- INVENTORY GUI
--- A tab of the main GUI
+local inventory_gui = {}
 
--- dependencies
 local gui = require("__flib__.control.gui")
 local util = require("scripts.util")
 
--- locals
 local bit32_btest = bit32.btest
 local string_find = string.find
 local string_gsub = string.gsub
 local string_lower = string.lower
 local string_match = string.match
-
--- object
-local inventory_gui = {}
-
--- -----------------------------------------------------------------------------
--- GUI DATA
 
 gui.add_templates{
   inventory = {
@@ -101,9 +91,6 @@ gui.add_handlers{
     }
   }
 }
-
--- -----------------------------------------------------------------------------
--- FUNCTIONS
 
 function inventory_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
   if state_changes.inventory then
@@ -247,8 +234,6 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
     end
   end
 end
-
--- -----------------------------------------------------------------------------
 
 inventory_gui.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.inventory", children={
   -- left column

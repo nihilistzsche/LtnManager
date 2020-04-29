@@ -1,20 +1,10 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- HISTORY GUI
--- A tab of the main GUI
+local history_gui = {}
 
--- dependencies
 local gui = require("__flib__.control.gui")
 local util = require("scripts.util")
 
--- locals
 local string_find = string.find
 local string_gsub = string.gsub
-
--- object
-local history_gui = {}
-
--- -----------------------------------------------------------------------------
--- GUI DATA
 
 gui.add_handlers{
   history = {
@@ -52,9 +42,6 @@ gui.add_handlers{
     }
   },
 }
-
--- -----------------------------------------------------------------------------
--- FUNCTIONS
 
 function history_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
   -- HISTORY
@@ -104,8 +91,6 @@ function history_gui.update(player, player_table, state_changes, gui_data, data,
     end
   end
 end
-
--- -----------------------------------------------------------------------------
 
 history_gui.base_template = {type="frame", style="ltnm_light_content_frame", direction="vertical", mods={visible=false}, save_as="tabbed_pane.contents.history",
   children={

@@ -1,23 +1,9 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- ALERT POPUP GUI
--- HUD to notify you when an alert is triggered
+local alert_popup_gui = {}
 
--- dependencies
--- local event = require("__RaiLuaLib__.lualib.event")
 local gui = require("__flib__.control.gui")
 local mod_gui = require("mod-gui")
 
--- locals
-local string_gsub = string.gsub
-
--- scripts
 local main_gui = require("scripts.gui.main")
-
--- object
-local alert_popup_gui = {}
-
--- -----------------------------------------------------------------------------
--- GUI DATA
 
 gui.add_handlers{
   alert_popup = {
@@ -38,9 +24,6 @@ gui.add_handlers{
     }
   }
 }
-
--- -----------------------------------------------------------------------------
--- FUNCTIONS
 
 function alert_popup_gui.create_or_update(player, player_table, data)
   local gui_data = player_table.gui.alert_popup
@@ -75,7 +58,5 @@ function alert_popup_gui.create_for_all(data)
     end
   end
 end
-
--- -----------------------------------------------------------------------------
 
 return alert_popup_gui

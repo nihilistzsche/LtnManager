@@ -1,11 +1,7 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- STATIONS GUI
--- A tab of the main GUI
+local stations_gui = {}
 
--- dependencies
 local gui = require("__flib__.control.gui")
 
--- locals
 local string_find = string.find
 local string_gsub = string.gsub
 
@@ -25,12 +21,6 @@ local ltn_virtual_signals = {
   ["ltn-requester-priority"] = true,
   ["ltn-disable-warnings"] = true
 }
-
--- object
-local stations_gui = {}
-
--- -----------------------------------------------------------------------------
--- GUI DATA
 
 gui.add_handlers{
   stations = {
@@ -56,9 +46,6 @@ gui.add_handlers{
     }
   }
 }
-
--- -----------------------------------------------------------------------------
--- FUNCTIONS
 
 function stations_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
   if state_changes.stations_list then
@@ -180,8 +167,6 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
     end
   end
 end
-
--- -----------------------------------------------------------------------------
 
 stations_gui.base_template = {type="frame", style="ltnm_light_content_frame", direction="vertical", mods={visible=false},
   save_as="tabbed_pane.contents.stations", children={

@@ -1,21 +1,10 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- DEPOTS GUI
--- A tab of the main GUI
+local depots_gui = {}
 
--- dependencies
--- local event = require("__RaiLuaLib__.lualib.event")
 local gui = require("__flib__.control.gui")
 
--- locals
 local string_find = string.find
 local string_gsub = string.gsub
 local string_len = string.len
-
--- object
-local depots_gui = {}
-
--- -----------------------------------------------------------------------------
--- GUI DATA
 
 gui.add_handlers{
   depots = {
@@ -47,9 +36,6 @@ gui.add_handlers{
     }
   }
 }
-
--- -----------------------------------------------------------------------------
--- FUNCTIONS
 
 function depots_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
   -- DEPOT BUTTONS
@@ -193,8 +179,6 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
     end
   end
 end
-
--- -----------------------------------------------------------------------------
 
 depots_gui.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.depots", children={
   -- buttons
