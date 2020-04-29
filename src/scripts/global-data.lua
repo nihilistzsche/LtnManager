@@ -7,7 +7,7 @@ function global_data.init()
   global.players = {}
   global_data.build_translations()
   for i, player in pairs(game.players) do
-    player_data.setup(player, i)
+    player_data.init(player, i)
     player_data.refresh(player, global.players[i])
   end
 end

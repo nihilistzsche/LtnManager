@@ -91,7 +91,7 @@ end)
 
 event.on_player_created(function(e)
   local player = game.get_player(e.player_index)
-  player_data.setup(player, e.player_index)
+  player_data.init(player, e.player_index)
   player_data.refresh(player, global.players[e.player_index])
 end)
 

@@ -5,7 +5,7 @@ local translation = require("__flib__.control.translation")
 local string_gsub = string.gsub
 local string_sub = string.sub
 
-function player_data.setup(player, index)
+function player_data.init(player, index)
   local player_table = {
     dictionary = {},
     flags = {
@@ -37,6 +37,7 @@ function player_data.refresh(player, player_table)
   player_table.flags.translations_finished = false
 
   -- set shortcut state
+  player.set_shortcut_toggled("ltnm-toggle-gui", false)
   player.set_shortcut_available("ltnm-toggle-gui", false)
 
   -- update settings
