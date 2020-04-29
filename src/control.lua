@@ -130,7 +130,7 @@ end)
 event.on_runtime_mod_setting_changed(function(e)
   if string_sub(e.setting, 1, 5) == "ltnm-" then
     for i, p in pairs(game.players) do
-      player_data.update_settings(p, global.players[i], e.setting)
+      player_data.update_settings(p, global.players[i])
     end
   end
 end)
