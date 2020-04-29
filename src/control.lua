@@ -22,7 +22,16 @@ end
 commands.add_command("LtnManager", {"ltnm-message.command-help"},
   function(e)
     if e.parameter == "refresh-player-data" then
-      data.refresh_player(game.get_player(e.player_index), global.players[e.player_index])
+      local player = game.get_player(e.player_index)
+      local player_table = global.players[e.player_index]
+      if player_table.gui.main then
+        main_gui.close(player, player_table)
+        main_gui.destroy(player, player_table)
+      end
+      if player_table.gui.alert_popup then
+        alert_popup_gui.destroy(player, player_table)
+      end
+      data.refresh_player(game.get_player(e.player_index), player_table)
     end
   end
 )
@@ -53,8 +62,16 @@ event.on_configuration_changed(function(e)
     -- update translation data
     data.build_translations()
     -- refresh all player information
-    for i, p in pairs(game.players) do
-      data.refresh_player(p, global.players[i])
+    for i, player in pairs(game.players) do
+      local player_table = global.players[i]
+      if player_table.gui.main then
+        main_gui.close(player, player_table)
+        main_gui.destroy(player, player_table)
+      end
+      if player_table.gui.alert_popup then
+        alert_popup_gui.destroy(player, player_table)
+      end
+      data.refresh_player(player, player_table)
     end
     -- reset LTN data iteration
     ltn_data.reset()
@@ -104,7 +121,7 @@ end)
 event.on_runtime_mod_setting_changed(function(e)
   if string_sub(e.setting, 1, 5) == "ltnm-" then
     for i, p in pairs(game.players) do
-      data.update_player_settings(p, global.players[i])
+      data.update_player_settings(p, global.players[i], e.setting)
     end
   end
 end)

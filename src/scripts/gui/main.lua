@@ -2,6 +2,8 @@ local main_gui = {}
 
 local gui = require("__flib__.control.gui")
 
+local data = require("scripts.data")
+
 local tabs = {}
 for _, name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
   tabs[name] = require("scripts.gui."..name)
@@ -34,7 +36,7 @@ gui.add_handlers{
     window = {
       on_gui_closed = function(e)
         local player_table = global.players[e.player_index]
-        if not player_table.gui.main.window.pinned then
+        if not player_table.settings.keep_gui_open then
           main_gui.close(game.get_player(e.player_index), player_table)
         end
       end
@@ -51,14 +53,14 @@ gui.add_handlers{
           local player = game.get_player(e.player_index)
           local player_table = global.players[e.player_index]
           local window_data = player_table.gui.main.window
-          if window_data.pinned then
+          if player_table.settings.keep_gui_open then
             e.element.style = "ltnm_frame_action_button"
-            window_data.pinned = false
+            player_table.settings.keep_gui_open = false
             window_data.frame.force_auto_center()
             player.opened = window_data.frame
           else
             e.element.style = "ltnm_active_frame_action_button"
-            window_data.pinned = true
+            player_table.settings.keep_gui_open = true
             window_data.frame.auto_center = false
             player.opened = nil
           end
@@ -67,13 +69,14 @@ gui.add_handlers{
       refresh_button = {
         on_gui_click = function(e)
           if e.shift then
-            -- if event.is_enabled("auto_refresh", e.player_index) then
-            --   event.disable("auto_refresh", e.player_index)
-            --   e.element.style = "ltnm_frame_action_button"
-            -- else
-            --   event.enable("auto_refresh", e.player_index)
-            --   e.element.style = "ltnm_active_frame_action_button"
-            -- end
+            local settings = global.players[e.player_index].settings
+            if settings.auto_refresh then
+              data.set_player_setting(e.player_index, "auto-refresh", false)
+              e.element.style = "ltnm_frame_action_button"
+            else
+              data.set_player_setting(e.player_index, "auto-refresh", true)
+              e.element.style = "ltnm_active_frame_action_button"
+            end
           else
             main_gui.update_active_tab(game.get_player(e.player_index), global.players[e.player_index])
           end
@@ -147,7 +150,6 @@ function main_gui.create(player, player_table)
   -- create base GUI structure
   local gui_data, filters = gui.build(player.gui.screen, {
     {type="frame", style="ltnm_empty_frame", direction="vertical", handlers="main.window", save_as="window.frame", children={
-      -- TITLEBAR
       {type="flow", style_mods={horizontal_spacing=0}, direction="horizontal", children={
         {template="mock_frame_tab", caption={"ltnm-gui.depots"}, save_as="tabbed_pane.tabs.depots"},
         {template="mock_frame_tab", caption={"ltnm-gui.stations"}, save_as="tabbed_pane.tabs.stations"},
@@ -182,13 +184,6 @@ function main_gui.create(player, player_table)
   -- event.enable_group("gui.main.material_button", player.index)
   -- event.enable_group("gui.alerts.clear_alert_button", player.index)
 
-  -- -- auto-refresh
-  -- if event.is_enabled("auto_refresh", player.index) then
-  --   gui_data.titlebar.refresh_button.style = "ltnm_active_frame_action_button"
-  -- else
-  --   gui_data.titlebar.refresh_button.style = "ltnm_frame_action_button"
-  -- end
-
   -- default settings
   gui_data.window.pinned = false
 
@@ -220,7 +215,21 @@ function main_gui.create(player, player_table)
 
   -- dragging and centering
   gui_data.titlebar.drag_handle.drag_target = gui_data.window.frame
-  gui_data.window.frame.force_auto_center()
+
+  -- auto-refresh
+  if player_table.settings.auto_refresh then
+    gui_data.titlebar.refresh_button.style = "ltnm_active_frame_action_button"
+  else
+    gui_data.titlebar.refresh_button.style = "ltnm_frame_action_button"
+  end
+
+  -- pinned
+  if player_table.settings.keep_gui_open then
+    gui_data.titlebar.pin_button.style = "ltnm_active_frame_action_button"
+  else
+    gui_data.titlebar.pin_button.style = "ltnm_frame_action_button"
+    gui_data.window.frame.force_auto_center()
+  end
 
   -- hide window
   gui_data.window.frame.visible = false

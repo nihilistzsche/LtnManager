@@ -3,14 +3,13 @@ local ltn_data = {}
 local event = require("__flib__.control.event")
 local util = require("scripts.util")
 
-local data = require("scripts.data")
+local alert_popup_gui = require("scripts.gui.alert-popup")
+local main_gui = require("scripts.gui.main")
 
 local math_floor = math.floor
 local table_insert = table.insert
 local table_remove = table.remove
 local table_sort = table.sort
-
-local alert_popup_gui = require("scripts.gui.alert-popup")
 
 -- -----------------------------------------------------------------------------
 -- PROCESSING FUNCTIONS
@@ -448,7 +447,10 @@ function ltn_data.iterate()
     for i, player_table in pairs(global.players) do
       local flags = player_table.flags
       if flags.translations_finished and not flags.can_open_gui then
-        data.enable_gui(i, player_table)
+        flags.can_open_gui = true
+        local player = game.get_player(i)
+        main_gui.create(player, player_table)
+        player.set_shortcut_available("ltnm-toggle-gui", true)
       end
     end
   end
