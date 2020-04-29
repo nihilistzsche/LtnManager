@@ -124,21 +124,21 @@ gui.add_handlers{
           inventory = string_gsub(e.element.sprite, "/", ",")}
         )
       end
-    },
-    ["ltnm-search"] = function(e)
-      local player_table = global.players[e.player_index]
-      if not player_table.flags.gui_open then return end
-      local gui_data = player_table.gui.main
-      local active_tab = gui_data.tabbed_pane.selected
-      if active_tab == "inventory" then
-        -- focus textfield
-        gui_data.inventory.search_textfield.focus()
-        -- select all text if on default
-        gui.handlers.inventory.search_textfield.on_gui_click{player_index=e.player_index, element=gui_data.inventory.search_textfield}
-      end
-    end
+    }
   }
 }
+
+function main_gui.open_search(player_index, player_table)
+  if not player_table.flags.gui_open then return end
+  local gui_data = player_table.gui.main
+  local active_tab = gui_data.tabbed_pane.selected
+  if active_tab == "inventory" then
+    -- focus textfield
+    gui_data.inventory.search_textfield.focus()
+    -- select all text if on default
+    gui.handlers.inventory.search_textfield.on_gui_click{player_index=player_index, element=gui_data.inventory.search_textfield}
+  end
+end
 
 function main_gui.create(player, player_table)
   -- create base GUI structure

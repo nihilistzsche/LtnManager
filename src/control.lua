@@ -84,6 +84,13 @@ end)
 
 gui.register_events()
 
+event.register("ltnm-search", function(e)
+  local player_table = global.players[e.player_index]
+  if player_table.flags.gui_open then
+    main_gui.open_search(e.player_index, player_table)
+  end
+end)
+
 -- PLAYER
 
 event.on_player_created(function(e)
