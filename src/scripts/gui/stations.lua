@@ -1,11 +1,7 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- STATIONS GUI
--- A tab of the main GUI
+local stations_gui = {}
 
--- dependencies
-local gui = require("__RaiLuaLib__.lualib.gui")
+local gui = require("__flib__.control.gui")
 
--- locals
 local string_find = string.find
 local string_gsub = string.gsub
 
@@ -26,13 +22,7 @@ local ltn_virtual_signals = {
   ["ltn-disable-warnings"] = true
 }
 
--- object
-local stations_gui = {}
-
--- -----------------------------------------------------------------------------
--- GUI DATA
-
-gui.handlers:extend{
+gui.add_handlers{
   stations = {
     sort_checkbox = {
       on_gui_checked_state_changed = function(e)
@@ -57,9 +47,6 @@ gui.handlers:extend{
   }
 }
 
--- -----------------------------------------------------------------------------
--- FUNCTIONS
-
 function stations_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
   if state_changes.stations_list then
     local stations_table = gui_data.stations.table
@@ -79,7 +66,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
       local t = stations[station_id]
       -- build GUI structure
       local elems = gui.build(stations_table, {
-        {type="label", name="ltnm_view_station_"..sorted_stations[i], style="hoverable_bold_label", style_mods={horizontally_stretchable=true},
+        {type="label", name="ltnm_view_station__"..sorted_stations[i], style="hoverable_bold_label", style_mods={horizontally_stretchable=true},
           caption=t.entity.backer_name, tooltip={"ltnm-gui.view-station-on-map"}},
         {type="label", style_mods={horizontal_align="center", width=24}, caption=t.network_id},
         gui.templates.status_indicator("indicator", t.status.name, t.status.count),
@@ -112,7 +99,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
           for name, count in pairs(materials) do
             mi = mi + 1
             provided_requested_rows = provided_requested_rows + 1
-            table_add{type="sprite-button", name="ltnm_material_button_"..mi, style="ltnm_small_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
+            table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
               number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
           end
         end
@@ -133,7 +120,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
           for name, count in pairs(shipment) do
             mi = mi + 1
             shipments_rows = shipments_rows + 1
-            table_add{type="sprite-button", name="ltnm_material_button_"..mi, style="ltnm_small_slot_button_"..style, sprite=string_gsub(name, ",", "/"),
+            table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_"..style, sprite=string_gsub(name, ",", "/"),
               number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
           end
         end
@@ -180,8 +167,6 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
     end
   end
 end
-
--- -----------------------------------------------------------------------------
 
 stations_gui.base_template = {type="frame", style="ltnm_light_content_frame", direction="vertical", mods={visible=false},
   save_as="tabbed_pane.contents.stations", children={

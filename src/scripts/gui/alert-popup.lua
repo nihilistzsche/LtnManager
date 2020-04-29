@@ -1,25 +1,11 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- ALERT POPUP GUI
--- HUD to notify you when an alert is triggered
-
--- dependencies
-local event = require("__RaiLuaLib__.lualib.event")
-local gui = require("__RaiLuaLib__.lualib.gui")
-local mod_gui = require("mod-gui")
-
--- locals
-local string_gsub = string.gsub
-
--- scripts
-local main_gui = require("gui.main")
-
--- object
 local alert_popup_gui = {}
 
--- -----------------------------------------------------------------------------
--- GUI DATA
+local gui = require("__flib__.control.gui")
+local mod_gui = require("mod-gui")
 
-gui.handlers:extend{
+local main_gui = require("scripts.gui.main")
+
+gui.add_handlers{
   alert_popup = {
     button = {
       on_gui_click = function(e)
@@ -39,13 +25,11 @@ gui.handlers:extend{
   }
 }
 
--- -----------------------------------------------------------------------------
--- FUNCTIONS
-
 function alert_popup_gui.create_or_update(player, player_table, data)
   local gui_data = player_table.gui.alert_popup
   if not gui_data then
-    gui_data = gui.build(mod_gui.get_frame_flow(player), {
+    local filters
+    gui_data, filters = gui.build(mod_gui.get_frame_flow(player), {
       {type="button", style="red_button", style_mods={width=150, height=56}, tooltip={"ltnm-gui.alert-popup-tooltip"},
         mouse_button_filter={"left", "right"}, handlers="alert_popup.button", save_as="button", children={
           {type="flow", direction="vertical", mods={ignored_by_interaction=true}, children={
@@ -55,14 +39,16 @@ function alert_popup_gui.create_or_update(player, player_table, data)
         }
       }
     })
+    gui_data.filters = filters
     player_table.gui.alert_popup = gui_data
   end
   gui_data.label.caption = {"ltnm-gui.alert-"..data.type}
 end
 
 function alert_popup_gui.destroy(player, player_table)
-  event.disable_group("gui.alert_popup", player.index)
-  player_table.gui.alert_popup.button.destroy()
+  local gui_data = player_table.gui.alert_popup
+  gui.remove_filters(player.index, gui_data.filters)
+  gui_data.button.destroy()
   player_table.gui.alert_popup = nil
 end
 
@@ -75,7 +61,5 @@ function alert_popup_gui.create_for_all(data)
     end
   end
 end
-
--- -----------------------------------------------------------------------------
 
 return alert_popup_gui

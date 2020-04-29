@@ -1,29 +1,17 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- MAIN GUI
--- The main GUI for the mod
-
--- dependencies
-local event = require("__RaiLuaLib__.lualib.event")
-local gui = require("__RaiLuaLib__.lualib.gui")
-
--- local profiler = require("__profiler__/profiler.lua")
-
--- locals
-local string_gsub = string.gsub
-
--- tabs
-local tabs = {}
-for _, name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
-  tabs[name] = require("gui."..name)
-end
-
--- object
 local main_gui = {}
 
--- -----------------------------------------------------------------------------
--- GUI DATA
+local gui = require("__flib__.control.gui")
 
-gui.templates:extend{
+local player_data = require("scripts.player-data")
+
+local tabs = {}
+for _, name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
+  tabs[name] = require("scripts.gui."..name)
+end
+
+local string_gsub = string.gsub
+
+gui.add_templates{
   pushers = {
     horizontal = {type="empty-widget", style_mods={horizontally_stretchable=true}},
     vertical = {type="empty-widget", style_mods={vertically_stretchable=true}},
@@ -40,12 +28,12 @@ gui.templates:extend{
   end
 }
 
-gui.handlers:extend{
+gui.add_handlers{
   main={
     window = {
       on_gui_closed = function(e)
         local player_table = global.players[e.player_index]
-        if not player_table.gui.main.window.pinned then
+        if not player_table.settings.keep_gui_open then
           main_gui.close(game.get_player(e.player_index), player_table)
         end
       end
@@ -62,14 +50,14 @@ gui.handlers:extend{
           local player = game.get_player(e.player_index)
           local player_table = global.players[e.player_index]
           local window_data = player_table.gui.main.window
-          if window_data.pinned then
+          if player_table.settings.keep_gui_open then
             e.element.style = "ltnm_frame_action_button"
-            window_data.pinned = false
+            player_table.settings.keep_gui_open = false
             window_data.frame.force_auto_center()
             player.opened = window_data.frame
           else
             e.element.style = "ltnm_active_frame_action_button"
-            window_data.pinned = true
+            player_table.settings.keep_gui_open = true
             window_data.frame.auto_center = false
             player.opened = nil
           end
@@ -78,11 +66,12 @@ gui.handlers:extend{
       refresh_button = {
         on_gui_click = function(e)
           if e.shift then
-            if event.is_enabled("auto_refresh", e.player_index) then
-              event.disable("auto_refresh", e.player_index)
+            local settings = global.players[e.player_index].settings
+            if settings.auto_refresh then
+              player_data.set_setting(e.player_index, "auto-refresh", false)
               e.element.style = "ltnm_frame_action_button"
             else
-              event.enable("auto_refresh", e.player_index)
+              player_data.set_setting(e.player_index, "auto-refresh", true)
               e.element.style = "ltnm_active_frame_action_button"
             end
           else
@@ -97,8 +86,8 @@ gui.handlers:extend{
       },
     },
     open_train_button = {
-      on_gui_click = {handler=function(e)
-        local train_id = string_gsub(e.element.name, "ltnm_open_train_", "")
+      on_gui_click = function(e)
+        local train_id = string_gsub(e.element.name, "ltnm_open_train__", "")
         train_id = tonumber(train_id)
         local train = global.data.trains[train_id]
         if train then
@@ -106,11 +95,11 @@ gui.handlers:extend{
         else
           game.get_player(e.player_index).print{"ltnm-message.train-invalid-refresh-gui"}
         end
-      end, gui_filters="ltnm_open_train_", options={match_filter_strings=true}}
+      end
     },
     view_station_button = {
-      on_gui_click = {handler=function(e)
-        local station_id = string_gsub(e.element.name, "ltnm_view_station_", "")
+      on_gui_click = function(e)
+        local station_id = string_gsub(e.element.name, "ltnm_view_station__", "")
         local player = game.get_player(e.player_index)
         local player_table = global.players[e.player_index]
 
@@ -124,41 +113,37 @@ gui.handlers:extend{
         else
           player.print{"ltnm-message.station-invalid"}
         end
-      end, gui_filters="ltnm_view_station_", options={match_filter_strings=true}}
+      end
     },
     material_button = {
-      on_gui_click = {handler=function(e)
+      on_gui_click = function(e)
         local player_table = global.players[e.player_index]
         local on_inventory_tab = player_table.gui.main.tabbed_pane.selected == "inventory"
         main_gui.update(game.get_player(e.player_index), player_table, {
           active_tab = (not on_inventory_tab) and "inventory",
           inventory = string_gsub(e.element.sprite, "/", ",")}
         )
-      end, gui_filters="ltnm_material_button_", options={match_filter_strings=true}}
-    },
-    ["ltnm-search"] = function(e)
-      local player_table = global.players[e.player_index]
-      if not player_table.flags.gui_open then return end
-      local gui_data = player_table.gui.main
-      local active_tab = gui_data.tabbed_pane.selected
-      if active_tab == "inventory" then
-        -- focus textfield
-        gui_data.inventory.search_textfield.focus()
-        -- select all text if on default
-        gui.handlers.inventory.search_textfield.on_gui_click{player_index=e.player_index, element=gui_data.inventory.search_textfield}
       end
-    end
+    }
   }
 }
 
--- -----------------------------------------------------------------------------
--- GUI MANAGEMENT
+function main_gui.open_search(player_index, player_table)
+  if not player_table.flags.gui_open then return end
+  local gui_data = player_table.gui.main
+  local active_tab = gui_data.tabbed_pane.selected
+  if active_tab == "inventory" then
+    -- focus textfield
+    gui_data.inventory.search_textfield.focus()
+    -- select all text if on default
+    gui.handlers.inventory.search_textfield.on_gui_click{player_index=player_index, element=gui_data.inventory.search_textfield}
+  end
+end
 
 function main_gui.create(player, player_table)
   -- create base GUI structure
-  local gui_data = gui.build(player.gui.screen, {
+  local gui_data, filters = gui.build(player.gui.screen, {
     {type="frame", style="ltnm_empty_frame", direction="vertical", handlers="main.window", save_as="window.frame", children={
-      -- TITLEBAR
       {type="flow", style_mods={horizontal_spacing=0}, direction="horizontal", children={
         {template="mock_frame_tab", caption={"ltnm-gui.depots"}, save_as="tabbed_pane.tabs.depots"},
         {template="mock_frame_tab", caption={"ltnm-gui.stations"}, save_as="tabbed_pane.tabs.stations"},
@@ -187,18 +172,10 @@ function main_gui.create(player, player_table)
   })
 
   -- other handlers
-  event.enable("gui.main.ltnm-search", player.index)
-  event.enable_group("gui.main.open_train_button", player.index)
-  event.enable_group("gui.main.view_station_button", player.index)
-  event.enable_group("gui.main.material_button", player.index)
-  event.enable_group("gui.alerts.clear_alert_button", player.index)
-
-  -- auto-refresh
-  if event.is_enabled("auto_refresh", player.index) then
-    gui_data.titlebar.refresh_button.style = "ltnm_active_frame_action_button"
-  else
-    gui_data.titlebar.refresh_button.style = "ltnm_frame_action_button"
-  end
+  gui.add_filters("main.open_train_button", player.index, {"ltnm_open_train"})
+  gui.add_filters("main.view_station_button", player.index, {"ltnm_view_station"})
+  gui.add_filters("main.material_button", player.index, {"ltnm_view_material"})
+  gui.add_filters("alerts.clear_alert_button", player.index, {"ltnm_clear_alert"})
 
   -- default settings
   gui_data.window.pinned = false
@@ -231,18 +208,35 @@ function main_gui.create(player, player_table)
 
   -- dragging and centering
   gui_data.titlebar.drag_handle.drag_target = gui_data.window.frame
-  gui_data.window.frame.force_auto_center()
+
+  -- auto-refresh
+  if player_table.settings.auto_refresh then
+    gui_data.titlebar.refresh_button.style = "ltnm_active_frame_action_button"
+  else
+    gui_data.titlebar.refresh_button.style = "ltnm_frame_action_button"
+  end
+
+  -- pinned
+  if player_table.settings.keep_gui_open then
+    gui_data.titlebar.pin_button.style = "ltnm_active_frame_action_button"
+  else
+    gui_data.titlebar.pin_button.style = "ltnm_frame_action_button"
+    -- center window
+    gui_data.window.frame.force_auto_center()
+  end
 
   -- hide window
   gui_data.window.frame.visible = false
 
   -- save data to global
+  gui_data.filters = filters
   player_table.gui.main = gui_data
 end
 
 -- completely destroys the GUI
 function main_gui.destroy(player, player_table)
-  event.disable_group("gui.main", player.index)
+  -- TODO add a GUI module function for this
+  global.__flib.gui[player.index] = {}
   player_table.gui.main.window.frame.destroy()
   player_table.gui.main = nil
 
@@ -250,9 +244,6 @@ function main_gui.destroy(player, player_table)
   player_table.flags.can_open_gui = false
   player.set_shortcut_available("ltnm-toggle-gui", false)
 end
-
--- -------------------------------------
--- STATE UPDATES
 
 -- updates the contents of the GUI
 function main_gui.update(player, player_table, state_changes)
@@ -314,7 +305,7 @@ function main_gui.open(player, player_table, skip_update)
   player.set_shortcut_toggled("ltnm-toggle-gui", true)
 end
 
-function main_gui.close(player, player_table, set_closed)
+function main_gui.close(player, player_table)
   player_table.flags.gui_open = false
   player_table.gui.main.window.frame.visible = false
 
