@@ -49,12 +49,12 @@ gui.add_handlers{
       end
     },
     clear_alert_button = {
-      on_gui_click = {handler=function(e)
-        local _,_,alert_id = string_find(e.element.name, "^ltnm_clear_alert_(.-)$")
+      on_gui_click = function(e)
+        local _,_,alert_id = string_find(e.element.name, "^ltnm_clear_alert__(.-)$")
         alert_id = tonumber(alert_id)
         global.data.alerts_to_delete[alert_id] = true
         alerts_gui.update(game.get_player(e.player_index), global.players[e.player_index], {alerts=true})
-      end, gui_filters="ltnm_clear_alert_", options={match_filter_strings=true}}
+      end
     }
   }
 }
@@ -106,7 +106,7 @@ function alerts_gui.update(player, player_table, state_changes, gui_data, data, 
                   tooltip={"ltnm-gui.open-train-gui"}},
               }},
               {type="frame", style="ltnm_dark_content_frame_in_light_frame", style_mods={padding=0}, children={
-                {type="sprite-button", name="ltnm_clear_alert_"..alert_id, style="ltnm_inset_red_icon_button", sprite="utility/trash",
+                {type="sprite-button", name="ltnm_clear_alert__"..alert_id, style="ltnm_inset_red_icon_button", sprite="utility/trash",
                   tooltip={"ltnm-gui.clear-alert"}}
               }}
             }}

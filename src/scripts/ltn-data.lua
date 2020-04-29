@@ -432,7 +432,9 @@ function ltn_data.iterate()
       invalidated_trains = {}
     }
 
-    -- TODO create alert popups
+    if working_data.alert_popup then
+      alert_popup_gui.create_for_all(working_data.alert_popup)
+    end
 
     -- reset working data
     global.working_data = {
@@ -533,7 +535,7 @@ local function on_delivery_pickup_complete(e)
         planned_shipment = e.planned_shipment,
         actual_shipment = e.actual_shipment
       }
-      global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type="incorrect_pickup"}
+      global.working_data.alert_popup = {id=alerts._index, type="incorrect_pickup"}
     end
   end
 end
@@ -584,7 +586,7 @@ local function on_delivery_completed(e)
       shipment = e.shipment,
       leftovers = contents
     }
-    global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type="incomplete_delivery"}
+    global.working_data.alert_popup = {id=alerts._index, type="incomplete_delivery"}
   end
 end
 
@@ -619,7 +621,7 @@ local function on_delivery_failed(e)
       },
       shipment = train.shipment
     }
-    global.working_data.alert_popups[#global.working_data.alert_popups+1] = {id=alerts._index, type=alert_type}
+    global.working_data.alert_popup = {id=alerts._index, type=alert_type}
   end
 end
 
@@ -676,7 +678,7 @@ end
 
 function ltn_data.init()
   global.data = nil
-  global.working_data = {history={}, alerts={_index=0}, alert_popups={}}
+  global.working_data = {history={}, alerts={_index=0}}
 end
 
 -- -----------------------------------------------------------------------------
