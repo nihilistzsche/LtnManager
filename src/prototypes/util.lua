@@ -22,8 +22,7 @@ function util.mipped_icon(name, position, filename, size, mipmap_count, mods)
 end
 
 util.paths = {
-  nav_icons = "__LtnManager__/graphics/gui/nav-icons.png",
-  tool_icons = "__LtnManager__/graphics/gui/tool-icons.png",
+  nav_icons = "__LtnManager__/graphics/gui/frame-action-icons.png",
   shortcut_icons = "__LtnManager__/graphics/shortcut/ltn-manager-shortcut.png"
 }
 

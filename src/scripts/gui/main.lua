@@ -17,8 +17,7 @@ gui.add_templates{
     vertical = {type="empty-widget", style_mods={vertically_stretchable=true}},
     both = {type="empty-widget", style_mods={horizontally_stretchable=true, vertically_stretchable=true}}
   },
-  close_button = {type="sprite-button", style="ltnm_frame_action_button", sprite="utility/close_white", hovered_sprite="utility/close_black",
-    clicked_sprite="utility/close_black", mouse_button_filter={"left"}, handlers="main.titlebar.close_button", save_as="titlebar.close_button"},
+  frame_action_button = {type="sprite-button", style="ltnm_frame_action_button", mouse_button_filter={"left"}},
   mock_frame_tab = {type="button", style="ltnm_mock_frame_tab", mouse_button_filter={"left"}, handlers="main.titlebar.frame_tab"},
   status_indicator = function(name, color, value)
     return {type="flow", style_mods={vertical_align="center"}, children={
@@ -137,15 +136,15 @@ gui.add_handlers{
 }
 
 function main_gui.open_search(player_index, player_table)
-  if not player_table.flags.gui_open then return end
-  local gui_data = player_table.gui.main
-  local active_tab = gui_data.tabbed_pane.selected
-  if active_tab == "inventory" then
-    -- focus textfield
-    gui_data.inventory.search_textfield.focus()
-    -- select all text if on default
-    gui.handlers.inventory.search_textfield.on_gui_click{player_index=player_index, element=gui_data.inventory.search_textfield}
-  end
+  -- if not player_table.flags.gui_open then return end
+  -- local gui_data = player_table.gui.main
+  -- local active_tab = gui_data.tabbed_pane.selected
+  -- if active_tab == "inventory" then
+  --   -- focus textfield
+  --   gui_data.inventory.search_textfield.focus()
+  --   -- select all text if on default
+  --   gui.handlers.inventory.search_textfield.on_gui_click{player_index=player_index, element=gui_data.inventory.search_textfield}
+  -- end
 end
 
 function main_gui.create(player, player_table)
@@ -159,14 +158,16 @@ function main_gui.create(player, player_table)
         {template="mock_frame_tab", caption={"ltnm-gui.history"}, save_as="tabbed_pane.tabs.history"},
         {template="mock_frame_tab", caption={"ltnm-gui.alerts"}, save_as="tabbed_pane.tabs.alerts"},
         {type="frame", style="ltnm_main_frame_header", children={
-          {type="empty-widget", style="draggable_space_header", style_mods={horizontally_stretchable=true, height=24, left_margin=0, right_margin=4},
+          {type="empty-widget", style="draggable_space_header", style_mods={horizontally_stretchable=true, height=24, left_margin=-2, right_margin=4},
             save_as="titlebar.drag_handle"},
-          {type="sprite-button", style="ltnm_frame_action_button", sprite="ltnm_pin_white", hovered_sprite="ltnm_pin_black", clicked_sprite="ltnm_pin_black",
-            tooltip={"ltnm-gui.keep-open"}, mouse_button_filter={"left"}, handlers="main.titlebar.pin_button", save_as="titlebar.pin_button"},
-          {type="sprite-button", style="ltnm_frame_action_button", sprite="ltnm_refresh_white", hovered_sprite="ltnm_refresh_black",
-            clicked_sprite="ltnm_refresh_black", tooltip={"ltnm-gui.refresh-button-tooltip"}, mouse_button_filter={"left"},
-            handlers="main.titlebar.refresh_button", save_as="titlebar.refresh_button"},
-          {template="close_button"}
+          {template="frame_action_button", sprite="ltnm_search_white", hovered_sprite="ltnm_search_black", clicked_sprite="ltnm_search_black",
+            tooltip={"ltnm-gui.search"}},
+          {template="frame_action_button", sprite="ltnm_pin_white", hovered_sprite="ltnm_pin_black", clicked_sprite="ltnm_pin_black",
+            tooltip={"ltnm-gui.keep-open"}, handlers="main.titlebar.pin_button", save_as="titlebar.pin_button"},
+          {template="frame_action_button", sprite="ltnm_refresh_white", hovered_sprite="ltnm_refresh_black", clicked_sprite="ltnm_refresh_black",
+            tooltip={"ltnm-gui.refresh-button-tooltip"}, handlers="main.titlebar.refresh_button", save_as="titlebar.refresh_button"},
+          {template="frame_action_button", sprite="ltnm_close_white", hovered_sprite="ltnm_close_black", clicked_sprite="ltnm_close_black",
+            handlers="main.titlebar.close_button", save_as="titlebar.close_button"}
         }}
       }},
       {type="frame", style="ltnm_main_frame_content", children={

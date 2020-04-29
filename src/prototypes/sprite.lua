@@ -21,9 +21,12 @@ end
 data:extend(indicator_sprites)
 
 data:extend{
-  util.mipped_icon("ltnm_refresh_black", {0,0}, util.paths.nav_icons),
-  util.mipped_icon("ltnm_refresh_white", {48,0}, util.paths.nav_icons),
-  util.mipped_icon("ltnm_pin_black", {0,32}, util.paths.nav_icons),
-  util.mipped_icon("ltnm_pin_white", {48,32}, util.paths.nav_icons),
-  util.mipped_icon("ltnm_filter", {0,0}, util.paths.tool_icons)
+  util.mipped_icon("ltnm_close_black", {0,0}, util.paths.nav_icons, 40),
+  util.mipped_icon("ltnm_close_white", {60,0}, util.paths.nav_icons, 40),
+  util.mipped_icon("ltnm_refresh_black", {0,40}, util.paths.nav_icons, 40),
+  util.mipped_icon("ltnm_refresh_white", {60,40}, util.paths.nav_icons, 40),
+  util.mipped_icon("ltnm_pin_black", {0,80}, util.paths.nav_icons, 40),
+  util.mipped_icon("ltnm_pin_white", {60,80}, util.paths.nav_icons, 40),
+  util.mipped_icon("ltnm_search_black", {0,120}, util.paths.nav_icons, 40),
+  util.mipped_icon("ltnm_search_white", {60,120}, util.paths.nav_icons, 40)
 }
