@@ -2,7 +2,7 @@ local main_gui = {}
 
 local gui = require("__flib__.control.gui")
 
-local data = require("scripts.data")
+local player_data = require("scripts.player-data")
 
 local tabs = {}
 for _, name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
@@ -71,10 +71,10 @@ gui.add_handlers{
           if e.shift then
             local settings = global.players[e.player_index].settings
             if settings.auto_refresh then
-              data.set_player_setting(e.player_index, "auto-refresh", false)
+              player_data.set_setting(e.player_index, "auto-refresh", false)
               e.element.style = "ltnm_frame_action_button"
             else
-              data.set_player_setting(e.player_index, "auto-refresh", true)
+              player_data.set_setting(e.player_index, "auto-refresh", true)
               e.element.style = "ltnm_active_frame_action_button"
             end
           else
