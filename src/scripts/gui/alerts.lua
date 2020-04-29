@@ -45,7 +45,7 @@ gui.add_handlers{
           gui_data["sort_"..clicked_type] = e.element.state
         end
         -- update GUI contents
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {alerts=true})
+        alerts_gui.update(game.get_player(e.player_index), player_table, {alerts=true})
       end
     },
     clear_alert_button = {
@@ -53,13 +53,16 @@ gui.add_handlers{
         local _,_,alert_id = string_find(e.element.name, "^ltnm_clear_alert_(.-)$")
         alert_id = tonumber(alert_id)
         global.data.alerts_to_delete[alert_id] = true
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), global.players[e.player_index], {alerts=true})
+        alerts_gui.update(game.get_player(e.player_index), global.players[e.player_index], {alerts=true})
       end, gui_filters="ltnm_clear_alert_", options={match_filter_strings=true}}
     }
   }
 }
 
 function alerts_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
+  gui_data = gui_data or player_table.gui.main
+  data = data or global.data
+  material_translations = material_translations or player_table.dictionary["materials"].translations
   if state_changes.alerts then
     local alerts_table = gui_data.alerts.table
     alerts_table.clear()

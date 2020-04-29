@@ -241,7 +241,6 @@ function main_gui.create(player, player_table)
   player_table.gui.main = gui_data
 end
 
--- completely destroys the GUI
 function main_gui.destroy(player, player_table)
   -- TODO add a GUI module function for this
   global.__flib.gui[player.index] = {}
@@ -253,13 +252,11 @@ function main_gui.destroy(player, player_table)
   player.set_shortcut_available("ltnm-toggle-gui", false)
 end
 
--- updates the contents of the GUI
 function main_gui.update(player, player_table, state_changes)
   local gui_data = player_table.gui.main
   local data = global.data
   local material_translations = player_table.dictionary.materials.translations
 
-  -- ACTIVE TAB
   if state_changes.active_tab then
     local tabbed_pane_data = gui_data.tabbed_pane
     -- close previous tab, if there was a previous tab
@@ -274,10 +271,9 @@ function main_gui.update(player, player_table, state_changes)
     tabbed_pane_data.selected = state_changes.active_tab
   end
 
-  -- TABS
-  for _, tab in pairs(tabs) do
-    tab.update(player, player_table, state_changes, gui_data, data, material_translations)
-  end
+  -- active tab
+  local active_tab = state_changes.active_tab or gui_data.tabbed_pane.selected
+  tabs[active_tab].update(player, player_table, state_changes, gui_data, data, material_translations)
 end
 
 function main_gui.update_active_tab(player, player_table, name)

@@ -41,13 +41,17 @@ gui.add_handlers{
           gui_data["sort_"..clicked_type] = e.element.state
         end
         -- update GUI contents
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {stations_list=true})
+        stations_gui.update(game.get_player(e.player_index), player_table, {stations_list=true})
       end
     }
   }
 }
 
 function stations_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
+  gui_data = gui_data or player_table.gui.main
+  data = data or global.data
+  material_translations = material_translations or player_table.dictionary["materials"].translations
+
   if state_changes.stations_list then
     local stations_table = gui_data.stations.table
     stations_table.clear()

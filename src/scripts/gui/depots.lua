@@ -11,7 +11,7 @@ gui.add_handlers{
     depot_button = {
       on_gui_click = function(e)
         local _,_,name = string_find(e.element.name, "^ltnm_depot_button_(.*)$")
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
+        depots_gui.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
       end
     },
     sort_checkbox = {
@@ -31,13 +31,16 @@ gui.add_handlers{
           gui_data["sort_"..clicked_type] = e.element.state
         end
         -- update GUI contents
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {depot_trains=true})
+        depots_gui.update(game.get_player(e.player_index), player_table, {depot_trains=true})
       end
     }
   }
 }
 
 function depots_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
+  gui_data = gui_data or player_table.gui.main
+  data = data or global.data
+  material_translations = material_translations or player_table.dictionary["materials"].translations
   -- DEPOT BUTTONS
   if state_changes.depot_buttons then
     local depots_gui_data = gui_data.depots

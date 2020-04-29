@@ -12,10 +12,6 @@ local player_data = require("scripts.player-data")
 
 local string_sub = string.sub
 
-function UPDATE_MAIN_GUI(player, player_table, state_changes)
-  main_gui.update(player, player_table, state_changes)
-end
-
 -- -----------------------------------------------------------------------------
 -- COMMANDS
 

@@ -76,7 +76,7 @@ gui.add_handlers{
         local player_table = global.players[e.player_index]
         local gui_data = player_table.gui.main.inventory
         gui_data.search_query = e.text
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {inventory=true})
+        inventory_gui.update(game.get_player(e.player_index), player_table, {inventory=true})
       end,
       on_gui_click = function(e)
         -- select all text if it is the default
@@ -91,13 +91,17 @@ gui.add_handlers{
         local gui_data = player_table.gui.main.inventory
         local input = tonumber(e.text) or -1
         gui_data.selected_network_id = input
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {inventory=true})
+        inventory_gui.update(game.get_player(e.player_index), player_table, {inventory=true})
       end
     }
   }
 }
 
 function inventory_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
+  gui_data = gui_data or player_table.gui.main
+  data = data or global.data
+  material_translations = material_translations or player_table.dictionary["materials"].translations
+
   if state_changes.inventory then
     local inventory = data.inventory
     local inventory_gui_data = gui_data.inventory

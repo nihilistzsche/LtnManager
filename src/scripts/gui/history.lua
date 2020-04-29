@@ -25,7 +25,7 @@ gui.add_handlers{
           gui_data["sort_"..clicked_type] = e.element.state
         end
         -- update GUI contents
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), player_table, {history=true})
+        history_gui.update(game.get_player(e.player_index), player_table, {history=true})
       end
     },
     delete_button = {
@@ -37,13 +37,16 @@ gui.add_handlers{
         for key in pairs(sorted_history) do
           sorted_history[key] = {}
         end
-        UPDATE_MAIN_GUI(game.get_player(e.player_index), global.players[e.player_index], {history=true})
+        history_gui.update(game.get_player(e.player_index), global.players[e.player_index], {history=true})
       end
     }
   },
 }
 
 function history_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
+  gui_data = gui_data or player_table.gui.main
+  data = data or global.data
+  material_translations = material_translations or player_table.dictionary["materials"].translations
   -- HISTORY
   if state_changes.history then
     local history_table = gui_data.history.table
