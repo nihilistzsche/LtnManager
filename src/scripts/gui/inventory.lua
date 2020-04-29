@@ -3,6 +3,12 @@ local inventory_gui = {}
 local gui = require("__flib__.control.gui")
 local util = require("scripts.util")
 
+local pane_heights = {
+  provided = 6,
+  requested = 3,
+  in_transit = 3
+}
+
 local bit32_btest = bit32.btest
 local string_find = string.find
 local string_gsub = string.gsub
@@ -12,10 +18,10 @@ gui.add_templates{
   inventory = {
     slot_table_with_label = function(name, rows)
       rows = rows or 4
-      return {type="flow", style_mods={vertical_spacing=8, top_padding=4}, direction="vertical", children={
+      return {type="flow", style_mods={vertical_spacing=7, top_padding=3}, direction="vertical", children={
         {type="label", style="caption_label", caption={"ltnm-gui."..string_gsub(name, "_", "-")}},
-        {type="frame", style="ltnm_dark_content_frame_in_light_frame", children={
-          {type="scroll-pane", style="ltnm_slot_table_scroll_pane", style_mods={height=rows*40}, vertical_scroll_policy="always", children={
+        {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="inventory."..name.."_frame", children={
+          {type="scroll-pane", style="ltnm_slot_table_scroll_pane", style_mods={height=rows*40}, children={
             {type="table", style="ltnm_inventory_slot_table", column_count=10, save_as="inventory."..name.."_table"}
           }}
         }}
@@ -108,6 +114,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
           combined_materials = util.add_materials(materials, combined_materials)
         end
       end
+
       -- filter by material name
       if query ~= "" then
         for name in pairs(combined_materials) do
@@ -116,6 +123,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
           end
         end
       end
+
       -- add combined materials to the GUI table (also temporary)
       inventory_gui_data.contents[type] = combined_materials
       -- add to table
@@ -130,7 +138,16 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
           number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
       end
       buttons[type] = elems
+
+      -- set frame style
+      if (i / 10) > pane_heights[type] then
+        inventory_gui_data[type.."_frame"].style.right_margin = -12
+      else
+        inventory_gui_data[type.."_frame"].style.right_margin = 0
+      end
     end
+
+
     -- remove previous selection since the buttons are no longer glowing
     state_changes.inventory = type(state_changes.inventory) == "boolean" and inventory_gui_data.selected or state_changes.inventory
     inventory_gui_data.selected = nil
@@ -236,9 +253,9 @@ end
 
 inventory_gui.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.inventory", children={
   -- left column
-  {type="frame", style="ltnm_light_content_frame", direction="vertical", children={
+  {type="frame", style="ltnm_light_content_frame", style_mods={top_padding=1}, direction="vertical", children={
     -- toolbar
-    {type="frame", style="ltnm_toolbar_frame", style_mods={height=nil}, direction="horizontal", children={
+    {type="frame", style="ltnm_toolbar_frame", style_mods={height=nil}, direction="horizontal", mods={visible=false}, children={
       {type="textfield", lose_focus_on_confirm=true, handlers="inventory.search_textfield",
         save_as="inventory.search_textfield"},
       {template="pushers.horizontal"},
@@ -247,10 +264,10 @@ inventory_gui.base_template = {type="flow", style_mods={horizontal_spacing=12}, 
         allow_negative=true, handlers="inventory.network_id_textfield", save_as="inventory.network_id_textfield"},
     }},
     -- inventory tables
-    {type="flow", style_mods={padding=10, top_padding=4}, direction="vertical", children={
-      gui.templates.inventory.slot_table_with_label("provided", 6),
-      gui.templates.inventory.slot_table_with_label("requested", 3),
-      gui.templates.inventory.slot_table_with_label("in_transit", 2)
+    {type="flow", style_mods={padding=12, top_padding=4}, direction="vertical", children={
+      gui.templates.inventory.slot_table_with_label("provided", pane_heights.provided),
+      gui.templates.inventory.slot_table_with_label("requested", pane_heights.requested),
+      gui.templates.inventory.slot_table_with_label("in_transit", pane_heights.in_transit)
     }}
   }},
   -- right column
