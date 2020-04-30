@@ -167,7 +167,7 @@ function main_gui.create(player, player_table)
           {type="empty-widget", style="draggable_space_header", style_mods={horizontally_stretchable=true, height=24, left_margin=-1, right_margin=7},
             save_as="titlebar.drag_handle"},
           {template="frame_action_button", sprite="ltnm_search_white", hovered_sprite="ltnm_search_black", clicked_sprite="ltnm_search_black",
-            tooltip={"ltnm-gui.search"}, handlers="main.titlebar.search_button", save_as="titlebar.search_button"},
+            tooltip={"ltnm-gui.search-tooltip"}, handlers="main.titlebar.search_button", save_as="titlebar.search_button"},
           {template="frame_action_button", sprite="ltnm_pin_white", hovered_sprite="ltnm_pin_black", clicked_sprite="ltnm_pin_black",
             tooltip={"ltnm-gui.keep-open"}, handlers="main.titlebar.pin_button", save_as="titlebar.pin_button"},
           {template="frame_action_button", sprite="ltnm_refresh_white", hovered_sprite="ltnm_refresh_black", clicked_sprite="ltnm_refresh_black",
