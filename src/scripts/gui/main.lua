@@ -5,7 +5,8 @@ local gui = require("__flib__.control.gui")
 local player_data = require("scripts.player-data")
 
 local tabs = {}
-for _, name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
+local tab_names = {"depots", "stations", "inventory", "history", "alerts"}
+for _, name in ipairs(tab_names) do
   tabs[name] = require("scripts.gui."..name)
 end
 
@@ -149,7 +150,7 @@ end
 
 function main_gui.create(player, player_table)
   -- create base GUI structure
-  local gui_data, filters = gui.build(player.gui.screen, {
+  local gui_data = gui.build(player.gui.screen, {
     {type="frame", style="ltnm_empty_frame", direction="vertical", handlers="main.window", save_as="window.frame", children={
       {type="flow", style_mods={horizontal_spacing=0}, direction="horizontal", children={
         {template="mock_frame_tab", caption={"ltnm-gui.depots"}, save_as="tabbed_pane.tabs.depots"},
@@ -181,10 +182,10 @@ function main_gui.create(player, player_table)
   })
 
   -- other handlers
-  gui.add_filters("main.open_train_button", player.index, {"ltnm_open_train"})
-  gui.add_filters("main.view_station_button", player.index, {"ltnm_view_station"})
-  gui.add_filters("main.material_button", player.index, {"ltnm_view_material"})
-  gui.add_filters("alerts.clear_alert_button", player.index, {"ltnm_clear_alert"})
+  gui.update_filters("main.open_train_button", player.index, {"ltnm_open_train"})
+  gui.update_filters("main.view_station_button", player.index, {"ltnm_view_station"})
+  gui.update_filters("main.material_button", player.index, {"ltnm_view_material"})
+  gui.update_filters("alerts.clear_alert_button", player.index, {"ltnm_clear_alert"})
 
   -- default settings
   gui_data.window.pinned = false
@@ -238,13 +239,14 @@ function main_gui.create(player, player_table)
   gui_data.window.frame.visible = false
 
   -- save data to global
-  gui_data.filters = filters
   player_table.gui.main = gui_data
 end
 
 function main_gui.destroy(player, player_table)
-  -- TODO add a GUI module function for this
-  global.__flib.gui[player.index] = {}
+  gui.update_filters("main", player.index, nil, "remove")
+  for _, name in ipairs(tab_names) do
+    gui.update_filters(name, player.index, nil, "remove")
+  end
   player_table.gui.main.window.frame.destroy()
   player_table.gui.main = nil
 

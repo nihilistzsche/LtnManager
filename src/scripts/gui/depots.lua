@@ -47,9 +47,7 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
     local buttons_pane = depots_gui_data.buttons_scroll_pane
     -- delete old buttons and disable handler
     buttons_pane.clear()
-    if depots_gui_data.depot_button_filters then
-      gui.remove_filters(player.index, depots_gui_data.depot_button_filters)
-    end
+    gui.update_filters("depots.depot_button", player.index, nil, "remove")
 
     local buttons_data = {}
 
@@ -57,12 +55,10 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
 
     local button_style = table_size(data.depots) > 7 and "ltnm_depot_button_for_scrollbar" or "ltnm_depot_button"
 
-    local button_filters = {}
-
     -- build all buttons as if they're inactive
     for name, t in pairs(data.depots) do
       button_index = button_index + 1
-      local elems, filters = gui.build(buttons_pane, {
+      local elems = gui.build(buttons_pane, {
         {type="button", name="ltnm_depot_button_"..name, style=button_style, handlers="depots.depot_button", save_as="button", children={
           {type="flow", ignored_by_interaction=true, direction="vertical", children={
             {type="label", style="ltnm_depot_button_caption_label", caption=name, mods={enabled=false}, save_as="labels.name"},
@@ -89,16 +85,9 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
         elems.labels[status_name] = output.indicator_label
       end
 
-      -- add filter to filters table
-      for filter, event_name in pairs(filters) do
-        button_filters[filter] = event_name
-      end
-
       -- add elems to button table
       buttons_data[name] = elems
     end
-
-    depots_gui_data.depot_button_filters = button_filters
 
     depots_gui_data.amount = button_index
     depots_gui_data.buttons = buttons_data

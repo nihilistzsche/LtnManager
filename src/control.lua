@@ -45,12 +45,12 @@ event.on_init(function()
   ltn_data.init()
   ltn_data.setup_events()
 
-  gui.bootstrap_postprocess()
+  gui.build_lookup_tables()
 end)
 
 event.on_load(function()
   ltn_data.setup_events()
-  gui.bootstrap_postprocess()
+  gui.build_lookup_tables()
 end)
 
 event.on_configuration_changed(function(e)
