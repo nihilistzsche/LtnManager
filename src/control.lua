@@ -138,6 +138,30 @@ event.on_tick(function()
   if flags.iterating_ltn_data then
     ltn_data.iterate()
   end
+  if flags.updating_guis then
+    local player_index = global.next_update_index
+    local player_table = global.players[player_index]
+    local player_flags = player_table.flags
+    if player_flags.translations_finished and not player_flags.can_open_gui then
+      -- create GUI
+      local player = game.get_player(player_index)
+      main_gui.create(player, player_table)
+      player_flags.can_open_gui = true
+      player.set_shortcut_available("ltnm-toggle-gui", true)
+    elseif player_table.settings.auto_refresh and game.tick - player_table.last_update >= 180 then
+      -- update GUI
+      main_gui.update_active_tab(game.get_player(player_index), player_table)
+      player_table.last_update = game.tick
+    end
+
+    -- get and save next index, or stop iteration
+    local next_index = next(global.players, global.next_update_index)
+    if next_index then
+      global.next_update_index = next_index
+    else
+      flags.updating_guis = false
+    end
+  end
   if global.__flib.translation.active_translations_count > 0 then
     translation.translate_batch()
   end

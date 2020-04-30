@@ -442,19 +442,10 @@ function ltn_data.iterate()
       alerts = global.working_data.alerts
     }
 
-    -- set flag
+    -- start updating GUIs
     global.flags.iterating_ltn_data = false
-
-    -- enable GUI for any waiting players
-    for i, player_table in pairs(global.players) do
-      local flags = player_table.flags
-      if flags.translations_finished and not flags.can_open_gui then
-        flags.can_open_gui = true
-        local player = game.get_player(i)
-        main_gui.create(player, player_table)
-        player.set_shortcut_available("ltnm-toggle-gui", true)
-      end
-    end
+    global.flags.updating_guis = true
+    global.next_update_index = next(global.players)
   end
 end
 
@@ -464,7 +455,7 @@ local function on_stops_updated(e)
 end
 
 local function on_dispatcher_updated(e)
-  if global.flags.iterating_ltn_data then return end
+  if global.flags.iterating_ltn_data or global.flags.updating_guis then return end
   local stations = global.working_data.stations
   if not stations then
     log("LTN event desync: did not receive stations in time! Skipping iteration.")

@@ -221,9 +221,6 @@ function main_gui.create(player, player_table)
   gui_data.alerts.sort_route = true
   gui_data.alerts.sort_type = true
 
-  -- dragging and centering
-  gui_data.titlebar.drag_handle.drag_target = gui_data.window.frame
-
   -- auto-refresh
   if player_table.settings.auto_refresh then
     gui_data.titlebar.refresh_button.style = "ltnm_active_frame_action_button"
@@ -240,10 +237,9 @@ function main_gui.create(player, player_table)
     gui_data.window.frame.force_auto_center()
   end
 
-  -- hide window
+  gui_data.titlebar.drag_handle.drag_target = gui_data.window.frame
   gui_data.window.frame.visible = false
 
-  -- save data to global
   player_table.gui.main = gui_data
 end
 

@@ -14,7 +14,8 @@ function player_data.init(player, index)
       translate_on_join = false,
       translations_finished = false
     },
-    gui = {}
+    gui = {},
+    last_update = game.tick
   }
   player.set_shortcut_available("ltnm-toggle-gui", false)
   global.players[index] = player_table

@@ -3,7 +3,10 @@ local global_data = {}
 local player_data = require("scripts.player-data")
 
 function global_data.init()
-  global.flags = {}
+  global.flags = {
+    iterating_ltn_data = false,
+    updating_guis = false
+  }
   global.players = {}
   global_data.build_translations()
   for i, player in pairs(game.players) do
