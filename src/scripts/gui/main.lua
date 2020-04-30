@@ -47,7 +47,7 @@ gui.add_handlers{
       },
       search_button = {
         on_gui_click = function(e)
-          game.print(serpent.block(e))
+          main_gui.open_search(game.get_player(e.player_index), global.players[e.player_index])
         end
       },
       pin_button = {
@@ -142,15 +142,10 @@ gui.add_handlers{
 }
 
 function main_gui.open_search(player_index, player_table)
-  -- if not player_table.flags.gui_open then return end
-  -- local gui_data = player_table.gui.main
-  -- local active_tab = gui_data.tabbed_pane.selected
-  -- if active_tab == "inventory" then
-  --   -- focus textfield
-  --   gui_data.inventory.search_textfield.focus()
-  --   -- select all text if on default
-  --   gui.handlers.inventory.search_textfield.on_gui_click{player_index=player_index, element=gui_data.inventory.search_textfield}
-  -- end
+  if not player_table.flags.gui_open then return end
+  local gui_data = player_table.gui.main
+  local active_tab = gui_data.tabbed_pane.selected
+  game.print("open search for tab: "..active_tab)
 end
 
 function main_gui.create(player, player_table)
