@@ -2,11 +2,12 @@
 Version: 0.2.0
 Date: ????
   Features:
-    - Shift+clicking a station name will open that station's LTN combinator, if one exists
+    - Shift + clicking a station name will open that station's LTN combinator, if one exists
   Changes:
     - Refactored mod structure to improve performance
     - Switched from OpteraLib and RaiLuaLib to FLib
     - History and alerts will be cleared on mod configuration change, to avoid migration issues
+    - The mod will only auto-update one GUI per tick, increasing performance on multiplayer servers
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.10
 Date: 2020-04-27

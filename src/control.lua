@@ -135,9 +135,11 @@ end)
 
 event.on_tick(function()
   local flags = global.flags
+
   if flags.iterating_ltn_data then
     ltn_data.iterate()
   end
+
   if flags.updating_guis then
     local player_index = global.next_update_index
     local player_table = global.players[player_index]
@@ -159,9 +161,11 @@ event.on_tick(function()
     if next_index then
       global.next_update_index = next_index
     else
+      global.next_update_index = nil
       flags.updating_guis = false
     end
   end
+
   if global.__flib.translation.active_translations_count > 0 then
     translation.translate_batch()
   end
