@@ -45,6 +45,11 @@ event.on_init(function()
   ltn_data.init()
   ltn_data.setup_events()
 
+  for i, player in pairs(game.players) do
+    player_data.init(player, i)
+    player_data.refresh(player, global.players[i])
+  end
+
   gui.build_lookup_tables()
 end)
 
