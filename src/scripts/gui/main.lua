@@ -7,7 +7,7 @@ local player_data = require("scripts.player-data")
 local tabs = {}
 local tab_names = {"depots", "stations", "inventory", "history", "alerts"}
 for _, name in ipairs(tab_names) do
-  tabs[name] = require("scripts.gui."..name)
+  tabs[name] = require("scripts.gui.main-tabs."..name)
 end
 
 local string_gsub = string.gsub

@@ -1,4 +1,4 @@
-local inventory_gui = {}
+local inventory_tab = {}
 
 local gui = require("__flib__.control.gui")
 local util = require("scripts.util")
@@ -76,7 +76,7 @@ gui.add_handlers{
         local player_table = global.players[e.player_index]
         local gui_data = player_table.gui.main.inventory
         gui_data.search_query = e.text
-        inventory_gui.update(game.get_player(e.player_index), player_table, {inventory=true})
+        inventory_tab.update(game.get_player(e.player_index), player_table, {inventory=true})
       end,
       on_gui_click = function(e)
         -- select all text if it is the default
@@ -91,13 +91,13 @@ gui.add_handlers{
         local gui_data = player_table.gui.main.inventory
         local input = tonumber(e.text) or -1
         gui_data.selected_network_id = input
-        inventory_gui.update(game.get_player(e.player_index), player_table, {inventory=true})
+        inventory_tab.update(game.get_player(e.player_index), player_table, {inventory=true})
       end
     }
   }
 }
 
-function inventory_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
+function inventory_tab.update(player, player_table, state_changes, gui_data, data, material_translations)
   gui_data = gui_data or player_table.gui.main
   data = data or global.data
   material_translations = material_translations or player_table.dictionary["materials"].translations
@@ -255,7 +255,7 @@ function inventory_gui.update(player, player_table, state_changes, gui_data, dat
   end
 end
 
-inventory_gui.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.inventory", children={
+inventory_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.inventory", children={
   -- left column
   {type="frame", style="ltnm_light_content_frame", style_mods={top_padding=1}, direction="vertical", children={
     -- toolbar
@@ -298,4 +298,4 @@ inventory_gui.base_template = {type="flow", style_mods={horizontal_spacing=12}, 
   }}
 }}
 
-return inventory_gui
+return inventory_tab

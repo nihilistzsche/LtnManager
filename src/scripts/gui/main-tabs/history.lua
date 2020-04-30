@@ -1,4 +1,4 @@
-local history_gui = {}
+local history_tab = {}
 
 local gui = require("__flib__.control.gui")
 local util = require("scripts.util")
@@ -25,7 +25,7 @@ gui.add_handlers{
           gui_data["sort_"..clicked_type] = e.element.state
         end
         -- update GUI contents
-        history_gui.update(game.get_player(e.player_index), player_table, {history=true})
+        history_tab.update(game.get_player(e.player_index), player_table, {history=true})
       end
     },
     delete_button = {
@@ -37,13 +37,13 @@ gui.add_handlers{
         for key in pairs(sorted_history) do
           sorted_history[key] = {}
         end
-        history_gui.update(game.get_player(e.player_index), global.players[e.player_index], {history=true})
+        history_tab.update(game.get_player(e.player_index), global.players[e.player_index], {history=true})
       end
     }
   },
 }
 
-function history_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
+function history_tab.update(player, player_table, state_changes, gui_data, data, material_translations)
   gui_data = gui_data or player_table.gui.main
   data = data or global.data
   material_translations = material_translations or player_table.dictionary["materials"].translations
@@ -95,7 +95,7 @@ function history_gui.update(player, player_table, state_changes, gui_data, data,
   end
 end
 
-history_gui.base_template = {type="frame", style="ltnm_light_content_frame", direction="vertical", mods={visible=false}, save_as="tabbed_pane.contents.history",
+history_tab.base_template = {type="frame", style="ltnm_light_content_frame", direction="vertical", mods={visible=false}, save_as="tabbed_pane.contents.history",
   children={
     -- toolbar
     {type="frame", style="ltnm_toolbar_frame", children={
@@ -123,4 +123,4 @@ history_gui.base_template = {type="frame", style="ltnm_light_content_frame", dir
   }
 }
 
-return history_gui
+return history_tab

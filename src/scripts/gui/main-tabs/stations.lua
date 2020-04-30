@@ -1,4 +1,4 @@
-local stations_gui = {}
+local stations_tab = {}
 
 local gui = require("__flib__.control.gui")
 
@@ -41,13 +41,13 @@ gui.add_handlers{
           gui_data["sort_"..clicked_type] = e.element.state
         end
         -- update GUI contents
-        stations_gui.update(game.get_player(e.player_index), player_table, {stations_list=true})
+        stations_tab.update(game.get_player(e.player_index), player_table, {stations_list=true})
       end
     }
   }
 }
 
-function stations_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
+function stations_tab.update(player, player_table, state_changes, gui_data, data, material_translations)
   gui_data = gui_data or player_table.gui.main
   data = data or global.data
   material_translations = material_translations or player_table.dictionary["materials"].translations
@@ -172,7 +172,7 @@ function stations_gui.update(player, player_table, state_changes, gui_data, data
   end
 end
 
-stations_gui.base_template = {type="frame", style="ltnm_light_content_frame", direction="vertical", mods={visible=false},
+stations_tab.base_template = {type="frame", style="ltnm_light_content_frame", direction="vertical", mods={visible=false},
   save_as="tabbed_pane.contents.stations", children={
     -- toolbar
     {type="frame", style="ltnm_toolbar_frame", children={
@@ -200,4 +200,4 @@ stations_gui.base_template = {type="frame", style="ltnm_light_content_frame", di
   }
 }
 
-return stations_gui
+return stations_tab

@@ -1,4 +1,4 @@
-local depots_gui = {}
+local depots_tab = {}
 
 local gui = require("__flib__.control.gui")
 
@@ -11,7 +11,7 @@ gui.add_handlers{
     depot_button = {
       on_gui_click = function(e)
         local _,_,name = string_find(e.element.name, "^ltnm_depot_button_(.*)$")
-        depots_gui.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
+        depots_tab.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
       end
     },
     sort_checkbox = {
@@ -31,13 +31,13 @@ gui.add_handlers{
           gui_data["sort_"..clicked_type] = e.element.state
         end
         -- update GUI contents
-        depots_gui.update(game.get_player(e.player_index), player_table, {depot_trains=true})
+        depots_tab.update(game.get_player(e.player_index), player_table, {depot_trains=true})
       end
     }
   }
 }
 
-function depots_gui.update(player, player_table, state_changes, gui_data, data, material_translations)
+function depots_tab.update(player, player_table, state_changes, gui_data, data, material_translations)
   gui_data = gui_data or player_table.gui.main
   data = data or global.data
   material_translations = material_translations or player_table.dictionary["materials"].translations
@@ -184,7 +184,7 @@ function depots_gui.update(player, player_table, state_changes, gui_data, data, 
   end
 end
 
-depots_gui.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.depots", children={
+depots_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.depots", children={
   -- buttons
   {type="frame", style="ltnm_dark_content_frame", children={
     {type="scroll-pane", style="ltnm_depots_scroll_pane", save_as="depots.buttons_scroll_pane"}
@@ -211,4 +211,4 @@ depots_gui.base_template = {type="flow", style_mods={horizontal_spacing=12}, mod
   }}
 }}
 
-return depots_gui
+return depots_tab
