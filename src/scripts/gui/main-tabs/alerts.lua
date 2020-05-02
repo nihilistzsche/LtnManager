@@ -55,6 +55,14 @@ gui.add_handlers{
         global.data.alerts_to_delete[alert_id] = true
         alerts_tab.update(game.get_player(e.player_index), global.players[e.player_index], {alerts=true})
       end
+    },
+    clear_alerts_button = {
+      on_gui_click = function(e)
+        local player_table = global.players[e.player_index]
+        local gui_data = player_table.gui.main.alerts
+        gui_data.clear_all = true
+        alerts_tab.update(game.get_player(e.player_index), player_table, { alerts = true })
+      end
     }
   }
 }
@@ -70,6 +78,7 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
     local active_sort = gui_data.alerts.active_sort
     local sort_value = gui_data.alerts["sort_"..active_sort]
     local sorted_alerts = data.sorted_alerts[active_sort]
+    local clear_all = gui_data.alerts.clear_all
 
     -- skip if there are no alerts
     if #sorted_alerts > 0 then
@@ -82,6 +91,10 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
 
       for i=start,finish,delta do
         local alert_id = sorted_alerts[i]
+        if clear_all then
+          to_be_deleted[alert_id] = true
+        end
+
         -- exclude if the alert is to be deleted
         if not to_be_deleted[alert_id] then
           local alert_data = alerts[alert_id]
@@ -118,6 +131,7 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
         end
       end
     end
+    gui_data.alerts.clear_all = false
   end
 end
 
@@ -134,7 +148,9 @@ alerts_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, mod
       {template="pushers.horizontal"},
       {type="checkbox", name="ltnm_sort_alerts_type", style="ltnm_sort_checkbox_inactive", style_mods={width=160}, state=true,
         caption={"ltnm-gui.alert"}, handlers="alerts.sort_checkbox", save_as="alerts.type_sort_checkbox"},
-      {type="empty-widget", style_mods={width=237, height=15}}
+      {type="empty-widget", style_mods={width=237, height=15}},
+      {type="sprite-button", style="red_icon_button", sprite="utility/trash", tooltip={"ltnm-gui.clear-alerts"},
+        handlers="alerts.clear_alerts_button", save_as="alerts.clear_alerts_button"}
     }},
     {type="scroll-pane", style="ltnm_blank_scroll_pane", style_mods={vertically_stretchable=true, horizontally_stretchable=true},
       vertical_scroll_policy="always", children={
