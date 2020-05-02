@@ -29,5 +29,13 @@ data:extend{
     setting_type = "runtime-per-user",
     default_value = false,
     hidden = true
+  },
+  {
+    type = "string-setting",
+    name = "ltnm-skip-alert-pattern",
+    setting_type = "runtime-per-user",
+    default_value = "",
+    allow_blank = true,
+    order = "a"
   }
 }

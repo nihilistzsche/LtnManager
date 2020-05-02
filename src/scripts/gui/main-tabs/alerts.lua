@@ -79,12 +79,22 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
       local delta = sort_value and 1 or -1
 
       local to_be_deleted = global.data.alerts_to_delete
+      local skip_alert_pattern = player_table.settings.skip_alert_pattern
 
       for i=start,finish,delta do
         local alert_id = sorted_alerts[i]
+        local alert_data = alerts[alert_id]
+        local route = alert_data.train.from.." -> "..alert_data.train.to
+        if skip_alert_pattern ~= nil and skip_alert_pattern ~= '' then
+          local match = string_find(route, skip_alert_pattern)
+          if match ~= nil then
+            player.print{"ltnm-message.skip-alert", route}
+            to_be_deleted[alert_id] = true
+          end
+        end
+
         -- exclude if the alert is to be deleted
         if not to_be_deleted[alert_id] then
-          local alert_data = alerts[alert_id]
           local elems = gui.build(alerts_table, {
             {type="label", style_mods={width=64}, caption=util.ticks_to_time(alert_data.time)},
             {type="label", style_mods={width=26, horizontal_align="center"}, caption=alert_data.train.network_id},
