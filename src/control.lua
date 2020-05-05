@@ -83,7 +83,7 @@ end)
 
 -- GUI
 
-gui.register_events()
+gui.register_handlers()
 
 event.register("ltnm-search", function(e)
   local player_table = global.players[e.player_index]
@@ -138,7 +138,7 @@ end)
 
 -- TICK
 
-event.on_tick(function()
+event.on_tick(function(e)
   local flags = global.flags
 
   if flags.iterating_ltn_data then
@@ -171,23 +171,26 @@ event.on_tick(function()
     end
   end
 
-  if global.__flib.translation.active_translations_count > 0 then
-    translation.translate_batch()
+  if global.__flib.translation.translating_players_count > 0 then
+    translation.iterate_batch(e)
   end
 end)
 
 -- TRANSLATIONS
 
-event.on_string_translated(translation.sort_string)
-
-translation.on_finished(function(e)
+event.on_string_translated(function(e)
+  local names, finished = translation.process_result(e)
   local player_table = global.players[e.player_index]
-  -- add to player table
-  player_table.dictionary[e.dictionary_name] = {
-    translations = e.translations
-  }
-  -- if this player is done translating
-  if global.__flib.translation.players[e.player_index].active_translations_count == 0 then
+  if names then
+    local translations = player_table.translations
+    for dictionary_name, internal_names in pairs(names) do
+      local dictionary = translations[dictionary_name]
+      for i = 1, #internal_names do
+        dictionary[internal_names[i]] = e.translated and e.result or internal_names[i]
+      end
+    end
+  end
+  if finished then
     -- enable opening the GUI on the next LTN update cycle
     player_table.flags.translations_finished = true
   end

@@ -192,7 +192,7 @@ local function sort_depot_trains(working_data)
         if player_table.flags.translations_finished then
           local sort_lookup = {}
           local sort_values = {}
-          local translations = player_table.dictionary.gui.translations
+          local translations = player_table.translations.gui
           -- sort trains
           for _, train_id in ipairs(depot.trains_temp) do
             local train = trains[train_id]

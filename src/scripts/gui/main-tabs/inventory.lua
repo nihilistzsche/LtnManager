@@ -100,7 +100,7 @@ gui.add_handlers{
 function inventory_tab.update(player, player_table, state_changes, gui_data, data, material_translations)
   gui_data = gui_data or player_table.gui.main
   data = data or global.data
-  material_translations = material_translations or player_table.dictionary["materials"].translations
+  material_translations = material_translations or player_table.translations.materials
 
   if state_changes.inventory then
     local inventory = data.inventory

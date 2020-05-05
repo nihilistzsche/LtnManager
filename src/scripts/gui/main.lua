@@ -254,7 +254,7 @@ end
 function main_gui.update(player, player_table, state_changes)
   local gui_data = player_table.gui.main
   local data = global.data
-  local material_translations = player_table.dictionary.materials.translations
+  local material_translations = player_table.translations.materials
 
   if state_changes.active_tab then
     local tabbed_pane_data = gui_data.tabbed_pane

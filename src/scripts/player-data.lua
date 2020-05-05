@@ -7,7 +7,6 @@ local string_sub = string.sub
 
 function player_data.init(player, index)
   local player_table = {
-    dictionary = {},
     flags = {
       can_open_gui = false,
       gui_open = false,
@@ -15,7 +14,11 @@ function player_data.init(player, index)
       translations_finished = false
     },
     gui = {},
-    last_update = game.tick
+    last_update = game.tick,
+    translations = {
+      gui = {},
+      materials = {}
+    }
   }
   player.set_shortcut_available("ltnm-toggle-gui", false)
   global.players[index] = player_table
@@ -45,7 +48,10 @@ function player_data.refresh(player, player_table)
   player_data.update_settings(player, player_table)
 
   -- run translations
-  player_table.dictionary = {}
+  player_table.translations = {
+    gui = {},
+    materials = {}
+  }
   if player.connected then
     player_data.start_translations(player.index)
   else
@@ -54,10 +60,7 @@ function player_data.refresh(player, player_table)
 end
 
 function player_data.start_translations(player_index)
-  local translation_data = global.translation_data
-  for _, name in ipairs{"materials", "gui"} do
-    translation.start(player_index, name, translation_data[name], {include_failed_translations=true})
-  end
+  translation.add_requests(player_index, global.translation_data)
 end
 
 function player_data.set_setting(player_index, setting_name, setting_value)
