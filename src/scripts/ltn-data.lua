@@ -4,7 +4,6 @@ local event = require("__flib__.control.event")
 local util = require("scripts.util")
 
 local alert_popup_gui = require("scripts.gui.alert-popup")
-local main_gui = require("scripts.gui.main")
 
 local math_floor = math.floor
 local table_insert = table.insert
@@ -156,7 +155,7 @@ end
 local function sort_depot_trains(working_data)
   local players = global.players
   local trains = working_data.trains
-  for n, depot in pairs(working_data.depots) do
+  for _, depot in pairs(working_data.depots) do
     local depot_trains = {}
 
     -- sort by composition - same for all players

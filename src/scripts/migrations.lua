@@ -11,7 +11,9 @@ return {
     global.flags.updating_guis = false
 
     local tick = game.tick
-    for _, player_table in pairs(game.players) do
+    for i in pairs(game.players) do
+      local player_table = global.players[i]
+      player_table.dictionary = nil
       player_table.last_update = tick
     end
   end
