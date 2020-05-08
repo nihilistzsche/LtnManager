@@ -215,6 +215,7 @@ function main_gui.create(player, player_table)
   gui_data.alerts.sort_id = true
   gui_data.alerts.sort_route = true
   gui_data.alerts.sort_type = true
+  gui_data.alerts.clear_all = false
 
   -- auto-refresh
   if player_table.settings.auto_refresh then
