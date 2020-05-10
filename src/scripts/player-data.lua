@@ -10,6 +10,8 @@ function player_data.init(player, index)
     flags = {
       can_open_gui = false,
       gui_open = false,
+      opening_search = false,
+      search_open = false,
       translate_on_join = false,
       translations_finished = false
     },

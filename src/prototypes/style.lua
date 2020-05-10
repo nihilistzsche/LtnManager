@@ -3,6 +3,8 @@
 
 local util = require("prototypes.util")
 
+local constants = require("constants")
+
 local styles = data.raw["gui-style"].default
 
 -- -----------------------------------------------------------------------------
@@ -355,8 +357,8 @@ styles.ltnm_main_frame_header = {
 styles.ltnm_main_frame_content = {
   type = "frame_style",
   parent = "dialog_frame",
-  width = 830,
-  height = 615,
+  width = constants.main_frame_width,
+  height = constants.main_frame_height,
   graphical_set = {
     base = {
       position = {0,0},
@@ -475,6 +477,17 @@ styles.ltnm_item_info_toolbar_frame = {
   type = "frame_style",
   parent = "ltnm_toolbar_frame",
   width = 370 -- hardcode width to prevent in-fighting between stretches
+}
+
+styles.ltnm_search_frame = {
+  type = "frame_style",
+  -- parent = "dialog_frame",
+  top_padding = 1, -- optical correction
+  bottom_padding = 2,
+  left_padding = 2,
+  right_padding = 2,
+  height = constants.search_frame_height,
+  width = constants.main_frame_width - constants.action_buttons_width - 18
 }
 
 -- -----------------------------------------------------------------------------
@@ -795,4 +808,13 @@ styles.ltnm_material_locations_table = {
   top_cell_padding = 4,
   bottom_cell_padding = 8,
   width = 352
+}
+
+-- -----------------------------------------------------------------------------
+-- TEXTFIELD STYLES
+
+styles.ltnm_search_textfield = {
+  type = "textbox_style",
+  width = 0,
+  horizontally_stretchable = "on"
 }
