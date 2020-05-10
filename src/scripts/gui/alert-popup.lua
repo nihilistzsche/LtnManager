@@ -1,6 +1,6 @@
 local alert_popup_gui = {}
 
-local gui = require("__flib__.control.gui")
+local gui = require("__flib__.gui")
 local mod_gui = require("mod-gui")
 
 local main_gui = require("scripts.gui.main")

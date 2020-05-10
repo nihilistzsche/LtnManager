@@ -48,7 +48,7 @@ function util.ticks_to_time(ticks)
   end
 end
 
-util.train = require("__flib__.control.train")
+util.train = require("__flib__.train")
 
 -- create a string naming the status of the train
 -- first return is the string used for sorting, second return is the formatted string data for display

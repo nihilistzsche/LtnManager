@@ -1,6 +1,6 @@
 local player_data = {}
 
-local translation = require("__flib__.control.translation")
+local translation = require("__flib__.translation")
 
 local string_gsub = string.gsub
 local string_sub = string.sub

@@ -1,5 +1,5 @@
-local gui = require("__flib__.control.gui")
-local translation = require("__flib__.control.translation")
+local gui = require("__flib__.gui")
+local translation = require("__flib__.translation")
 
 return {
   ["0.2.0"] = function()

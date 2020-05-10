@@ -1,6 +1,6 @@
 local stations_tab = {}
 
-local gui = require("__flib__.control.gui")
+local gui = require("__flib__.gui")
 
 local string_find = string.find
 local string_gsub = string.gsub

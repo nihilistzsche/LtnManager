@@ -1,6 +1,6 @@
 local inventory_tab = {}
 
-local gui = require("__flib__.control.gui")
+local gui = require("__flib__.gui")
 local util = require("scripts.util")
 
 local pane_heights = {

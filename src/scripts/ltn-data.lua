@@ -1,6 +1,6 @@
 local ltn_data = {}
 
-local event = require("__flib__.control.event")
+local event = require("__flib__.event")
 local util = require("scripts.util")
 
 local alert_popup_gui = require("scripts.gui.alert-popup")
