@@ -376,7 +376,6 @@ function main_gui.open_search(player, player_table, gui_data)
     }}
   })
 
-
   gui_data.titlebar.search_button.style = "ltnm_active_frame_action_button"
   gui_data.search.elems = elems
 
