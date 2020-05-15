@@ -493,7 +493,8 @@ styles.ltnm_search_frame = {
   bottom_padding = 2,
   left_padding = 2,
   right_padding = 2,
-  height = constants.search_frame_height
+  height = constants.search_frame_height,
+  maximal_width = constants.main_frame_width
 }
 
 -- -----------------------------------------------------------------------------
