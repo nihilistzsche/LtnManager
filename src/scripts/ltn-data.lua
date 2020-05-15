@@ -533,7 +533,12 @@ end
 local function on_delivery_completed(e)
   if not global.data then return end
   local train = global.data.trains[e.train_id]
-  if not train then error("Could not find train of ID: "..e.train_id) end
+  if not train then error("Could not find train of ID ["..e.train_id.."]") end
+
+  if not train.started then
+    log("Shipment of ID ["..e.train_id.."] is missing some data. Skipping!")
+    return
+  end
 
   -- add to delivery history
   table.insert(global.working_data.history, 1, {
@@ -545,7 +550,7 @@ local function on_delivery_completed(e)
     network_id = train.network_id,
     depot = train.depot,
     shipment = e.shipment,
-    runtime = game.tick - (train.started),
+    runtime = game.tick - train.started,
     finished = game.tick
   })
   global.working_data.history[51] = nil -- limit to 50 entries
