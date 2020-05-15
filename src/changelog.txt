@@ -8,6 +8,9 @@ Date: ????
     - Switched from OpteraLib and RaiLuaLib to FLib
     - History and alerts will be cleared on mod configuration change, to avoid migration issues
     - The mod will only auto-update one GUI per tick, increasing performance on multiplayer servers
+  Bugfixes:
+    - Fixed a crash when a just-completed shipment is missing its start time
+    - Fixed a crash when updating the GUI after deconstructing a station, but before the next LTN update cycle
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.10
 Date: 2020-04-27
