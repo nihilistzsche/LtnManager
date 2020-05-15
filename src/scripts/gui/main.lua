@@ -287,7 +287,7 @@ function main_gui.update(player, player_table, state_changes)
       main_gui.close_search(player, player_table, gui_data)
     end
     local search_button = gui_data.titlebar.search_button
-    if constants.search_supported_tabs[state_changes.active_tab] then
+    if tabs[state_changes.active_tab].search_template then
       search_button.enabled = true
       search_button.tooltip = {"ltnm-gui.search-tooltip"}
     else
@@ -405,7 +405,7 @@ function main_gui.toggle_search(player, player_table)
   local active_tab = gui_data.tabbed_pane.selected
   if player_table.flags.search_open then
     main_gui.close_search(player, player_table, gui_data)
-  elseif constants.search_supported_tabs[active_tab] then
+  elseif tabs[active_tab].search_template then
     main_gui.open_search(player, player_table, gui_data)
   else
     player.print{"ltnm-message.search-not-supported"}
