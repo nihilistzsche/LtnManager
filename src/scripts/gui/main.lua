@@ -62,7 +62,7 @@ gui.add_handlers{
             window_data.frame.force_auto_center()
             if player_table.flags.search_open then
               local gui_data = player_table.gui.main
-              player.opened = gui_data.search.elems.window
+              player.opened = gui_data.search.window
             else
               player.opened = window_data.frame
             end
@@ -243,15 +243,6 @@ function main_gui.create(player, player_table)
     gui_data.window.frame.force_auto_center()
   end
 
-  -- search
-  gui_data.search = {
-    query = "",
-    network_id = -1,
-    options = {
-      -- TODO
-    }
-  }
-
   gui_data.titlebar.drag_handle.drag_target = gui_data.window.frame
   gui_data.window.frame.visible = false
 
@@ -355,7 +346,7 @@ function main_gui.close(player, player_table)
   player.set_shortcut_toggled("ltnm-toggle-gui", false)
 
   if player_table.flags.search_open then
-    main_gui.close_search(player, player_table, player_table.gui.main)
+    main_gui.close_search(player, player_table, player_table.gui.main, true)
   end
 
   player.opened = nil
@@ -370,15 +361,16 @@ function main_gui.toggle(player, player_table)
 end
 
 function main_gui.open_search(player, player_table, gui_data)
+  local selected_tab = gui_data.tabbed_pane.selected
   local elems = gui.build(player.gui.screen, {
-    {type="frame", style="ltnm_search_frame", handlers="search.window", save_as="window", children={
-      {type="textfield", style="ltnm_search_textfield"}
-    }}
+    {type="frame", style="ltnm_search_frame", handlers="search.window", save_as="window", children=tabs[selected_tab].search_template}
   })
 
   gui_data.titlebar.search_button.style = "ltnm_active_frame_action_button"
-  gui_data.search.elems = elems
+  gui_data.search = elems
 
+  -- set initial state
+  tabs[selected_tab].set_search_initial_state(player, player_table, gui_data)
   main_gui.update_search_location(gui_data)
 
   if not player_table.settings.keep_gui_open then
@@ -390,10 +382,10 @@ function main_gui.open_search(player, player_table, gui_data)
   player_table.flags.search_open = true
 end
 
-function main_gui.close_search(player, player_table, gui_data)
+function main_gui.close_search(player, player_table, gui_data, skip_update)
   gui.update_filters("search", player.index, nil, "remove")
-  gui_data.search.elems.window.destroy()
-  gui_data.search.elems = nil
+  gui_data.search.window.destroy()
+  gui_data.search = nil
 
   if not player_table.settings.keep_gui_open then
     player.opened = gui_data.window.frame
@@ -402,6 +394,10 @@ function main_gui.close_search(player, player_table, gui_data)
   gui_data.titlebar.search_button.style = "ltnm_frame_action_button"
 
   player_table.flags.search_open = false
+
+  if not skip_update then
+    main_gui.update_active_tab(player, player_table)
+  end
 end
 
 function main_gui.toggle_search(player, player_table)
@@ -418,7 +414,7 @@ end
 
 function main_gui.update_search_location(gui_data)
   local main_frame_location = gui_data.window.frame.location
-  gui_data.search.elems.window.location = {
+  gui_data.search.window.location = {
     x = main_frame_location.x,
     y = main_frame_location.y - constants.search_frame_height
   }

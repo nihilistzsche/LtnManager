@@ -488,7 +488,11 @@ styles.ltnm_search_frame = {
   right_padding = 2,
   height = constants.search_frame_height,
   -- width = constants.main_frame_width - constants.action_buttons_width - 18
-  width = constants.main_frame_width
+  width = constants.main_frame_width,
+  horizontal_flow_style = {
+    type = "horizontal_flow_style",
+    vertical_align = "center"
+  }
 }
 
 -- -----------------------------------------------------------------------------

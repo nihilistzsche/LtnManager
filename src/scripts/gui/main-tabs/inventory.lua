@@ -71,28 +71,24 @@ gui.add_templates{
 
 gui.add_handlers{
   inventory = {
-    search_textfield = {
-      on_gui_text_changed = function(e)
-        local player_table = global.players[e.player_index]
-        local gui_data = player_table.gui.main.inventory
-        gui_data.search_query = e.text
-        inventory_tab.update(game.get_player(e.player_index), player_table, {inventory=true})
-      end,
-      on_gui_click = function(e)
-        -- select all text if it is the default
-        if e.element.text == global.players[e.player_index].dictionary.gui.translations.search then
-          e.element.select_all()
+    search = {
+      name_textfield = {
+        on_gui_text_changed = function(e)
+          local player_table = global.players[e.player_index]
+          local gui_data = player_table.gui.main.inventory
+          gui_data.search_query = e.text
+          inventory_tab.update(game.get_player(e.player_index), player_table, {inventory=true})
         end
-      end
-    },
-    network_id_textfield = {
-      on_gui_text_changed = function(e)
-        local player_table = global.players[e.player_index]
-        local gui_data = player_table.gui.main.inventory
-        local input = tonumber(e.text) or -1
-        gui_data.selected_network_id = input
-        inventory_tab.update(game.get_player(e.player_index), player_table, {inventory=true})
-      end
+      },
+      network_id_textfield = {
+        on_gui_text_changed = function(e)
+          local player_table = global.players[e.player_index]
+          local gui_data = player_table.gui.main.inventory
+          local input = tonumber(e.text) or -1
+          gui_data.selected_network_id = input
+          inventory_tab.update(game.get_player(e.player_index), player_table, {inventory=true})
+        end
+      }
     }
   }
 }
@@ -109,7 +105,10 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
     inventory_gui_data.material_buttons = {}
     inventory_gui_data.contents = {}
     local buttons = inventory_gui_data.material_buttons
-    local query = string_lower(inventory_gui_data.search_textfield.text)
+    local query = ""
+    if player_table.flags.search_open then
+      query = string_lower(gui_data.search.name_textfield.text)
+    end
     for type, color in pairs{provided="green", requested="red", in_transit="blue"} do
       -- combine contents of each matching network
       local combined_materials = {}
@@ -260,16 +259,6 @@ end
 inventory_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.inventory", children={
   -- left column
   {type="frame", style="ltnm_light_content_frame", style_mods={top_padding=1}, direction="vertical", children={
-    -- toolbar
-    {type="frame", style="ltnm_toolbar_frame", style_mods={height=nil}, direction="horizontal", mods={visible=false}, children={
-      {type="textfield", lose_focus_on_confirm=true, handlers="inventory.search_textfield",
-        save_as="inventory.search_textfield"},
-      {template="pushers.horizontal"},
-      {type="label", style="caption_label", caption={"ltnm-gui.network-id"}, tooltip={"ltnm-gui.encoded-network-id-tooltip"}},
-      {type="textfield", style="short_number_textfield", text="-1", lose_focus_on_confirm=true, numeric=true,
-        allow_negative=true, handlers="inventory.network_id_textfield", save_as="inventory.network_id_textfield"},
-    }},
-    -- inventory tables
     {type="flow", style_mods={padding=12, top_padding=4}, direction="vertical", children={
       gui.templates.inventory.slot_table_with_label("provided", pane_heights.provided),
       gui.templates.inventory.slot_table_with_label("requested", pane_heights.requested),
@@ -296,8 +285,23 @@ inventory_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, 
           vertical_scroll_policy="always", save_as="inventory.locations_scroll_pane"}
       }
     }
-
   }}
 }}
+
+inventory_tab.search_template = {
+  {type="textfield", lose_focus_on_confirm=true, handlers="inventory.search.name_textfield", save_as="name_textfield"},
+  {type="label", style="caption_label", style_mods={left_margin=12}, caption={"ltnm-gui.network-id"}},
+  {type="textfield", style_mods={width=80}, lose_focus_on_confirm=true, numeric=true, allow_negative=true, handlers="inventory.search.network_id_textfield",
+    save_as="network_id_textfield"}
+}
+
+function inventory_tab.set_search_initial_state(player, player_table, gui_data)
+  local search_gui_data = gui_data.search
+  search_gui_data.network_id_textfield.text = -1
+  search_gui_data.name_textfield.focus()
+
+  search_gui_data.query = ""
+  search_gui_data.network_id = -1
+end
 
 return inventory_tab
