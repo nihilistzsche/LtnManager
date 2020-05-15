@@ -417,7 +417,11 @@ function main_gui.toggle_search(player, player_table)
 end
 
 function main_gui.update_search_location(gui_data)
-  gui_data.search.elems.window.location = gui_data.window.frame.location
+  local main_frame_location = gui_data.window.frame.location
+  gui_data.search.elems.window.location = {
+    x = main_frame_location.x,
+    y = main_frame_location.y - constants.search_frame_height
+  }
 end
 
 return main_gui
