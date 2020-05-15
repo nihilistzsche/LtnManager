@@ -2,6 +2,7 @@
 Version: 0.2.0
 Date: ????
   Features:
+    - Added search to the stations tab - you can search by station name or filter by network ID
     - Shift + clicking a station name will open that station's LTN combinator, if one exists
   Changes:
     - Refactored mod structure to improve performance
