@@ -67,106 +67,108 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
     local delta = sort_value and 1 or -1
     for i=start,finish,delta do
       local station_id = sorted_stations[i]
-      local t = stations[station_id]
-      -- build GUI structure
-      local elems = gui.build(stations_table, {
-        {type="label", name="ltnm_view_station__"..sorted_stations[i], style="hoverable_bold_label", style_mods={horizontally_stretchable=true},
-          caption=t.entity.backer_name, tooltip={"ltnm-gui.view-station-on-map"}},
-        {type="label", style_mods={horizontal_align="center", width=24}, caption=t.network_id},
-        gui.templates.status_indicator("indicator", t.status.name, t.status.count),
-        -- items
-        {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="provided_requested_frame", children={
-          {type="scroll-pane", style="ltnm_station_provided_requested_slot_table_scroll_pane", save_as="provided_requested_scroll_pane", children={
-            {type="table", style="ltnm_small_slot_table", column_count=5, save_as="provided_requested_table"}
+      local station = stations[station_id]
+      if station.entity and station.entity.valid then
+        -- build GUI structure
+        local elems = gui.build(stations_table, {
+          {type="label", name="ltnm_view_station__"..sorted_stations[i], style="hoverable_bold_label", style_mods={horizontally_stretchable=true},
+            caption=station.entity.backer_name, tooltip={"ltnm-gui.view-station-on-map"}},
+          {type="label", style_mods={horizontal_align="center", width=24}, caption=station.network_id},
+          gui.templates.status_indicator("indicator", station.status.name, station.status.count),
+          -- items
+          {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="provided_requested_frame", children={
+            {type="scroll-pane", style="ltnm_station_provided_requested_slot_table_scroll_pane", save_as="provided_requested_scroll_pane", children={
+              {type="table", style="ltnm_small_slot_table", column_count=5, save_as="provided_requested_table"}
+            }}
+          }},
+          {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="shipments_frame", children={
+            {type="scroll-pane", style="ltnm_station_shipments_slot_table_scroll_pane", save_as="shipments_scroll_pane", children={
+              {type="table", style="ltnm_small_slot_table", column_count=4, save_as="shipments_table"}
+            }}
+          }},
+          -- control signals
+          {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="signals_frame", children={
+            {type="scroll-pane", style="ltnm_station_shipments_slot_table_scroll_pane", save_as="signals_scroll_pane", children={
+              {type="table", style="ltnm_small_slot_table", column_count=4, save_as="signals_table"}
+            }}
           }}
-        }},
-        {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="shipments_frame", children={
-          {type="scroll-pane", style="ltnm_station_shipments_slot_table_scroll_pane", save_as="shipments_scroll_pane", children={
-            {type="table", style="ltnm_small_slot_table", column_count=4, save_as="shipments_table"}
-          }}
-        }},
-        -- control signals
-        {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="signals_frame", children={
-          {type="scroll-pane", style="ltnm_station_shipments_slot_table_scroll_pane", save_as="signals_scroll_pane", children={
-            {type="table", style="ltnm_small_slot_table", column_count=4, save_as="signals_table"}
-          }}
-        }}
-      })
+        })
 
-      -- add provided/requested materials
-      local table_add = elems.provided_requested_table.add
-      local provided_requested_rows = 0
-      local mi = 0
-      for key, color in pairs{provided="green", requested="red"} do
-        local materials = t[key]
-        if materials then
-          for name, count in pairs(materials) do
-            mi = mi + 1
-            provided_requested_rows = provided_requested_rows + 1
-            table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
-              number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
+        -- add provided/requested materials
+        local table_add = elems.provided_requested_table.add
+        local provided_requested_rows = 0
+        local mi = 0
+        for key, color in pairs{provided="green", requested="red"} do
+          local materials = station[key]
+          if materials then
+            for name, count in pairs(materials) do
+              mi = mi + 1
+              provided_requested_rows = provided_requested_rows + 1
+              table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
+                number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
+            end
           end
         end
-      end
-      provided_requested_rows = math.ceil(provided_requested_rows / 6) -- number of rows
+        provided_requested_rows = math.ceil(provided_requested_rows / 6) -- number of rows
 
-      -- add active shipments
-      local shipments = t.active_deliveries
-      local shipments_len = #shipments
-      local shipments_rows = 0
-      if shipments_len > 0 then
-        table_add = elems.shipments_table.add
-        mi = 0
-        for si=1,#shipments do
-          local train = trains[shipments[si]]
-          local shipment = train.shipment
-          local style = (train.from_id == station_id and "red" or "green")
-          for name, count in pairs(shipment) do
-            mi = mi + 1
-            shipments_rows = shipments_rows + 1
-            table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_"..style, sprite=string_gsub(name, ",", "/"),
-              number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
+        -- add active shipments
+        local shipments = station.active_deliveries
+        local shipments_len = #shipments
+        local shipments_rows = 0
+        if shipments_len > 0 then
+          table_add = elems.shipments_table.add
+          mi = 0
+          for si=1,#shipments do
+            local train = trains[shipments[si]]
+            local shipment = train.shipment
+            local style = (train.from_id == station_id and "red" or "green")
+            for name, count in pairs(shipment) do
+              mi = mi + 1
+              shipments_rows = shipments_rows + 1
+              table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_"..style, sprite=string_gsub(name, ",", "/"),
+                number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
+            end
+          end
+          shipments_rows = math.ceil(shipments_rows / 4) -- number of rows
+        else
+          shipments_rows = 0
+        end
+
+        -- add control signals
+        local signals = station.input.get_merged_signals()
+        table_add = elems.signals_table.add
+        local signals_rows = 0
+        for si=1,#signals do
+          local signal = signals[si]
+          local name = signal.signal.name
+          if ltn_virtual_signals[name] then
+            signals_rows = signals_rows + 1
+            table_add{type="sprite-button", style="ltnm_small_slot_button_dark_grey", sprite="virtual-signal/"..name, number=signal.count,
+              tooltip={"", {"virtual-signal-name."..name}, "\n"..util.comma_value(signal.count)}}.enabled = false
           end
         end
-        shipments_rows = math.ceil(shipments_rows / 4) -- number of rows
-      else
-        shipments_rows = 0
-      end
+        signals_rows = math.ceil(signals_rows / 4) -- number of rows
 
-      -- add control signals
-      local signals = t.input.get_merged_signals()
-      table_add = elems.signals_table.add
-      local signals_rows = 0
-      for si=1,#signals do
-        local signal = signals[si]
-        local name = signal.signal.name
-        if ltn_virtual_signals[name] then
-          signals_rows = signals_rows + 1
-          table_add{type="sprite-button", style="ltnm_small_slot_button_dark_grey", sprite="virtual-signal/"..name, number=signal.count,
-            tooltip={"", {"virtual-signal-name."..name}, "\n"..util.comma_value(signal.count)}}.enabled = false
+        local num_rows = math.max(provided_requested_rows, shipments_rows, signals_rows)
+
+        -- set scroll pane properties
+        if provided_requested_rows > 3 then
+          elems.provided_requested_frame.style.right_margin = -12
+          elems.shipments_frame.style = "ltnm_dark_content_frame_in_light_frame_no_left"
         end
-      end
-      signals_rows = math.ceil(signals_rows / 4) -- number of rows
-
-      local num_rows = math.max(provided_requested_rows, shipments_rows, signals_rows)
-
-      -- set scroll pane properties
-      if provided_requested_rows > 3 then
-        elems.provided_requested_frame.style.right_margin = -12
-        elems.shipments_frame.style = "ltnm_dark_content_frame_in_light_frame_no_left"
-      end
-      if shipments_rows > 3 then
-        elems.shipments_frame.style.right_margin = -12
-        elems.signals_frame.style = "ltnm_dark_content_frame_in_light_frame_no_left"
-      end
-      if shipments_rows > 3 then
-        elems.shipments_frame.style.right_margin = -12
-      end
-      if num_rows > 1 then
-        local frame_height = 36 * math.min(num_rows, 3)
-        elems.provided_requested_scroll_pane.style.height = frame_height
-        elems.shipments_scroll_pane.style.height = frame_height
-        elems.signals_scroll_pane.style.height = frame_height
+        if shipments_rows > 3 then
+          elems.shipments_frame.style.right_margin = -12
+          elems.signals_frame.style = "ltnm_dark_content_frame_in_light_frame_no_left"
+        end
+        if shipments_rows > 3 then
+          elems.shipments_frame.style.right_margin = -12
+        end
+        if num_rows > 1 then
+          local frame_height = 36 * math.min(num_rows, 3)
+          elems.provided_requested_scroll_pane.style.height = frame_height
+          elems.shipments_scroll_pane.style.height = frame_height
+          elems.signals_scroll_pane.style.height = frame_height
+        end
       end
     end
   end

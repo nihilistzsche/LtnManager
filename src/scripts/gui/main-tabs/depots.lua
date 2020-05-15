@@ -75,8 +75,11 @@ function depots_tab.update(player, player_table, state_changes, gui_data, data, 
       })
       local statuses = {}
       for _, station_id in ipairs(t.stations) do
-        local status = data.stations[station_id].status
-        statuses[status.name] = (statuses[status.name] or 0) + status.count
+        local station_data = data.stations[station_id]
+        if station_data.entity and station_data.entity.valid then
+          local status = station_data.status
+          statuses[status.name] = (statuses[status.name] or 0) + status.count
+        end
       end
       local status_flow = elems.status_flow
       for status_name, status_count in pairs(statuses) do

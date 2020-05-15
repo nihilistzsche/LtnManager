@@ -205,20 +205,22 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
           local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
           for i=1,#station_ids do
             local station = stations[station_ids[i]]
-            if bit32_btest(station.network_id, selected_network_id) then
-              local materials = {}
-              for mode, color in pairs{provided="green", requested="red"} do
-                local contents = station[mode]
-                if contents then
-                  materials[#materials+1] = {color, contents}
+            if station.entity and station.entity.valid then
+              if bit32_btest(station.network_id, selected_network_id) then
+                local materials = {}
+                for mode, color in pairs{provided="green", requested="red"} do
+                  local station_contents = station[mode]
+                  if station_contents then
+                    materials[#materials+1] = {color, station_contents}
+                  end
                 end
+                location_template(
+                  table,
+                  {{"hoverable_bold_label", station.entity.backer_name, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..station_ids[i]}},
+                  materials,
+                  material_translations
+                )
               end
-              location_template(
-                table,
-                {{"hoverable_bold_label", station.entity.backer_name, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..station_ids[i]}},
-                materials,
-                material_translations
-              )
             end
           end
           if #table.children == 0 then
