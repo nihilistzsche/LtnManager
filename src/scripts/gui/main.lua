@@ -208,7 +208,6 @@ function main_gui.create(player, player_table)
 
   gui_data.stations.active_sort = "name"
   gui_data.stations.sort_name = true
-  gui_data.stations.sort_network_id = true
   gui_data.stations.sort_status = true
 
   gui_data.inventory.selected_network_id = -1

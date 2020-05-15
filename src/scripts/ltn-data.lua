@@ -231,7 +231,6 @@ local function sort_stations(working_data)
   -- sorting tables
   local sort = {
     name = {lookup={}, values={}},
-    network_id = {lookup={}, values={}},
     status = {lookup={}, values={}},
   }
 

@@ -756,19 +756,17 @@ styles.ltnm_stations_table = {
   type = "table_style",
   parent = "ltnm_rows_table",
   column_widths = {
-    {column=2, width=24},
-    {column=3, width=34},
-    {column=4, width=180},
-    {column=5, width=144},
-    {column=6, width=144}
+    {column=2, width=34},
+    {column=3, width=180},
+    {column=4, width=144},
+    {column=5, width=144}
   },
   column_alignments = {
     {column=1, alignment="middle-left"},
     {column=2, alignment="middle-center"},
-    {column=3, alignment="middle-center"},
+    {column=3, alignment="middle-left"},
     {column=4, alignment="middle-left"},
-    {column=5, alignment="middle-left"},
-    {column=6, alignment="middle-left"}
+    {column=5, alignment="middle-left"}
   }
 }
 

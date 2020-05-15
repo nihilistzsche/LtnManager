@@ -103,7 +103,6 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
           local elems = gui.build(stations_table, {
             {type="label", name="ltnm_view_station__"..sorted_stations[i], style="hoverable_bold_label", style_mods={horizontally_stretchable=true},
               caption=station.entity.backer_name, tooltip={"ltnm-gui.view-station-on-map"}},
-            {type="label", style_mods={horizontal_align="center", width=24}, caption=station.network_id},
             gui.templates.status_indicator("indicator", station.status.name, station.status.count),
             -- items
             {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="provided_requested_frame", children={
@@ -213,9 +212,6 @@ stations_tab.base_template = {type="frame", style="ltnm_light_content_frame", di
       {type="checkbox", name="ltnm_sort_station_name", style="ltnm_sort_checkbox_active", style_mods={left_margin=-4}, caption={"ltnm-gui.station-name"},
         state=true, handlers="stations.sort_checkbox", save_as="stations.name_sort_checkbox"},
       {template="pushers.horizontal"},
-      {type="checkbox", name="ltnm_sort_station_network_id", style="ltnm_sort_checkbox_inactive", style_mods={width=24},
-        state=true, caption={"ltnm-gui.id"}, tooltip={"ltnm-gui.station-network-id-tooltip"}, handlers="stations.sort_checkbox",
-        save_as="stations.network_id_sort_checkbox"},
       {type="flow", style_mods={horizontal_align="center", width=34}, children={
         {type="checkbox", name="ltnm_sort_station_status", style="ltnm_sort_checkbox_inactive", style_mods={width=8, height=20},
           tooltip={"ltnm-gui.station-status-tooltip"}, state=true, handlers="stations.sort_checkbox", save_as="stations.status_sort_checkbox"},
@@ -227,7 +223,7 @@ stations_tab.base_template = {type="frame", style="ltnm_light_content_frame", di
       {type="empty-widget", style_mods={width=8}}
     }},
     {type="scroll-pane", style="ltnm_blank_scroll_pane", direction="vertical", vertical_scroll_policy="always", save_as="stations.scroll_pane", children={
-      {type="table", style="ltnm_stations_table", style_mods={vertically_stretchable=true, horizontally_stretchable=true}, column_count=6,
+      {type="table", style="ltnm_stations_table", style_mods={vertically_stretchable=true, horizontally_stretchable=true}, column_count=5,
         save_as="stations.table"}
     }}
   }
