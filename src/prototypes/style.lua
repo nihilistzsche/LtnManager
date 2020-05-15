@@ -297,6 +297,13 @@ styles.ltnm_station_labels_flow = {
   vertical_align = "center"
 }
 
+styles.ltnm_search_content_flow = {
+  type = "horizontal_flow_style",
+  margin = 0,
+  padding = 0,
+  vertical_align = "center"
+}
+
 -- -----------------------------------------------------------------------------
 -- FRAME STYLES
 
@@ -486,13 +493,7 @@ styles.ltnm_search_frame = {
   bottom_padding = 2,
   left_padding = 2,
   right_padding = 2,
-  height = constants.search_frame_height,
-  -- width = constants.main_frame_width - constants.action_buttons_width - 18
-  width = constants.main_frame_width,
-  horizontal_flow_style = {
-    type = "horizontal_flow_style",
-    vertical_align = "center"
-  }
+  height = constants.search_frame_height
 }
 
 -- -----------------------------------------------------------------------------

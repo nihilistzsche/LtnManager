@@ -28,7 +28,7 @@ gui.add_handlers{
       name_textfield = {
         on_gui_text_changed = function(e)
           local player_table = global.players[e.player_index]
-          local search_gui_data = player_table.gui.main.search
+          local search_gui_data = player_table.gui.main.stations.search
           search_gui_data.query = e.text
           stations_tab.update(game.get_player(e.player_index), player_table, {stations_list=true})
         end
@@ -36,7 +36,7 @@ gui.add_handlers{
       network_id_textfield = {
         on_gui_text_changed = function(e)
           local player_table = global.players[e.player_index]
-          local search_gui_data = player_table.gui.main.search
+          local search_gui_data = player_table.gui.main.stations.search
           local input = tonumber(e.text) or -1
           search_gui_data.network_id = input
           stations_tab.update(game.get_player(e.player_index), player_table, {stations_list=true})
@@ -72,7 +72,8 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
   material_translations = material_translations or player_table.translations.materials
 
   if state_changes.stations_list then
-    local stations_table = gui_data.stations.table
+    local stations_gui_data = gui_data.stations
+    local stations_table = stations_gui_data.table
     stations_table.clear()
 
     local trains = data.trains
@@ -86,12 +87,8 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
     local delta = sort_value and 1 or -1
 
     -- check search filters
-    local query = ""
-    local network_id_query = -1
-    if player_table.flags.search_open then
-      query = gui_data.search.query
-      network_id_query = gui_data.search.network_id
-    end
+    local query = string.lower(stations_gui_data.search.query)
+    local network_id_query = stations_gui_data.search.network_id
     for i=start,finish,delta do
       local station_id = sorted_stations[i]
       local station = stations[station_id]
@@ -230,19 +227,17 @@ stations_tab.base_template = {type="frame", style="ltnm_light_content_frame", di
 }
 
 stations_tab.search_template = {
-  {type="textfield", lose_focus_on_confirm=true, handlers="stations.search.name_textfield", save_as="name_textfield"},
+  {type="textfield", lose_focus_on_confirm=true, handlers="stations.search.name_textfield", save_as="stations.search.name_textfield"},
   {type="label", style="caption_label", style_mods={left_margin=12}, caption={"ltnm-gui.network-id"}},
   {type="textfield", style_mods={width=80}, lose_focus_on_confirm=true, numeric=true, allow_negative=true, handlers="stations.search.network_id_textfield",
-    save_as="network_id_textfield"}
+    save_as="stations.search.network_id_textfield"}
 }
 
 function stations_tab.set_search_initial_state(player, player_table, gui_data)
-  local search_gui_data = gui_data.search
-  search_gui_data.network_id_textfield.text = -1
-  search_gui_data.name_textfield.focus()
-
-  search_gui_data.query = ""
-  search_gui_data.network_id = -1
+  local stations_gui_data = gui_data.stations.search
+  stations_gui_data.name_textfield.text = stations_gui_data.query
+  stations_gui_data.network_id_textfield.text = stations_gui_data.network_id
+  stations_gui_data.name_textfield.focus()
 end
 
 return stations_tab

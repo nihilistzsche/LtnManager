@@ -5,6 +5,7 @@ local gui = require("__flib__.gui")
 local constants = require("constants")
 local player_data = require("scripts.player-data")
 
+
 local tabs = {}
 local tab_names = {"depots", "stations", "inventory", "history", "alerts"}
 for _, name in ipairs(tab_names) do
@@ -26,6 +27,9 @@ gui.add_templates{
       {type="sprite", style="ltnm_status_icon", sprite="ltnm_indicator_"..color, save_as=name.."_circle"},
       {type="label", style="ltnm_depot_button_label", caption=value, save_as=name.."_label"}
     }}
+  end,
+  search_contents = function(name)
+    return {type="flow", name=name.."_contents", style="ltnm_search_content_flow", mods={visible=false}, children=tabs[name].search_template}
   end
 }
 
@@ -34,7 +38,7 @@ gui.add_handlers{
     window = {
       on_gui_closed = function(e)
         local player_table = global.players[e.player_index]
-        if not player_table.settings.keep_gui_open and not player_table.flags.opening_search then
+        if not player_table.settings.keep_gui_open and not player_table.flags.toggling_search then
           main_gui.close(game.get_player(e.player_index), player_table)
         end
       end
@@ -150,7 +154,7 @@ gui.add_handlers{
       on_gui_closed = function(e)
         local player = game.get_player(e.player_index)
         local player_table = global.players[e.player_index]
-        if not player_table.settings.keep_gui_open then
+        if not player_table.flags.toggling_search and not player_table.settings.keep_gui_open then
           main_gui.close_search(player, player_table, player_table.gui.main)
         end
       end
@@ -162,6 +166,13 @@ function main_gui.create(player, player_table)
   -- create base GUI structure
   local gui_data = gui.build(player.gui.screen, {
     {type="frame", style="ltnm_empty_frame", direction="vertical", handlers="main.window", save_as="window.frame", children={
+      {type="flow", children={
+        {template="pushers.horizontal"},
+        {type="frame", style="ltnm_search_frame", mods={visible=false}, handlers="search.window", save_as="search.window", children={
+          gui.templates.search_contents("stations"),
+          gui.templates.search_contents("inventory")
+        }},
+      }},
       {type="flow", style_mods={horizontal_spacing=0}, direction="horizontal", children={
         {template="mock_frame_tab", caption={"ltnm-gui.depots"}, save_as="tabbed_pane.tabs.depots"},
         {template="mock_frame_tab", caption={"ltnm-gui.stations"}, save_as="tabbed_pane.tabs.stations"},
@@ -209,9 +220,11 @@ function main_gui.create(player, player_table)
   gui_data.stations.active_sort = "name"
   gui_data.stations.sort_name = true
   gui_data.stations.sort_status = true
+  gui_data.stations.search.query = ""
+  gui_data.stations.search.network_id = -1
 
-  gui_data.inventory.selected_network_id = -1
-  gui_data.inventory.search_query = ""
+  gui_data.inventory.search.query = ""
+  gui_data.inventory.search.network_id = -1
 
   gui_data.history.active_sort = "finished"
   gui_data.history.sort_depot = true
@@ -281,10 +294,6 @@ function main_gui.update(player, player_table, state_changes)
     -- update selected tab in global
     tabbed_pane_data.selected = state_changes.active_tab
 
-    -- update search
-    if player_table.flags.search_open then
-      main_gui.close_search(player, player_table, gui_data)
-    end
     local search_button = gui_data.titlebar.search_button
     if tabs[state_changes.active_tab].search_template then
       search_button.enabled = true
@@ -304,8 +313,12 @@ function main_gui.update_active_tab(player, player_table, name)
   local changes
   if name then
     changes = {active_tab=name}
+    -- close search
+    if player_table.flags.search_open then
+      main_gui.close_search(player, player_table, player_table.gui.main, true)
+    end
   else
-    name = name or player_table.gui.main.tabbed_pane.selected
+    name = player_table.gui.main.tabbed_pane.selected
     changes = {}
   end
   if name == "depots" then
@@ -361,33 +374,46 @@ end
 
 function main_gui.open_search(player, player_table, gui_data)
   local selected_tab = gui_data.tabbed_pane.selected
-  local elems = gui.build(player.gui.screen, {
-    {type="frame", style="ltnm_search_frame", handlers="search.window", save_as="window", children=tabs[selected_tab].search_template}
-  })
 
   gui_data.titlebar.search_button.style = "ltnm_active_frame_action_button"
-  gui_data.search = elems
 
   -- set initial state
   tabs[selected_tab].set_search_initial_state(player, player_table, gui_data)
-  main_gui.update_search_location(gui_data)
 
+  -- set frame location offset
+  local main_window = gui_data.window.frame
+  local location = main_window.location
+  main_window.location = {x=location.x, y=(location.y - constants.search_frame_height)}
+
+  -- actually show the frame
+  local search_window = gui_data.search.window
+  search_window[selected_tab.."_contents"].visible = true
+  search_window.visible = true
+
+  -- opened logic
   if not player_table.settings.keep_gui_open then
-    player_table.flags.opening_search = true
-    player.opened = elems.window
-    player_table.flags.opening_search = false
+    player_table.flags.toggling_search = true
+    player.opened = search_window
+    player_table.flags.toggling_search = false
   end
-
   player_table.flags.search_open = true
 end
 
 function main_gui.close_search(player, player_table, gui_data, skip_update)
-  gui.update_filters("search", player.index, nil, "remove")
-  gui_data.search.window.destroy()
-  gui_data.search = nil
+  local search_window = gui_data.search.window
+  local selected_tab = gui_data.tabbed_pane.selected
+  search_window[selected_tab.."_contents"].visible = false
+  search_window.visible = false
+
+  -- set frame location offset
+  local main_window = gui_data.window.frame
+  local location = main_window.location
+  main_window.location = {x=location.x, y=(location.y + constants.search_frame_height)}
 
   if not player_table.settings.keep_gui_open then
+    player_table.flags.toggling_search = true
     player.opened = gui_data.window.frame
+    player_table.flags.toggling_search = false
   end
 
   gui_data.titlebar.search_button.style = "ltnm_frame_action_button"
@@ -409,14 +435,6 @@ function main_gui.toggle_search(player, player_table)
   else
     player.print{"ltnm-message.search-not-supported"}
   end
-end
-
-function main_gui.update_search_location(gui_data)
-  local main_frame_location = gui_data.window.frame.location
-  gui_data.search.window.location = {
-    x = main_frame_location.x,
-    y = main_frame_location.y - constants.search_frame_height
-  }
 end
 
 return main_gui

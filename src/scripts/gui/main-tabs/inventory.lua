@@ -76,7 +76,7 @@ gui.add_handlers{
         on_gui_text_changed = function(e)
           local player_table = global.players[e.player_index]
           local gui_data = player_table.gui.main.inventory
-          gui_data.search_query = e.text
+          gui_data.search.query = e.text
           inventory_tab.update(game.get_player(e.player_index), player_table, {inventory=true})
         end
       },
@@ -85,7 +85,7 @@ gui.add_handlers{
           local player_table = global.players[e.player_index]
           local gui_data = player_table.gui.main.inventory
           local input = tonumber(e.text) or -1
-          gui_data.selected_network_id = input
+          gui_data.search.network_id = input
           inventory_tab.update(game.get_player(e.player_index), player_table, {inventory=true})
         end
       }
@@ -101,19 +101,16 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
   if state_changes.inventory then
     local inventory = data.inventory
     local inventory_gui_data = gui_data.inventory
-    local selected_network_id = inventory_gui_data.selected_network_id
     inventory_gui_data.material_buttons = {}
     inventory_gui_data.contents = {}
     local buttons = inventory_gui_data.material_buttons
-    local query = ""
-    if player_table.flags.search_open then
-      query = string_lower(gui_data.search.name_textfield.text)
-    end
+    local query = string_lower(gui_data.inventory.search.query)
+    local network_id_query = inventory_gui_data.search.network_id
     for type, color in pairs{provided="green", requested="red", in_transit="blue"} do
       -- combine contents of each matching network
       local combined_materials = {}
       for network_id, materials in pairs(inventory[type]) do
-        if bit32_btest(network_id, selected_network_id) then
+        if bit32_btest(network_id, network_id_query) then
           combined_materials = util.add_materials(materials, combined_materials)
         end
       end
@@ -205,7 +202,7 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
           for i=1,#station_ids do
             local station = stations[station_ids[i]]
             if station.entity and station.entity.valid then
-              if bit32_btest(station.network_id, selected_network_id) then
+              if bit32_btest(station.network_id, network_id_query) then
                 local materials = {}
                 for mode, color in pairs{provided="green", requested="red"} do
                   local station_contents = station[mode]
@@ -236,7 +233,7 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
           local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
           for i=1,#train_ids do
             local train = trains[train_ids[i]]
-            if bit32_btest(train.network_id, selected_network_id) then
+            if bit32_btest(train.network_id, network_id_query) then
               local materials = {}
               if train.shipment then
                 materials = {{"blue", train.shipment}}
@@ -289,19 +286,17 @@ inventory_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, 
 }}
 
 inventory_tab.search_template = {
-  {type="textfield", lose_focus_on_confirm=true, handlers="inventory.search.name_textfield", save_as="name_textfield"},
+  {type="textfield", lose_focus_on_confirm=true, handlers="inventory.search.name_textfield", save_as="inventory.search.name_textfield"},
   {type="label", style="caption_label", style_mods={left_margin=12}, caption={"ltnm-gui.network-id"}},
   {type="textfield", style_mods={width=80}, lose_focus_on_confirm=true, numeric=true, allow_negative=true, handlers="inventory.search.network_id_textfield",
-    save_as="network_id_textfield"}
+    save_as="inventory.search.network_id_textfield"}
 }
 
 function inventory_tab.set_search_initial_state(player, player_table, gui_data)
-  local search_gui_data = gui_data.search
-  search_gui_data.network_id_textfield.text = -1
+  local search_gui_data = gui_data.inventory.search
+  search_gui_data.name_textfield.text = search_gui_data.query
+  search_gui_data.network_id_textfield.text = search_gui_data.network_id
   search_gui_data.name_textfield.focus()
-
-  search_gui_data.query = ""
-  search_gui_data.network_id = -1
 end
 
 return inventory_tab
