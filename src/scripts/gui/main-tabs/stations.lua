@@ -135,7 +135,7 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
               end
             end
           end
-          provided_requested_rows = math.ceil(provided_requested_rows / 6) -- number of rows
+          provided_requested_rows = math.ceil(provided_requested_rows / 5) -- number of rows
 
           -- add active shipments
           local shipments = station.active_deliveries
