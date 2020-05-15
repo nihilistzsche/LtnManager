@@ -38,9 +38,11 @@ gui.add_templates{
       local elems = gui.build(parent, {
         {type="flow", direction="vertical", children={
           {type="flow", save_as="labels_flow"},
-          {type="frame", style="ltnm_dark_content_frame_in_light_frame", children={
-            {type="scroll-pane", style="ltnm_material_location_slot_table_scroll_pane", vertical_scroll_policy="always", children={
-              {type="table", style="ltnm_materials_in_location_slot_table", column_count=9, save_as="table"}
+          {type="flow", style_mods={margin=0, padding=0, horizontal_align="center", horizontally_stretchable=true}, children={
+            {type="frame", style="ltnm_dark_content_frame_in_light_frame", children={
+              {type="scroll-pane", style="ltnm_material_location_slot_table_scroll_pane", children={
+                {type="table", style="ltnm_materials_in_location_slot_table", column_count=9, save_as="table"}
+              }}
             }}
           }}
         }}
