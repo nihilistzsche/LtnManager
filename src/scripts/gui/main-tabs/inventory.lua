@@ -143,9 +143,9 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
 
       -- set frame style
       if (i / 10) > pane_heights[type] then
-        inventory_gui_data[type.."_frame"].style.right_margin = -12
-      else
         inventory_gui_data[type.."_frame"].style.right_margin = 0
+      else
+        inventory_gui_data[type.."_frame"].style.right_margin = 12
       end
     end
 
@@ -258,7 +258,7 @@ end
 inventory_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.inventory", children={
   -- left column
   {type="frame", style="ltnm_light_content_frame", style_mods={top_padding=1}, direction="vertical", children={
-    {type="flow", style_mods={padding=12, top_padding=4}, direction="vertical", children={
+    {type="flow", style_mods={padding=12, top_padding=4, right_padding=0}, direction="vertical", children={
       gui.templates.inventory.slot_table_with_label("provided", pane_heights.provided),
       gui.templates.inventory.slot_table_with_label("requested", pane_heights.requested),
       gui.templates.inventory.slot_table_with_label("in_transit", pane_heights.in_transit)
