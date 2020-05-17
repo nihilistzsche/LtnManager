@@ -170,7 +170,8 @@ function main_gui.create(player, player_table)
         {template="pushers.horizontal"},
         {type="frame", style="ltnm_search_frame", mods={visible=false}, handlers="search.window", save_as="search.window", children={
           gui.templates.search_contents("stations"),
-          gui.templates.search_contents("inventory")
+          gui.templates.search_contents("inventory"),
+          gui.templates.search_contents("history")
         }},
       }},
       {type="flow", style_mods={horizontal_spacing=0}, direction="horizontal", children={
@@ -231,6 +232,8 @@ function main_gui.create(player, player_table)
   gui_data.history.sort_route = true
   gui_data.history.sort_runtime = true
   gui_data.history.sort_finished = false
+  gui_data.history.search.query = ""
+  gui_data.history.search.network_id = -1
 
   gui_data.alerts.active_sort = "time"
   gui_data.alerts.sort_time = false
@@ -372,7 +375,7 @@ function main_gui.toggle(player, player_table)
   end
 end
 
-function main_gui.open_search(player, player_table, gui_data)
+function main_gui.open_search(player, player_table, gui_data, skip_update)
   local selected_tab = gui_data.tabbed_pane.selected
 
   gui_data.titlebar.search_button.style = "ltnm_active_frame_action_button"
@@ -397,6 +400,10 @@ function main_gui.open_search(player, player_table, gui_data)
     player_table.flags.toggling_search = false
   end
   player_table.flags.search_open = true
+
+  if not skip_update then
+    main_gui.update_active_tab(player, player_table)
+  end
 end
 
 function main_gui.close_search(player, player_table, gui_data, skip_update)

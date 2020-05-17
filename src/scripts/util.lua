@@ -1,6 +1,3 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- CONTROL STAGE UTILITIES
-
 local util = require("__core__.lualib.util")
 
 -- adds the contents of two material tables together

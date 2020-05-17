@@ -1,6 +1,3 @@
--- -------------------------------------------------------------------------------------------------------------------------------------------------------------
--- DATA STAGE UTILITIES
-
 local util = require("__core__.lualib.util")
 
 function util.mipped_icon(name, position, filename, size, mipmap_count, mods)

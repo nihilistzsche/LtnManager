@@ -39,6 +39,25 @@ gui.add_handlers{
         end
         history_tab.update(game.get_player(e.player_index), global.players[e.player_index], {history=true})
       end
+    },
+    search = {
+      name_textfield = {
+        on_gui_text_changed = function(e)
+          local player_table = global.players[e.player_index]
+          local gui_data = player_table.gui.main.history
+          gui_data.search.query = e.text
+          history_tab.update(game.get_player(e.player_index), player_table, {history=true})
+        end
+      },
+      network_id_textfield = {
+        on_gui_text_changed = function(e)
+          local player_table = global.players[e.player_index]
+          local gui_data = player_table.gui.main.history
+          local input = tonumber(e.text) or -1
+          gui_data.search.network_id = input
+          history_tab.update(game.get_player(e.player_index), player_table, {history=true})
+        end
+      }
     }
   },
 }
@@ -122,5 +141,19 @@ history_tab.base_template = {type="frame", style="ltnm_light_content_frame", dir
     }
   }
 }
+
+history_tab.search_template = {
+  {type="textfield", lose_focus_on_confirm=true, handlers="history.search.name_textfield", save_as="history.search.name_textfield"},
+  {type="label", style="caption_label", style_mods={left_margin=12}, caption={"ltnm-gui.network-id"}},
+  {type="textfield", style_mods={width=80}, lose_focus_on_confirm=true, numeric=true, allow_negative=true, handlers="history.search.network_id_textfield",
+    save_as="history.search.network_id_textfield"}
+}
+
+function history_tab.set_search_initial_state(player, player_table, gui_data)
+  local search_gui_data = gui_data.history.search
+  search_gui_data.name_textfield.text = search_gui_data.query
+  search_gui_data.network_id_textfield.text = search_gui_data.network_id
+  search_gui_data.name_textfield.focus()
+end
 
 return history_tab
