@@ -284,7 +284,6 @@ local function sort_history(working_data)
   local sort = {
     depot = {lookup={}, values={}},
     route = {lookup={}, values={}},
-    network_id = {lookup={}, values={}},
     runtime = {lookup={}, values={}},
     finished = {lookup={}, values={}}
   }

@@ -94,7 +94,6 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
               {type="label", name="ltnm_view_station__"..entry.to_id, style="hoverable_bold_label", caption=entry.to, tooltip={"ltnm-gui.view-station-on-map"}}
             }}
           }},
-          {type="label", style_mods={right_margin=8, width=16, horizontal_align="right"}, caption=entry.network_id},
           {type="label", style_mods={right_margin=8, width=66, horizontal_align="right"}, caption=util.ticks_to_time(entry.runtime)},
           {type="label", style_mods={right_margin=8, width=64, horizontal_align="right"}, caption=util.ticks_to_time(entry.finished)},
           {type="frame", style="ltnm_dark_content_frame_in_light_frame", children={
@@ -123,8 +122,6 @@ history_tab.base_template = {type="frame", style="ltnm_light_content_frame", dir
       {type="checkbox", name="ltnm_sort_history_route", style="ltnm_sort_checkbox_inactive", state=true, caption={"ltnm-gui.route"},
         handlers="history.sort_checkbox", save_as="history.route_sort_checkbox"},
       {template="pushers.horizontal"},
-      {type="checkbox", name="ltnm_sort_history_network_id", style="ltnm_sort_checkbox_inactive", style_mods={right_margin=8}, state=true,
-        caption={"ltnm-gui.id"}, tooltip={"ltnm-gui.history-network-id-tooltip"}, handlers="history.sort_checkbox", save_as="history.network_id_sort_checkbox"},
       {type="checkbox", name="ltnm_sort_history_runtime", style="ltnm_sort_checkbox_inactive", style_mods={right_margin=8}, state=true,
         caption={"ltnm-gui.runtime"}, handlers="history.sort_checkbox", save_as="history.runtime_sort_checkbox"},
       {type="checkbox", name="ltnm_sort_history_finished", style="ltnm_sort_checkbox_active", style_mods={right_margin=8}, state=false,
@@ -136,7 +133,7 @@ history_tab.base_template = {type="frame", style="ltnm_light_content_frame", dir
     -- listing
     {type="scroll-pane", style="ltnm_blank_scroll_pane", style_mods={horizontally_stretchable=true, vertically_stretchable=true},
       vertical_scroll_policy="always", save_as="history.pane", children={
-        {type="table", style="ltnm_rows_table", style_mods={vertically_stretchable=true}, column_count=6, save_as="history.table"}
+        {type="table", style="ltnm_rows_table", style_mods={vertically_stretchable=true}, column_count=5, save_as="history.table"}
       }
     }
   }
