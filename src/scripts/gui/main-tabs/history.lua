@@ -68,7 +68,8 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
   material_translations = material_translations or player_table.translations.materials
   -- HISTORY
   if state_changes.history then
-    local history_table = gui_data.history.table
+    local history_gui_data = gui_data.history
+    local history_table = history_gui_data.table
     history_table.clear()
 
     local active_sort = gui_data.history.active_sort
@@ -82,31 +83,38 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
       local finish = sort_value and #sorted_history or 1
       local delta = sort_value and 1 or -1
 
+      local query = string.lower(history_gui_data.search.query)
+      local network_id_query = history_gui_data.search.network_id
+
       for i=start,finish,delta do
         local entry = history[sorted_history[i]]
-        local table_add = gui.build(history_table, {
-          {type="label", style="bold_label", style_mods={width=140}, caption=entry.depot},
-          {type="flow", style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction="vertical", children={
-            {type="label", name="ltnm_view_station__"..entry.from_id, style="hoverable_bold_label", caption=entry.from,
-              tooltip={"ltnm-gui.view-station-on-map"}},
-            {type="flow", children={
-              {type="label", style="caption_label", caption="->"},
-              {type="label", name="ltnm_view_station__"..entry.to_id, style="hoverable_bold_label", caption=entry.to, tooltip={"ltnm-gui.view-station-on-map"}}
+
+        -- check search criteria
+        if string.find(string.lower(entry.from.." -> "..entry.to), query) and bit32.btest(entry.network_id, network_id_query) then
+          local table_add = gui.build(history_table, {
+            {type="label", style="bold_label", style_mods={width=140}, caption=entry.depot},
+            {type="flow", style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction="vertical", children={
+              {type="label", name="ltnm_view_station__"..entry.from_id, style="hoverable_bold_label", caption=entry.from,
+                tooltip={"ltnm-gui.view-station-on-map"}},
+              {type="flow", children={
+                {type="label", style="caption_label", caption="->"},
+                {type="label", name="ltnm_view_station__"..entry.to_id, style="hoverable_bold_label", caption=entry.to, tooltip={"ltnm-gui.view-station-on-map"}}
+              }}
+            }},
+            {type="label", style_mods={right_margin=8, width=66, horizontal_align="right"}, caption=util.ticks_to_time(entry.runtime)},
+            {type="label", style_mods={right_margin=8, width=64, horizontal_align="right"}, caption=util.ticks_to_time(entry.finished)},
+            {type="frame", style="ltnm_dark_content_frame_in_light_frame", children={
+              {type="scroll-pane", style="ltnm_train_slot_table_scroll_pane", children={
+                {type="table", style="ltnm_small_slot_table", column_count=4, save_as="table"}
+              }}
             }}
-          }},
-          {type="label", style_mods={right_margin=8, width=66, horizontal_align="right"}, caption=util.ticks_to_time(entry.runtime)},
-          {type="label", style_mods={right_margin=8, width=64, horizontal_align="right"}, caption=util.ticks_to_time(entry.finished)},
-          {type="frame", style="ltnm_dark_content_frame_in_light_frame", children={
-            {type="scroll-pane", style="ltnm_train_slot_table_scroll_pane", children={
-              {type="table", style="ltnm_small_slot_table", column_count=4, save_as="table"}
-            }}
-          }}
-        }).table.add
-        local mi = 0
-        for name, count in pairs(entry.actual_shipment or entry.shipment) do
-          mi = mi + 1
-          table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_dark_grey", sprite=string.gsub(name, ",", "/"),
-            number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
+          }).table.add
+          local mi = 0
+          for name, count in pairs(entry.actual_shipment or entry.shipment) do
+            mi = mi + 1
+            table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_dark_grey", sprite=string.gsub(name, ",", "/"),
+              number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
+          end
         end
       end
     end
