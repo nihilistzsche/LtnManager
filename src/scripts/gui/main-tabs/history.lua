@@ -1,16 +1,16 @@
 local history_tab = {}
 
 local gui = require("__flib__.gui")
+
 local util = require("scripts.util")
 
-local string_find = string.find
-local string_gsub = string.gsub
+local string = string
 
 gui.add_handlers{
   history = {
     sort_checkbox = {
       on_gui_checked_state_changed = function(e)
-        local _,_,clicked_type = string_find(e.element.name, "^ltnm_sort_history_(.-)$")
+        local _,_,clicked_type = string.find(e.element.name, "^ltnm_sort_history_(.-)$")
         local player_table = global.players[e.player_index]
         local gui_data = player_table.gui.main.history
         if gui_data.active_sort ~= clicked_type then
@@ -105,7 +105,7 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
         local mi = 0
         for name, count in pairs(entry.actual_shipment or entry.shipment) do
           mi = mi + 1
-          table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_dark_grey", sprite=string_gsub(name, ",", "/"),
+          table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_dark_grey", sprite=string.gsub(name, ",", "/"),
             number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
         end
       end
