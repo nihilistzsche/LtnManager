@@ -59,7 +59,7 @@ gui.add_handlers{
         end
       }
     }
-  },
+  }
 }
 
 function history_tab.update(player, player_table, state_changes, gui_data, data, material_translations)

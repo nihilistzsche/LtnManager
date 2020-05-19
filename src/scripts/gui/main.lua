@@ -5,7 +5,6 @@ local gui = require("__flib__.gui")
 local constants = require("constants")
 local player_data = require("scripts.player-data")
 
-
 local tabs = {}
 local tab_names = {"depots", "stations", "inventory", "history", "alerts"}
 for _, name in ipairs(tab_names) do
@@ -127,8 +126,20 @@ gui.add_handlers{
               player.print{"ltnm-message.ltn-combinator-not-found"}
             end
           else
+            local entity = station_data.entity
             -- view station on map
-            player.zoom_to_world(station_data.entity.position, 0.5)
+            player.zoom_to_world(entity.position, 0.5)
+            rendering.draw_circle{
+              color = constants.station_indicator_color,
+              -- radius = math.max(entity.bounding_box.width, entity.bounding_box.height),
+              radius = 2,
+              width = 6,
+              filled = false,
+              target = entity,
+              surface = entity.surface,
+              time_to_live = 180,
+              players = {e.player_index}
+            }
             if not player_table.gui.main.window.pinned then
               main_gui.close(player, player_table)
             end
