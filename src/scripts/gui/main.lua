@@ -131,8 +131,7 @@ gui.add_handlers{
             player.zoom_to_world(entity.position, 0.5)
             rendering.draw_circle{
               color = constants.station_indicator_color,
-              -- radius = math.max(entity.bounding_box.width, entity.bounding_box.height),
-              radius = 2,
+              radius = 1.5,
               width = 6,
               filled = false,
               target = entity,
