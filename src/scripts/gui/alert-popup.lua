@@ -25,7 +25,7 @@ gui.add_handlers{
   }
 }
 
-function alert_popup_gui.create_or_update(player, player_table, data)
+function alert_popup_gui.create_or_update(player, player_table, alert_type)
   local gui_data = player_table.gui.alert_popup
   if not gui_data then
     gui_data = gui.build(mod_gui.get_frame_flow(player), {
@@ -40,7 +40,7 @@ function alert_popup_gui.create_or_update(player, player_table, data)
     })
     player_table.gui.alert_popup = gui_data
   end
-  gui_data.label.caption = {"ltnm-gui.alert-"..data.type}
+  gui_data.label.caption = {"ltnm-gui.alert-"..alert_type}
 end
 
 function alert_popup_gui.destroy(player, player_table)
@@ -50,12 +50,12 @@ function alert_popup_gui.destroy(player, player_table)
   player_table.gui.alert_popup = nil
 end
 
-function alert_popup_gui.create_for_all(data)
+function alert_popup_gui.create_for_all(alert_type)
   local players = global.players
   for _, player in ipairs(game.connected_players) do
     local player_table = players[player.index]
     if player_table.flags.can_open_gui and player_table.settings.show_alert_popups then
-      alert_popup_gui.create_or_update(player, players[player.index], data)
+      alert_popup_gui.create_or_update(player, players[player.index], alert_type)
     end
   end
 end

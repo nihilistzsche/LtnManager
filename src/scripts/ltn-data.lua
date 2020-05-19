@@ -387,6 +387,49 @@ local function sort_alerts(working_data)
   working_data.step = 100
 end
 
+local function add_alert(e, alert_type, ...)
+  -- save train data so it will persist after the delivery is through
+  local trains = global.data.trains
+  local train = trains[e.train_id] or trains[global.data.invalidated_trains[e.train_id]]
+  if not train then error("Could not find train of ID: "..e.train_id) end
+
+  -- add common data
+  local alert_data = {
+    time = game.tick,
+    type = alert_type,
+    train = {
+      depot = train.depot,
+      from = train.from,
+      from_id = train.from_id,
+      id = e.train_id,
+      network_id = train.network_id,
+      pickup_done = train.pickupDone or false,
+      to = train.to,
+      to_id = train.to_id
+    }
+  }
+
+  -- add unique data
+  local arg = {...}
+  if alert_type == "incorrect_pickup" then
+    alert_data.actual_shipment = e.actual_shipment
+    alert_data.planned_shipment = e.planned_shipment
+  elseif alert_type == "incomplete_delivery" then
+    alert_data.leftovers = arg[1]
+    alert_data.shipment = e.shipment
+  else
+    alert_data.shipment = arg[1]
+  end
+
+  -- save to data table
+  local alerts = global.data.alerts
+  table.insert(alerts, 1, alert_data)
+  alerts[31] = nil -- limit to 30 entries
+
+  -- set popup flag
+  global.working_data.alert_popup = alert_type
+end
+
 -- -----------------------------------------------------------------------------
 -- HANDLERS
 
@@ -446,12 +489,12 @@ function ltn_data.iterate()
   end
 end
 
-local function on_stops_updated(e)
+function ltn_data.on_stops_updated(e)
   if global.flags.iterating_ltn_data then return end
   global.working_data.stations = e.logistic_train_stops
 end
 
-local function on_dispatcher_updated(e)
+function ltn_data.on_dispatcher_updated(e)
   if global.flags.iterating_ltn_data or global.flags.updating_guis then return end
   local stations = global.working_data.stations
   if not stations then
@@ -496,39 +539,18 @@ local function on_dispatcher_updated(e)
   global.flags.iterating_ltn_data = true
 end
 
-local function on_delivery_pickup_complete(e)
+function ltn_data.on_delivery_pickup_complete(e)
   if not global.data then return end
 
   -- compare shipments to see if something was loaded incorrectly
   for name, count in pairs(e.actual_shipment) do
     if not e.planned_shipment[name] or math_floor(e.planned_shipment[name]) > math_floor(count) then
-      -- save train data so it will persist after the delivery is through
-      local train = global.data.trains[e.train_id]
-      if not train then error("Could not find train of ID: "..e.train_id) end
-      local alerts = global.working_data.alerts
-      alerts._index = alerts._index + 1
-      alerts[alerts._index] = {
-        time = game.tick,
-        type = "incorrect_pickup",
-        train = {
-          depot = train.depot,
-          from = train.from,
-          from_id = train.from_id,
-          id = e.train_id,
-          network_id = train.network_id,
-          pickup_done = train.pickupDone or false,
-          to = train.to,
-          to_id = train.to_id
-        },
-        planned_shipment = e.planned_shipment,
-        actual_shipment = e.actual_shipment
-      }
-      global.working_data.alert_popup = {id=alerts._index, type="incorrect_pickup"}
+      add_alert(e, "incorrect_pickup")
     end
   end
 end
 
-local function on_delivery_completed(e)
+function ltn_data.on_delivery_completed(e)
   if not global.data then return end
   local train = global.data.trains[e.train_id]
   if not train then error("Could not find train of ID ["..e.train_id.."]") end
@@ -562,63 +584,29 @@ local function on_delivery_completed(e)
     contents["fluid,"..n] = c
   end
   if table_size(contents) > 0 then
-    local alerts = global.working_data.alerts
-    alerts._index = alerts._index + 1
-    alerts[alerts._index] = {
-      time = game.tick,
-      type = "incomplete_delivery",
-      train = {
-        depot = train.depot,
-        from = train.from,
-        from_id = train.from_id,
-        id = e.train_id,
-        network_id = train.network_id,
-        to = train.to,
-        to_id = train.to_id
-      },
-      shipment = e.shipment,
-      leftovers = contents
-    }
-    global.working_data.alert_popup = {id=alerts._index, type="incomplete_delivery"}
+    add_alert(e, "incomplete_delivery", contents)
   end
 end
 
-local function on_delivery_failed(e)
+function ltn_data.on_delivery_failed(e)
   if not global.data then return end
 
-  local alerts = global.working_data.alerts
-  alerts._index = alerts._index + 1
-  local alert_type
-
   local trains = global.data.trains
-
   local train = trains[e.train_id] or trains[global.data.invalidated_trains[e.train_id]]
+
   if train then
+    local alert_type
     if train.train.valid then
       alert_type = "delivery_timed_out"
     else
       alert_type = "train_invalidated"
     end
 
-    alerts[alerts._index] = {
-      time = game.tick,
-      type = alert_type,
-      train = {
-        depot = train.depot,
-        from = train.from,
-        from_id = train.from_id,
-        id = e.train_id,
-        network_id = train.network_id,
-        to = train.to,
-        to_id = train.to_id
-      },
-      shipment = train.shipment
-    }
-    global.working_data.alert_popup = {id=alerts._index, type=alert_type}
+    add_alert(e, alert_type, train.shipment)
   end
 end
 
-local function on_train_created(e)
+function ltn_data.on_train_created(e)
   if not global.data then return end
   local trains = global.data.trains
   local invalidated_trains = global.data.invalidated_trains
@@ -644,36 +632,13 @@ local function on_train_created(e)
 end
 
 -- -----------------------------------------------------------------------------
--- EVENT REGISTRATION
+-- MODULE
 
 ltn_data.event_ids = {}
 
-ltn_data.handlers = {
-  on_stops_updated = on_stops_updated,
-  on_dispatcher_updated = on_dispatcher_updated,
-  -- on_dispatcher_no_train_found = on_dispatcher_no_train_found, UNUSED
-  on_delivery_pickup_complete = on_delivery_pickup_complete,
-  on_delivery_completed = on_delivery_completed,
-  on_delivery_failed = on_delivery_failed
-}
-
-function ltn_data.setup_events()
-  if not remote.interfaces["logistic-train-network"] then
-    error("Could not establish connection to LTN!")
-  end
-  for event_name, handler in pairs(ltn_data.handlers) do
-    local id = remote.call("logistic-train-network", event_name)
-    ltn_data.event_ids[event_name] = id
-    event.register(id, handler)
-  end
-  event.on_train_created(on_train_created)
-end
-
 function ltn_data.init()
   global.data = nil
-  global.working_data = {history={}, alerts={_index=0}}
+  global.working_data = {history={}, alerts={}}
 end
-
--- -----------------------------------------------------------------------------
 
 return ltn_data

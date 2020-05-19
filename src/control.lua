@@ -3,6 +3,8 @@ local gui = require("__flib__.gui")
 local migration = require("__flib__.migration")
 local translation = require("__flib__.translation")
 
+local constants = require("constants")
+
 local alert_popup_gui = require("scripts.gui.alert-popup")
 local global_data = require("scripts.global-data")
 local ltn_data = require("scripts.ltn-data")
@@ -35,6 +37,18 @@ commands.add_command("LtnManager", {"ltnm-message.command-help"},
 -- -----------------------------------------------------------------------------
 -- EVENT HANDLERS
 
+local function setup_ltn_handlers()
+  if not remote.interfaces["logistic-train-network"] then
+    error("Could not establish connection to LTN!")
+  end
+  for event_name in pairs(constants.ltn_event_names) do
+    local id = remote.call("logistic-train-network", event_name)
+    ltn_data.event_ids[event_name] = id
+    event.register(id, ltn_data[event_name])
+  end
+  event.on_train_created(ltn_data.on_train_created)
+end
+
 -- BOOTSTRAP
 
 event.on_init(function()
@@ -43,7 +57,8 @@ event.on_init(function()
 
   global_data.init()
   ltn_data.init()
-  ltn_data.setup_events()
+
+  setup_ltn_handlers()
 
   for i, player in pairs(game.players) do
     player_data.init(player, i)
@@ -54,7 +69,8 @@ event.on_init(function()
 end)
 
 event.on_load(function()
-  ltn_data.setup_events()
+  setup_ltn_handlers()
+
   gui.build_lookup_tables()
 end)
 
