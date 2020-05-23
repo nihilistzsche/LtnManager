@@ -20,7 +20,7 @@ gui.add_templates{
       rows = rows or 4
       return {type="flow", style_mods={vertical_spacing=7, top_padding=3}, direction="vertical", children={
         {type="label", style="caption_label", caption={"ltnm-gui."..string_gsub(name, "_", "-")}},
-        {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="inventory."..name.."_frame", children={
+        {type="frame", style="deep_frame_in_shallow_frame", save_as="inventory."..name.."_frame", children={
           {type="scroll-pane", style="ltnm_slot_table_scroll_pane", style_mods={height=rows*40}, children={
             {type="table", style="ltnm_inventory_slot_table", column_count=10, save_as="inventory."..name.."_table"}
           }}
@@ -39,7 +39,7 @@ gui.add_templates{
         {type="flow", direction="vertical", children={
           {type="flow", save_as="labels_flow"},
           {type="flow", style_mods={margin=0, padding=0, horizontal_align="center", horizontally_stretchable=true}, children={
-            {type="frame", style="ltnm_dark_content_frame_in_light_frame", children={
+            {type="frame", style="deep_frame_in_shallow_frame", children={
               {type="scroll-pane", style="ltnm_material_location_slot_table_scroll_pane", children={
                 {type="table", style="ltnm_materials_in_location_slot_table", column_count=9, save_as="table"}
               }}
@@ -214,7 +214,7 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
                 end
                 location_template(
                   table,
-                  {{"hoverable_bold_label", station.entity.backer_name, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..station_ids[i]}},
+                  {{"ltnm_hoverable_bold_label", station.entity.backer_name, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..station_ids[i]}},
                   materials,
                   material_translations
                 )
@@ -240,8 +240,8 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
               if train.shipment then
                 materials = {{"blue", train.shipment}}
               end
-              location_template(table, {{"hoverable_bold_label", train.from, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..train.from_id},
-                {"caption_label", "->"}, {"hoverable_bold_label", train.to, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..train.to_id}}, materials,
+              location_template(table, {{"ltnm_hoverable_bold_label", train.from, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..train.from_id},
+                {"caption_label", "->"}, {"ltnm_hoverable_bold_label", train.to, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..train.to_id}}, materials,
                 material_translations)
             end
           end
@@ -255,9 +255,9 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
   end
 end
 
-inventory_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.inventory", children={
+inventory_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, elem_mods={visible=false}, save_as="tabbed_pane.contents.inventory", children={
   -- left column
-  {type="frame", style="ltnm_light_content_frame", style_mods={top_padding=1}, direction="vertical", children={
+  {type="frame", style="inside_shallow_frame", style_mods={top_padding=1}, direction="vertical", children={
     {type="flow", style_mods={padding=12, top_padding=4, right_padding=0}, direction="vertical", children={
       gui.templates.inventory.slot_table_with_label("provided", pane_heights.provided),
       gui.templates.inventory.slot_table_with_label("requested", pane_heights.requested),
@@ -265,9 +265,9 @@ inventory_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, 
     }}
   }},
   -- right column
-  {type="frame", style="ltnm_light_content_frame", direction="vertical", children={
+  {type="frame", style="inside_shallow_frame", direction="vertical", children={
     -- item information
-    {type="frame", style="ltnm_light_content_frame_in_light_frame", style_mods={horizontally_stretchable=true, vertically_stretchable=true},
+    {type="frame", style="ltnm_shallow_frame_in_shallow_frame", style_mods={horizontally_stretchable=true, vertically_stretchable=true},
       direction="vertical", children={
         {type="frame", style="ltnm_item_info_toolbar_frame", direction="vertical", children={
           -- icon and name

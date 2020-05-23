@@ -19,7 +19,7 @@ gui.add_templates{
     vertical = {type="empty-widget", style_mods={vertically_stretchable=true}},
     both = {type="empty-widget", style_mods={horizontally_stretchable=true, vertically_stretchable=true}}
   },
-  frame_action_button = {type="sprite-button", style="ltnm_frame_action_button", mouse_button_filter={"left"}},
+  frame_action_button = {type="sprite-button", style="frame_action_button", mouse_button_filter={"left"}},
   mock_frame_tab = {type="button", style="ltnm_mock_frame_tab", mouse_button_filter={"left"}, handlers="main.titlebar.frame_tab"},
   status_indicator = function(name, color, value)
     return {type="flow", style_mods={vertical_align="center"}, children={
@@ -28,7 +28,7 @@ gui.add_templates{
     }}
   end,
   search_contents = function(name)
-    return {type="flow", name=name.."_contents", style="ltnm_search_content_flow", mods={visible=false}, children=tabs[name].search_template}
+    return {type="flow", name=name.."_contents", style="ltnm_search_content_flow", elem_mods={visible=false}, children=tabs[name].search_template}
   end
 }
 
@@ -60,7 +60,7 @@ gui.add_handlers{
           local player_table = global.players[e.player_index]
           local window_data = player_table.gui.main.window
           if player_table.settings.keep_gui_open then
-            e.element.style = "ltnm_frame_action_button"
+            e.element.style = "frame_action_button"
             player_table.settings.keep_gui_open = false
             window_data.frame.force_auto_center()
             if player_table.flags.search_open then
@@ -83,7 +83,7 @@ gui.add_handlers{
             local settings = global.players[e.player_index].settings
             if settings.auto_refresh then
               player_data.set_setting(e.player_index, "auto-refresh", false)
-              e.element.style = "ltnm_frame_action_button"
+              e.element.style = "frame_action_button"
             else
               player_data.set_setting(e.player_index, "auto-refresh", true)
               e.element.style = "ltnm_active_frame_action_button"
@@ -175,35 +175,37 @@ gui.add_handlers{
 function main_gui.create(player, player_table)
   -- create base GUI structure
   local gui_data = gui.build(player.gui.screen, {
-    {type="frame", style="ltnm_empty_frame", direction="vertical", handlers="main.window", save_as="window.frame", children={
+    {type="frame", style="invisible_frame", direction="vertical", handlers="main.window", save_as="window.frame", children={
       {type="flow", children={
         {template="pushers.horizontal"},
-        {type="frame", style="ltnm_search_frame", mods={visible=false}, handlers="search.window", save_as="search.window", children={
+        {type="frame", style="ltnm_search_frame", elem_mods={visible=false}, handlers="search.window", save_as="search.window", children={
           gui.templates.search_contents("stations"),
           gui.templates.search_contents("inventory"),
           gui.templates.search_contents("history")
         }},
       }},
-      {type="flow", style_mods={horizontal_spacing=0}, direction="horizontal", children={
-        {template="mock_frame_tab", caption={"ltnm-gui.depots"}, save_as="tabbed_pane.tabs.depots"},
-        {template="mock_frame_tab", caption={"ltnm-gui.stations"}, save_as="tabbed_pane.tabs.stations"},
-        {template="mock_frame_tab", caption={"ltnm-gui.inventory"}, save_as="tabbed_pane.tabs.inventory"},
-        {template="mock_frame_tab", caption={"ltnm-gui.history"}, save_as="tabbed_pane.tabs.history"},
-        {template="mock_frame_tab", caption={"ltnm-gui.alerts"}, save_as="tabbed_pane.tabs.alerts"},
-        {type="frame", style="ltnm_main_frame_header", children={
-          {type="empty-widget", style="draggable_space_header", style_mods={horizontally_stretchable=true, height=24, left_margin=-1, right_margin=7},
-            save_as="titlebar.drag_handle"},
-          {template="frame_action_button", sprite="ltnm_search_white", hovered_sprite="ltnm_search_black", clicked_sprite="ltnm_search_black",
+      {type="flow", style_mods={horizontal_spacing=0, padding=0}, direction="horizontal", children={
+        -- TODO left side
+        {type="frame", style="ltnm_titlebar_tab_filler_frame", children={
+          {template="mock_frame_tab", caption={"ltnm-gui.depots"}, save_as="tabbed_pane.tabs.depots"},
+          {template="mock_frame_tab", caption={"ltnm-gui.stations"}, save_as="tabbed_pane.tabs.stations"},
+          {template="mock_frame_tab", caption={"ltnm-gui.inventory"}, save_as="tabbed_pane.tabs.inventory"},
+          {template="mock_frame_tab", caption={"ltnm-gui.history"}, save_as="tabbed_pane.tabs.history"},
+          {template="mock_frame_tab", caption={"ltnm-gui.alerts"}, save_as="tabbed_pane.tabs.alerts"},
+        }},
+        {type="frame", style="ltnm_titlebar_right_frame", children={
+          {type="empty-widget", style="ltnm_titlebar_drag_handle", save_as="titlebar.drag_handle"},
+          {template="frame_action_button", sprite="utility/search_white", hovered_sprite="utility/search_black", clicked_sprite="utility/search_black",
             tooltip={"ltnm-gui.search-tooltip"}, handlers="main.titlebar.search_button", save_as="titlebar.search_button"},
           {template="frame_action_button", sprite="ltnm_pin_white", hovered_sprite="ltnm_pin_black", clicked_sprite="ltnm_pin_black",
             tooltip={"ltnm-gui.keep-open"}, handlers="main.titlebar.pin_button", save_as="titlebar.pin_button"},
           {template="frame_action_button", sprite="ltnm_refresh_white", hovered_sprite="ltnm_refresh_black", clicked_sprite="ltnm_refresh_black",
             tooltip={"ltnm-gui.refresh-button-tooltip"}, handlers="main.titlebar.refresh_button", save_as="titlebar.refresh_button"},
-          {template="frame_action_button", sprite="ltnm_close_white", hovered_sprite="ltnm_close_black", clicked_sprite="ltnm_close_black",
+          {template="frame_action_button", sprite="utility/close_white", hovered_sprite="utility/close_black", clicked_sprite="utility/close_black",
             handlers="main.titlebar.close_button", save_as="titlebar.close_button"}
         }}
       }},
-      {type="frame", style="ltnm_main_frame_content", children={
+      {type="frame", style="ltnm_main_content_frame", children={
         tabs.depots.base_template,
         tabs.stations.base_template,
         tabs.inventory.base_template,
@@ -214,10 +216,10 @@ function main_gui.create(player, player_table)
   })
 
   -- other handlers
-  gui.update_filters("main.open_train_button", player.index, {"ltnm_open_train"})
-  gui.update_filters("main.view_station_button", player.index, {"ltnm_view_station"})
-  gui.update_filters("main.material_button", player.index, {"ltnm_view_material"})
-  gui.update_filters("alerts.clear_alert_button", player.index, {"ltnm_clear_alert"})
+  gui.update_filters("main.open_train_button", player.index, {"ltnm_open_train"}, "add")
+  gui.update_filters("main.view_station_button", player.index, {"ltnm_view_station"}, "add")
+  gui.update_filters("main.material_button", player.index, {"ltnm_view_material"}, "add")
+  gui.update_filters("alerts.clear_alert_button", player.index, {"ltnm_clear_alert"}, "add")
 
   -- default settings
   gui_data.window.pinned = false
@@ -256,14 +258,14 @@ function main_gui.create(player, player_table)
   if player_table.settings.auto_refresh then
     gui_data.titlebar.refresh_button.style = "ltnm_active_frame_action_button"
   else
-    gui_data.titlebar.refresh_button.style = "ltnm_frame_action_button"
+    gui_data.titlebar.refresh_button.style = "frame_action_button"
   end
 
   -- pinned
   if player_table.settings.keep_gui_open then
     gui_data.titlebar.pin_button.style = "ltnm_active_frame_action_button"
   else
-    gui_data.titlebar.pin_button.style = "ltnm_frame_action_button"
+    gui_data.titlebar.pin_button.style = "frame_action_button"
     -- center window
     gui_data.window.frame.force_auto_center()
   end
@@ -433,7 +435,7 @@ function main_gui.close_search(player, player_table, gui_data, skip_update)
     player_table.flags.toggling_search = false
   end
 
-  gui_data.titlebar.search_button.style = "ltnm_frame_action_button"
+  gui_data.titlebar.search_button.style = "frame_action_button"
 
   player_table.flags.search_open = false
 

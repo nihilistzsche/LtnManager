@@ -98,22 +98,22 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
         if string.find(string.lower(entity.backer_name), query) and bit32.btest(station.network_id, network_id_query) then
           -- build GUI structure
           local elems = gui.build(stations_table, {
-            {type="label", name="ltnm_view_station__"..sorted_stations[i], style="hoverable_bold_label", style_mods={horizontally_stretchable=true},
+            {type="label", name="ltnm_view_station__"..sorted_stations[i], style="ltnm_hoverable_bold_label", style_mods={horizontally_stretchable=true},
               caption=station.entity.backer_name, tooltip={"ltnm-gui.view-station-on-map"}},
             gui.templates.status_indicator("indicator", station.status.name, station.status.count),
             -- items
-            {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="provided_requested_frame", children={
+            {type="frame", style="deep_frame_in_shallow_frame", save_as="provided_requested_frame", children={
               {type="scroll-pane", style="ltnm_station_provided_requested_slot_table_scroll_pane", save_as="provided_requested_scroll_pane", children={
                 {type="table", style="ltnm_small_slot_table", column_count=5, save_as="provided_requested_table"}
               }}
             }},
-            {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="shipments_frame", children={
+            {type="frame", style="deep_frame_in_shallow_frame", save_as="shipments_frame", children={
               {type="scroll-pane", style="ltnm_station_shipments_slot_table_scroll_pane", save_as="shipments_scroll_pane", children={
                 {type="table", style="ltnm_small_slot_table", column_count=4, save_as="shipments_table"}
               }}
             }},
             -- control signals
-            {type="frame", style="ltnm_dark_content_frame_in_light_frame", save_as="signals_frame", children={
+            {type="frame", style="deep_frame_in_shallow_frame", save_as="signals_frame", children={
               {type="scroll-pane", style="ltnm_station_shipments_slot_table_scroll_pane", save_as="signals_scroll_pane", children={
                 {type="table", style="ltnm_small_slot_table", column_count=4, save_as="signals_table"}
               }}
@@ -180,11 +180,11 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
           -- set scroll pane properties
           if provided_requested_rows > 3 then
             elems.provided_requested_frame.style.right_margin = -12
-            elems.shipments_frame.style = "ltnm_dark_content_frame_in_light_frame_no_left"
+            elems.shipments_frame.style = "deep_frame_in_shallow_frame_no_left"
           end
           if shipments_rows > 3 then
             elems.shipments_frame.style.right_margin = -12
-            elems.signals_frame.style = "ltnm_dark_content_frame_in_light_frame_no_left"
+            elems.signals_frame.style = "deep_frame_in_shallow_frame_no_left"
           end
           if shipments_rows > 3 then
             elems.shipments_frame.style.right_margin = -12
@@ -201,7 +201,7 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
   end
 end
 
-stations_tab.base_template = {type="frame", style="ltnm_light_content_frame", direction="vertical", mods={visible=false},
+stations_tab.base_template = {type="frame", style="inside_shallow_frame", direction="vertical", elem_mods={visible=false},
   save_as="tabbed_pane.contents.stations", children={
     -- toolbar
     {type="frame", style="ltnm_toolbar_frame", children={

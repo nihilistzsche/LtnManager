@@ -7,5 +7,5 @@
 "homepage": "https://github.com/raiguard/Factorio-LtnManager",
 "description": "A GUI for managing your Logistics Train Network.\nALPHA VERSION - MIGHT BE BROKEN. PLEASE GIVE FEEDBACK AND BUG REPORTS ON THE GITHUB REPOSITORY.",
 "factorio_version": "0.18",
-"dependencies": ["base >= 0.18.21", "LogisticTrainNetwork >= 1.13.1", "flib >= 0.1.0", "? LTN_Combinator >= 0.6.1"]
+"dependencies": ["base >= 0.18.27", "LogisticTrainNetwork >= 1.13.1", "flib >= 0.1.0", "? LTN_Combinator >= 0.6.1"]
 }

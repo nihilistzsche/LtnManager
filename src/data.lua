@@ -1,3 +1,5 @@
+local data_util = require("__flib__.data_util")
+
 local util = require("prototypes.util")
 
 data:extend{
@@ -17,10 +19,10 @@ data:extend{
   {
     type = "shortcut",
     name = "ltnm-toggle-gui",
-    icon = util.mipped_icon(nil, {0,0}, util.paths.shortcut_icons, 32, 2),
-    disabled_icon = util.mipped_icon(nil, {48,0}, util.paths.shortcut_icons, 32, 2),
-    small_icon = util.mipped_icon(nil, {0,32}, util.paths.shortcut_icons, 24, 2),
-    disabled_small_icon = util.mipped_icon(nil, {36,32}, util.paths.shortcut_icons, 24, 2),
+    icon = data_util.build_sprite(nil, {0, 0}, util.paths.shortcut_icons, 32, 2),
+    disabled_icon = data_util.build_sprite(nil, {48, 0}, util.paths.shortcut_icons, 32, 2),
+    small_icon = data_util.build_sprite(nil, {0, 32}, util.paths.shortcut_icons, 24, 2),
+    disabled_small_icon = data_util.build_sprite(nil, {36, 32}, util.paths.shortcut_icons, 24, 2),
     toggleable = true,
     action = "lua",
     associated_control_input = "ltnm-toggle-gui",

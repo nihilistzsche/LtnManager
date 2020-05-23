@@ -26,6 +26,8 @@ gui.add_templates{
   }
 }
 
+-- TODO alert muting and management
+
 gui.add_handlers{
   alerts = {
     sort_checkbox = {
@@ -102,11 +104,11 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
             {type="label", style_mods={width=64}, caption=util.ticks_to_time(alert_data.time)},
             {type="label", style_mods={width=26, horizontal_align="center"}, caption=alert_data.train.network_id},
             {type="flow", style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction="vertical", children={
-              {type="label", name="ltnm_view_station__"..alert_data.train.from_id, style="hoverable_bold_label", caption=alert_data.train.from,
+              {type="label", name="ltnm_view_station__"..alert_data.train.from_id, style="ltnm_hoverable_bold_label", caption=alert_data.train.from,
                 tooltip={"ltnm-gui.view-station-on-map"}},
               {type="flow", children={
                 {type="label", style="caption_label", caption="->"},
-                {type="label", name="ltnm_view_station__"..alert_data.train.to_id, style="hoverable_bold_label", caption=alert_data.train.to,
+                {type="label", name="ltnm_view_station__"..alert_data.train.to_id, style="ltnm_hoverable_bold_label", caption=alert_data.train.to,
                   tooltip={"ltnm-gui.view-station-on-map"}}
               }}
             }},
@@ -119,7 +121,7 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
                   tooltip={"ltnm-gui.open-train-gui"}},
               }},
               {type="frame", style="ltnm_dark_content_frame_in_light_frame", style_mods={padding=0}, children={
-                {type="sprite-button", name="ltnm_clear_alert__"..alert_id, style="ltnm_inset_red_icon_button", sprite="utility/trash",
+                {type="sprite-button", name="ltnm_clear_alert__"..alert_id, style="ltnm_inset_tool_button_red", sprite="utility/trash",
                   tooltip={"ltnm-gui.clear-alert"}}
               }}
             }}
@@ -135,9 +137,9 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
   end
 end
 
-alerts_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, mods={visible=false}, save_as="tabbed_pane.contents.alerts", children={
+alerts_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, elem_mods={visible=false}, save_as="tabbed_pane.contents.alerts", children={
   -- alerts list
-  {type="frame", style="ltnm_light_content_frame", direction="vertical", children={
+  {type="frame", style="inside_shallow_frame", direction="vertical", children={
     {type="frame", style="ltnm_toolbar_frame", children={
       {type="checkbox", name="ltnm_sort_alerts_time", style="ltnm_sort_checkbox_active", style_mods={left_margin=8, width=64}, state=false,
         caption={"ltnm-gui.time"}, handlers="alerts.sort_checkbox", save_as="alerts.time_sort_checkbox"},
@@ -149,7 +151,7 @@ alerts_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, mod
       {type="checkbox", name="ltnm_sort_alerts_type", style="ltnm_sort_checkbox_inactive", style_mods={width=160}, state=true,
         caption={"ltnm-gui.alert"}, handlers="alerts.sort_checkbox", save_as="alerts.type_sort_checkbox"},
       {type="empty-widget", style_mods={width=237, height=15}},
-      {type="sprite-button", style="red_icon_button", sprite="utility/trash", tooltip={"ltnm-gui.clear-alerts"},
+      {type="sprite-button", style="tool_button_red", sprite="utility/trash", tooltip={"ltnm-gui.clear-alerts"},
         handlers="alerts.clear_alerts_button", save_as="alerts.clear_alerts_button"}
     }},
     {type="scroll-pane", style="ltnm_blank_scroll_pane", style_mods={vertically_stretchable=true, horizontally_stretchable=true},
