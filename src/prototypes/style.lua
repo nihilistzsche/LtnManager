@@ -297,7 +297,7 @@ styles.ltnm_search_content_flow = {
 
 styles.ltnm_alert_popup_frame = {
   type = "frame_style",
-  parent = "inner_frame_in_outer_frame",
+  parent = "standalone_inner_frame_in_outer_frame",
   graphical_set = {
     base = {position={403, 17}, corner_size=8},
     shadow = default_shadow
@@ -360,7 +360,7 @@ styles.ltnm_titlebar_right_frame = {
 
 styles.ltnm_main_content_frame = {
   type = "frame_style",
-  parent = "inner_frame_in_outer_frame",
+  parent = "standalone_inner_frame_in_outer_frame",
   width = constants.main_frame_width,
   height = constants.main_frame_height,
   graphical_set = {
