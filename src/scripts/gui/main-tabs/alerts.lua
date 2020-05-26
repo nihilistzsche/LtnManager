@@ -150,7 +150,7 @@ alerts_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, ele
       {template="pushers.horizontal"},
       {type="checkbox", name="ltnm_sort_alerts_type", style="ltnm_sort_checkbox_inactive", style_mods={width=160}, state=true,
         caption={"ltnm-gui.alert"}, handlers="alerts.sort_checkbox", save_as="alerts.type_sort_checkbox"},
-      {type="empty-widget", style_mods={width=237, height=15}},
+      {type="empty-widget", style_mods={width=196, height=15}},
       {type="sprite-button", style="tool_button_red", sprite="utility/trash", tooltip={"ltnm-gui.clear-alerts"},
         handlers="alerts.clear_alerts_button", save_as="alerts.clear_alerts_button"}
     }},
