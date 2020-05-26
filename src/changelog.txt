@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.0
-Date: ????
+Date: 2020-05-26
   Features:
     - Added a new, unified search interface
     - Added search to the stations tab - you can search by station name or filter by network ID
