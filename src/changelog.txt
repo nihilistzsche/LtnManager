@@ -2,8 +2,9 @@
 Version: 0.2.0
 Date: ????
   Features:
-    - Added search to the stations tab - you can search by station name or filter by network ID
     - Added a new, unified search interface
+    - Added search to the stations tab - you can search by station name or filter by network ID
+    - Added search to the history tab - you can search by route or filter by network ID
     - Shift + clicking a station name will open that station's LTN combinator, if one exists
   Changes:
     - Refactored mod structure to improve performance
@@ -11,6 +12,7 @@ Date: ????
     - History and alerts will be cleared on mod configuration change, to avoid migration issues
     - The mod will only auto-update one GUI per tick, increasing performance on multiplayer servers
     - Updated GUI styling for Factorio 0.18.27
+    - The mod will only store the most recent 30 alerts, significantly improving performance
   Bugfixes:
     - Fixed a crash when a just-completed shipment is missing its start time
     - Fixed a crash when updating the GUI after deconstructing a station, but before the next LTN update cycle
