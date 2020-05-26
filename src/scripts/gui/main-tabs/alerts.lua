@@ -10,7 +10,7 @@ gui.add_templates{
   alerts = {
     materials_table = function(parent, style, materials, material_translations)
       local table_add = gui.build(parent, {
-        {type="frame", style="ltnm_dark_content_frame_in_light_frame", children={
+        {type="frame", style="deep_frame_in_shallow_frame", children={
           {type="scroll-pane", style="ltnm_train_slot_table_scroll_pane", children={
             {type="table", style="ltnm_small_slot_table", column_count=4, save_as="table"}
           }}
@@ -116,11 +116,11 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
               tooltip={"ltnm-gui.alert-"..alert_data.type.."-description"}},
             {type="flow", style_mods={vertical_spacing=8}, direction="vertical", save_as="tables_flow"},
             {type="flow", children={
-              {type="frame", style="ltnm_dark_content_frame_in_light_frame", style_mods={padding=0}, children={
+              {type="frame", style="deep_frame_in_shallow_frame", style_mods={padding=0}, children={
                 {type="sprite-button", name="ltnm_open_train__"..alert_data.train.id, style="ltnm_inset_tool_button", sprite="utility/preset",
                   tooltip={"ltnm-gui.open-train-gui"}},
               }},
-              {type="frame", style="ltnm_dark_content_frame_in_light_frame", style_mods={padding=0}, children={
+              {type="frame", style="deep_frame_in_shallow_frame", style_mods={padding=0}, children={
                 {type="sprite-button", name="ltnm_clear_alert__"..alert_id, style="ltnm_inset_tool_button_red", sprite="utility/trash",
                   tooltip={"ltnm-gui.clear-alert"}}
               }}
