@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.1
-Date: ????
+Date: 2020-05-26
   Bugfixes:
     - Fixed alignment of "alert" column in alerts tab
     - Fixed a crash when an alert is raised
