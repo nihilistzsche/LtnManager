@@ -122,8 +122,12 @@ gui.add_handlers{
         if station_data and station_data.entity.valid then
           if e.shift then
             -- open LTN combinator
-            if not remote.call("ltn-combinator", "open_ltn_combinator", e.player_index, station_data.lamp_control, true) then
-              player.print{"ltnm-message.ltn-combinator-not-found"}
+            if remote.interfaces["ltn-combinator"] then
+              if not remote.call("ltn-combinator", "open_ltn_combinator", e.player_index, station_data.lamp_control, true) then
+                player.print{"ltnm-message.ltn-combinator-not-found"}
+              end
+            else
+              player.print{"ltnm-message.ltn-combinator-not-enabled"}
             end
           else
             local entity = station_data.entity

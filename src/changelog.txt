@@ -4,6 +4,7 @@ Date: ????
   Bugfixes:
     - Fixed alignment of "alert" column in alerts tab
     - Fixed a crash when an alert is raised
+    - Fixed a crash when trying to opening an LTN combinator when the LTNC mod is not enabled
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.0
 Date: 2020-05-26
