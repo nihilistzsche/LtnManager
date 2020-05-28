@@ -3,6 +3,7 @@ Version: 0.2.2
 Date: ????
   Bugfixes:
     - Fixed a crash when a station is providing/requesting more than fifteen objects
+    - Fixed a crash when an LTN-controlled train has had its schedule modified
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.1
 Date: 2020-05-26
