@@ -146,13 +146,16 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
             mi = 0
             for si=1,#shipments do
               local train = trains[shipments[si]]
-              local shipment = train.shipment
-              local style = (train.from_id == station_id and "red" or "green")
-              for name, count in pairs(shipment) do
-                mi = mi + 1
-                shipments_rows = shipments_rows + 1
-                table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_"..style, sprite=string.gsub(name, ",", "/"),
-                  number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
+              -- avoid crashing on the slim chance that a player modified the train and removed its LTN stops
+              if train then
+                local shipment = train.shipment
+                local style = (train.from_id == station_id and "red" or "green")
+                for name, count in pairs(shipment) do
+                  mi = mi + 1
+                  shipments_rows = shipments_rows + 1
+                  table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_"..style, sprite=string.gsub(name, ",", "/"),
+                    number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
+                end
               end
             end
             shipments_rows = math.ceil(shipments_rows / 4) -- number of rows
