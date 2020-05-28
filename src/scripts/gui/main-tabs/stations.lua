@@ -180,11 +180,11 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
           -- set scroll pane properties
           if provided_requested_rows > 3 then
             elems.provided_requested_frame.style.right_margin = -12
-            elems.shipments_frame.style = "deep_frame_in_shallow_frame_no_left"
+            elems.shipments_frame.style = "ltnm_deep_frame_in_shallow_frame_no_left"
           end
           if shipments_rows > 3 then
             elems.shipments_frame.style.right_margin = -12
-            elems.signals_frame.style = "deep_frame_in_shallow_frame_no_left"
+            elems.signals_frame.style = "ltnm_deep_frame_in_shallow_frame_no_left"
           end
           if shipments_rows > 3 then
             elems.shipments_frame.style.right_margin = -12
