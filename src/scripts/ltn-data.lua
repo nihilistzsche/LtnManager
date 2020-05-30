@@ -638,6 +638,8 @@ ltn_data.event_ids = {}
 function ltn_data.init()
   global.data = nil
   global.working_data = {history={}, alerts={}}
+  global.flags.iterating_ltn_data = false
+  global.flags.updating_guis = false
 end
 
 return ltn_data
