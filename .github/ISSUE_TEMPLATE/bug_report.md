@@ -10,10 +10,17 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is. If the bug was a crash, include a screenshot or a copy of the crash text.
 
-**Save file**
-Upload the save file where the bug occured. If the file is too large for GitHub, use a file service such as Google Drive or Dropbox. If these aren't available, PM me (Raiguard) on the Factorio forums, or on Discord (Raiguard#7402).
+```
+Insert the crash report here
+```
 
-If you can consistently reproduce the error from a new save, please upload the original save anyways, just in case.
+**Save file**
+Upload the save file where the bug occured. If the file is too large for GitHub, use an alternative file service.
+
+_IF YOU DO NOT UPLOAD A SAVE FILE, THE BUG REPORT WILL BE IGNORED UNTIL YOU DO._
+
+**Log file**
+Attach `factorio-curreng.log`, found in Factorio's [user data directory](https://wiki.factorio.com/Application_directory#User_data_directory).
 
 **To Reproduce**
 Steps to reproduce the behavior:
