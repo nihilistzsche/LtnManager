@@ -1,7 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.3
 Date: ????
-  Changes:
+  Bugfixes:
+    - Fixed that the GUI would never become openable if mod version changes happened during LTN data iteration
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.2
 Date: 2020-05-28
