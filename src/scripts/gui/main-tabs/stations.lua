@@ -1,6 +1,7 @@
 local stations_tab = {}
 
 local gui = require("__flib__.gui")
+local util = require("scripts.util")
 
 local bit32 = bit32
 local string = string

@@ -1,6 +1,7 @@
 local depots_tab = {}
 
 local gui = require("__flib__.gui")
+local util = require("scripts.util")
 
 local string_find = string.find
 local string_gsub = string.gsub
