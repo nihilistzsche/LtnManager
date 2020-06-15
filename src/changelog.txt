@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.3
 Date: ????
+  Changes:
+    - Updated button colors. The mod now uses styles provided by FLib, with some additional smaller styles
   Bugfixes:
     - Fixed that the GUI would never become openable if mod version changes happened during LTN data iteration
 ---------------------------------------------------------------------------------------------------

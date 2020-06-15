@@ -173,7 +173,7 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
             local name = signal.signal.name
             if ltn_virtual_signals[name] then
               signals_rows = signals_rows + 1
-              table_add{type="sprite-button", style="ltnm_small_slot_button_dark_grey", sprite="virtual-signal/"..name, number=signal.count,
+              table_add{type="sprite-button", style="ltnm_small_slot_button_default", sprite="virtual-signal/"..name, number=signal.count,
                 tooltip={"", {"virtual-signal-name."..name}, "\n"..util.comma_value(signal.count)}}.enabled = false
             end
           end

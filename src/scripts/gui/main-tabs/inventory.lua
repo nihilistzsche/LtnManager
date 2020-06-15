@@ -136,7 +136,7 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
       local i = 0
       for name, count in pairs(combined_materials) do
         i = i + 1
-        elems[name] = add{type="sprite-button", name="ltnm_view_material__"..i, style="ltnm_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
+        elems[name] = add{type="sprite-button", name="ltnm_view_material__"..i, style="flib_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
           number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
       end
       buttons[type] = elems
@@ -162,14 +162,14 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
         -- deselect previous button
         local button = buttons[inventory_gui_data.selected]
         if button then
-          button.style = string_gsub(button.style.name, "ltnm_active_", "ltnm_")
-          button.ignored_by_interaction = false
+          button.style = string_gsub(button.style.name, "flib_selected_", "flib_")
+          button.enabled = true
         end
         -- select new button
         button = buttons[state_changes.inventory]
         if button then
-          button.style = string_gsub(button.style.name, "ltnm_", "ltnm_active_")
-          button.ignored_by_interaction = true
+          button.style = string_gsub(button.style.name, "flib_", "flib_selected_")
+          button.enabled = false
         end
       end
 

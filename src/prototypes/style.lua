@@ -9,46 +9,17 @@ local styles = data.raw["gui-style"].default
 -- -----------------------------------------------------------------------------
 -- BUTTON STYLES
 
-local slot_buttons_tileset = "__LtnManager__/graphics/gui/slot-buttons.png"
-
-local function slot_button(y, glow_color, default_x, size)
-  return {
+for _, color in ipairs{"default", "red", "green", "blue"} do
+  styles["ltnm_small_slot_button_"..color] = {
     type = "button_style",
-    parent = "slot_button",
-    size = size or 40,
-    default_graphical_set = {
-      base = {border=4, position={(default_x or 0),y}, size=80, filename=slot_buttons_tileset},
-      shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
-    },
-    hovered_graphical_set = {
-      base = {border=4, position={80,y}, size=80, filename=slot_buttons_tileset},
-      shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
-      glow = offset_by_2_rounded_corners_glow(glow_color)
-    },
-    clicked_graphical_set = {
-      base = {border=4, position={160,y}, size=80, filename=slot_buttons_tileset},
-      shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
-    },
-    disabled_graphical_set = { -- identical to default graphical set
-      base = {border=4, position={(default_x or 0),y}, size=80, filename=slot_buttons_tileset},
-      shadow = offset_by_2_rounded_corners_glow(default_dirt_color),
-    },
+    parent = "flib_slot_button_"..color,
+    size = 36
   }
-end
-
-local slot_button_data = {
-  {name="dark_grey", y=0, glow=default_glow_color},
-  {name="light_grey", y=80, glow=default_glow_color},
-  {name="red", y=160, glow={255,166,123,128}},
-  {name="green", y=240, glow={34,255,75,128}},
-  {name="blue", y=320, glow={34,181,255,128}},
-}
-
-for _, data in ipairs(slot_button_data) do
-  styles["ltnm_slot_button_"..data.name] = slot_button(data.y, data.glow)
-  styles["ltnm_small_slot_button_"..data.name] = slot_button(data.y, data.glow, nil, 36)
-  styles["ltnm_active_slot_button_"..data.name] = slot_button(data.y, data.glow, 80)
-  styles["ltnm_active_small_slot_button_"..data.name] = slot_button(data.y, data.glow, 80, 36)
+  styles["ltnm_selected_small_slot_button_"..color] = {
+    type = "button_style",
+    parent = "flib_selected_slot_button_"..color,
+    size = 36
+  }
 end
 
 local function ltnm_tab_base(pos)

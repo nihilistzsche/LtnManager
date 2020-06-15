@@ -180,7 +180,7 @@ function depots_tab.update(player, player_table, state_changes, gui_data, data, 
         local i = 0
         for name, count in pairs(train.shipment) do
           i = i + 1
-          contents_table.add{type="sprite-button", name="ltnm_view_material__"..i, style="ltnm_small_slot_button_dark_grey",
+          contents_table.add{type="sprite-button", name="ltnm_view_material__"..i, style="ltnm_small_slot_button_default",
             sprite=string_gsub(name, ",", "/"), number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
         end
       end
