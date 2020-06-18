@@ -171,7 +171,7 @@ event.on_tick(function(e)
       main_gui.create(player, player_table)
       player_flags.can_open_gui = true
       player.set_shortcut_available("ltnm-toggle-gui", true)
-    elseif player_table.settings.auto_refresh and game.tick - player_table.last_update >= 180 then
+    elseif player_table.flags.gui_open and player_table.settings.auto_refresh and game.tick - player_table.last_update >= 180 then
       -- update GUI
       main_gui.update_active_tab(game.get_player(player_index), player_table)
       player_table.last_update = game.tick
