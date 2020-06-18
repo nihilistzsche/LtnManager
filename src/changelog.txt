@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.3
-Date: ????
+Date: 2020-06-18
   Changes:
     - Updated button colors. The mod now uses styles provided by FLib, with some additional smaller styles
   Bugfixes:
