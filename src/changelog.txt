@@ -6,6 +6,7 @@ Date: ????
   Bugfixes:
     - Fixed that the GUI would never become openable if mod version changes happened during LTN data iteration
     - Fixed a crash when the mod would auto-update the GUI when it didn't exist yet
+    - Fixed a crash when a station had a white status light (uninitialized)
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.2
 Date: 2020-05-28
