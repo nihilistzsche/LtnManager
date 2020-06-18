@@ -279,7 +279,7 @@ function main_gui.create(player, player_table)
 
   player_table.gui.main = gui_data
 
-  main_gui.update_active_tab(player, player_table, "depots")
+  main_gui.update(player, player_table, {active_tab="depots"})
 end
 
 function main_gui.destroy(player, player_table)
