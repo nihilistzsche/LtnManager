@@ -3,9 +3,21 @@ local data_util = require("__flib__.data_util")
 local util = require("prototypes.util")
 
 -- station status indicators
-local indicator_sprites = {}
+local indicator_sprites = {
+  {
+    type = "sprite",
+    name = "ltnm_indicator_signal-white",
+    filename = "__core__/graphics/gui-new.png",
+    position = {128, 96},
+    size = 28,
+    scale = 0.5,
+    shift = {0, 1},
+    tint = {255,255,255},
+    flags = {"icon"}
+  }
+}
 for i, t in ipairs(data.raw.lamp["small-lamp"].signal_to_color_mapping) do
-  indicator_sprites[i] = {
+  indicator_sprites[i + 1] = {
     type = "sprite",
     name = "ltnm_indicator_"..t.name,
     filename = "__core__/graphics/gui-new.png",
