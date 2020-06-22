@@ -284,10 +284,14 @@ end
 
 function main_gui.destroy(player, player_table)
   gui.update_filters("main", player.index, nil, "remove")
+  gui.update_filters("search", player.index, nil, "remove")
   for _, name in ipairs(tab_names) do
     gui.update_filters(name, player.index, nil, "remove")
   end
-  player_table.gui.main.window.frame.destroy()
+  local window_frame = player_table.gui.main.window.frame
+  if window_frame.valid then
+    window_frame.destroy()
+  end
   player_table.gui.main = nil
 
   player_table.flags.gui_open = false
@@ -356,6 +360,15 @@ function main_gui.update_active_tab(player, player_table, name)
 end
 
 function main_gui.open(player, player_table, skip_update)
+  local window_frame = player_table.gui.main.window.frame
+  if not window_frame.valid then
+    player.print{"ltnm-message.invalid-gui-error"}
+    main_gui.close(player, player_table)
+    main_gui.destroy(player, player_table)
+    player_data.refresh(player, player_table)
+    return
+  end
+
   if not skip_update then
     main_gui.update_active_tab(player, player_table)
   end
@@ -372,13 +385,17 @@ end
 
 function main_gui.close(player, player_table)
   player_table.flags.gui_open = false
-  player_table.gui.main.window.frame.visible = false
 
-  player.set_shortcut_toggled("ltnm-toggle-gui", false)
+  local window_frame = player_table.gui.main.window.frame
+  if window_frame.valid then
+    window_frame.visible = false
+  end
 
   if player_table.flags.search_open then
     main_gui.close_search(player, player_table, player_table.gui.main, true)
   end
+
+  player.set_shortcut_toggled("ltnm-toggle-gui", false)
 
   player.opened = nil
 end
@@ -425,27 +442,30 @@ end
 function main_gui.close_search(player, player_table, gui_data, skip_update)
   local search_window = gui_data.search.window
   local selected_tab = gui_data.tabbed_pane.selected
-  search_window[selected_tab.."_contents"].visible = false
-  search_window.visible = false
+  if search_window.valid then
+    search_window[selected_tab.."_contents"].visible = false
+    search_window.visible = false
 
-  -- set frame location offset
-  local main_window = gui_data.window.frame
-  local location = main_window.location
-  main_window.location = {x=location.x, y=(location.y + constants.search_frame_height)}
+    -- set frame location offset
+    local main_window = gui_data.window.frame
+    local location = main_window.location
+    main_window.location = {x=location.x, y=(location.y + constants.search_frame_height)}
 
-  if not player_table.settings.keep_gui_open then
-    player_table.flags.toggling_search = true
-    player.opened = gui_data.window.frame
-    player_table.flags.toggling_search = false
+    if not player_table.settings.keep_gui_open then
+      player_table.flags.toggling_search = true
+      player.opened = gui_data.window.frame
+      player_table.flags.toggling_search = false
+    end
+
+    gui_data.titlebar.search_button.style = "frame_action_button"
+
+    if not skip_update then
+      main_gui.update_active_tab(player, player_table)
+    end
   end
-
-  gui_data.titlebar.search_button.style = "frame_action_button"
 
   player_table.flags.search_open = false
 
-  if not skip_update then
-    main_gui.update_active_tab(player, player_table)
-  end
 end
 
 function main_gui.toggle_search(player, player_table)

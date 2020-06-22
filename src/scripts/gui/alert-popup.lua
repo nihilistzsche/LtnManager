@@ -12,7 +12,7 @@ gui.add_handlers{
         local player = game.get_player(e.player_index)
         local player_table = global.players[e.player_index]
 
-        if e.button == defines.mouse_button_type.left then
+        if e.button == defines.mouse_button_type.left and player_table.gui.main and player_table.gui.main.window.frame.valid then
           -- change tab and select correct alert
           main_gui.update(player, player_table, {active_tab="alerts", alerts=true})
           -- open in case it's closed
