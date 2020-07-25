@@ -550,8 +550,10 @@ function ltn_data.on_delivery_pickup_complete(e)
 end
 
 function ltn_data.on_delivery_completed(e)
-  if not global.data then return end
-  local train = global.data.trains[e.train_id]
+  local data = global.data
+  if not data then return end
+  local trains = data.trains
+  local train = trains[e.train_id] or trains[data.invalidated_trains[e.train_id]]
   if not train then error("Could not find train of ID ["..e.train_id.."]") end
 
   if not train.started then
@@ -615,13 +617,11 @@ function ltn_data.on_train_created(e)
   for i=1,2 do
     local old_id = e["old_train_id_"..i]
     if old_id then
-      local train_data = trains[old_id]
-      if train_data or invalidated_trains[old_id] then
+      local train_data = trains[old_id] or trains[invalidated_trains[old_id]]
+      if train_data then
         -- add a mapping for alerts
         invalidated_trains[new_id] = invalidated_trains[old_id] or old_id
         invalidated_trains[old_id] = nil
-      end
-      if train_data then
         -- replace train and main_locomotive, the actual IDs and such will be updated on the next LTN update cycle
         train_data.train = new_train
         train_data.main_locomotive = util.train.get_main_locomotive(new_train)
