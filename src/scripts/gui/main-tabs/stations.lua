@@ -3,6 +3,8 @@ local stations_tab = {}
 local gui = require("__flib__.gui")
 local util = require("scripts.util")
 
+local constants = require("constants")
+
 local bit32 = bit32
 local string = string
 
@@ -87,8 +89,11 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
     local finish = sort_value and #sorted_stations or 1
     local delta = sort_value and 1 or -1
 
-    -- check search filters
+    -- check search queries
     local query = string.lower(stations_gui_data.search.query)
+    for pattern, replacement in pairs(constants.input_sanitisers) do
+      query = string.gsub(query, pattern, replacement)
+    end
     local network_id_query = stations_gui_data.search.network_id
     for i=start,finish,delta do
       local station_id = sorted_stations[i]

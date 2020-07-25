@@ -2,6 +2,7 @@ local history_tab = {}
 
 local gui = require("__flib__.gui")
 
+local constants = require("constants")
 local util = require("scripts.util")
 
 local string = string
@@ -84,6 +85,9 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
       local delta = sort_value and 1 or -1
 
       local query = string.lower(history_gui_data.search.query)
+      for pattern, replacement in pairs(constants.input_sanitisers) do
+        query = string.gsub(query, pattern, replacement)
+      end
       local network_id_query = history_gui_data.search.network_id
 
       for i=start,finish,delta do

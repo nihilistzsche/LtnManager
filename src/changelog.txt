@@ -3,6 +3,7 @@ Version: 0.2.6
 Date: ????
   Bugfixes:
     - Fixed a crash upon botched migration of train IDs
+    - Fixed crashes related to unsanitised search inputs
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.5
 Date: 2020-06-24

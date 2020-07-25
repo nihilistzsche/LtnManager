@@ -3,6 +3,8 @@ local inventory_tab = {}
 local gui = require("__flib__.gui")
 local util = require("scripts.util")
 
+local constants = require("constants")
+
 local pane_heights = {
   provided = 6,
   requested = 3,
@@ -107,6 +109,9 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
     inventory_gui_data.contents = {}
     local buttons = inventory_gui_data.material_buttons
     local query = string_lower(gui_data.inventory.search.query)
+    for pattern, replacement in pairs(constants.input_sanitisers) do
+      query = string.gsub(query, pattern, replacement)
+    end
     local network_id_query = inventory_gui_data.search.network_id
     for type, color in pairs{provided="green", requested="red", in_transit="blue"} do
       -- combine contents of each matching network
