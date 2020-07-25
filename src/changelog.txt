@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.6
 Date: ????
+  Changes:
+    - Added mod description to locale so it can be translated
   Bugfixes:
     - Fixed a crash upon botched migration of train IDs
     - Fixed crashes related to unsanitised search inputs
