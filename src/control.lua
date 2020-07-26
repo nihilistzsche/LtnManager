@@ -128,6 +128,12 @@ event.on_player_joined_game(function(e)
   end
 end)
 
+event.on_player_left_game(function(e)
+  if translation.is_translating(e.player_index) then
+    translation.cancel(e.player_index)
+  end
+end)
+
 -- SHORTCUT
 
 event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)

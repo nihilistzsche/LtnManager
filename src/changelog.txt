@@ -1,7 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.7
 Date: ????
-  Changes:
+  Bugfixes:
+    - Fixed a desync related to player.connnected being unreliable during on_configuration_changed in multiplayer
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.6
 Date: 2020-07-25
