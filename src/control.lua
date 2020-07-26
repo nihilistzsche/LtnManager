@@ -193,7 +193,7 @@ event.on_tick(function(e)
     end
   end
 
-  if global.__flib.translation.translating_players_count > 0 then
+  if translation.translating_players_count() > 0 then
     translation.iterate_batch(e)
   end
 end)
