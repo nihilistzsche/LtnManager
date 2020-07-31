@@ -76,6 +76,9 @@ end)
 
 event.on_configuration_changed(function(e)
   if migration.on_config_changed(e, migrations) then
+    -- migrate flib modules
+    gui.check_filter_validity()
+    translation.init()
     -- update translation data
     global_data.build_translations()
     -- reset LTN data
@@ -94,8 +97,6 @@ event.on_configuration_changed(function(e)
       -- refresh data
       player_data.refresh(player, player_table)
     end
-
-    gui.check_filter_validity()
   end
 end)
 
