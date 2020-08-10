@@ -134,6 +134,7 @@ end)
 event.on_player_left_game(function(e)
   if translation.is_translating(e.player_index) then
     translation.cancel(e.player_index)
+    global.players[e.player_index].flags.translate_on_join = true
   end
 end)
 
