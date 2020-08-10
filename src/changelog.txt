@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.7
-Date: ????
+Date: 2020-08-10
   Bugfixes:
     - Fixed a crash when a mod would removed while translations were running, but before those translations translated all of that mod's strings
     - Fixed a desync related to player.connnected being unreliable during on_configuration_changed in multiplayer
