@@ -6,6 +6,6 @@
   "contact": "Discord: Raiguard#7402",
   "homepage": "https://github.com/raiguard/Factorio-LtnManager",
   "description": "A GUI for managing your Logistic Train Network.\nALPHA VERSION - code is not yet optimized and crashes may occur!",
-  "factorio_version": "0.18",
-  "dependencies": ["base >= 0.18.36", "LogisticTrainNetwork >= 1.13.9", "flib >= 0.2.0", "? LTN_Combinator >= 0.6.2"]
+  "factorio_version": "1.0",
+  "dependencies": ["base >= 1.0.0", "LogisticTrainNetwork >= 1.13.9", "flib >= 0.2.0", "? LTN_Combinator >= 0.6.2"]
 }
