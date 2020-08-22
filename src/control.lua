@@ -147,7 +147,11 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
     if player_table.flags.can_open_gui then
       main_gui.toggle(player, player_table)
     else
-      player.print{"ltnm-message.cannot-open-gui"}
+      if player_table.flags.translations_finished then
+        player.print{"ltnm-message.ltn-no-data"}
+      else
+        player.print{"ltnm-message.translations-not-finished"}
+      end
     end
   end
 end)
