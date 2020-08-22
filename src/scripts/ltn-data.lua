@@ -28,7 +28,7 @@ local function iterate_stations(working_data)
   local available_trains = working_data.available_trains
 
   local index = working_data.index
-  local num_to_iterate = settings.global["ltnm-stations-per-tick"].value
+  local num_to_iterate = settings.global["ltnm-iterations-per-tick"].value
   local end_index = index + num_to_iterate
 
   for i=index,end_index do
