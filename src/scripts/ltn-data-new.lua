@@ -6,7 +6,8 @@ local table = require("__flib__.table")
 -- PROCESSORS
 
 local function iterate_stations(working_data, iterations_per_tick)
-  local stations = working_data.stations
+  local depots = working_data.depots
+  local station_ids = working_data.station_ids
   local trains = working_data.trains
 
   local network_to_stations = working_data.network_to_stations
@@ -14,7 +15,7 @@ local function iterate_stations(working_data, iterations_per_tick)
 
   local inventory = working_data.inventory
 
-  local end_index = table.for_n_of(stations, working_data.index, iterations_per_tick, function(station, station_id)
+  return table.for_n_of(working_data.stations, working_data.key, iterations_per_tick, function(station, station_id)
     -- check station validity
     if not station.entity.valid or not station.input.valid or not station.output.valid then return end
 
@@ -35,12 +36,24 @@ local function iterate_stations(working_data, iterations_per_tick)
 
     -- process station materials
     -- TODO consider other methods (might be slow with large amounts of materials in a station)
+    -- TODO follow up on performance improvements?
     for _, mode in ipairs{"provided", "requested"} do
       local materials = working_data[mode.."_by_stop"][station_id]
       if materials then
+        local materials_copy = {}
+        for name, count in pairs(materials) do
+          -- add to lookup
+          local locations = material_locations[name]
+          if not locations then
+            material_locations[name] = {stations={station_id}, trains={}}
+          else
+            locations.stations[#locations.stations+1] = station_id
+          end
+          -- copy
+          materials_copy[name] = count
+        end
         -- add to station
-        -- TODO follow up to test performance improvement
-        station[mode] = table.shallow_copy(materials)
+        station[mode] = materials_copy
         -- add to network
         local inv = inventory[mode][network_id]
         if not inv then
@@ -48,28 +61,69 @@ local function iterate_stations(working_data, iterations_per_tick)
         else
           inv = util.add_materials(materials, inv)
         end
-        -- add to lookup
-        for name in pairs(materials) do
-          local locations = material_locations[name]
-          if not locations then
-            material_locations[name] = {stations={station_id}, trains={}}
-          else
-            locations.stations[#locations.stations+1] = station_id
-          end
-        end
       end
     end
 
     -- add station trains to trains table
-    for _, train in ipairs(station.entity.get_train_stop_trains()) do
+    local station_trains = station.entity.get_train_stop_trains()
+    for _, train in ipairs(station_trains) do
       trains[train.id] = {train=train}
     end
-  end)
 
-  working_data.index = end_index
-  if not end_index then
-    working_data.step = 2
-  end
+    -- add station to depot
+    if station.is_depot then
+      local depot = depots[station_name]
+      if depot then
+        depot.stations[#depot.stations+1] = station_id
+      else
+        depots[station_name] = {available_trains={}, num_trains=#station_trains, stations={station_id}, trains={}}
+      end
+    end
+
+    -- sorting data
+    station_ids[#station_ids+1] = station_id
+    working_data.num_stations = working_data.num_stations + 1
+  end)
+end
+
+local function iterate_trains(working_data, iterations_per_tick)
+  local depots = working_data.depots
+  local trains = working_data.trains
+
+  local deliveries = working_data.deliveries
+  local available_trains = working_data.available_trains
+
+  return table.for_n_of(trains, working_data.key, iterations_per_tick / 2, function(train_data, train_id)
+    local train = train_data.train
+    local train_state = train.state
+    local schedule = train.schedule
+    local depot = schedule.records[1].station
+    local depot_data = depots[depot]
+    if train_state == defines.train_state.wait_station and schedule.records[schedule.current].station == depot then
+      depot_data.available_trains[#depot_data.available_trains+1] = train_id
+      depot_data.trains[#depot_data.trains+1] = train_id
+    end
+
+    -- construct train data
+    train_data.state = train_state
+    train_data.depot = depot
+    train_data.composition = util.train.get_composition_string(train)
+    train_data.main_locomotive = util.train.get_main_locomotive(train)
+    train_data.status = {}
+    trains[train_id] = train_data
+    for key, value in pairs(
+      deliveries[train_id]
+      or available_trains[train_id]
+      or {
+      train = train,
+      network_id = depot_data.network_id,
+      force = depot_data.entity.force,
+      returning_to_depot = true
+      }
+    ) do
+      train_data[key] = value
+    end
+  end)
 end
 
 -- -----------------------------------------------------------------------------
@@ -82,12 +136,19 @@ function ltn_data.iterate(e)
   -- this value will be adjusted per step based on the performance impact
   local iterations_per_tick = settings.global["ltnm-iterations-per-tick"].value
 
-  if step == 1 then
-    iterate_stations(working_data, iterations_per_tick)
-  elseif step == 2 then
-    local breakpoint
-  elseif step == 3 then
+  local processors = {
+    iterate_stations,
+    iterate_trains
+  }
 
+  if processors[step] then
+    local end_key = processors[step](working_data, iterations_per_tick)
+    working_data.key = end_key
+    if not end_key then
+      working_data.step = step + 1
+    end
+  else
+    global.flags.iterating_ltn_data = false
   end
 end
 
@@ -135,7 +196,7 @@ function ltn_data.on_dispatcher_updated(e)
   data.available_trains = e.available_trains
   -- iteration data
   data.step = 1
-  data.index = 1
+  data.key = 1
 
   -- enable data iteration handler
   global.flags.iterating_ltn_data = true
