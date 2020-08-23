@@ -76,7 +76,14 @@ local function iterate_stations(working_data, iterations_per_tick)
       if depot then
         depot.stations[#depot.stations+1] = station_id
       else
-        depots[station_name] = {available_trains={}, num_trains=#station_trains, stations={station_id}, trains={}}
+        depots[station_name] = {
+          available_trains = {},
+          force = station.entity.force,
+          network_id = network_id,
+          num_trains = #station_trains,
+          stations = {station_id},
+          trains = {}
+        }
       end
     end
 
@@ -117,7 +124,7 @@ local function iterate_trains(working_data, iterations_per_tick)
       or {
       train = train,
       network_id = depot_data.network_id,
-      force = depot_data.entity.force,
+      force = depot_data.force,
       returning_to_depot = true
       }
     ) do
