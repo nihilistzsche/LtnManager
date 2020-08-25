@@ -54,38 +54,54 @@ function util.train.get_status_string(train_data, translations)
   local def = defines.train_state
   if state == def.on_the_path or state == def.arrive_signal or state == def.wait_signal or state == def.arrive_station then
     if train_data.returning_to_depot then
-      return translations["returning-to-depot"], {{"bold_label", translations["returning-to-depot"]}}
+      return {
+        string = translations["returning-to-depot"],
+        data = {{"bold_label", translations["returning-to-depot"]}}
+      }
     else
       if train_data.pickupDone then
-        return
-          translations["delivering-to"]..":^^"..train_data.to,
-          {{"label", translations["delivering-to"]..":"}, {"bold_label", train_data.to}}
+        return {
+          string = translations["delivering-to"]..": "..train_data.to,
+          data = {{"label", translations["delivering-to"]..":"}, {"bold_label", train_data.to}}
+        }
       else
         if not train_data.from then
-          return "N/A", {{"bold_red_label", "N/A"}}
+          return {
+            string = "N/A",
+            data = {{"bold_red_label", "N/A"}}
+          }
         else
-          return
-            translations["fetching-from"]..":^^"..train_data.from,
-            {{"label", translations["fetching-from"]..":"}, {"bold_label", train_data.from}}
+          return {
+            string = translations["fetching-from"]..": "..train_data.from,
+            data = {{"label", translations["fetching-from"]..":"}, {"bold_label", train_data.from}}
+          }
         end
       end
     end
   elseif state == def.wait_station then
     if train_data.surface or train_data.returning_to_depot then
-      return translations["parked-at-depot"], {{"bold_green_label", translations["parked-at-depot"]}}
+      return {
+        string = translations["parked-at-depot"],
+        data = {{"bold_green_label", translations["parked-at-depot"]}}
+      }
     else
       if train_data.pickupDone then
-        return
-          translations["unloading-at"]..":^^"..train_data.to,
-          {{"label", translations["unloading-at"]..":"}, {"bold_label", train_data.to}}
+        return {
+          string = translations["unloading-at"]..": "..train_data.to,
+          data = {{"label", translations["unloading-at"]..":"}, {"bold_label", train_data.to}}
+        }
       else
-        return
-          translations["loading-at"]..":^^"..train_data.from,
-          {{"label", translations["loading-at"]..":"}, {"bold_label", train_data.from}}
+        return {
+          string = translations["loading-at"]..": "..train_data.from,
+          data = {{"label", translations["loading-at"]..":"}, {"bold_label", train_data.from}}
+        }
       end
     end
   else
-    return "N/A", {{"bold_red_label", "N/A"}}
+    return {
+      string = "N/A",
+      data = {{"bold_red_label", "N/A"}}
+    }
   end
 end
 
