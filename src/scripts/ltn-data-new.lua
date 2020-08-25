@@ -167,15 +167,6 @@ local function iterate_in_transit(working_data, iterations_per_tick)
   end)
 end
 
-local function sort_depot_trains_by_composition(working_data)
-  local trains = working_data.trains
-  return table.for_n_of(working_data.depots, working_data.key, 1, function(depot)
-    table.sort(depot.sorted_trains.composition, function(id_1, id_2)
-      return trains[id_1].composition < trains[id_2].composition
-    end)
-  end)
-end
-
 local function generate_train_status_strings(working_data, iterations_per_tick)
   local players = global.players
   local trains  = working_data.trains
@@ -186,7 +177,7 @@ local function generate_train_status_strings(working_data, iterations_per_tick)
       train.status[key.player] = util.train.get_status_string(train, data.translations)
     end,
     function(_, key)
-      key = key or {}
+      key = key or {player=next(players)}
       local player = key.player
       local train = key.train
 
@@ -194,7 +185,7 @@ local function generate_train_status_strings(working_data, iterations_per_tick)
       local next_train = next(trains, key.train)
       if next_train then
         train = next_train
-        player = key.player or next(players)
+        player = key.player
       else
         train = next(trains)
         local next_player = next(players, player)
@@ -231,7 +222,7 @@ local function sort_depot_trains_by_status(working_data)
       depot_data.sorted_trains.status[player_index] = train_ids
     end,
     function(_, key)
-      key = key or {}
+      key = key or {player=next(players)}
       local player = key.player
       local depot = key.depot
 
@@ -239,7 +230,7 @@ local function sort_depot_trains_by_status(working_data)
       local next_depot = next(depots, key.depot)
       if next_depot then
         depot = next_depot
-        player = key.player or next(players)
+        player = key.player
       else
         depot = next(depots)
         local next_player = next(players, player)
@@ -257,6 +248,15 @@ local function sort_depot_trains_by_status(working_data)
         depots[depot]
     end
   )
+end
+
+local function sort_depot_trains_by_composition(working_data)
+  local trains = working_data.trains
+  return table.for_n_of(working_data.depots, working_data.key, 1, function(depot)
+    table.sort(depot.sorted_trains.composition, function(id_1, id_2)
+      return trains[id_1].composition < trains[id_2].composition
+    end)
+  end)
 end
 
 local function sort_stations_by_name(working_data)
@@ -388,9 +388,9 @@ function ltn_data.iterate()
     iterate_stations,
     iterate_trains,
     iterate_in_transit,
-    sort_depot_trains_by_composition,
     generate_train_status_strings,
     sort_depot_trains_by_status,
+    sort_depot_trains_by_composition,
     sort_stations_by_name,
     sort_stations_by_status,
     sort_history,
