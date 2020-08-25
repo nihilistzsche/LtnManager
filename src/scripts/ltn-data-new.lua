@@ -30,7 +30,7 @@ local function iterate_stations(working_data, iterations_per_tick)
     -- add station to by-network lookup
     local network_stations = network_to_stations[network_id]
     if network_stations then
-      network_stations[#network_stations+1] = station_id -- TODO check performance
+      network_stations[#network_stations+1] = station_id
     else
       network_to_stations[network_id] = {station_id}
     end
@@ -437,8 +437,8 @@ function ltn_data.iterate()
 
     -- start updating GUIs
     global.flags.iterating_ltn_data = false
-    -- global.flags.updating_guis = true
-    -- global.next_update_index = next(global.players)
+    global.flags.updating_guis = true
+    global.next_update_index = next(global.players)
   end
 end
 

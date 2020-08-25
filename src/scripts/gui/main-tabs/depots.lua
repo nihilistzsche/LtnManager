@@ -65,7 +65,7 @@ function depots_tab.update(player, player_table, state_changes, gui_data, data, 
             {type="label", style="ltnm_depot_button_caption_label", caption=name, elem_mods={enabled=false}, save_as="labels.name"},
             {type="flow", direction="horizontal", children={
               {type="label", style="ltnm_depot_button_bold_label", caption={"", {"ltnm-gui.trains"}, ":"}, elem_mods={enabled=false}, save_as="labels.trains"},
-              {type="label", style="ltnm_depot_button_label", caption=t.available_trains.."/"..t.num_trains, elem_mods={enabled=false},
+              {type="label", style="ltnm_depot_button_label", caption=#t.available_trains.."/"..t.num_trains, elem_mods={enabled=false},
                 save_as="labels.train_count"}
             }},
             {type="flow", style_mods={vertical_align="center", horizontal_spacing=6}, save_as="status_flow", children={
@@ -146,7 +146,7 @@ function depots_tab.update(player, player_table, state_changes, gui_data, data, 
     -- retrieve train array and iteration settings
     local depot = data.depots[depot_data.selected]
     local active_sort = depot_data.active_sort
-    local trains = depot.trains[active_sort]
+    local trains = depot.sorted_trains[active_sort]
     if active_sort == "status" then
       trains = trains[player.index]
     end
@@ -171,7 +171,7 @@ function depots_tab.update(player, player_table, state_changes, gui_data, data, 
       })
       -- train status
       local status_flow_add = elems.status_flow.add
-      for _, t in ipairs(train.status[player.index]) do
+      for _, t in ipairs(train.status[player.index].data) do
         status_flow_add{type="label", style=t[1], caption=t[2]}
       end
       -- contents table
