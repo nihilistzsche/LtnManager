@@ -259,21 +259,26 @@ local function sort_depot_trains_by_composition(working_data)
   end)
 end
 
-local function sort_stations_by_name(working_data)
+local function sort_stations_by_name(working_data, iterations_per_tick)
   local stations = working_data.stations
-  table.sort(working_data.sorted_stations.name, function(id_1, id_2)
+  return table.partial_sort(working_data.sorted_stations.name, working_data.key, math.ceil(iterations_per_tick / 2), function(id_1, id_2)
     return stations[id_1].name < stations[id_2].name
   end)
 end
 
-local function sort_stations_by_status(working_data)
+local function sort_stations_by_status(working_data, iterations_per_tick)
   local stations = working_data.stations
-  table.sort(working_data.sorted_stations.status, function(id_1, id_2)
-    return stations[id_1].status.sort_key < stations[id_2].status.sort_key
-  end)
+  return table.partial_sort(
+    working_data.sorted_stations.status,
+    working_data.key,
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
+      return stations[id_1].status.sort_key < stations[id_2].status.sort_key
+    end
+  )
 end
 
-local function sort_history(working_data)
+local function prepare_history_alerts_sort(working_data)
   local history = working_data.history
   local history_length = #history
   local sorted_history = working_data.sorted_history
@@ -284,25 +289,6 @@ local function sort_history(working_data)
     end
   end
 
-  -- sort arrays
-  table.sort(sorted_history.depot, function(id_1, id_2)
-    return history[id_1].depot < history[id_2].depot
-  end)
-  table.sort(sorted_history.route, function(id_1, id_2)
-    return history[id_1].route_sort_key < history[id_2].route_sort_key
-  end)
-  table.sort(sorted_history.runtime, function(id_1, id_2)
-    return history[id_1].runtime < history[id_2].runtime
-  end)
-  table.sort(sorted_history.finished, function(id_1, id_2)
-    return history[id_1].finished < history[id_2].finished
-  end)
-end
-
--- TODO rename alerts_to_delete to deleted_alerts, add deleted_all_alerts
--- TODO directly modify alerts table in working_data when manipulated
-
-local function sort_alerts(working_data)
   local alerts = working_data.alerts
   local alerts_length = #alerts
   local sorted_alerts = working_data.sorted_alerts
@@ -312,21 +298,83 @@ local function sort_alerts(working_data)
       array[i] = i
     end
   end
+end
 
-  -- sort arrays
-  -- TODO remove network_id column from alerts?
-  table.sort(sorted_alerts.network_id, function(id_1, id_2)
-    return alerts[id_1].train.network_id < alerts[id_2].train.network_id
-  end)
-  table.sort(sorted_alerts.route, function(id_1, id_2)
-    return alerts[id_1].train.route_sort_key < alerts[id_2].train.route_sort_key
-  end)
-  table.sort(sorted_alerts.time, function(id_1, id_2)
-    return alerts[id_1].time < alerts[id_2].time
-  end)
-  table.sort(sorted_alerts.type, function(id_1, id_2)
-    return alerts[id_1].type < alerts[id_2].type
-  end)
+local history_sorts = {
+  depot = true,
+  route = true,
+  runtime = true,
+  finished = true
+}
+
+local function sort_history(working_data, iterations_per_tick)
+  local history = working_data.history
+  local sorted_history = working_data.sorted_history
+
+  local key = working_data.key or {sort=next(history_sorts)}
+  local sort = key.sort
+
+  local next_index = table.partial_sort(
+    sorted_history[key.sort],
+    key.index,
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
+      return history[id_1][sort] < history[id_2][sort]
+    end
+  )
+
+  key.index = next_index
+  if not next_index then
+    local next_sort = next(history_sorts, sort)
+    if next_sort then
+      key.sort = next_sort
+    else
+      key = nil
+    end
+  end
+
+  return key
+end
+
+-- TODO rename alerts_to_delete to deleted_alerts, add deleted_all_alerts
+-- TODO directly modify alerts table in working_data when manipulated
+
+local alerts_sorts = {
+  network_id = true,
+  route = true,
+  time = true,
+  type = true
+}
+
+local function sort_alerts(working_data, iterations_per_tick)
+  local alerts = working_data.alerts
+  local sorted_alerts = working_data.sorted_alerts
+
+  local key = working_data.key or {sort=next(alerts_sorts)}
+  local sort = key.sort
+
+  local next_index = table.partial_sort(
+    sorted_alerts[key.sort],
+    key.index,
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
+      local alert_1 = alerts[id_1]
+      local alert_2 = alerts[id_2]
+      return (alert_1[sort] or alert_1.train[sort]) < (alerts[id_2][sort] or alert_2.train[sort])
+    end
+  )
+
+  key.index = next_index
+  if not next_index then
+    local next_sort = next(alerts_sorts, sort)
+    if next_sort then
+      key.sort = next_sort
+    else
+      key = nil
+    end
+  end
+
+  return key
 end
 
 local function add_alert(e, alert_type, shipment)
@@ -348,7 +396,7 @@ local function add_alert(e, alert_type, shipment)
       pickup_done = train.pickupDone or false,
       to = train.to,
       to_id = train.to_id,
-      route_sort_key = train.from.." -> "..train.to
+      route = train.from.." -> "..train.to
     }
   }
 
@@ -393,6 +441,7 @@ function ltn_data.iterate()
     sort_depot_trains_by_composition,
     sort_stations_by_name,
     sort_stations_by_status,
+    prepare_history_alerts_sort,
     sort_history,
     sort_alerts
   }
@@ -540,7 +589,7 @@ function ltn_data.on_delivery_completed(e)
     shipment = e.shipment,
     runtime = game.tick - train.started,
     finished = game.tick,
-    route_sort_key = train.from.." -> "..train.to
+    route = train.from.." -> "..train.to
   })
   global.working_data.history[51] = nil -- limit to 50 entries
 
