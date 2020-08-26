@@ -7,7 +7,7 @@ local constants = require("constants")
 
 local alert_popup_gui = require("scripts.gui.alert-popup")
 local global_data = require("scripts.global-data")
-local ltn_data = require("scripts.ltn-data-new")
+local ltn_data = require("scripts.ltn-data")
 local main_gui = require("scripts.gui.main")
 local migrations = require("scripts.migrations")
 local player_data = require("scripts.player-data")
