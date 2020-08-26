@@ -31,4 +31,18 @@ constants.ltn_event_names = {
   on_delivery_failed = true
 }
 
+-- sorts
+constants.alerts_sorts = {
+  network_id = true,
+  route = true,
+  time = true,
+  type = true
+}
+constants.history_sorts = {
+  depot = true,
+  route = true,
+  runtime = true,
+  finished = true
+}
+
 return constants

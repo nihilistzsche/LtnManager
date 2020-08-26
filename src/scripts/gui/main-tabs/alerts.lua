@@ -54,16 +54,15 @@ gui.add_handlers{
       on_gui_click = function(e)
         local _,_,alert_id = string_find(e.element.name, "^ltnm_clear_alert__(.-)$")
         alert_id = tonumber(alert_id)
-        global.data.alerts_to_delete[alert_id] = true
+        global.data.deleted_alerts[alert_id] = true
         alerts_tab.update(game.get_player(e.player_index), global.players[e.player_index], {alerts=true})
       end
     },
-    clear_alerts_button = {
+    clear_all_alerts_button = {
       on_gui_click = function(e)
         local player_table = global.players[e.player_index]
-        local gui_data = player_table.gui.main.alerts
-        gui_data.clear_all = true
-        alerts_tab.update(game.get_player(e.player_index), player_table, { alerts = true })
+        global.data.deleted_all_alerts = true
+        alerts_tab.update(game.get_player(e.player_index), player_table, {alerts=true})
       end
     }
   }
@@ -80,25 +79,22 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
     local active_sort = gui_data.alerts.active_sort
     local sort_value = gui_data.alerts["sort_"..active_sort]
     local sorted_alerts = data.sorted_alerts[active_sort]
-    local clear_all = gui_data.alerts.clear_all
 
-    -- skip if there are no alerts
-    if #sorted_alerts > 0 then
+    -- skip if there are no alerts or all have been deleted
+    if #sorted_alerts > 0 and not global.data.deleted_all_alerts then
       local alerts = data.alerts
       local start = sort_value and 1 or #sorted_alerts
       local finish = sort_value and #sorted_alerts or 1
       local delta = sort_value and 1 or -1
 
-      local to_be_deleted = global.data.alerts_to_delete
+      local deleted_alerts = global.data.deleted_alerts
 
       for i=start,finish,delta do
         local alert_id = sorted_alerts[i]
-        if clear_all then
-          to_be_deleted[alert_id] = true
-        end
+        gui_data.alerts.clear_all_alerts_button.enabled = true
 
         -- exclude if the alert is to be deleted
-        if not to_be_deleted[alert_id] then
+        if not deleted_alerts[alert_id] then
           local alert_data = alerts[alert_id]
           local elems = gui.build(alerts_table, {
             {type="label", style_mods={width=64}, caption=util.ticks_to_time(alert_data.time)},
@@ -132,8 +128,9 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
           end
         end
       end
+    else
+      gui_data.alerts.clear_all_alerts_button.enabled = false
     end
-    gui_data.alerts.clear_all = false
   end
 end
 
@@ -152,7 +149,7 @@ alerts_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, ele
         caption={"ltnm-gui.alert"}, handlers="alerts.sort_checkbox", save_as="alerts.type_sort_checkbox"},
       {type="empty-widget", style_mods={width=196, height=15}},
       {type="sprite-button", style="tool_button_red", sprite="utility/trash", tooltip={"ltnm-gui.clear-alerts"},
-        handlers="alerts.clear_alerts_button", save_as="alerts.clear_alerts_button"}
+        handlers="alerts.clear_all_alerts_button", save_as="alerts.clear_all_alerts_button"}
     }},
     {type="scroll-pane", style="ltnm_blank_scroll_pane", style_mods={vertically_stretchable=true, horizontally_stretchable=true},
       vertical_scroll_policy="always", children={

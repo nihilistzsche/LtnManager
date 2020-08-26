@@ -2,7 +2,57 @@ local ltn_data = {}
 
 local table = require("__flib__.table")
 
+local constants = require("constants")
+
 local alert_popup_gui = require("scripts.gui.alert-popup")
+
+-- -----------------------------------------------------------------------------
+-- HELPER FUNCTIONS
+
+local function add_alert(e, alert_type, shipment)
+  -- save train data so it will persist after the delivery is through
+  local trains = global.data.trains
+  local train = trains[e.train_id] or trains[global.data.invalidated_trains[e.train_id]]
+  if not train then error("Could not find train of ID: "..e.train_id) end
+
+  -- add common data
+  local alert_data = {
+    time = game.tick,
+    type = alert_type,
+    train = {
+      depot = train.depot,
+      from = train.from,
+      from_id = train.from_id,
+      id = e.train_id,
+      network_id = train.network_id,
+      pickup_done = train.pickupDone or false,
+      to = train.to,
+      to_id = train.to_id,
+      route = train.from.." -> "..train.to
+    }
+  }
+
+  -- add unique data
+  if alert_type == "incorrect_pickup" then
+    -- TODO handle wrong_load in alert info
+    alert_data.wrong_load = e.wrong_load
+    alert_data.actual_shipment = e.actual_shipment
+    alert_data.planned_shipment = e.planned_shipment
+  elseif alert_type == "incomplete_delivery" then
+    alert_data.leftovers = e.remaining_load
+    alert_data.shipment = e.shipment
+  else
+    alert_data.shipment = shipment
+  end
+
+  -- save to data table
+  local alerts = global.data.alerts
+  table.insert(alerts, 1, alert_data)
+  alerts[31] = nil -- limit to 30 entries
+
+  -- set popup flag
+  global.working_data.alert_popup = alert_type
+end
 
 -- -----------------------------------------------------------------------------
 -- PROCESSORS
@@ -278,6 +328,17 @@ local function sort_stations_by_status(working_data, iterations_per_tick)
   )
 end
 
+local function remove_deleted_alerts(working_data)
+  if not global.data then return end
+  if global.data.deleted_all_alerts then
+    working_data.alerts = {}
+  else
+    for id in pairs(global.data.deleted_alerts) do
+      table.remove(working_data.alerts, id)
+    end
+  end
+end
+
 local function prepare_history_alerts_sort(working_data)
   local history = working_data.history
   local history_length = #history
@@ -300,18 +361,11 @@ local function prepare_history_alerts_sort(working_data)
   end
 end
 
-local history_sorts = {
-  depot = true,
-  route = true,
-  runtime = true,
-  finished = true
-}
-
 local function sort_history(working_data, iterations_per_tick)
   local history = working_data.history
   local sorted_history = working_data.sorted_history
 
-  local key = working_data.key or {sort=next(history_sorts)}
+  local key = working_data.key or {sort=next(constants.history_sorts)}
   local sort = key.sort
 
   local next_index = table.partial_sort(
@@ -325,7 +379,7 @@ local function sort_history(working_data, iterations_per_tick)
 
   key.index = next_index
   if not next_index then
-    local next_sort = next(history_sorts, sort)
+    local next_sort = next(constants.history_sorts, sort)
     if next_sort then
       key.sort = next_sort
     else
@@ -336,21 +390,11 @@ local function sort_history(working_data, iterations_per_tick)
   return key
 end
 
--- TODO rename alerts_to_delete to deleted_alerts, add deleted_all_alerts
--- TODO directly modify alerts table in working_data when manipulated
-
-local alerts_sorts = {
-  network_id = true,
-  route = true,
-  time = true,
-  type = true
-}
-
 local function sort_alerts(working_data, iterations_per_tick)
   local alerts = working_data.alerts
   local sorted_alerts = working_data.sorted_alerts
 
-  local key = working_data.key or {sort=next(alerts_sorts)}
+  local key = working_data.key or {sort=next(constants.alerts_sorts)}
   local sort = key.sort
 
   local next_index = table.partial_sort(
@@ -366,7 +410,7 @@ local function sort_alerts(working_data, iterations_per_tick)
 
   key.index = next_index
   if not next_index then
-    local next_sort = next(alerts_sorts, sort)
+    local next_sort = next(constants.alerts_sorts, sort)
     if next_sort then
       key.sort = next_sort
     else
@@ -375,51 +419,6 @@ local function sort_alerts(working_data, iterations_per_tick)
   end
 
   return key
-end
-
-local function add_alert(e, alert_type, shipment)
-  -- save train data so it will persist after the delivery is through
-  local trains = global.data.trains
-  local train = trains[e.train_id] or trains[global.data.invalidated_trains[e.train_id]]
-  if not train then error("Could not find train of ID: "..e.train_id) end
-
-  -- add common data
-  local alert_data = {
-    time = game.tick,
-    type = alert_type,
-    train = {
-      depot = train.depot,
-      from = train.from,
-      from_id = train.from_id,
-      id = e.train_id,
-      network_id = train.network_id,
-      pickup_done = train.pickupDone or false,
-      to = train.to,
-      to_id = train.to_id,
-      route = train.from.." -> "..train.to
-    }
-  }
-
-  -- add unique data
-  if alert_type == "incorrect_pickup" then
-    -- TODO handle wrong_load in alert info
-    alert_data.wrong_load = e.wrong_load
-    alert_data.actual_shipment = e.actual_shipment
-    alert_data.planned_shipment = e.planned_shipment
-  elseif alert_type == "incomplete_delivery" then
-    alert_data.leftovers = e.remaining_load
-    alert_data.shipment = e.shipment
-  else
-    alert_data.shipment = shipment
-  end
-
-  -- save to data table
-  local alerts = global.data.alerts
-  table.insert(alerts, 1, alert_data)
-  alerts[31] = nil -- limit to 30 entries
-
-  -- set popup flag
-  global.working_data.alert_popup = alert_type
 end
 
 -- -----------------------------------------------------------------------------
@@ -441,6 +440,7 @@ function ltn_data.iterate()
     sort_depot_trains_by_composition,
     sort_stations_by_name,
     sort_stations_by_status,
+    remove_deleted_alerts,
     prepare_history_alerts_sort,
     sort_history,
     sort_alerts
@@ -465,12 +465,14 @@ function ltn_data.iterate()
       -- lookup tables
       network_to_stations = working_data.network_to_stations,
       material_locations = working_data.material_locations,
+      -- sorting tables
       sorted_stations = working_data.sorted_stations,
       sorted_history = working_data.sorted_history,
       sorted_alerts = working_data.sorted_alerts,
       -- other
       num_stations = working_data.num_stations,
-      alerts_to_delete = {},
+      deleted_alerts = {},
+      deleted_all_alerts = false,
       invalidated_trains = {}
     }
 
