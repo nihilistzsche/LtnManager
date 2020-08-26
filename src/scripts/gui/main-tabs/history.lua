@@ -31,13 +31,7 @@ gui.add_handlers{
     },
     delete_button = {
       on_gui_click = function(e)
-        -- remove from current data
-        global.data.history = {}
-        global.working_data.history = {}
-        local sorted_history = global.data.sorted_history
-        for key in pairs(sorted_history) do
-          sorted_history[key] = {}
-        end
+        global.data.deleted_history = true
         history_tab.update(game.get_player(e.player_index), global.players[e.player_index], {history=true})
       end
     },
@@ -78,7 +72,9 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
     local sorted_history = data.sorted_history[active_sort]
 
     -- skip if the history is empty
-    if #sorted_history > 0 then
+    if #sorted_history > 0 and not data.deleted_history then
+      history_gui_data.delete_button.enabled = true
+
       local history = data.history
       local start = sort_value and 1 or #sorted_history
       local finish = sort_value and #sorted_history or 1
@@ -102,7 +98,8 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
                 tooltip={"ltnm-gui.view-station-on-map"}},
               {type="flow", children={
                 {type="label", style="caption_label", caption="->"},
-                {type="label", name="ltnm_view_station__"..entry.to_id, style="ltnm_hoverable_bold_label", caption=entry.to, tooltip={"ltnm-gui.view-station-on-map"}}
+                {type="label", name="ltnm_view_station__"..entry.to_id, style="ltnm_hoverable_bold_label", caption=entry.to,
+                  tooltip={"ltnm-gui.view-station-on-map"}}
               }}
             }},
             {type="label", style_mods={right_margin=8, width=66, horizontal_align="right"}, caption=util.ticks_to_time(entry.runtime)},
@@ -121,6 +118,8 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
           end
         end
       end
+    else
+      history_gui_data.delete_button.enabled = false
     end
   end
 end

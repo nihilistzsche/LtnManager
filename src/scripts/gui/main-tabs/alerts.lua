@@ -81,13 +81,13 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
     local sorted_alerts = data.sorted_alerts[active_sort]
 
     -- skip if there are no alerts or all have been deleted
-    if #sorted_alerts > 0 and not global.data.deleted_all_alerts then
+    if #sorted_alerts > 0 and not data.deleted_all_alerts then
       local alerts = data.alerts
       local start = sort_value and 1 or #sorted_alerts
       local finish = sort_value and #sorted_alerts or 1
       local delta = sort_value and 1 or -1
 
-      local deleted_alerts = global.data.deleted_alerts
+      local deleted_alerts = data.deleted_alerts
 
       for i=start,finish,delta do
         local alert_id = sorted_alerts[i]

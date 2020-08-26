@@ -328,8 +328,14 @@ local function sort_stations_by_status(working_data, iterations_per_tick)
   )
 end
 
-local function remove_deleted_alerts(working_data)
+-- ! FIXME if you press delete after this step executes, everything will come back after iteration is finished :(
+local function remove_deleted_alerts_and_history(working_data)
   if not global.data then return end
+  -- history
+  if global.data.deleted_history then
+    working_data.history = {}
+  end
+  -- alerts
   if global.data.deleted_all_alerts then
     working_data.alerts = {}
   else
@@ -440,7 +446,7 @@ function ltn_data.iterate()
     sort_depot_trains_by_composition,
     sort_stations_by_name,
     sort_stations_by_status,
-    remove_deleted_alerts,
+    remove_deleted_alerts_and_history,
     prepare_history_alerts_sort,
     sort_history,
     sort_alerts
@@ -471,6 +477,7 @@ function ltn_data.iterate()
       sorted_alerts = working_data.sorted_alerts,
       -- other
       num_stations = working_data.num_stations,
+      deleted_history = false,
       deleted_alerts = {},
       deleted_all_alerts = false,
       invalidated_trains = {}
