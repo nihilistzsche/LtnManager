@@ -80,6 +80,8 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
     local sort_value = gui_data.alerts["sort_"..active_sort]
     local sorted_alerts = data.sorted_alerts[active_sort]
 
+    local actually_shown = 0
+
     -- skip if there are no alerts or all have been deleted
     if #sorted_alerts > 0 and not global.flags.deleted_all_alerts then
       local alerts = data.alerts
@@ -95,6 +97,8 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
 
         -- exclude if the alert is to be deleted
         if not deleted_alerts[alert_id] then
+          actually_shown = actually_shown + 1
+
           local alert_data = alerts[alert_id]
           local elems = gui.build(alerts_table, {
             {type="label", style_mods={width=64}, caption=util.ticks_to_time(alert_data.time)},
@@ -133,6 +137,10 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
         end
       end
     else
+      gui_data.alerts.clear_all_alerts_button.enabled = false
+    end
+
+    if actually_shown == 0 then
       gui_data.alerts.clear_all_alerts_button.enabled = false
     end
   end
