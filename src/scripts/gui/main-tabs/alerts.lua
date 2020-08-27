@@ -127,8 +127,7 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
             gui.templates.alerts.materials_table(
               elems.tables_flow,
               "red",
-              -- ! FIXME this will add the materials on every GUI update...
-              util.add_materials(alert_data.actual_shipment, alert_data.wrong_load) or alert_data.leftovers, material_translations
+              alert_data.actual_shipment or alert_data.leftovers, material_translations
             )
           end
         end

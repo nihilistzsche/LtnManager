@@ -34,9 +34,7 @@ local function add_alert(e, alert_type, shipment)
 
   -- add unique data
   if alert_type == "incorrect_pickup" then
-    -- TODO handle wrong_load in alert info
-    alert_data.wrong_load = e.wrong_load
-    alert_data.actual_shipment = e.actual_shipment
+    alert_data.actual_shipment = util.add_materials(e.actual_shipment, e.wrong_load)
     alert_data.planned_shipment = e.planned_shipment
   elseif alert_type == "incomplete_delivery" then
     alert_data.leftovers = e.remaining_load
