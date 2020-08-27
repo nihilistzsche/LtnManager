@@ -328,20 +328,22 @@ local function sort_stations_by_status(working_data, iterations_per_tick)
   )
 end
 
--- ! FIXME if you press delete after this step executes, everything will come back after iteration is finished :(
 local function remove_deleted_alerts_and_history(working_data)
-  if not global.data then return end
+  local flags = global.flags
   -- history
-  if global.data.deleted_history then
+  if flags.deleted_history then
     working_data.history = {}
+    flags.deleted_history = false
   end
   -- alerts
-  if global.data.deleted_all_alerts then
+  if flags.deleted_all_alerts then
     working_data.alerts = {}
+    flags.deleted_all_alerts = false
   else
-    for id in pairs(global.data.deleted_alerts) do
+    for id in pairs(flags.deleted_alerts) do
       table.remove(working_data.alerts, id)
     end
+    flags.deleted_alerts = {}
   end
 end
 
@@ -459,6 +461,7 @@ function ltn_data.iterate()
       working_data.step = step + 1
     end
   else
+    local prev_data = global.data
     -- output data
     global.data = {
       -- bulk data
@@ -477,9 +480,6 @@ function ltn_data.iterate()
       sorted_alerts = working_data.sorted_alerts,
       -- other
       num_stations = working_data.num_stations,
-      deleted_history = false,
-      deleted_alerts = {},
-      deleted_all_alerts = false,
       invalidated_trains = {}
     }
 

@@ -18,5 +18,10 @@ return {
       player_table.flags.toggling_search = false
       player_table.last_update = tick
     end
+  end,
+  ["0.3.0"] = function()
+    global.flags.deleted_alerts = {}
+    global.flags.deleted_all_alerts = false
+    global.flags.deleted_history = false
   end
 }

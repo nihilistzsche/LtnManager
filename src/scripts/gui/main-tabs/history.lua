@@ -31,7 +31,7 @@ gui.add_handlers{
     },
     delete_button = {
       on_gui_click = function(e)
-        global.data.deleted_history = true
+        global.flags.deleted_history = true
         history_tab.update(game.get_player(e.player_index), global.players[e.player_index], {history=true})
       end
     },
@@ -72,7 +72,7 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
     local sorted_history = data.sorted_history[active_sort]
 
     -- skip if the history is empty
-    if #sorted_history > 0 and not data.deleted_history then
+    if #sorted_history > 0 and not global.flags.deleted_history then
       history_gui_data.delete_button.enabled = true
 
       local history = data.history
