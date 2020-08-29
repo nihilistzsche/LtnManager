@@ -165,6 +165,9 @@ local function iterate_trains(working_data, iterations_per_tick)
     local depot = schedule.records[1].station
     local depot_data = depots[depot]
 
+    -- not every train will be LTN-controlled
+    if not depot_data then return nil, true end
+
     -- add to depot trains lists
     local train_ids = depot_data.train_ids
     train_ids[#train_ids+1] = train_id
