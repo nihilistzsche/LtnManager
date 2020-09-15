@@ -319,9 +319,11 @@ function main_gui.update(player, player_table, state_changes)
 
     local search_button = gui_data.titlebar.search_button
     if tabs[state_changes.active_tab].search_template then
+      search_button.sprite = "utility/search_white"
       search_button.enabled = true
       search_button.tooltip = {"ltnm-gui.search-tooltip"}
     else
+      search_button.sprite = "ltnm_search_disabled"
       search_button.enabled = false
       search_button.tooltip = {"ltnm-message.search-not-supported"}
     end

@@ -1,4 +1,4 @@
-local data_util = require("__flib__.data_util")
+local data_util = require("__flib__.data-util")
 
 local util = require("prototypes.util")
 
