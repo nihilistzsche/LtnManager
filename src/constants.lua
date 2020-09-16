@@ -26,7 +26,7 @@ constants.input_sanitisers = {
 constants.ltn_event_names = {
   on_stops_updated = true,
   on_dispatcher_updated = true,
-  on_delivery_pickup_complete = true,
+  -- on_delivery_pickup_complete = true,
   on_delivery_completed = true,
   on_delivery_failed = true
 }

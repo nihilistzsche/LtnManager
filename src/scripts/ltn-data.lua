@@ -34,7 +34,7 @@ local function add_alert(e, alert_type, shipment)
 
   -- add unique data
   if alert_type == "incorrect_pickup" then
-    alert_data.actual_shipment = util.add_materials(e.actual_shipment, e.wrong_load)
+    alert_data.actual_shipment = util.add_materials(e.actual_shipment)
     alert_data.planned_shipment = e.planned_shipment
   elseif alert_type == "incomplete_delivery" then
     alert_data.leftovers = e.remaining_load
@@ -564,17 +564,6 @@ function ltn_data.on_dispatcher_updated(e)
   global.flags.iterating_ltn_data = true
 end
 
-function ltn_data.on_delivery_pickup_complete(e)
-  if not global.data then return end
-
-  -- compare shipments to see if something was loaded incorrectly
-  for name, count in pairs(e.actual_shipment) do
-    if not e.planned_shipment[name] or math.floor(e.planned_shipment[name]) > math.floor(count) then
-      add_alert(e, "incorrect_pickup")
-    end
-  end
-end
-
 function ltn_data.on_delivery_completed(e)
   local data = global.data
   if not data then return end
@@ -602,11 +591,6 @@ function ltn_data.on_delivery_completed(e)
     route = train.from.." -> "..train.to
   })
   global.working_data.history[51] = nil -- limit to 50 entries
-
-  -- detect incomplete deliveries
-  if table_size(e.remaining_load) > 0 then
-    add_alert(e, "incomplete_delivery")
-  end
 end
 
 function ltn_data.on_delivery_failed(e)
