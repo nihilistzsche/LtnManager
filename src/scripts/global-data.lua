@@ -26,7 +26,11 @@ function global_data.build_translations()
   for _, type in ipairs{"fluid", "item"} do
     local prefix = type..","
     for name, prototype in pairs(game[type.."_prototypes"]) do
-      translation_data[#translation_data+1] = {dictionary="materials", internal=prefix..name, localised=prototype.localised_name}
+      translation_data[#translation_data+1] = {
+        dictionary = "materials",
+        internal = prefix..name,
+        localised = prototype.localised_name
+      }
     end
   end
   global.translation_data = translation_data

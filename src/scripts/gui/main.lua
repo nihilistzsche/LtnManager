@@ -20,7 +20,13 @@ gui.add_templates{
     both = {type="empty-widget", style_mods={horizontally_stretchable=true, vertically_stretchable=true}}
   },
   frame_action_button = {type="sprite-button", style="frame_action_button", mouse_button_filter={"left"}},
-  mock_frame_tab = {type="button", style="ltnm_mock_frame_tab", mouse_button_filter={"left"}, handlers="main.titlebar.frame_tab"},
+  mock_frame_tab = (
+    {type="button",
+      style="ltnm_mock_frame_tab",
+      mouse_button_filter={"left"},
+      handlers="main.titlebar.frame_tab"
+    }
+  ),
   status_indicator = function(name, color, value)
     return {type="flow", style_mods={vertical_align="center"}, children={
       {type="sprite", style="ltnm_status_icon", sprite="ltnm_indicator_"..color, save_as=name.."_circle"},
@@ -28,7 +34,14 @@ gui.add_templates{
     }}
   end,
   search_contents = function(name)
-    return {type="flow", name=name.."_contents", style="ltnm_search_content_flow", elem_mods={visible=false}, children=tabs[name].search_template}
+    return (
+      {type="flow",
+        name=name.."_contents",
+        style="ltnm_search_content_flow",
+        elem_mods={visible=false},
+        children=tabs[name].search_template
+      }
+    )
   end
 }
 
@@ -123,7 +136,13 @@ gui.add_handlers{
           if e.shift then
             -- open LTN combinator
             if remote.interfaces["ltn-combinator"] then
-              if not remote.call("ltn-combinator", "open_ltn_combinator", e.player_index, station_data.lamp_control, true) then
+              if not remote.call(
+                "ltn-combinator",
+                "open_ltn_combinator",
+                e.player_index,
+                station_data.lamp_control,
+                true
+              ) then
                 player.print{"ltnm-message.ltn-combinator-not-found"}
               end
             else
@@ -179,44 +198,79 @@ gui.add_handlers{
 function main_gui.create(player, player_table)
   -- create base GUI structure
   local gui_data = gui.build(player.gui.screen, {
-    {type="frame", style="invisible_frame", direction="vertical", handlers="main.window", save_as="window.frame", children={
-      {type="flow", children={
-        {template="pushers.horizontal"},
-        {type="frame", style="ltnm_search_frame", elem_mods={visible=false}, handlers="search.window", save_as="search.window", children={
-          gui.templates.search_contents("stations"),
-          gui.templates.search_contents("inventory"),
-          gui.templates.search_contents("history")
+    {type="frame",
+      style="invisible_frame",
+      direction="vertical",
+      handlers="main.window",
+      save_as="window.frame",
+      children={
+        {type="flow", children={
+          {template="pushers.horizontal"},
+          {type="frame",
+            style="ltnm_search_frame",
+            elem_mods={visible=false},
+            handlers="search.window",
+            save_as="search.window",
+            children={
+              gui.templates.search_contents("stations"),
+              gui.templates.search_contents("inventory"),
+              gui.templates.search_contents("history")
+            }
+          },
         }},
-      }},
-      {type="flow", style_mods={horizontal_spacing=0, padding=0}, direction="horizontal", children={
-        -- TODO left side
-        {type="frame", style="ltnm_titlebar_tab_filler_frame", children={
-          {template="mock_frame_tab", caption={"ltnm-gui.depots"}, save_as="tabbed_pane.tabs.depots"},
-          {template="mock_frame_tab", caption={"ltnm-gui.stations"}, save_as="tabbed_pane.tabs.stations"},
-          {template="mock_frame_tab", caption={"ltnm-gui.inventory"}, save_as="tabbed_pane.tabs.inventory"},
-          {template="mock_frame_tab", caption={"ltnm-gui.history"}, save_as="tabbed_pane.tabs.history"},
-          {template="mock_frame_tab", caption={"ltnm-gui.alerts"}, save_as="tabbed_pane.tabs.alerts"},
+        {type="flow", style_mods={horizontal_spacing=0, padding=0}, direction="horizontal", children={
+          -- TODO left side
+          {type="frame", style="ltnm_titlebar_tab_filler_frame", children={
+            {template="mock_frame_tab", caption={"ltnm-gui.depots"}, save_as="tabbed_pane.tabs.depots"},
+            {template="mock_frame_tab", caption={"ltnm-gui.stations"}, save_as="tabbed_pane.tabs.stations"},
+            {template="mock_frame_tab", caption={"ltnm-gui.inventory"}, save_as="tabbed_pane.tabs.inventory"},
+            {template="mock_frame_tab", caption={"ltnm-gui.history"}, save_as="tabbed_pane.tabs.history"},
+            {template="mock_frame_tab", caption={"ltnm-gui.alerts"}, save_as="tabbed_pane.tabs.alerts"},
+          }},
+          {type="frame", style="ltnm_titlebar_right_frame", children={
+            {type="empty-widget", style="ltnm_titlebar_drag_handle", save_as="titlebar.drag_handle"},
+            {template="frame_action_button",
+              sprite="utility/search_white",
+              hovered_sprite="utility/search_black",
+              clicked_sprite="utility/search_black",
+              tooltip={"ltnm-gui.search-tooltip"},
+              handlers="main.titlebar.search_button",
+              save_as="titlebar.search_button"
+            },
+            {template="frame_action_button",
+              sprite="ltnm_pin_white",
+              hovered_sprite="ltnm_pin_black",
+              clicked_sprite="ltnm_pin_black",
+              tooltip={"ltnm-gui.keep-open"},
+              handlers="main.titlebar.pin_button",
+              save_as="titlebar.pin_button"
+            },
+            {template="frame_action_button",
+              sprite="ltnm_refresh_white",
+              hovered_sprite="ltnm_refresh_black",
+              clicked_sprite="ltnm_refresh_black",
+              tooltip={"ltnm-gui.refresh-button-tooltip"},
+              handlers="main.titlebar.refresh_button",
+              save_as="titlebar.refresh_button"
+            },
+            {template="frame_action_button",
+              sprite="utility/close_white",
+              hovered_sprite="utility/close_black",
+              clicked_sprite="utility/close_black",
+              handlers="main.titlebar.close_button",
+              save_as="titlebar.close_button"
+            }
+          }}
         }},
-        {type="frame", style="ltnm_titlebar_right_frame", children={
-          {type="empty-widget", style="ltnm_titlebar_drag_handle", save_as="titlebar.drag_handle"},
-          {template="frame_action_button", sprite="utility/search_white", hovered_sprite="utility/search_black", clicked_sprite="utility/search_black",
-            tooltip={"ltnm-gui.search-tooltip"}, handlers="main.titlebar.search_button", save_as="titlebar.search_button"},
-          {template="frame_action_button", sprite="ltnm_pin_white", hovered_sprite="ltnm_pin_black", clicked_sprite="ltnm_pin_black",
-            tooltip={"ltnm-gui.keep-open"}, handlers="main.titlebar.pin_button", save_as="titlebar.pin_button"},
-          {template="frame_action_button", sprite="ltnm_refresh_white", hovered_sprite="ltnm_refresh_black", clicked_sprite="ltnm_refresh_black",
-            tooltip={"ltnm-gui.refresh-button-tooltip"}, handlers="main.titlebar.refresh_button", save_as="titlebar.refresh_button"},
-          {template="frame_action_button", sprite="utility/close_white", hovered_sprite="utility/close_black", clicked_sprite="utility/close_black",
-            handlers="main.titlebar.close_button", save_as="titlebar.close_button"}
+        {type="frame", style="ltnm_main_content_frame", children={
+          tabs.depots.base_template,
+          tabs.stations.base_template,
+          tabs.inventory.base_template,
+          tabs.history.base_template,
+          tabs.alerts.base_template
         }}
-      }},
-      {type="frame", style="ltnm_main_content_frame", children={
-        tabs.depots.base_template,
-        tabs.stations.base_template,
-        tabs.inventory.base_template,
-        tabs.history.base_template,
-        tabs.alerts.base_template
-      }}
-    }}
+      }
+    }
   })
 
   -- other handlers

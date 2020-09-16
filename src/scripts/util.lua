@@ -52,7 +52,12 @@ util.train = require("__flib__.train")
 function util.train.get_status_string(train_data, translations)
   local state = train_data.state
   local def = defines.train_state
-  if state == def.on_the_path or state == def.arrive_signal or state == def.wait_signal or state == def.arrive_station then
+  if
+    state == def.on_the_path
+    or state == def.arrive_signal
+    or state == def.wait_signal
+    or state == def.arrive_station
+  then
     if train_data.returning_to_depot then
       return {
         string = translations["returning-to-depot"],

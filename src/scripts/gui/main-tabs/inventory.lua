@@ -31,7 +31,11 @@ gui.add_templates{
     end,
     label_with_value = function(name, label_caption, value)
       return {type="flow", style_mods={left_margin=2, right_margin=2}, children={
-        {type="label", style="bold_label", caption={"", label_caption, ":"}, save_as="inventory.info_pane."..name.."_label"},
+        {type="label",
+          style="bold_label",
+          caption={"", label_caption, ":"},
+          save_as="inventory.info_pane."..name.."_label"
+        },
         {template="pushers.horizontal"},
         {type="label", caption=value, save_as="inventory.info_pane."..name.."_value"}
       }}
@@ -40,13 +44,16 @@ gui.add_templates{
       local elems = gui.build(parent, {
         {type="flow", direction="vertical", children={
           {type="flow", save_as="labels_flow"},
-          {type="flow", style_mods={margin=0, padding=0, horizontal_align="center", horizontally_stretchable=true}, children={
-            {type="frame", style="deep_frame_in_shallow_frame", children={
-              {type="scroll-pane", style="ltnm_material_location_slot_table_scroll_pane", children={
-                {type="table", style="ltnm_materials_in_location_slot_table", column_count=9, save_as="table"}
+          {type="flow",
+            style_mods={margin=0, padding=0, horizontal_align="center", horizontally_stretchable=true},
+            children={
+              {type="frame", style="deep_frame_in_shallow_frame", children={
+                {type="scroll-pane", style="ltnm_material_location_slot_table_scroll_pane", children={
+                  {type="table", style="ltnm_materials_in_location_slot_table", column_count=9, save_as="table"}
+                }}
               }}
-            }}
-          }}
+            }
+          }
         }}
       })
       -- populate labels
@@ -64,8 +71,13 @@ gui.add_templates{
         local style = "ltnm_small_slot_button_"..t[1]
         for name, count in pairs(t[2]) do
           i = i + 1
-          table_add{type="sprite-button", name="ltnm_view_material__"..i, style=style, sprite=string_gsub(name, ",", "/"), number=count,
-            tooltip=translations[name].."\n"..util.comma_value(count)}
+          table_add{
+            type = "sprite-button",
+            name = "ltnm_view_material__"..i,
+            style = style, sprite=string_gsub(name, ",", "/"),
+            number = count,
+            tooltip = translations[name].."\n"..util.comma_value(count)
+          }
         end
       end
       return elems
@@ -141,8 +153,14 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
       local i = 0
       for name, count in pairs(combined_materials) do
         i = i + 1
-        elems[name] = add{type="sprite-button", name="ltnm_view_material__"..i, style="flib_slot_button_"..color, sprite=string_gsub(name, ",", "/"),
-          number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
+        elems[name] = add{
+          type = "sprite-button",
+          name = "ltnm_view_material__"..i,
+          style = "flib_slot_button_"..color,
+          sprite = string_gsub(name, ",", "/"),
+          number = count,
+          tooltip = (material_translations[name] or name).."\n"..util.comma_value(count)
+        }
       end
       buttons[type] = elems
 
@@ -156,7 +174,9 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
 
 
     -- remove previous selection since the buttons are no longer glowing
-    state_changes.inventory = type(state_changes.inventory) == "boolean" and inventory_gui_data.selected or state_changes.inventory
+    state_changes.inventory = (
+      type(state_changes.inventory) == "boolean" and inventory_gui_data.selected or state_changes.inventory
+    )
     inventory_gui_data.selected = nil
 
     -- update selected material
@@ -204,7 +224,11 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
         local stations = data.stations
         local station_ids = locations.stations
         if #station_ids > 0 then
-          local label = locations_pane.add{type="label", style="ltnm_material_locations_label", caption={"ltnm-gui.stations"}}
+          local label = locations_pane.add{
+            type = "label",
+            style = "ltnm_material_locations_label",
+            caption = {"ltnm-gui.stations"}
+          }
           local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
           for i=1,#station_ids do
             local station = stations[station_ids[i]]
@@ -219,7 +243,14 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
                 end
                 location_template(
                   table,
-                  {{"ltnm_hoverable_bold_label", station.entity.backer_name, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..station_ids[i]}},
+                  {
+                    {
+                      "ltnm_hoverable_bold_label",
+                      station.entity.backer_name,
+                      {"ltnm-gui.view-station-on-map"},
+                      "ltnm_view_station__"..station_ids[i]
+                    }
+                  },
                   materials,
                   material_translations
                 )
@@ -236,7 +267,11 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
         local trains = data.trains
         local train_ids = locations.trains
         if #train_ids > 0 then
-          local label = locations_pane.add{type="label", style="ltnm_material_locations_label", caption={"ltnm-gui.trains"}}
+          local label = locations_pane.add{
+            type = "label",
+            style = "ltnm_material_locations_label",
+            caption = {"ltnm-gui.trains"}
+          }
           local table = locations_pane.add{type="table", style="ltnm_material_locations_table", column_count=1}
           for i=1,#train_ids do
             local train = trains[train_ids[i]]
@@ -245,9 +280,26 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
               if train.shipment then
                 materials = {{"blue", train.shipment}}
               end
-              location_template(table, {{"ltnm_hoverable_bold_label", train.from, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..train.from_id},
-                {"caption_label", "->"}, {"ltnm_hoverable_bold_label", train.to, {"ltnm-gui.view-station-on-map"}, "ltnm_view_station__"..train.to_id}}, materials,
-                material_translations)
+              location_template(
+                table,
+                {
+                  {
+                    "ltnm_hoverable_bold_label",
+                    train.from,
+                    {"ltnm-gui.view-station-on-map"},
+                    "ltnm_view_station__"..train.from_id
+                  },
+                  {"caption_label", "->"},
+                  {
+                    "ltnm_hoverable_bold_label",
+                    train.to,
+                    {"ltnm-gui.view-station-on-map"},
+                    "ltnm_view_station__"..train.to_id
+                  }
+                },
+                materials,
+                material_translations
+              )
             end
           end
           if #table.children == 0 then
@@ -260,43 +312,76 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
   end
 end
 
-inventory_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, elem_mods={visible=false}, save_as="tabbed_pane.contents.inventory", children={
-  -- left column
-  {type="frame", style="inside_shallow_frame", style_mods={top_padding=1}, direction="vertical", children={
-    {type="flow", style_mods={padding=12, top_padding=4, right_padding=0}, direction="vertical", children={
-      gui.templates.inventory.slot_table_with_label("provided", pane_heights.provided),
-      gui.templates.inventory.slot_table_with_label("requested", pane_heights.requested),
-      gui.templates.inventory.slot_table_with_label("in_transit", pane_heights.in_transit)
-    }}
-  }},
-  -- right column
-  {type="frame", style="inside_shallow_frame", direction="vertical", children={
-    -- item information
-    {type="frame", style="ltnm_shallow_frame_in_shallow_frame", style_mods={horizontally_stretchable=true, vertically_stretchable=true},
-      direction="vertical", children={
-        {type="frame", style="ltnm_item_info_toolbar_frame", direction="vertical", children={
-          -- icon and name
-          {type="flow", style_mods={vertical_align="center"}, children={
-            {type="sprite", style="ltnm_material_icon", sprite="item-group/intermediate-products", save_as="inventory.info_pane.icon"},
-            {type="label", style="caption_label", style_mods={left_margin=2}, caption={"ltnm-gui.choose-an-item"}, save_as="inventory.info_pane.name"}
-          }},
-          -- info
-          gui.templates.inventory.label_with_value("provided", {"ltnm-gui.provided"}, 0),
-          gui.templates.inventory.label_with_value("requested", {"ltnm-gui.requested"}, 0),
-          gui.templates.inventory.label_with_value("in_transit", {"ltnm-gui.in-transit"}, 0)
-        }},
-        {type="scroll-pane", style="ltnm_material_locations_scroll_pane", style_mods={horizontally_stretchable=true, vertically_stretchable=true},
-          vertical_scroll_policy="always", save_as="inventory.locations_scroll_pane"}
+inventory_tab.base_template = (
+  {type="flow",
+    style_mods={horizontal_spacing=12},
+    elem_mods={visible=false},
+    save_as="tabbed_pane.contents.inventory",
+    children={
+      -- left column
+      {type="frame", style="inside_shallow_frame", style_mods={top_padding=1}, direction="vertical", children={
+        {type="flow", style_mods={padding=12, top_padding=4, right_padding=0}, direction="vertical", children={
+          gui.templates.inventory.slot_table_with_label("provided", pane_heights.provided),
+          gui.templates.inventory.slot_table_with_label("requested", pane_heights.requested),
+          gui.templates.inventory.slot_table_with_label("in_transit", pane_heights.in_transit)
+        }}
+      }},
+      -- right column
+      {type="frame", style="inside_shallow_frame", direction="vertical", children={
+        -- item information
+        {type="frame",
+          style="ltnm_shallow_frame_in_shallow_frame",
+          style_mods={horizontally_stretchable=true, vertically_stretchable=true},
+          direction="vertical",
+          children={
+            {type="frame", style="ltnm_item_info_toolbar_frame", direction="vertical", children={
+              -- icon and name
+              {type="flow", style_mods={vertical_align="center"}, children={
+                {type="sprite",
+                  style="ltnm_material_icon",
+                  sprite="item-group/intermediate-products",
+                  save_as="inventory.info_pane.icon"
+                },
+                {type="label",
+                  style="caption_label",
+                  style_mods={left_margin=2},
+                  caption={"ltnm-gui.choose-an-item"},
+                  save_as="inventory.info_pane.name"
+                }
+              }},
+              -- info
+              gui.templates.inventory.label_with_value("provided", {"ltnm-gui.provided"}, 0),
+              gui.templates.inventory.label_with_value("requested", {"ltnm-gui.requested"}, 0),
+              gui.templates.inventory.label_with_value("in_transit", {"ltnm-gui.in-transit"}, 0)
+            }},
+            {type="scroll-pane",
+              style="ltnm_material_locations_scroll_pane",
+              style_mods={horizontally_stretchable=true, vertically_stretchable=true},
+              vertical_scroll_policy="always",
+              save_as="inventory.locations_scroll_pane"
+            }
+          }
+        }
       }
     }
   }}
-}}
+)
 
 inventory_tab.search_template = {
-  {type="textfield", lose_focus_on_confirm=true, handlers="inventory.search.name_textfield", save_as="inventory.search.name_textfield"},
+  {type="textfield",
+    lose_focus_on_confirm=true,
+    handlers="inventory.search.name_textfield",
+    save_as="inventory.search.name_textfield"
+  },
   {type="label", style="caption_label", style_mods={left_margin=12}, caption={"ltnm-gui.network-id"}},
-  {type="textfield", style_mods={width=80}, lose_focus_on_confirm=true, numeric=true, allow_negative=true, handlers="inventory.search.network_id_textfield",
-    save_as="inventory.search.network_id_textfield"}
+  {type="textfield",
+    style_mods={width=80},
+    lose_focus_on_confirm=true,
+    numeric=true,
+    allow_negative=true,
+    handlers="inventory.search.network_id_textfield",
+    save_as="inventory.search.network_id_textfield"
+  }
 }
 
 function inventory_tab.set_search_initial_state(player, player_table, gui_data)

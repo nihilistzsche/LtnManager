@@ -12,7 +12,11 @@ gui.add_handlers{
         local player = game.get_player(e.player_index)
         local player_table = global.players[e.player_index]
 
-        if e.button == defines.mouse_button_type.left and player_table.gui.main and player_table.gui.main.window.frame.valid then
+        if
+          e.button == defines.mouse_button_type.left
+          and player_table.gui.main
+          and player_table.gui.main.window.frame.valid
+        then
           -- change tab and select correct alert
           main_gui.update(player, player_table, {active_tab="alerts", alerts=true})
           -- open in case it's closed
@@ -32,7 +36,11 @@ function alert_popup_gui.create_or_update(player, player_table, alert_type)
       {type="button", style="red_button", style_mods={width=150, height=56}, tooltip={"ltnm-gui.alert-popup-tooltip"},
         mouse_button_filter={"left", "right"}, handlers="alert_popup.button", save_as="button", children={
           {type="flow", direction="vertical", elem_mods={ignored_by_interaction=true}, children={
-            {type="label", style="ltnm_depot_button_bold_label", elem_mods={enabled=false}, caption={"ltnm-gui.new-alert"}},
+            {type="label",
+              style="ltnm_depot_button_bold_label",
+              elem_mods={enabled=false},
+              caption={"ltnm-gui.new-alert"}
+            },
             {type="label", style="ltnm_depot_button_label", elem_mods={enabled=false}, save_as="label"}
           }}
         }

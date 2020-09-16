@@ -203,19 +203,27 @@ local function iterate_in_transit(working_data, iterations_per_tick)
   local in_transit = working_data.inventory.in_transit
   local material_locations = working_data.material_locations
 
-  return table.for_n_of(working_data.deliveries, working_data.key, iterations_per_tick, function(delivery_data, delivery_id)
-    -- add to in transit inventory
-    in_transit[delivery_data.network_id] = util.add_materials(delivery_data.shipment, in_transit[delivery_data.network_id] or {})
-    -- sort materials into locations
-    for name in pairs(delivery_data.shipment) do
-      local locations = material_locations[name]
-      if not locations then
-        material_locations[name] = {stations={}, trains={delivery_id}}
-      else
-        locations.trains[#locations.trains+1] = delivery_id
+  return table.for_n_of(
+    working_data.deliveries,
+    working_data.key,
+    iterations_per_tick,
+    function(delivery_data, delivery_id)
+      -- add to in transit inventory
+      in_transit[delivery_data.network_id] = util.add_materials(
+        delivery_data.shipment,
+        in_transit[delivery_data.network_id] or {}
+      )
+      -- sort materials into locations
+      for name in pairs(delivery_data.shipment) do
+        local locations = material_locations[name]
+        if not locations then
+          material_locations[name] = {stations={}, trains={delivery_id}}
+        else
+          locations.trains[#locations.trains+1] = delivery_id
+        end
       end
     end
-  end)
+  )
 end
 
 local function generate_train_status_strings(working_data, iterations_per_tick)
@@ -312,9 +320,14 @@ end
 
 local function sort_stations_by_name(working_data, iterations_per_tick)
   local stations = working_data.stations
-  return table.partial_sort(working_data.sorted_stations.name, working_data.key, math.ceil(iterations_per_tick / 2), function(id_1, id_2)
-    return stations[id_1].name < stations[id_2].name
-  end)
+  return table.partial_sort(
+    working_data.sorted_stations.name,
+    working_data.key,
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
+      return stations[id_1].name < stations[id_2].name
+    end
+  )
 end
 
 local function sort_stations_by_status(working_data, iterations_per_tick)

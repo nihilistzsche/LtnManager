@@ -19,8 +19,14 @@ gui.add_templates{
       local mi = 0
       for name, count in pairs(materials) do
         mi = mi + 1
-        table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_"..style, sprite=string_gsub(name, ",", "/"),
-          number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
+        table_add{
+          type = "sprite-button",
+          name = "ltnm_view_material__"..mi,
+          style = "ltnm_small_slot_button_"..style,
+          sprite = string_gsub(name, ",", "/"),
+          number = count,
+          tooltip = (material_translations[name] or name).."\n"..util.comma_value(count)
+        }
       end
     end
   }
@@ -103,30 +109,58 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
           local elems = gui.build(alerts_table, {
             {type="label", style_mods={width=64}, caption=util.ticks_to_time(alert_data.time)},
             {type="label", style_mods={width=26, horizontal_align="center"}, caption=alert_data.train.network_id},
-            {type="flow", style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction="vertical", children={
-              {type="label", name="ltnm_view_station__"..alert_data.train.from_id, style="ltnm_hoverable_bold_label", caption=alert_data.train.from,
-                tooltip={"ltnm-gui.view-station-on-map"}},
-              {type="flow", children={
-                {type="label", style="caption_label", caption="->"},
-                {type="label", name="ltnm_view_station__"..alert_data.train.to_id, style="ltnm_hoverable_bold_label", caption=alert_data.train.to,
-                  tooltip={"ltnm-gui.view-station-on-map"}}
-              }}
-            }},
-            {type="label", style="bold_label", style_mods={width=160}, caption={"ltnm-gui.alert-"..alert_data.type},
-              tooltip={"ltnm-gui.alert-"..alert_data.type.."-description"}},
+            {type="flow",
+              style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1},
+              direction="vertical",
+              children={
+                {type="label",
+                  name="ltnm_view_station__"..alert_data.train.from_id,
+                  style="ltnm_hoverable_bold_label",
+                  caption=alert_data.train.from,
+                  tooltip={"ltnm-gui.view-station-on-map"}
+                },
+                {type="flow", children={
+                  {type="label", style="caption_label", caption="->"},
+                  {type="label",
+                    name="ltnm_view_station__"..alert_data.train.to_id,
+                    style="ltnm_hoverable_bold_label",
+                    caption=alert_data.train.to,
+                    tooltip={"ltnm-gui.view-station-on-map"}
+                  }
+                }}
+              }
+            },
+            {type="label",
+              style="bold_label",
+              style_mods={width=160},
+              caption={"ltnm-gui.alert-"..alert_data.type},
+              tooltip={"ltnm-gui.alert-"..alert_data.type.."-description"}
+            },
             {type="flow", style_mods={vertical_spacing=8}, direction="vertical", save_as="tables_flow"},
             {type="flow", children={
               {type="frame", style="deep_frame_in_shallow_frame", style_mods={padding=0}, children={
-                {type="sprite-button", name="ltnm_open_train__"..alert_data.train.id, style="ltnm_inset_tool_button", sprite="utility/preset",
-                  tooltip={"ltnm-gui.open-train-gui"}},
+                {type="sprite-button",
+                  name="ltnm_open_train__"..alert_data.train.id,
+                  style="ltnm_inset_tool_button",
+                  sprite="utility/preset",
+                  tooltip={"ltnm-gui.open-train-gui"}
+                },
               }},
               {type="frame", style="deep_frame_in_shallow_frame", style_mods={padding=0}, children={
-                {type="sprite-button", name="ltnm_clear_alert__"..alert_id, style="ltnm_inset_tool_button_red", sprite="utility/trash",
-                  tooltip={"ltnm-gui.clear-alert"}}
+                {type="sprite-button",
+                  name="ltnm_clear_alert__"..alert_id,
+                  style="ltnm_inset_tool_button_red",
+                  sprite="utility/trash",
+                  tooltip={"ltnm-gui.clear-alert"}
+                }
               }}
             }}
           })
-          gui.templates.alerts.materials_table(elems.tables_flow, "green", alert_data.shipment or alert_data.planned_shipment, material_translations)
+          gui.templates.alerts.materials_table(
+            elems.tables_flow,
+            "green",
+            alert_data.shipment or alert_data.planned_shipment, material_translations
+          )
           if alert_data.actual_shipment or alert_data.leftovers then
             gui.templates.alerts.materials_table(
               elems.tables_flow,
@@ -146,29 +180,71 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
   end
 end
 
-alerts_tab.base_template = {type="flow", style_mods={horizontal_spacing=12}, elem_mods={visible=false}, save_as="tabbed_pane.contents.alerts", children={
-  -- alerts list
-  {type="frame", style="inside_shallow_frame", direction="vertical", children={
-    {type="frame", style="ltnm_toolbar_frame", children={
-      {type="checkbox", name="ltnm_sort_alerts_time", style="ltnm_sort_checkbox_active", style_mods={left_margin=8, width=64}, state=false,
-        caption={"ltnm-gui.time"}, handlers="alerts.sort_checkbox", save_as="alerts.time_sort_checkbox"},
-      {type="checkbox", name="ltnm_sort_alerts_network_id", style="ltnm_sort_checkbox_inactive", state=true, caption={"ltnm-gui.id"},
-        tooltip={"ltnm-gui.history-network-id-tooltip"}, handlers="alerts.sort_checkbox", save_as="alerts.network_id_sort_checkbox"},
-      {type="checkbox", name="ltnm_sort_alerts_route", style="ltnm_sort_checkbox_inactive", state=true, caption={"ltnm-gui.route"},
-        handlers="alerts.sort_checkbox", save_as="alerts.route_sort_checkbox"},
-      {template="pushers.horizontal"},
-      {type="checkbox", name="ltnm_sort_alerts_type", style="ltnm_sort_checkbox_inactive", style_mods={width=160}, state=true,
-        caption={"ltnm-gui.alert"}, handlers="alerts.sort_checkbox", save_as="alerts.type_sort_checkbox"},
-      {type="empty-widget", style_mods={width=196, height=15}},
-      {type="sprite-button", style="tool_button_red", sprite="utility/trash", tooltip={"ltnm-gui.clear-alerts"},
-        handlers="alerts.clear_all_alerts_button", save_as="alerts.clear_all_alerts_button"}
-    }},
-    {type="scroll-pane", style="ltnm_blank_scroll_pane", style_mods={vertically_stretchable=true, horizontally_stretchable=true},
-      vertical_scroll_policy="always", children={
-        {type="table", style="ltnm_rows_table", column_count=6, save_as="alerts.table"}
+alerts_tab.base_template = (
+  {type="flow",
+    style_mods={horizontal_spacing=12},
+    elem_mods={visible=false},
+    save_as="tabbed_pane.contents.alerts",
+    children={
+      -- alerts list
+      {type="frame", style="inside_shallow_frame", direction="vertical", children={
+        {type="frame", style="ltnm_toolbar_frame", children={
+          {type="checkbox",
+            name="ltnm_sort_alerts_time",
+            style="ltnm_sort_checkbox_active",
+            style_mods={left_margin=8, width=64},
+            state=false,
+            caption={"ltnm-gui.time"},
+            handlers="alerts.sort_checkbox",
+            save_as="alerts.time_sort_checkbox"
+          },
+          {type="checkbox",
+            name="ltnm_sort_alerts_network_id",
+            style="ltnm_sort_checkbox_inactive",
+            state=true,
+            caption={"ltnm-gui.id"},
+            tooltip={"ltnm-gui.history-network-id-tooltip"},
+            handlers="alerts.sort_checkbox",
+            save_as="alerts.network_id_sort_checkbox"
+          },
+          {type="checkbox",
+            name="ltnm_sort_alerts_route",
+            style="ltnm_sort_checkbox_inactive",
+            state=true,
+            caption={"ltnm-gui.route"},
+            handlers="alerts.sort_checkbox",
+            save_as="alerts.route_sort_checkbox"
+          },
+          {template="pushers.horizontal"},
+          {type="checkbox",
+            name="ltnm_sort_alerts_type",
+            style="ltnm_sort_checkbox_inactive",
+            style_mods={width=160},
+            state=true,
+            caption={"ltnm-gui.alert"},
+            handlers="alerts.sort_checkbox",
+            save_as="alerts.type_sort_checkbox"
+          },
+          {type="empty-widget", style_mods={width=196, height=15}},
+          {type="sprite-button",
+            style="tool_button_red",
+            sprite="utility/trash",
+            tooltip={"ltnm-gui.clear-alerts"},
+            handlers="alerts.clear_all_alerts_button",
+            save_as="alerts.clear_all_alerts_button"
+          }
+        }},
+        {type="scroll-pane",
+          style="ltnm_blank_scroll_pane",
+          style_mods={vertically_stretchable=true, horizontally_stretchable=true},
+          vertical_scroll_policy="always",
+          children={
+            {type="table", style="ltnm_rows_table", column_count=6, save_as="alerts.table"}
+          }
+        }
       }
     }
   }}
-}}
+)
 
 return alerts_tab

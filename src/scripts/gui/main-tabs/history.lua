@@ -90,20 +90,41 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
         local entry = history[sorted_history[i]]
 
         -- check search criteria
-        if string.find(string.lower(entry.from.." -> "..entry.to), query) and bit32.btest(entry.network_id, network_id_query) then
+        if
+          string.find(string.lower(entry.from.." -> "..entry.to), query)
+          and bit32.btest(entry.network_id, network_id_query)
+        then
           local table_add = gui.build(history_table, {
             {type="label", style="bold_label", style_mods={width=140}, caption=entry.depot},
-            {type="flow", style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1}, direction="vertical", children={
-              {type="label", name="ltnm_view_station__"..entry.from_id, style="ltnm_hoverable_bold_label", caption=entry.from,
-                tooltip={"ltnm-gui.view-station-on-map"}},
-              {type="flow", children={
-                {type="label", style="caption_label", caption="->"},
-                {type="label", name="ltnm_view_station__"..entry.to_id, style="ltnm_hoverable_bold_label", caption=entry.to,
-                  tooltip={"ltnm-gui.view-station-on-map"}}
-              }}
-            }},
-            {type="label", style_mods={right_margin=8, width=66, horizontal_align="right"}, caption=util.ticks_to_time(entry.runtime)},
-            {type="label", style_mods={right_margin=8, width=64, horizontal_align="right"}, caption=util.ticks_to_time(entry.finished)},
+            {type="flow",
+              style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1},
+              direction="vertical",
+              children={
+                {type="label",
+                  name="ltnm_view_station__"..entry.from_id,
+                  style="ltnm_hoverable_bold_label",
+                  caption=entry.from,
+                  tooltip={"ltnm-gui.view-station-on-map"}
+                },
+                {type="flow", children={
+                  {type="label", style="caption_label", caption="->"},
+                  {type="label",
+                    name="ltnm_view_station__"..entry.to_id,
+                    style="ltnm_hoverable_bold_label",
+                    caption=entry.to,
+                    tooltip={"ltnm-gui.view-station-on-map"}
+                  }
+                }}
+              }
+            },
+            {type="label",
+              style_mods={right_margin=8, width=66, horizontal_align="right"},
+              caption=util.ticks_to_time(entry.runtime)
+            },
+            {type="label",
+              style_mods={right_margin=8, width=64, horizontal_align="right"},
+              caption=util.ticks_to_time(entry.finished)
+            },
             {type="frame", style="deep_frame_in_shallow_frame", children={
               {type="scroll-pane", style="ltnm_train_slot_table_scroll_pane", children={
                 {type="table", style="ltnm_small_slot_table", column_count=4, save_as="table"}
@@ -113,8 +134,14 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
           local mi = 0
           for name, count in pairs(entry.actual_shipment or entry.shipment) do
             mi = mi + 1
-            table_add{type="sprite-button", name="ltnm_view_material__"..mi, style="ltnm_small_slot_button_default", sprite=string.gsub(name, ",", "/"),
-              number=count, tooltip=(material_translations[name] or name).."\n"..util.comma_value(count)}
+            table_add{
+              type = "sprite-button",
+              name = "ltnm_view_material__"..mi,
+              style = "ltnm_small_slot_button_default",
+              sprite = string.gsub(name, ",", "/"),
+              number = count,
+              tooltip = (material_translations[name] or name).."\n"..util.comma_value(count)
+            }
           end
         end
       end
@@ -124,37 +151,94 @@ function history_tab.update(player, player_table, state_changes, gui_data, data,
   end
 end
 
-history_tab.base_template = {type="frame", style="inside_shallow_frame", direction="vertical", elem_mods={visible=false}, save_as="tabbed_pane.contents.history",
-  children={
-    -- toolbar
-    {type="frame", style="ltnm_toolbar_frame", children={
-      {type="checkbox", name="ltnm_sort_history_depot", style="ltnm_sort_checkbox_inactive", state=true, style_mods={width=140, left_margin=8},
-        caption={"ltnm-gui.depot"}, handlers="history.sort_checkbox", save_as="history.depot_sort_checkbox"},
-      {type="checkbox", name="ltnm_sort_history_route", style="ltnm_sort_checkbox_inactive", state=true, caption={"ltnm-gui.route"},
-        handlers="history.sort_checkbox", save_as="history.route_sort_checkbox"},
-      {template="pushers.horizontal"},
-      {type="checkbox", name="ltnm_sort_history_runtime", style="ltnm_sort_checkbox_inactive", style_mods={right_margin=8}, state=true,
-        caption={"ltnm-gui.runtime"}, handlers="history.sort_checkbox", save_as="history.runtime_sort_checkbox"},
-      {type="checkbox", name="ltnm_sort_history_finished", style="ltnm_sort_checkbox_active", style_mods={right_margin=8}, state=false,
-        caption={"ltnm-gui.finished"}, handlers="history.sort_checkbox", save_as="history.finished_sort_checkbox"},
-      {type="label", style="caption_label", style_mods={width=124}, caption={"ltnm-gui.shipment"}},
-      {type="sprite-button", style="tool_button_red", sprite="utility/trash", tooltip={"ltnm-gui.clear-history"},
-        handlers="history.delete_button", save_as="history.delete_button"}
-    }},
-    -- listing
-    {type="scroll-pane", style="ltnm_blank_scroll_pane", style_mods={horizontally_stretchable=true, vertically_stretchable=true},
-      vertical_scroll_policy="always", save_as="history.pane", children={
-        {type="table", style="ltnm_rows_table", style_mods={vertically_stretchable=true}, column_count=5, save_as="history.table"}
+history_tab.base_template = (
+  {type="frame",
+    style="inside_shallow_frame",
+    direction="vertical",
+    elem_mods={visible=false},
+    save_as="tabbed_pane.contents.history",
+    children={
+      -- toolbar
+      {type="frame", style="ltnm_toolbar_frame", children={
+        {type="checkbox",
+          name="ltnm_sort_history_depot",
+          style="ltnm_sort_checkbox_inactive",
+          style_mods={width=140, left_margin=8},
+          state=true,
+          caption={"ltnm-gui.depot"},
+          handlers="history.sort_checkbox",
+          save_as="history.depot_sort_checkbox"
+        },
+        {type="checkbox",
+          name="ltnm_sort_history_route",
+          style="ltnm_sort_checkbox_inactive",
+          state=true,
+          caption={"ltnm-gui.route"},
+          handlers="history.sort_checkbox",
+          save_as="history.route_sort_checkbox"
+        },
+        {template="pushers.horizontal"},
+        {type="checkbox",
+          name="ltnm_sort_history_runtime",
+          style="ltnm_sort_checkbox_inactive",
+          style_mods={right_margin=8},
+          state=true,
+          caption={"ltnm-gui.runtime"},
+          handlers="history.sort_checkbox",
+          save_as="history.runtime_sort_checkbox"
+        },
+        {type="checkbox",
+          name="ltnm_sort_history_finished",
+          style="ltnm_sort_checkbox_active",
+          style_mods={right_margin=8},
+          state=false,
+          caption={"ltnm-gui.finished"},
+          handlers="history.sort_checkbox",
+          save_as="history.finished_sort_checkbox"
+        },
+        {type="label", style="caption_label", style_mods={width=124}, caption={"ltnm-gui.shipment"}},
+        {type="sprite-button",
+          style="tool_button_red",
+          sprite="utility/trash",
+          tooltip={"ltnm-gui.clear-history"},
+          handlers="history.delete_button",
+          save_as="history.delete_button"
+        }
+      }},
+      -- listing
+      {type="scroll-pane",
+        style="ltnm_blank_scroll_pane",
+        style_mods={horizontally_stretchable=true, vertically_stretchable=true},
+        vertical_scroll_policy="always",
+        save_as="history.pane",
+        children={
+          {type="table",
+            style="ltnm_rows_table",
+            style_mods={vertically_stretchable=true},
+            column_count=5,
+            save_as="history.table"
+          }
+        }
       }
     }
   }
-}
+)
 
 history_tab.search_template = {
-  {type="textfield", lose_focus_on_confirm=true, handlers="history.search.name_textfield", save_as="history.search.name_textfield"},
+  {type="textfield",
+    lose_focus_on_confirm=true,
+    handlers="history.search.name_textfield",
+    save_as="history.search.name_textfield"
+  },
   {type="label", style="caption_label", style_mods={left_margin=12}, caption={"ltnm-gui.network-id"}},
-  {type="textfield", style_mods={width=80}, lose_focus_on_confirm=true, numeric=true, allow_negative=true, handlers="history.search.network_id_textfield",
-    save_as="history.search.network_id_textfield"}
+  {type="textfield",
+    style_mods={width=80},
+    lose_focus_on_confirm=true,
+    numeric=true,
+    allow_negative=true,
+    handlers="history.search.network_id_textfield",
+    save_as="history.search.network_id_textfield"
+  }
 }
 
 function history_tab.set_search_initial_state(player, player_table, gui_data)
