@@ -12,7 +12,7 @@ gui.add_handlers{
     depot_button = {
       on_gui_click = function(e)
         local _,_,name = string_find(e.element.name, "^ltnm_depot_button_(.*)$")
-        depots_tab.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot=name})
+        depots_tab.update(game.get_player(e.player_index), global.players[e.player_index], {selected_depot = name})
       end
     },
     sort_checkbox = {
@@ -32,7 +32,7 @@ gui.add_handlers{
           gui_data["sort_"..clicked_type] = e.element.state
         end
         -- update GUI contents
-        depots_tab.update(game.get_player(e.player_index), player_table, {depot_trains=true})
+        depots_tab.update(game.get_player(e.player_index), player_table, {depot_trains = true})
       end
     }
   }
@@ -60,42 +60,48 @@ function depots_tab.update(player, player_table, state_changes, gui_data, data, 
     for name, t in pairs(data.depots) do
       button_index = button_index + 1
       local elems = gui.build(buttons_pane, {
-        {type="button",
-          name="ltnm_depot_button_"..name,
-          style=button_style,
-          handlers="depots.depot_button",
-          save_as="button",
-          children={
-            {type="flow", ignored_by_interaction=true, direction="vertical", children={
-              {type="label",
-                style="ltnm_depot_button_caption_label",
-                caption=name,
-                elem_mods={enabled=false},
-                save_as="labels.name"
+        {
+          type = "button",
+          name = "ltnm_depot_button_"..name,
+          style = button_style,
+          handlers = "depots.depot_button",
+          save_as = "button",
+          children = {
+            {type = "flow", ignored_by_interaction = true, direction = "vertical", children = {
+              {
+                type = "label",
+                style = "ltnm_depot_button_caption_label",
+                caption = name,
+                elem_mods = {enabled = false},
+                save_as = "labels.name"
               },
-              {type="flow", direction="horizontal", children={
-                {type="label",
-                  style="ltnm_depot_button_bold_label",
-                  caption={"", {"ltnm-gui.trains"}, ":"},
-                  elem_mods={enabled=false},
-                  save_as="labels.trains"
+              {type = "flow", direction = "horizontal", children = {
+                {
+                  type = "label",
+                  style = "ltnm_depot_button_bold_label",
+                  caption = {"", {"ltnm-gui.trains"}, ":"},
+                  elem_mods = {enabled = false},
+                  save_as = "labels.trains"
                 },
-                {type="label",
-                  style="ltnm_depot_button_label",
-                  caption=#t.available_trains.."/"..t.num_trains,
-                  elem_mods={enabled=false},
-                  save_as="labels.train_count"
+                {
+                  type = "label",
+                  style = "ltnm_depot_button_label",
+                  caption = #t.available_trains.."/"..t.num_trains,
+                  elem_mods = {enabled = false},
+                  save_as = "labels.train_count"
                 }
               }},
-              {type="flow",
-                style_mods={vertical_align="center", horizontal_spacing=6},
-                save_as="status_flow",
-                children={
-                  {type="label",
-                    style="ltnm_depot_button_bold_label",
-                    caption={"", {"ltnm-gui.status"}, ":"},
-                    elem_mods={enabled=false},
-                    save_as="labels.status"
+              {
+                type = "flow",
+                style_mods = {vertical_align = "center", horizontal_spacing = 6},
+                save_as = "status_flow",
+                children = {
+                  {
+                    type = "label",
+                    style = "ltnm_depot_button_bold_label",
+                    caption = {"", {"ltnm-gui.status"}, ":"},
+                    elem_mods = {enabled = false},
+                    save_as = "labels.status"
                   }
                 }
               }
@@ -191,27 +197,30 @@ function depots_tab.update(player, player_table, state_changes, gui_data, data, 
       local train = data.trains[train_id]
       -- build GUI structure
       local elems = gui.build(trains_table, {
-        {type="label",
-          name="ltnm_open_train__"..train_id,
-          style="ltnm_hoverable_bold_label",
-          style_mods={top_margin=-2, width=120},
-          caption=train.composition,
-          tooltip={
+        {
+          type = "label",
+          name = "ltnm_open_train__"..train_id,
+          style = "ltnm_hoverable_bold_label",
+          style_mods = {top_margin = -2, width = 120},
+          caption = train.composition,
+          tooltip = {
             "",
             string_len(train.composition) > 15 and train.composition.."\n" or "",
             {"ltnm-gui.open-train-gui"}
           }
         },
-        {type="flow",
-          style_mods={horizontally_stretchable=true, vertical_spacing=-1, top_padding=-2, bottom_padding=-1},
-          direction="vertical",
-          save_as="status_flow"
+        {
+          type = "flow",
+          style_mods = {horizontally_stretchable = true, vertical_spacing = -1, top_padding = -2, bottom_padding = -1},
+          direction = "vertical",
+          save_as = "status_flow"
         },
-        {type="frame",
-          style="deep_frame_in_shallow_frame",
-          children={
-            {type="scroll-pane", style="ltnm_train_slot_table_scroll_pane", children={
-              {type="table", style="ltnm_small_slot_table", column_count=4, save_as="contents_table"}
+        {
+          type = "frame",
+          style = "deep_frame_in_shallow_frame",
+          children = {
+            {type = "scroll-pane", style = "ltnm_train_slot_table_scroll_pane", children = {
+              {type = "table", style = "ltnm_small_slot_table", column_count = 4, save_as = "contents_table"}
             }}
           }
         }
@@ -219,7 +228,7 @@ function depots_tab.update(player, player_table, state_changes, gui_data, data, 
       -- train status
       local status_flow_add = elems.status_flow.add
       for _, t in ipairs(train.status[player.index].data) do
-        status_flow_add{type="label", style=t[1], caption=t[2]}
+        status_flow_add{type = "label", style = t[1], caption = t[2]}
       end
       -- contents table
       if train.shipment then
@@ -241,56 +250,58 @@ function depots_tab.update(player, player_table, state_changes, gui_data, data, 
   end
 end
 
-depots_tab.base_template = (
-  {type="flow",
-    style_mods={horizontal_spacing=12},
-    elem_mods={visible=false},
-    save_as="tabbed_pane.contents.depots",
-    children={
-      -- buttons
-      {type="frame", style="inside_deep_frame", children={
-        {type="scroll-pane", style="ltnm_depots_scroll_pane", save_as="depots.buttons_scroll_pane"}
+depots_tab.base_template = {
+  type = "flow",
+  style_mods = {horizontal_spacing = 12},
+  elem_mods = {visible = false},
+  save_as = "tabbed_pane.contents.depots",
+  children = {
+    -- buttons
+    {type = "frame", style = "inside_deep_frame", children = {
+      {type = "scroll-pane", style = "ltnm_depots_scroll_pane", save_as = "depots.buttons_scroll_pane"}
+    }},
+    -- trains
+    {type = "frame", style = "inside_shallow_frame", direction = "vertical", children = {
+      -- toolbar
+      {type = "frame", style = "ltnm_toolbar_frame", children = {
+        {
+          type = "checkbox",
+          name = "ltnm_sort_train_composition",
+          style = "ltnm_sort_checkbox_active",
+          style_mods = {left_margin = 8, width = 120},
+          caption = {"ltnm-gui.composition"},
+          tooltip = {"ltnm-gui.train-composition-tooltip"},
+          state = true,
+          handlers = "depots.sort_checkbox",
+          save_as = "depots.composition_sort_checkbox"
+        },
+        {
+          type = "checkbox",
+          name = "ltnm_sort_train_status",
+          style = "ltnm_sort_checkbox_inactive",
+          caption = {"ltnm-gui.train-status"},
+          tooltip = {"ltnm-gui.train-status-tooltip"},
+          state = true,
+          handlers = "depots.sort_checkbox",
+          save_as = "depots.status_sort_checkbox"
+        },
+        {template = "pushers.horizontal"},
+        {type = "label", style = "caption_label", style_mods = {width = 144}, caption = {"ltnm-gui.shipment"}},
+        {type = "empty-widget", style_mods = {width = 6}}
       }},
       -- trains
-      {type="frame", style="inside_shallow_frame", direction="vertical", children={
-        -- toolbar
-        {type="frame", style="ltnm_toolbar_frame", children={
-          {type="checkbox",
-            name="ltnm_sort_train_composition",
-            style="ltnm_sort_checkbox_active",
-            style_mods={left_margin=8, width=120},
-            caption={"ltnm-gui.composition"},
-            tooltip={"ltnm-gui.train-composition-tooltip"},
-            state=true,
-            handlers="depots.sort_checkbox",
-            save_as="depots.composition_sort_checkbox"
-          },
-          {type="checkbox",
-            name="ltnm_sort_train_status",
-            style="ltnm_sort_checkbox_inactive",
-            caption={"ltnm-gui.train-status"},
-            tooltip={"ltnm-gui.train-status-tooltip"},
-            state=true,
-            handlers="depots.sort_checkbox",
-            save_as="depots.status_sort_checkbox"
-          },
-          {template="pushers.horizontal"},
-          {type="label", style="caption_label", style_mods={width=144}, caption={"ltnm-gui.shipment"}},
-          {type="empty-widget", style_mods={width=6}}
-        }},
-        -- trains
-        {type="scroll-pane",
-          style="ltnm_blank_scroll_pane",
-          style_mods={vertically_stretchable=true, horizontally_stretchable=true},
-          vertical_scroll_policy="always",
-          save_as="depots.trains_scrollpane",
-          children={
-            {type="table", style="ltnm_depot_trains_table", column_count=3, save_as="depots.trains_table"}
-          }
+      {
+        type = "scroll-pane",
+        style = "ltnm_blank_scroll_pane",
+        style_mods = {vertically_stretchable = true, horizontally_stretchable = true},
+        vertical_scroll_policy = "always",
+        save_as = "depots.trains_scrollpane",
+        children = {
+          {type = "table", style = "ltnm_depot_trains_table", column_count = 3, save_as = "depots.trains_table"}
         }
-      }}
-    }
+      }
+    }}
   }
-)
+}
 
 return depots_tab

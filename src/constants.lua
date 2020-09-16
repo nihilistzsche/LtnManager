@@ -1,7 +1,7 @@
 local constants = {}
 
 -- colors
-constants.station_indicator_color = {r=1, g=0.2, b=0.2, a=0.75}
+constants.station_indicator_color = {r = 1, g = 0.2, b = 0.2, a = 0.75}
 
 -- gui
 constants.action_buttons_width = 96

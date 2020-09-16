@@ -15,38 +15,40 @@ local string_gsub = string.gsub
 
 gui.add_templates{
   pushers = {
-    horizontal = {type="empty-widget", style_mods={horizontally_stretchable=true}},
-    vertical = {type="empty-widget", style_mods={vertically_stretchable=true}},
-    both = {type="empty-widget", style_mods={horizontally_stretchable=true, vertically_stretchable=true}}
+    horizontal = {type = "empty-widget", style_mods = {horizontally_stretchable = true}},
+    vertical = {type = "empty-widget", style_mods = {vertically_stretchable = true}},
+    both = {type = "empty-widget", style_mods = {horizontally_stretchable = true, vertically_stretchable = true}}
   },
-  frame_action_button = {type="sprite-button", style="frame_action_button", mouse_button_filter={"left"}},
+  frame_action_button = {type = "sprite-button", style = "frame_action_button", mouse_button_filter = {"left"}},
   mock_frame_tab = (
-    {type="button",
-      style="ltnm_mock_frame_tab",
-      mouse_button_filter={"left"},
-      handlers="main.titlebar.frame_tab"
+    {
+      type = "button",
+      style = "ltnm_mock_frame_tab",
+      mouse_button_filter = {"left"},
+      handlers = "main.titlebar.frame_tab"
     }
   ),
   status_indicator = function(name, color, value)
-    return {type="flow", style_mods={vertical_align="center"}, children={
-      {type="sprite", style="ltnm_status_icon", sprite="ltnm_indicator_"..color, save_as=name.."_circle"},
-      {type="label", style="ltnm_depot_button_label", caption=value, save_as=name.."_label"}
+    return {type = "flow", style_mods = {vertical_align = "center"}, children = {
+      {type = "sprite", style = "ltnm_status_icon", sprite = "ltnm_indicator_"..color, save_as = name.."_circle"},
+      {type = "label", style = "ltnm_depot_button_label", caption = value, save_as = name.."_label"}
     }}
   end,
   search_contents = function(name)
     return (
-      {type="flow",
-        name=name.."_contents",
-        style="ltnm_search_content_flow",
-        elem_mods={visible=false},
-        children=tabs[name].search_template
+      {
+        type = "flow",
+        name = name.."_contents",
+        style = "ltnm_search_content_flow",
+        elem_mods = {visible = false},
+        children = tabs[name].search_template
       }
     )
   end
 }
 
 gui.add_handlers{
-  main={
+  main = {
     window = {
       on_gui_closed = function(e)
         local player_table = global.players[e.player_index]
@@ -198,71 +200,77 @@ gui.add_handlers{
 function main_gui.create(player, player_table)
   -- create base GUI structure
   local gui_data = gui.build(player.gui.screen, {
-    {type="frame",
-      style="invisible_frame",
-      direction="vertical",
-      handlers="main.window",
-      save_as="window.frame",
-      children={
-        {type="flow", children={
-          {template="pushers.horizontal"},
-          {type="frame",
-            style="ltnm_search_frame",
-            elem_mods={visible=false},
-            handlers="search.window",
-            save_as="search.window",
-            children={
+    {
+      type = "frame",
+      style = "invisible_frame",
+      direction = "vertical",
+      handlers = "main.window",
+      save_as = "window.frame",
+      children = {
+        {type = "flow", children = {
+          {template = "pushers.horizontal"},
+          {
+            type = "frame",
+            style = "ltnm_search_frame",
+            elem_mods = {visible = false},
+            handlers = "search.window",
+            save_as = "search.window",
+            children = {
               gui.templates.search_contents("stations"),
               gui.templates.search_contents("inventory"),
               gui.templates.search_contents("history")
             }
           },
         }},
-        {type="flow", style_mods={horizontal_spacing=0, padding=0}, direction="horizontal", children={
+        {type = "flow", style_mods = {horizontal_spacing = 0, padding = 0}, direction = "horizontal", children = {
           -- TODO left side
-          {type="frame", style="ltnm_titlebar_tab_filler_frame", children={
-            {template="mock_frame_tab", caption={"ltnm-gui.depots"}, save_as="tabbed_pane.tabs.depots"},
-            {template="mock_frame_tab", caption={"ltnm-gui.stations"}, save_as="tabbed_pane.tabs.stations"},
-            {template="mock_frame_tab", caption={"ltnm-gui.inventory"}, save_as="tabbed_pane.tabs.inventory"},
-            {template="mock_frame_tab", caption={"ltnm-gui.history"}, save_as="tabbed_pane.tabs.history"},
-            {template="mock_frame_tab", caption={"ltnm-gui.alerts"}, save_as="tabbed_pane.tabs.alerts"},
+          {type = "frame", style = "ltnm_titlebar_tab_filler_frame", children = {
+            {template = "mock_frame_tab", caption = {"ltnm-gui.depots"}, save_as = "tabbed_pane.tabs.depots"},
+            {template = "mock_frame_tab", caption = {"ltnm-gui.stations"}, save_as = "tabbed_pane.tabs.stations"},
+            {template = "mock_frame_tab", caption = {"ltnm-gui.inventory"}, save_as = "tabbed_pane.tabs.inventory"},
+            {template = "mock_frame_tab", caption = {"ltnm-gui.history"}, save_as = "tabbed_pane.tabs.history"},
+            {template = "mock_frame_tab", caption = {"ltnm-gui.alerts"}, save_as = "tabbed_pane.tabs.alerts"},
           }},
-          {type="frame", style="ltnm_titlebar_right_frame", children={
-            {type="empty-widget", style="ltnm_titlebar_drag_handle", save_as="titlebar.drag_handle"},
-            {template="frame_action_button",
-              sprite="utility/search_white",
-              hovered_sprite="utility/search_black",
-              clicked_sprite="utility/search_black",
-              tooltip={"ltnm-gui.search-tooltip"},
-              handlers="main.titlebar.search_button",
-              save_as="titlebar.search_button"
+          {type = "frame", style = "ltnm_titlebar_right_frame", children = {
+            {type = "empty-widget", style = "ltnm_titlebar_drag_handle", save_as = "titlebar.drag_handle"},
+            {
+              template = "frame_action_button",
+              sprite = "utility/search_white",
+              hovered_sprite = "utility/search_black",
+              clicked_sprite = "utility/search_black",
+              tooltip = {"ltnm-gui.search-tooltip"},
+              handlers = "main.titlebar.search_button",
+              save_as = "titlebar.search_button"
             },
-            {template="frame_action_button",
-              sprite="ltnm_pin_white",
-              hovered_sprite="ltnm_pin_black",
-              clicked_sprite="ltnm_pin_black",
-              tooltip={"ltnm-gui.keep-open"},
-              handlers="main.titlebar.pin_button",
-              save_as="titlebar.pin_button"
+            {
+              template = "frame_action_button",
+              sprite = "ltnm_pin_white",
+              hovered_sprite = "ltnm_pin_black",
+              clicked_sprite = "ltnm_pin_black",
+              tooltip = {"ltnm-gui.keep-open"},
+              handlers = "main.titlebar.pin_button",
+              save_as = "titlebar.pin_button"
             },
-            {template="frame_action_button",
-              sprite="ltnm_refresh_white",
-              hovered_sprite="ltnm_refresh_black",
-              clicked_sprite="ltnm_refresh_black",
-              tooltip={"ltnm-gui.refresh-button-tooltip"},
-              handlers="main.titlebar.refresh_button",
-              save_as="titlebar.refresh_button"
+            {
+              template = "frame_action_button",
+              sprite = "ltnm_refresh_white",
+              hovered_sprite = "ltnm_refresh_black",
+              clicked_sprite = "ltnm_refresh_black",
+              tooltip = {"ltnm-gui.refresh-button-tooltip"},
+              handlers = "main.titlebar.refresh_button",
+              save_as = "titlebar.refresh_button"
             },
-            {template="frame_action_button",
-              sprite="utility/close_white",
-              hovered_sprite="utility/close_black",
-              clicked_sprite="utility/close_black",
-              handlers="main.titlebar.close_button",
-              save_as="titlebar.close_button"
+            {
+              template = "frame_action_button",
+              sprite = "utility/close_white",
+              hovered_sprite = "utility/close_black",
+              clicked_sprite = "utility/close_black",
+              handlers = "main.titlebar.close_button",
+              save_as = "titlebar.close_button"
             }
           }}
         }},
-        {type="frame", style="ltnm_main_content_frame", children={
+        {type = "frame", style = "ltnm_main_content_frame", children = {
           tabs.depots.base_template,
           tabs.stations.base_template,
           tabs.inventory.base_template,
@@ -333,7 +341,7 @@ function main_gui.create(player, player_table)
 
   player_table.gui.main = gui_data
 
-  main_gui.update(player, player_table, {active_tab="depots"})
+  main_gui.update(player, player_table, {active_tab = "depots"})
 end
 
 function main_gui.destroy(player, player_table)
@@ -391,7 +399,7 @@ end
 function main_gui.update_active_tab(player, player_table, name)
   local changes
   if name then
-    changes = {active_tab=name}
+    changes = {active_tab = name}
     -- close search
     if player_table.flags.search_open then
       main_gui.close_search(player, player_table, player_table.gui.main, true)
@@ -475,7 +483,7 @@ function main_gui.open_search(player, player_table, gui_data, skip_update)
   -- set frame location offset
   local main_window = gui_data.window.frame
   local location = main_window.location
-  main_window.location = {x=location.x, y=(location.y - constants.search_frame_height)}
+  main_window.location = {x = location.x, y = (location.y - constants.search_frame_height)}
 
   -- actually show the frame
   local search_window = gui_data.search.window
@@ -505,7 +513,7 @@ function main_gui.close_search(player, player_table, gui_data, skip_update)
     -- set frame location offset
     local main_window = gui_data.window.frame
     local location = main_window.location
-    main_window.location = {x=location.x, y=(location.y + constants.search_frame_height)}
+    main_window.location = {x = location.x, y = (location.y + constants.search_frame_height)}
 
     if not player_table.settings.keep_gui_open then
       player_table.flags.toggling_search = true

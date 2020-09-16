@@ -58,16 +58,16 @@ styles.ltnm_mock_frame_tab = {
   default_graphical_set = {
     base = ltnm_tab_base{102, 0},
     shadow = tab_glow(default_shadow_color, 0.5),
-    glow = {bottom=mock_frame_shadow}
+    glow = {bottom = mock_frame_shadow}
   },
   hovered_graphical_set = {
     base = ltnm_tab_base{153, 0},
     glow = {
-      left_top = {position={216, 0}, size=16, tint=default_glow_color, scale=0.5},
-      top = {position={208, 128}, size={1, 8}, tint=default_glow_color, scale=0.5},
-      right_top = {position={232, 0}, size=16, tint=default_glow_color, scale=0.5},
-      left = {position={200, 136}, size={8, 1}, tint=default_glow_color, scale=0.5},
-      right = {position={209, 136}, size={8, 1}, tint=default_glow_color, scale=0.5},
+      left_top = {position = {216, 0}, size = 16, tint = default_glow_color, scale = 0.5},
+      top = {position = {208, 128}, size = {1, 8}, tint = default_glow_color, scale = 0.5},
+      right_top = {position = {232, 0}, size = 16, tint = default_glow_color, scale = 0.5},
+      left = {position = {200, 136}, size = {8, 1}, tint = default_glow_color, scale = 0.5},
+      right = {position = {209, 136}, size = {8, 1}, tint = default_glow_color, scale = 0.5},
       left_bottom = mock_frame_shadow,
       bottom = mock_frame_shadow,
       right_bottom = mock_frame_shadow,
@@ -81,7 +81,7 @@ styles.ltnm_mock_frame_tab = {
   clicked_vertical_offset = 0,
   clicked_graphical_set = {
     base = ltnm_tab_base{153, 0},
-    glow = {bottom=mock_frame_shadow}
+    glow = {bottom = mock_frame_shadow}
   },
   disabled_font_color = heading_font_color,
   disabled_graphical_set = {
@@ -269,7 +269,7 @@ styles.ltnm_search_content_flow = {
 styles.ltnm_alert_popup_frame = {
   type = "frame_style",
   graphical_set = {
-    base = {position={403, 17}, corner_size=8},
+    base = {position = {403, 17}, corner_size = 8},
     shadow = default_shadow
   }
 }
@@ -280,8 +280,8 @@ styles.ltnm_titlebar_tab_filler_frame = {
   height = 36,
   graphical_set = {
     base = {
-      bottom = {position={17, 0}, size={1, 8}},
-      center = {filename=data_util.empty_image, size=1}
+      bottom = {position = {17, 0}, size = {1, 8}},
+      center = {filename = data_util.empty_image, size = 1}
     }
   },
   horizontal_flow_style = {
@@ -296,28 +296,28 @@ styles.ltnm_titlebar_right_frame = {
   height = 36,
   graphical_set = {
     base = {
-      left_top = {position={0, 0}, size={8, 8}},
-      top = {position={8, 0}, size={1, 8}},
-      right_top = {position={9, 0}, size={8, 8}},
-      right = {position={9, 8}, size={8, 1}},
-      right_bottom = {position={9, 8}, size={8, 1}},
-      bottom = {position={8, 8}, size={1, 1}},
-      left_bottom = {position={26, 9}, size={8, 8}},
-      left = {position={0, 8}, size={8, 1}},
-      center = {position={8, 8}, size={1, 1}}
+      left_top = {position = {0, 0}, size = {8, 8}},
+      top = {position = {8, 0}, size = {1, 8}},
+      right_top = {position = {9, 0}, size = {8, 8}},
+      right = {position = {9, 8}, size = {8, 1}},
+      right_bottom = {position = {9, 8}, size = {8, 1}},
+      bottom = {position = {8, 8}, size = {1, 1}},
+      left_bottom = {position = {26, 9}, size = {8, 8}},
+      left = {position = {0, 8}, size = {8, 1}},
+      center = {position = {8, 8}, size = {1, 1}}
     },
     glow = {
-      left = {position={200, 136}, size={8, 1}, scale=0.5, tint=default_shadow_color},
-      left_bottom = {filename=data_util.empty_image, size=8},
-      bottom = {filename=data_util.empty_image, size={1, 8}},
+      left = {position = {200, 136}, size = {8, 1}, scale = 0.5, tint = default_shadow_color},
+      left_bottom = {filename = data_util.empty_image, size = 8},
+      bottom = {filename = data_util.empty_image, size = {1, 8}},
       draw_type = "outer"
     },
     shadow = {
-      top = {position={208, 128}, size={1, 8}},
-      left_top = {position={200, 128}, size={8, 8}},
-      right_top = {position={209, 128}, size={8, 8}},
-      right = {position={209, 136}, size={8, 1}},
-      center = {position={208, 136}, size={1, 1}},
+      top = {position = {208, 128}, size = {1, 8}},
+      left_top = {position = {200, 128}, size = {8, 8}},
+      right_top = {position = {209, 128}, size = {8, 8}},
+      right = {position = {209, 136}, size = {8, 1}},
+      center = {position = {208, 136}, size = {1, 1}},
       tint = default_shadow_color,
       scale = 0.5,
       draw_type = "outer"
@@ -366,7 +366,7 @@ styles.ltnm_shallow_frame_in_shallow_frame = {
       position = {85, 0},
       corner_size = 8,
       draw_type = "outer",
-      center = {position={76, 8}, size=1}
+      center = {position = {76, 8}, size = 1}
     },
     shadow = default_inner_shadow
   }
@@ -381,7 +381,7 @@ styles.ltnm_deep_frame_in_shallow_frame_no_left = {
       position = {85, 0},
       corner_size = 8,
       draw_type = "outer",
-      center = {position={42, 8}, size=1},
+      center = {position = {42, 8}, size = 1},
       left = {},
       left_top = {},
       left_bottom = {}
@@ -687,7 +687,7 @@ styles.ltnm_depot_trains_table = {
   type = "table_style",
   parent = "ltnm_rows_table",
   column_widths = {
-    {column=1, width=120}
+    {column = 1, width = 120}
   }
 }
 
@@ -695,17 +695,17 @@ styles.ltnm_stations_table = {
   type = "table_style",
   parent = "ltnm_rows_table",
   column_widths = {
-    {column=2, width=34},
-    {column=3, width=180},
-    {column=4, width=144},
-    {column=5, width=144}
+    {column = 2, width = 34},
+    {column = 3, width = 180},
+    {column = 4, width = 144},
+    {column = 5, width = 144}
   },
   column_alignments = {
-    {column=1, alignment="middle-left"},
-    {column=2, alignment="middle-center"},
-    {column=3, alignment="middle-left"},
-    {column=4, alignment="middle-left"},
-    {column=5, alignment="middle-left"}
+    {column = 1, alignment = "middle-left"},
+    {column = 2, alignment = "middle-center"},
+    {column = 3, alignment = "middle-left"},
+    {column = 4, alignment = "middle-left"},
+    {column = 5, alignment = "middle-left"}
   }
 }
 

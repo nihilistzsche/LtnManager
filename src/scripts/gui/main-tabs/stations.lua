@@ -33,7 +33,7 @@ gui.add_handlers{
           local player_table = global.players[e.player_index]
           local search_gui_data = player_table.gui.main.stations.search
           search_gui_data.query = e.text
-          stations_tab.update(game.get_player(e.player_index), player_table, {stations_list=true})
+          stations_tab.update(game.get_player(e.player_index), player_table, {stations_list = true})
         end
       },
       network_id_textfield = {
@@ -42,7 +42,7 @@ gui.add_handlers{
           local search_gui_data = player_table.gui.main.stations.search
           local input = tonumber(e.text) or -1
           search_gui_data.network_id = input
-          stations_tab.update(game.get_player(e.player_index), player_table, {stations_list=true})
+          stations_tab.update(game.get_player(e.player_index), player_table, {stations_list = true})
         end
       }
     },
@@ -63,7 +63,7 @@ gui.add_handlers{
           gui_data["sort_"..clicked_type] = e.element.state
         end
         -- update GUI contents
-        stations_tab.update(game.get_player(e.player_index), player_table, {stations_list=true})
+        stations_tab.update(game.get_player(e.player_index), player_table, {stations_list = true})
       end
     }
   }
@@ -95,7 +95,7 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
       query = string.gsub(query, pattern, replacement)
     end
     local network_id_query = stations_gui_data.search.network_id
-    for i=start,finish,delta do
+    for i = start,finish,delta do
       local station_id = sorted_stations[i]
       local station = stations[station_id]
       local entity = station.entity
@@ -107,40 +107,49 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
         then
           -- build GUI structure
           local elems = gui.build(stations_table, {
-            {type="label",
-              name="ltnm_view_station__"..sorted_stations[i],
-              style="ltnm_hoverable_bold_label",
-              style_mods={horizontally_stretchable=true},
-              caption=station.entity.backer_name,
-              tooltip={"ltnm-gui.view-station-on-map"}
+            {
+              type = "label",
+              name = "ltnm_view_station__"..sorted_stations[i],
+              style = "ltnm_hoverable_bold_label",
+              style_mods = {horizontally_stretchable = true},
+              caption = station.entity.backer_name,
+              tooltip = {"ltnm-gui.view-station-on-map"}
             },
             gui.templates.status_indicator("indicator", station.status.name, station.status.count),
             -- items
-            {type="frame", style="deep_frame_in_shallow_frame", save_as="provided_requested_frame", children={
-              {type="scroll-pane",
-                style="ltnm_station_provided_requested_slot_table_scroll_pane",
-                save_as="provided_requested_scroll_pane",
-                children={
-                  {type="table", style="ltnm_small_slot_table", column_count=5, save_as="provided_requested_table"}
+            {type = "frame", style = "deep_frame_in_shallow_frame", save_as = "provided_requested_frame", children = {
+              {
+                type = "scroll-pane",
+                style = "ltnm_station_provided_requested_slot_table_scroll_pane",
+                save_as = "provided_requested_scroll_pane",
+                children = {
+                  {
+                    type = "table",
+                    style = "ltnm_small_slot_table",
+                    column_count = 5,
+                    save_as = "provided_requested_table"
+                  }
                 }
               }
             }},
-            {type="frame", style="deep_frame_in_shallow_frame", save_as="shipments_frame", children={
-              {type="scroll-pane",
-                style="ltnm_station_shipments_slot_table_scroll_pane",
-                save_as="shipments_scroll_pane",
-                children={
-                  {type="table", style="ltnm_small_slot_table", column_count=4, save_as="shipments_table"}
+            {type = "frame", style = "deep_frame_in_shallow_frame", save_as = "shipments_frame", children = {
+              {
+                type = "scroll-pane",
+                style = "ltnm_station_shipments_slot_table_scroll_pane",
+                save_as = "shipments_scroll_pane",
+                children = {
+                  {type = "table", style = "ltnm_small_slot_table", column_count = 4, save_as = "shipments_table"}
                 }
               }
             }},
             -- control signals
-            {type="frame", style="deep_frame_in_shallow_frame", save_as="signals_frame", children={
-              {type="scroll-pane",
-                style="ltnm_station_shipments_slot_table_scroll_pane",
-                save_as="signals_scroll_pane",
-                children={
-                  {type="table", style="ltnm_small_slot_table", column_count=4, save_as="signals_table"}
+            {type = "frame", style = "deep_frame_in_shallow_frame", save_as = "signals_frame", children = {
+              {
+                type = "scroll-pane",
+                style = "ltnm_station_shipments_slot_table_scroll_pane",
+                save_as = "signals_scroll_pane",
+                children = {
+                  {type = "table", style = "ltnm_small_slot_table", column_count = 4, save_as = "signals_table"}
                 }
               }
             }}
@@ -150,7 +159,7 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
           local table_add = elems.provided_requested_table.add
           local provided_requested_rows = 0
           local mi = 0
-          for key, color in pairs{provided="green", requested="red"} do
+          for key, color in pairs{provided = "green", requested = "red"} do
             local materials = station[key]
             if materials then
               for name, count in pairs(materials) do
@@ -176,7 +185,7 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
           if shipments_len > 0 then
             table_add = elems.shipments_table.add
             mi = 0
-            for si=1,#shipments do
+            for si = 1,#shipments do
               local train = trains[shipments[si]]
               -- avoid crashing on the slim chance that a player modified the train and removed its LTN stops
               if train then
@@ -205,7 +214,7 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
           local signals = station.input.get_merged_signals()
           table_add = elems.signals_table.add
           local signals_rows = 0
-          for si=1,#signals do
+          for si = 1,#signals do
             local signal = signals[si]
             local name = signal.signal.name
             if ltn_virtual_signals[name] then
@@ -247,85 +256,97 @@ function stations_tab.update(player, player_table, state_changes, gui_data, data
   end
 end
 
-stations_tab.base_template = (
-  {type="frame", style="inside_shallow_frame", direction="vertical", elem_mods={visible=false},
-    save_as="tabbed_pane.contents.stations", children={
-      -- toolbar
-      {type="frame", style="ltnm_toolbar_frame", children={
-        {type="empty-widget", style_mods={height=28}},
-        {type="checkbox",
-          name="ltnm_sort_station_name",
-          style="ltnm_sort_checkbox_active",
-          style_mods={left_margin=-4},
-          caption={"ltnm-gui.station-name"},
-          state=true,
-          handlers="stations.sort_checkbox",
-          save_as="stations.name_sort_checkbox"
+stations_tab.base_template = {
+  type = "frame",
+  style = "inside_shallow_frame",
+  direction = "vertical",
+  elem_mods = {visible = false},
+  save_as = "tabbed_pane.contents.stations",
+  children = {
+    -- toolbar
+    {type = "frame", style = "ltnm_toolbar_frame", children = {
+      {type = "empty-widget", style_mods = {height = 28}},
+      {
+        type = "checkbox",
+        name = "ltnm_sort_station_name",
+        style = "ltnm_sort_checkbox_active",
+        style_mods = {left_margin = -4},
+        caption = {"ltnm-gui.station-name"},
+        state = true,
+        handlers = "stations.sort_checkbox",
+        save_as = "stations.name_sort_checkbox"
+      },
+      {template = "pushers.horizontal"},
+      {type = "flow", style_mods = {horizontal_align = "center", width = 34}, children = {
+        {
+          type = "checkbox",
+          name = "ltnm_sort_station_status",
+          style = "ltnm_sort_checkbox_inactive",
+          style_mods = {width = 8, height = 20},
+          tooltip = {"ltnm-gui.station-status-tooltip"},
+          state = true,
+          handlers = "stations.sort_checkbox",
+          save_as = "stations.status_sort_checkbox"
         },
-        {template="pushers.horizontal"},
-        {type="flow", style_mods={horizontal_align="center", width=34}, children={
-          {type="checkbox",
-            name="ltnm_sort_station_status",
-            style="ltnm_sort_checkbox_inactive",
-            style_mods={width=8, height=20},
-            tooltip={"ltnm-gui.station-status-tooltip"},
-            state=true,
-            handlers="stations.sort_checkbox",
-            save_as="stations.status_sort_checkbox"
-          },
-        }},
-        {type="label",
-          style="caption_label",
-          style_mods={width=180},
-          caption={"ltnm-gui.provided-requested"},
-          tooltip={"ltnm-gui.station-provided-requested-tooltip"}
-        },
-        {type="label",
-          style="caption_label",
-          style_mods={width=144},
-          caption={"ltnm-gui.shipments"},
-          tooltip={"ltnm-gui.station-shipments-tooltip"}
-        },
-        {type="label",
-          style="caption_label",
-          style_mods={width=144},
-          caption={"ltnm-gui.control-signals"},
-          tooltip={"ltnm-gui.station-control-signals-tooltip"}
-        },
-        {type="empty-widget", style_mods={width=8}}
       }},
-      {type="scroll-pane",
-        style="ltnm_blank_scroll_pane",
-        direction="vertical",
-        vertical_scroll_policy="always",
-        save_as="stations.scroll_pane",
-        children={
-          {type="table",
-            style="ltnm_stations_table",
-            style_mods={vertically_stretchable=true, horizontally_stretchable=true},
-            column_count=5,
-            save_as="stations.table"
-          }
+      {
+        type = "label",
+        style = "caption_label",
+        style_mods = {width = 180},
+        caption = {"ltnm-gui.provided-requested"},
+        tooltip = {"ltnm-gui.station-provided-requested-tooltip"}
+      },
+      {
+        type = "label",
+        style = "caption_label",
+        style_mods = {width = 144},
+        caption = {"ltnm-gui.shipments"},
+        tooltip = {"ltnm-gui.station-shipments-tooltip"}
+      },
+      {
+        type = "label",
+        style = "caption_label",
+        style_mods = {width = 144},
+        caption = {"ltnm-gui.control-signals"},
+        tooltip = {"ltnm-gui.station-control-signals-tooltip"}
+      },
+      {type = "empty-widget", style_mods = {width = 8}}
+    }},
+    {
+      type = "scroll-pane",
+      style = "ltnm_blank_scroll_pane",
+      direction = "vertical",
+      vertical_scroll_policy = "always",
+      save_as = "stations.scroll_pane",
+      children = {
+        {
+          type = "table",
+          style = "ltnm_stations_table",
+          style_mods = {vertically_stretchable = true, horizontally_stretchable = true},
+          column_count = 5,
+          save_as = "stations.table"
         }
       }
     }
   }
-)
+}
 
 stations_tab.search_template = {
-  {type="textfield",
-    lose_focus_on_confirm=true,
-    handlers="stations.search.name_textfield",
-    save_as="stations.search.name_textfield"
+  {
+    type = "textfield",
+    lose_focus_on_confirm = true,
+    handlers = "stations.search.name_textfield",
+    save_as = "stations.search.name_textfield"
   },
-  {type="label", style="caption_label", style_mods={left_margin=12}, caption={"ltnm-gui.network-id"}},
-  {type="textfield",
-    style_mods={width=80},
-    lose_focus_on_confirm=true,
-    numeric=true,
-    allow_negative=true,
-    handlers="stations.search.network_id_textfield",
-    save_as="stations.search.network_id_textfield"
+  {type = "label", style = "caption_label", style_mods = {left_margin = 12}, caption = {"ltnm-gui.network-id"}},
+  {
+    type = "textfield",
+    style_mods = {width = 80},
+    lose_focus_on_confirm = true,
+    numeric = true,
+    allow_negative = true,
+    handlers = "stations.search.network_id_textfield",
+    save_as = "stations.search.network_id_textfield"
   }
 }
 

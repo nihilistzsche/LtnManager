@@ -18,7 +18,7 @@ gui.add_handlers{
           and player_table.gui.main.window.frame.valid
         then
           -- change tab and select correct alert
-          main_gui.update(player, player_table, {active_tab="alerts", alerts=true})
+          main_gui.update(player, player_table, {active_tab = "alerts", alerts = true})
           -- open in case it's closed
           main_gui.open(player, player_table, true)
         end
@@ -33,15 +33,23 @@ function alert_popup_gui.create_or_update(player, player_table, alert_type)
   local gui_data = player_table.gui.alert_popup
   if not gui_data then
     gui_data = gui.build(mod_gui.get_frame_flow(player), {
-      {type="button", style="red_button", style_mods={width=150, height=56}, tooltip={"ltnm-gui.alert-popup-tooltip"},
-        mouse_button_filter={"left", "right"}, handlers="alert_popup.button", save_as="button", children={
-          {type="flow", direction="vertical", elem_mods={ignored_by_interaction=true}, children={
-            {type="label",
-              style="ltnm_depot_button_bold_label",
-              elem_mods={enabled=false},
-              caption={"ltnm-gui.new-alert"}
+      {
+        type = "button",
+        style = "red_button",
+        style_mods = {width = 150, height = 56},
+        tooltip = {"ltnm-gui.alert-popup-tooltip"},
+        mouse_button_filter = {"left", "right"},
+        handlers = "alert_popup.button",
+        save_as = "button",
+        children = {
+          {type = "flow", direction = "vertical", elem_mods = {ignored_by_interaction = true}, children = {
+            {
+              type = "label",
+              style = "ltnm_depot_button_bold_label",
+              elem_mods = {enabled = false},
+              caption = {"ltnm-gui.new-alert"}
             },
-            {type="label", style="ltnm_depot_button_label", elem_mods={enabled=false}, save_as="label"}
+            {type = "label", style = "ltnm_depot_button_label", elem_mods = {enabled = false}, save_as = "label"}
           }}
         }
       }
