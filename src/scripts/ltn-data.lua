@@ -613,14 +613,7 @@ function ltn_data.on_delivery_failed(e)
   local train = trains[e.train_id] or trains[global.data.invalidated_trains[e.train_id]]
 
   if train then
-    local alert_type
-    if train.train.valid then
-      alert_type = "delivery_timed_out"
-    else
-      alert_type = "train_invalidated"
-    end
-
-    add_alert(e, alert_type, train.shipment)
+    add_alert(e, "delivery_timed_out", train.shipment)
   end
 end
 
@@ -645,6 +638,24 @@ function ltn_data.on_train_created(e)
       end
     end
   end
+end
+
+-- ALERTS
+
+function ltn_data.on_provider_missing_cargo(e)
+  game.print("provider missing cargo: "..serpent.line(e))
+end
+
+function ltn_data.on_provider_unscheduled_cargo(e)
+  game.print("provider unscheduled cargo: "..serpent.line(e))
+end
+
+function ltn_data.on_requester_remaining_cargo(e)
+  game.print("requester remaining cargo: "..serpent.line(e))
+end
+
+function ltn_data.on_requester_unscheduled_cargo(e)
+  game.print("requester unscheduled cargo: "..serpent.line(e))
 end
 
 -- -----------------------------------------------------------------------------

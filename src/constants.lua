@@ -28,7 +28,13 @@ constants.ltn_event_names = {
   on_dispatcher_updated = true,
   -- on_delivery_pickup_complete = true,
   on_delivery_completed = true,
-  on_delivery_failed = true
+  on_delivery_failed = true,
+  -- alerts
+  -- on_dispatcher_no_train_found = true,
+  on_provider_missing_cargo = true,
+  on_provider_unscheduled_cargo = true,
+  on_requester_remaining_cargo = true,
+  on_requester_unscheduled_cargo = true
 }
 
 -- sorts
