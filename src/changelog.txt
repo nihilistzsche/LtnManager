@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.0
-Date: ????
+Date: 2020-09-17
   Features:
     - Added more verbose error messages when the GUI is unopenable
   Changes:
