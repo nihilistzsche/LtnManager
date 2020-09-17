@@ -24,7 +24,12 @@ gui.add_templates{
         {type = "label", style = "caption_label", caption = {"ltnm-gui."..string_gsub(name, "_", "-")}},
         {type = "frame", style = "deep_frame_in_shallow_frame", save_as = "inventory."..name.."_frame", children = {
           {type = "scroll-pane", style = "ltnm_slot_table_scroll_pane", style_mods = {height = rows*40}, children = {
-            {type = "table", style = "ltnm_inventory_slot_table", column_count = 10, save_as = "inventory."..name.."_table"}
+            {
+              type = "table",
+              style = "ltnm_inventory_slot_table",
+              column_count = 10,
+              save_as = "inventory."..name.."_table"
+            }
           }}
         }}
       }}
@@ -41,10 +46,10 @@ gui.add_templates{
         {type = "label", caption = value, save_as = "inventory.info_pane."..name.."_value"}
       }}
     end,
-    small_slot_table_with_label = function(parent, labels, materials, translations)
+    small_slot_table_with_label = function(parent, materials, translations)
       local elems = gui.build(parent, {
         {type = "flow", direction = "vertical", children = {
-          {type = "flow", save_as = "labels_flow"},
+          {type = "flow", style_mods = {width = 336}, direction = "vertical", save_as = "labels_flow"},
           {
             type = "flow",
             style_mods = {margin = 0, padding = 0, horizontal_align = "center", horizontally_stretchable = true},
@@ -58,14 +63,6 @@ gui.add_templates{
           }
         }}
       })
-      -- populate labels
-      local flow = elems.labels_flow
-      local flow_add = flow.add
-      for _, t in ipairs(labels) do
-        flow_add{type = "label", style = t[1], caption = t[2], tooltip = t[3], name = t[4]}
-        flow_add{type = "empty-widget"}.style.horizontally_stretchable = true
-      end
-      flow.children[#flow.children].destroy()
       -- populate materials
       local table_add = elems.table.add
       local i = 0
@@ -243,19 +240,19 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
                     materials[#materials+1] = {color, station_contents}
                   end
                 end
-                location_template(
+                local elems = location_template(
                   table,
-                  {
-                    {
-                      "ltnm_hoverable_bold_label",
-                      station.entity.backer_name,
-                      {"ltnm-gui.view-station-on-map"},
-                      "ltnm_view_station__"..station_ids[i]
-                    }
-                  },
                   materials,
                   material_translations
                 )
+                elems.labels_flow.add{
+                  type = "label",
+                  name = "ltnm_view_station__"..station_ids[i],
+                  style = "ltnm_hoverable_bold_label",
+                  style_mods = {horizontally_squashable = true},
+                  caption = station.entity.backer_name,
+                  tooltip = {"ltnm-gui.view-station-on-map"}
+                }
               end
             end
           end
@@ -282,26 +279,35 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
               if train.shipment then
                 materials = {{"blue", train.shipment}}
               end
-              location_template(
+              local elems = location_template(
                 table,
-                {
-                  {
-                    "ltnm_hoverable_bold_label",
-                    train.from,
-                    {"ltnm-gui.view-station-on-map"},
-                    "ltnm_view_station__"..train.from_id
-                  },
-                  {"caption_label", "->"},
-                  {
-                    "ltnm_hoverable_bold_label",
-                    train.to,
-                    {"ltnm-gui.view-station-on-map"},
-                    "ltnm_view_station__"..train.to_id
-                  }
-                },
                 materials,
                 material_translations
               )
+              gui.build(elems.labels_flow, {
+                {type = "flow", children = {
+                  {type = "label", style = "caption_label", caption={"ltnm-gui.from"}},
+                  {
+                    type = "label",
+                    name = "ltnm_view_station__"..train.from_id,
+                    style = "ltnm_hoverable_bold_label",
+                    style_mods = {horizontally_squashable = true},
+                    caption = train.from,
+                    tooltip = {"ltnm-gui.view-station-on-map"}
+                  }
+                }},
+                {type = "flow", children = {
+                  {type = "label", style = "caption_label", caption={"ltnm-gui.to"}},
+                  {
+                    type = "label",
+                    name = "ltnm_view_station__"..train.from_id,
+                    style = "ltnm_hoverable_bold_label",
+                    style_mods = {horizontally_squashable = true},
+                    caption = train.to,
+                    tooltip = {"ltnm-gui.view-station-on-map"}
+                  }
+                }}
+              })
             end
           end
           if #table.children == 0 then

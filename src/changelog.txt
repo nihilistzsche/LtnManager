@@ -7,6 +7,8 @@ Date: ????
     - Updated to Factorio 1.0
     - Refactored LTN data iteration to majorly improve performance and make it easier to add new features
     - Removed alert popups in favor of LTN's built-in notifications
+  Bugfixes:
+    - Fixed that long station names would run off the edge of the in transit view
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.7
 Date: 2020-08-10
