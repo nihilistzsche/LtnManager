@@ -315,7 +315,6 @@ function main_gui.create(player, player_table)
 
   gui_data.alerts.active_sort = "time"
   gui_data.alerts.sort_time = false
-  gui_data.alerts.sort_id = true
   gui_data.alerts.sort_route = true
   gui_data.alerts.sort_type = true
   gui_data.alerts.clear_all = false

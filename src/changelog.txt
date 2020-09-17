@@ -1,11 +1,12 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.2.8
+Version: 0.3.0
 Date: ????
   Features:
     - Added more verbose error messages when the GUI is unopenable
   Changes:
     - Updated to Factorio 1.0
     - Refactored LTN data iteration to majorly improve performance and make it easier to add new features
+    - Removed alert popups in favor of LTN's built-in notifications
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.7
 Date: 2020-08-10

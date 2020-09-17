@@ -5,7 +5,6 @@ local translation = require("__flib__.translation")
 
 local constants = require("constants")
 
-local alert_popup_gui = require("scripts.gui.alert-popup")
 local global_data = require("scripts.global-data")
 local ltn_data = require("scripts.ltn-data")
 local main_gui = require("scripts.gui.main")
@@ -26,9 +25,6 @@ commands.add_command("LtnManager", {"ltnm-message.command-help"},
         main_gui.close(player, player_table)
         main_gui.destroy(player, player_table)
       end
-      if player_table.gui.alert_popup then
-        alert_popup_gui.destroy(player, player_table)
-      end
       player_data.refresh(game.get_player(e.player_index), player_table)
     end
   end
@@ -36,42 +32,31 @@ commands.add_command("LtnManager", {"ltnm-message.command-help"},
 
 -- -----------------------------------------------------------------------------
 -- EVENT HANDLERS
-
-local function setup_ltn_handlers()
-  if not remote.interfaces["logistic-train-network"] then
-    error("Could not establish connection to LTN!")
-  end
-  for event_name in pairs(constants.ltn_event_names) do
-    local id = remote.call("logistic-train-network", event_name)
-    ltn_data.event_ids[event_name] = id
-    event.register(id, ltn_data[event_name])
-  end
-  event.on_train_created(ltn_data.on_train_created)
-end
+-- LTN data handlers are kept in `scripts.ltn-data`
+-- all other handlers are kept here
 
 -- BOOTSTRAP
 
 event.on_init(function()
   gui.init()
+  gui.build_lookup_tables()
   translation.init()
 
   global_data.init()
   ltn_data.init()
-
-  setup_ltn_handlers()
+  ltn_data.connect()
 
   for i, player in pairs(game.players) do
     player_data.init(player, i)
     player_data.refresh(player, global.players[i])
   end
 
-  gui.build_lookup_tables()
 end)
 
 event.on_load(function()
-  setup_ltn_handlers()
-
   gui.build_lookup_tables()
+
+  ltn_data.connect()
 end)
 
 event.on_configuration_changed(function(e)
@@ -90,9 +75,6 @@ event.on_configuration_changed(function(e)
       if player_table.gui.main then
         main_gui.close(player, player_table)
         main_gui.destroy(player, player_table)
-      end
-      if player_table.gui.alert_popup then
-        alert_popup_gui.destroy(player, player_table)
       end
       -- refresh data
       player_data.refresh(player, player_table)

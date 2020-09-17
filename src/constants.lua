@@ -39,7 +39,6 @@ constants.ltn_event_names = {
 
 -- sorts
 constants.alerts_sorts = {
-  network_id = true,
   route = true,
   time = true,
   type = true

@@ -16,18 +16,7 @@ gui.add_templates{
           }}
         }}
       }).table.add
-      local mi = 0
-      for name, count in pairs(materials) do
-        mi = mi + 1
-        table_add{
-          type = "sprite-button",
-          name = "ltnm_view_material__"..mi,
-          style = "ltnm_small_slot_button_"..style,
-          sprite = string_gsub(name, ",", "/"),
-          number = count,
-          tooltip = (material_translations[name] or name).."\n"..util.comma_value(count)
-        }
-      end
+
     end
   }
 }
@@ -60,7 +49,7 @@ gui.add_handlers{
       on_gui_click = function(e)
         local _,_,alert_id = string_find(e.element.name, "^ltnm_clear_alert__(.-)$")
         alert_id = tonumber(alert_id)
-        global.flags.deleted_alerts[alert_id] = true
+        global.active_data.deleted_alerts[alert_id] = true
         alerts_tab.update(game.get_player(e.player_index), global.players[e.player_index], {alerts = true})
       end
     },
@@ -95,9 +84,9 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
       local finish = sort_value and #sorted_alerts or 1
       local delta = sort_value and 1 or -1
 
-      local deleted_alerts = global.flags.deleted_alerts
+      local deleted_alerts = global.active_data.deleted_alerts
 
-      for i = start,finish,delta do
+      for i = start, finish, delta do
         local alert_id = sorted_alerts[i]
         gui_data.alerts.clear_all_alerts_button.enabled = true
 
@@ -108,11 +97,6 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
           local alert_data = alerts[alert_id]
           local elems = gui.build(alerts_table, {
             {type = "label", style_mods = {width = 64}, caption = util.ticks_to_time(alert_data.time)},
-            {
-              type = "label",
-              style_mods = {width = 26, horizontal_align = "center"},
-              caption = alert_data.train.network_id
-            },
             {
               type = "flow",
               style_mods = {
@@ -145,11 +129,15 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
             {
               type = "label",
               style = "bold_label",
-              style_mods = {width = 160},
+              style_mods = {width = 200},
               caption = {"ltnm-gui.alert-"..alert_data.type},
               tooltip = {"ltnm-gui.alert-"..alert_data.type.."-description"}
             },
-            {type = "flow", style_mods = {vertical_spacing = 8}, direction = "vertical", save_as = "tables_flow"},
+            {type = "frame", style = "deep_frame_in_shallow_frame", children = {
+              {type = "scroll-pane", style = "ltnm_train_slot_table_scroll_pane", children = {
+                {type = "table", style = "ltnm_small_slot_table", column_count = 4, save_as = "slot_table"}
+              }}
+            }},
             {type = "flow", children = {
               {type = "frame", style = "deep_frame_in_shallow_frame", style_mods = {padding = 0}, children = {
                 {
@@ -171,18 +159,32 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
               }}
             }}
           })
-          gui.templates.alerts.materials_table(
-            elems.tables_flow,
-            "green",
-            alert_data.shipment or alert_data.planned_shipment, material_translations
-          )
-          if alert_data.actual_shipment or alert_data.leftovers then
-            gui.templates.alerts.materials_table(
-              elems.tables_flow,
-              "red",
-              alert_data.actual_shipment or alert_data.leftovers, material_translations
-            )
+
+          local slot_table = elems.slot_table
+          local table_add = slot_table.add
+          local function add_materials(materials, color)
+            local j = #slot_table.children
+            for name, count in pairs(materials) do
+              j = j + 1
+              table_add{
+                type = "sprite-button",
+                name = "ltnm_view_material__"..j,
+                style = "ltnm_small_slot_button_"..color,
+                sprite = string_gsub(name, ",", "/"),
+                number = count,
+                tooltip = (material_translations[name] or name).."\n"..util.comma_value(count)
+              }
+            end
           end
+
+          add_materials(alert_data.planned_shipment or {}, "green")
+          add_materials(
+            alert_data.actual_shipment
+            or alert_data.unscheduled_load
+            or alert_data.remaining_load
+            or {},
+            "red"
+          )
         end
       end
     else
@@ -216,16 +218,6 @@ alerts_tab.base_template = {
         },
         {
           type = "checkbox",
-          name = "ltnm_sort_alerts_network_id",
-          style = "ltnm_sort_checkbox_inactive",
-          state = true,
-          caption = {"ltnm-gui.id"},
-          tooltip = {"ltnm-gui.history-network-id-tooltip"},
-          handlers = "alerts.sort_checkbox",
-          save_as = "alerts.network_id_sort_checkbox"
-        },
-        {
-          type = "checkbox",
           name = "ltnm_sort_alerts_route",
           style = "ltnm_sort_checkbox_inactive",
           state = true,
@@ -238,7 +230,7 @@ alerts_tab.base_template = {
           type = "checkbox",
           name = "ltnm_sort_alerts_type",
           style = "ltnm_sort_checkbox_inactive",
-          style_mods = {width = 160},
+          style_mods = {width = 200},
           state = true,
           caption = {"ltnm-gui.alert"},
           handlers = "alerts.sort_checkbox",
@@ -260,7 +252,7 @@ alerts_tab.base_template = {
         style_mods = {vertically_stretchable = true, horizontally_stretchable = true},
         vertical_scroll_policy = "always",
         children = {
-          {type = "table", style = "ltnm_rows_table", column_count = 6, save_as = "alerts.table"}
+          {type = "table", style = "ltnm_rows_table", column_count = 5, save_as = "alerts.table"}
         }
       }
     }

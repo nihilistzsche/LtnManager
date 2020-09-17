@@ -11,17 +11,10 @@ data:extend{
   -- player
   {
     type = "bool-setting",
-    name = "ltnm-show-alert-popups",
-    setting_type = "runtime-per-user",
-    default_value = true,
-    order = "a"
-  },
-  {
-    type = "bool-setting",
     name = "ltnm-auto-refresh",
     setting_type = "runtime-per-user",
     default_value = false,
-    order = "b",
+    order = "a",
   },
   {
     type = "bool-setting",

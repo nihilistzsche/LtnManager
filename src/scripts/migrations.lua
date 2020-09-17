@@ -20,8 +20,16 @@ return {
     end
   end,
   ["0.3.0"] = function()
-    global.flags.deleted_alerts = {}
     global.flags.deleted_all_alerts = false
     global.flags.deleted_history = false
+
+    -- remove all alert popup GUIs
+    for _, player_table in pairs(global.players) do
+      local alert_popup = player_table.gui.alert_popup
+      if player_table.gui.alert_popup then
+        alert_popup.button.destroy()
+        player_table.gui.alert_popup = nil
+      end
+    end
   end
 }

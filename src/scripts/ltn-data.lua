@@ -1,19 +1,22 @@
 local ltn_data = {}
 
+local event = require("__flib__.event")
+local queue = require("lib.queue")
 local table = require("__flib__.table")
 
 local constants = require("constants")
 
-local alert_popup_gui = require("scripts.gui.alert-popup")
-
 -- -----------------------------------------------------------------------------
 -- HELPER FUNCTIONS
 
-local function add_alert(e, alert_type, shipment)
+local function add_alert(e)
   -- save train data so it will persist after the delivery is through
+  local train_id = e.train_id or e.train.id
   local trains = global.data.trains
-  local train = trains[e.train_id] or trains[global.data.invalidated_trains[e.train_id]]
-  if not train then error("Could not find train of ID: "..e.train_id) end
+  local train = trains[train_id] or trains[global.data.invalidated_trains[train_id]]
+  if not train then error("Could not find train of ID: "..train_id) end
+
+  local alert_type = ltn_data.alert_types[e.name]
 
   -- add common data
   local alert_data = {
@@ -23,7 +26,7 @@ local function add_alert(e, alert_type, shipment)
       depot = train.depot,
       from = train.from,
       from_id = train.from_id,
-      id = e.train_id,
+      id = train_id,
       network_id = train.network_id,
       pickup_done = train.pickupDone or false,
       to = train.to,
@@ -33,23 +36,35 @@ local function add_alert(e, alert_type, shipment)
   }
 
   -- add unique data
-  if alert_type == "incorrect_pickup" then
-    alert_data.actual_shipment = util.add_materials(e.actual_shipment)
+  if alert_type == "provider_missing_cargo" then
+    alert_data.actual_shipment = e.actual_shipment
     alert_data.planned_shipment = e.planned_shipment
-  elseif alert_type == "incomplete_delivery" then
-    alert_data.leftovers = e.remaining_load
-    alert_data.shipment = e.shipment
-  else
-    alert_data.shipment = shipment
+  elseif alert_type == "provider_unscheduled_cargo" or alert_type == "requester_unscheduled_cargo" then
+    alert_data.planned_shipment = e.planned_shipment
+    -- ! TEMPORARY - unscheduled_load does not consistently include the material types
+    local unscheduled_load = {}
+    for name, count in pairs(e.unscheduled_load) do
+      if not string.find(name, ",") then
+        local type = game.fluid_prototypes[name] and "fluid," or "item,"
+        unscheduled_load[type..name] = count
+      else
+        unscheduled_load[name] = count
+      end
+    end
+    alert_data.unscheduled_load = unscheduled_load
+  elseif alert_type == "requester_remaining_cargo" then
+    alert_data.remaining_load = e.remaining_load
+  elseif alert_type == "delivery_failed" then
+    alert_data.planned_shipment = e.planned_shipment
   end
 
   -- save to data table
-  local alerts = global.data.alerts
-  table.insert(alerts, 1, alert_data)
-  alerts[31] = nil -- limit to 30 entries
-
-  -- set popup flag
-  global.working_data.alert_popup = alert_type
+  local active_alerts = global.active_data.alerts
+  queue.push_left(active_alerts, alert_data)
+  -- limit to 30 entries
+  if queue.length(active_alerts) > 30 then
+    queue.pop_right(active_alerts)
+  end
 end
 
 -- -----------------------------------------------------------------------------
@@ -342,44 +357,61 @@ local function sort_stations_by_status(working_data, iterations_per_tick)
   )
 end
 
-local function remove_deleted_alerts_and_history(working_data)
+local function prepare_history_sort(working_data)
+  local active_data = global.active_data
+  local active_history = active_data.history
   local flags = global.flags
-  -- history
+
+  -- delete if necessary
   if flags.deleted_history then
-    working_data.history = {}
+    active_data.history = queue.new()
+    active_history = active_data.history
     flags.deleted_history = false
   end
-  -- alerts
-  if flags.deleted_all_alerts then
-    working_data.alerts = {}
-    flags.deleted_all_alerts = false
-  else
-    for id in pairs(flags.deleted_alerts) do
-      table.remove(working_data.alerts, id)
-    end
-    flags.deleted_alerts = {}
+
+  -- copy to working data
+  working_data.history = table.shallow_copy(active_history)
+
+  -- populate sorting tables
+  local sorted_history = working_data.sorted_history
+  -- add IDs to array
+  local history_ids = {}
+  for i in queue.iter_left(active_history) do
+    history_ids[#history_ids+1] = i
+  end
+  -- copy to each table
+  for key in pairs(sorted_history) do
+    sorted_history[key] = table.array_copy(history_ids)
   end
 end
 
-local function prepare_history_alerts_sort(working_data)
-  local history = working_data.history
-  local history_length = #history
-  local sorted_history = working_data.sorted_history
-  -- add IDs to arrays
-  for _, array in pairs(sorted_history) do
-    for i = 1, history_length do
-      array[i] = i
-    end
-  end
+local function prepare_alerts_sort(working_data)
+  local active_data = global.active_data
+  local active_alerts = active_data.alerts
+  local flags = global.flags
 
-  local alerts = working_data.alerts
-  local alerts_length = #alerts
+  -- delete alerts if necessary
+  if flags.deleted_all_alerts then
+    active_data.alerts = queue.new()
+    active_alerts = active_data.alerts
+  else
+    queue.pop_multi(active_alerts, active_data.deleted_alerts)
+  end
+  active_data.deleted_alerts = {}
+
+  -- copy to working data
+  working_data.alerts = table.shallow_copy(active_alerts)
+
+  -- populate sorting tables
   local sorted_alerts = working_data.sorted_alerts
   -- add IDs to array
-  for _, array in pairs(sorted_alerts) do
-    for i = 1, alerts_length do
-      array[i] = i
-    end
+  local alert_ids = {}
+  for i in queue.iter_left(active_alerts) do
+    alert_ids[#alert_ids+1] = i
+  end
+  -- copy to each table
+  for key in pairs(sorted_alerts) do
+    sorted_alerts[key] = table.array_copy(alert_ids)
   end
 end
 
@@ -462,9 +494,9 @@ function ltn_data.iterate()
     sort_depot_trains_by_composition,
     sort_stations_by_name,
     sort_stations_by_status,
-    remove_deleted_alerts_and_history,
-    prepare_history_alerts_sort,
+    prepare_history_sort,
     sort_history,
+    prepare_alerts_sort,
     sort_alerts
   }
 
@@ -475,7 +507,6 @@ function ltn_data.iterate()
       working_data.step = step + 1
     end
   else
-    local prev_data = global.data
     -- output data
     global.data = {
       -- bulk data
@@ -497,10 +528,6 @@ function ltn_data.iterate()
       invalidated_trains = {}
     }
 
-    if working_data.alert_popup then
-      alert_popup_gui.create_for_all(working_data.alert_popup)
-    end
-
     -- reset working data
     global.working_data = {
       history = global.working_data.history,
@@ -516,7 +543,7 @@ end
 
 function ltn_data.on_stops_updated(e)
   if global.flags.iterating_ltn_data then return end
-  global.working_data.stations = e.logistic_train_stops
+  global.working_data = {stations = e.logistic_train_stops}
 end
 
 function ltn_data.on_dispatcher_updated(e)
@@ -545,6 +572,8 @@ function ltn_data.on_dispatcher_updated(e)
     requested = {},
     in_transit = {}
   }
+  data.history = table.shallow_copy(global.active_data.history)
+  data.alerts = table.shallow_copy(global.active_data.alerts)
   data.trains = {}
   -- lookup tables
   data.network_to_stations = {}
@@ -564,7 +593,6 @@ function ltn_data.on_dispatcher_updated(e)
     finished = {}
   }
   data.sorted_alerts = {
-    network_id = {},
     route = {},
     time = {},
     type = {}
@@ -590,7 +618,8 @@ function ltn_data.on_delivery_completed(e)
   end
 
   -- add to delivery history
-  table.insert(global.working_data.history, 1, {
+  local active_history = global.active_data.history
+  queue.push_left(active_history, {
     type = "delivery",
     from = train.from,
     to = train.to,
@@ -603,7 +632,10 @@ function ltn_data.on_delivery_completed(e)
     finished = game.tick,
     route = train.from.." -> "..train.to
   })
-  global.working_data.history[51] = nil -- limit to 50 entries
+  -- limit to 50 entries
+  if queue.length(active_history) > 50 then
+    queue.pop_right(active_history)
+  end
 end
 
 function ltn_data.on_delivery_failed(e)
@@ -613,7 +645,8 @@ function ltn_data.on_delivery_failed(e)
   local train = trains[e.train_id] or trains[global.data.invalidated_trains[e.train_id]]
 
   if train then
-    add_alert(e, "delivery_timed_out", train.shipment)
+    e.planned_shipment = train.shipment
+    add_alert(e)
   end
 end
 
@@ -642,32 +675,37 @@ end
 
 -- ALERTS
 
-function ltn_data.on_provider_missing_cargo(e)
-  game.print("provider missing cargo: "..serpent.line(e))
-end
+ltn_data.on_provider_missing_cargo = add_alert
 
-function ltn_data.on_provider_unscheduled_cargo(e)
-  game.print("provider unscheduled cargo: "..serpent.line(e))
-end
+ltn_data.on_provider_unscheduled_cargo = add_alert
 
-function ltn_data.on_requester_remaining_cargo(e)
-  game.print("requester remaining cargo: "..serpent.line(e))
-end
+ltn_data.on_requester_remaining_cargo = add_alert
 
-function ltn_data.on_requester_unscheduled_cargo(e)
-  game.print("requester unscheduled cargo: "..serpent.line(e))
-end
+ltn_data.on_requester_unscheduled_cargo = add_alert
 
 -- -----------------------------------------------------------------------------
 -- MODULE
 
-ltn_data.event_ids = {}
+ltn_data.alert_types = {}
 
 function ltn_data.init()
   global.data = nil
-  global.working_data = {history = {}, alerts = {}}
+  global.working_data = nil
+  global.active_data = {history = queue.new(), alerts = queue.new(), deleted_alerts = {}}
   global.flags.iterating_ltn_data = false
   global.flags.updating_guis = false
+end
+
+function ltn_data.connect()
+  if not remote.interfaces["logistic-train-network"] then
+    error("Could not establish connection to LTN!")
+  end
+  for event_name in pairs(constants.ltn_event_names) do
+    local id = remote.call("logistic-train-network", event_name)
+    ltn_data.alert_types[id] = string.gsub(event_name, "^on_", "")
+    event.register(id, ltn_data[event_name])
+  end
+  event.on_train_created(ltn_data.on_train_created)
 end
 
 return ltn_data
