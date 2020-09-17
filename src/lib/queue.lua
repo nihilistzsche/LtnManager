@@ -66,7 +66,7 @@ function queue.pop_multi(tbl, to_pop)
 end
 
 function queue.iter_left(tbl)
-  local i = tbl.first
+  local i = tbl.first - 1
   return function()
     if i < tbl.last then
       i = i + 1
