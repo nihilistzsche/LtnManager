@@ -41,17 +41,7 @@ local function add_alert(e)
     alert_data.planned_shipment = e.planned_shipment
   elseif alert_type == "provider_unscheduled_cargo" or alert_type == "requester_unscheduled_cargo" then
     alert_data.planned_shipment = e.planned_shipment
-    -- ! TEMPORARY - unscheduled_load does not consistently include the material types
-    local unscheduled_load = {}
-    for name, count in pairs(e.unscheduled_load) do
-      if not string.find(name, ",") then
-        local type = game.fluid_prototypes[name] and "fluid," or "item,"
-        unscheduled_load[type..name] = count
-      else
-        unscheduled_load[name] = count
-      end
-    end
-    alert_data.unscheduled_load = unscheduled_load
+    alert_data.unscheduled_load = e.unscheduled_load
   elseif alert_type == "requester_remaining_cargo" then
     alert_data.remaining_load = e.remaining_load
   elseif alert_type == "delivery_failed" then
@@ -60,10 +50,10 @@ local function add_alert(e)
 
   -- save to data table
   local active_alerts = global.active_data.alerts
-  queue.push_left(active_alerts, alert_data)
+  queue.push_right(active_alerts, alert_data)
   -- limit to 30 entries
   if queue.length(active_alerts) > 30 then
-    queue.pop_right(active_alerts)
+    queue.pop_left(active_alerts)
   end
 end
 
@@ -616,7 +606,7 @@ function ltn_data.on_delivery_completed(e)
 
   -- add to delivery history
   local active_history = global.active_data.history
-  queue.push_left(active_history, {
+  queue.push_right(active_history, {
     type = "delivery",
     from = train.from,
     to = train.to,
@@ -631,7 +621,7 @@ function ltn_data.on_delivery_completed(e)
   })
   -- limit to 50 entries
   if queue.length(active_history) > 50 then
-    queue.pop_right(active_history)
+    queue.pop_left(active_history)
   end
 end
 
