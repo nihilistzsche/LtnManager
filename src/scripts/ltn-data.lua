@@ -529,10 +529,7 @@ function ltn_data.iterate()
     }
 
     -- reset working data
-    global.working_data = {
-      history = global.working_data.history,
-      alerts = global.working_data.alerts
-    }
+    global.working_data = nil
 
     -- start updating GUIs
     global.flags.iterating_ltn_data = false
