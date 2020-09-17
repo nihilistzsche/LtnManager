@@ -183,6 +183,8 @@ function depots_tab.update(player, player_table, state_changes, gui_data, data, 
     local depot_data = gui_data.depots
     -- retrieve train array and iteration settings
     local depot = data.depots[depot_data.selected]
+    -- don't do anything if no depots actually exist yet
+    if not depot then return end
     local active_sort = depot_data.active_sort
     local trains = depot.sorted_trains[active_sort]
     if active_sort == "status" then
