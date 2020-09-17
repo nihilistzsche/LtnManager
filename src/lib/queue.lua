@@ -1,6 +1,6 @@
 -- Lua queue implementation
 -- based on "Queues and Double Queues" from `Programming in Lua`: http://www.lua.org/pil/11.4.html
--- modifications: changed naming conventions, added pop_at(), iter_left(), iter_right(), and length() methods
+-- modifications: changed naming conventions, added pop_at(), pop_multi(), iter_left(), iter_right(), and length()
 local queue = {}
 
 function queue.new()
@@ -75,7 +75,7 @@ function queue.iter_left(tbl)
   end
 end
 
-function queue.iter_left(tbl)
+function queue.iter_right(tbl)
   local i = tbl.last + 1
   return function()
     if i > tbl.first then
