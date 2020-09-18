@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.1
-Date: ????
+Date: 2020-09-18
   Bugfixes:
     - Fixed a crash when the LTN data iterator would attempt to sort for players whose translations were not finished
 ---------------------------------------------------------------------------------------------------
