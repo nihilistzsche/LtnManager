@@ -252,7 +252,13 @@ local function generate_train_status_strings(working_data, iterations_per_tick)
         player = key.player
       else
         train = next(trains)
-        local next_player = next(players, player)
+        local next_player = player
+        while next_player do
+          next_player = next(players, next_player)
+          if next_player and players[next_player].flags.translations_finished then
+            break
+          end
+        end
         if next_player then
           player = next_player
         else
@@ -297,7 +303,13 @@ local function sort_depot_trains_by_status(working_data)
         player = key.player
       else
         depot = next(depots)
-        local next_player = next(players, player)
+        local next_player = player
+        while next_player do
+          next_player = next(players, next_player)
+          if next_player and players[next_player].flags.translations_finished then
+            break
+          end
+        end
         if next_player then
           player = next_player
         else
