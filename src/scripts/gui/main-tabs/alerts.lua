@@ -6,21 +6,6 @@ local util = require("scripts.util")
 local string_find = string.find
 local string_gsub = string.gsub
 
-gui.add_templates{
-  alerts = {
-    materials_table = function(parent, style, materials, material_translations)
-      local table_add = gui.build(parent, {
-        {type = "frame", style = "deep_frame_in_shallow_frame", children = {
-          {type = "scroll-pane", style = "ltnm_train_slot_table_scroll_pane", children = {
-            {type = "table", style = "ltnm_small_slot_table", column_count = 4, save_as = "table"}
-          }}
-        }}
-      }).table.add
-
-    end
-  }
-}
-
 gui.add_handlers{
   alerts = {
     sort_checkbox = {
