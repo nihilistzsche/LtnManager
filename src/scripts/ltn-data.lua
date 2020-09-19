@@ -93,8 +93,6 @@ local function iterate_stations(working_data, iterations_per_tick)
     station_data.status = {name = signal.signal.name, count = signal.count, sort_key = signal.signal.name..signal.count}
 
     -- process station materials
-    -- TODO consider other methods (might be slow with large amounts of materials in a station)
-    -- TODO follow up on performance improvements?
     for _, mode in ipairs{"provided", "requested"} do
       local materials = working_data[mode.."_by_stop"][station_id]
       if materials then

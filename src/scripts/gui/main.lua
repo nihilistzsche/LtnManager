@@ -223,7 +223,6 @@ function main_gui.create(player, player_table)
           },
         }},
         {type = "flow", style_mods = {horizontal_spacing = 0, padding = 0}, direction = "horizontal", children = {
-          -- TODO left side
           {type = "frame", style = "ltnm_titlebar_tab_filler_frame", children = {
             {template = "mock_frame_tab", caption = {"ltnm-gui.depots"}, save_as = "tabbed_pane.tabs.depots"},
             {template = "mock_frame_tab", caption = {"ltnm-gui.stations"}, save_as = "tabbed_pane.tabs.stations"},

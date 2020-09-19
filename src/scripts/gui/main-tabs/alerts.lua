@@ -21,8 +21,6 @@ gui.add_templates{
   }
 }
 
--- TODO alert muting and management
-
 gui.add_handlers{
   alerts = {
     sort_checkbox = {
