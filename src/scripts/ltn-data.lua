@@ -543,7 +543,7 @@ function ltn_data.iterate()
 end
 
 function ltn_data.on_stops_updated(e)
-  if global.flags.iterating_ltn_data then return end
+  if global.flags.iterating_ltn_data or global.flags.updating_guis then return end
   global.working_data = {stations = e.logistic_train_stops}
 end
 
@@ -552,7 +552,7 @@ function ltn_data.on_dispatcher_updated(e)
   local stations = global.working_data.stations
   if not stations then
     log("LTN event desync: did not receive stations in time! Skipping iteration.")
-    global.working_data.stations = nil
+    global.working_data = nil
     return
   end
 
