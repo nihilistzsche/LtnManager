@@ -13,7 +13,7 @@ local function add_alert(e)
   -- save train data so it will persist after the delivery is through
   local train_id = e.train_id or e.train.id
   local trains = global.data.trains
-  local train = trains[train_id] or trains[global.data.invalidated_trains[train_id]]
+  local train = trains[train_id] or trains[global.active_data.invalidated_trains[train_id]]
   if not train then error("Could not find train of ID: "..train_id) end
 
   local alert_type = ltn_data.alert_types[e.name]
@@ -526,12 +526,14 @@ function ltn_data.iterate()
       sorted_history = working_data.sorted_history,
       sorted_alerts = working_data.sorted_alerts,
       -- other
-      num_stations = working_data.num_stations,
-      invalidated_trains = {}
+      num_stations = working_data.num_stations
     }
 
     -- reset working data
     global.working_data = nil
+
+    -- reset invalidated trains list
+    global.active_data.invalidated_trains = {}
 
     -- start updating GUIs
     global.flags.iterating_ltn_data = false
@@ -608,7 +610,7 @@ function ltn_data.on_delivery_completed(e)
   local data = global.data
   if not data then return end
   local trains = data.trains
-  local train = trains[e.train_id] or trains[data.invalidated_trains[e.train_id]]
+  local train = trains[e.train_id] or trains[global.active_data.invalidated_trains[e.train_id]]
   if not train then error("Could not find train of ID ["..e.train_id.."]") end
 
   if not train.started then
@@ -641,7 +643,7 @@ function ltn_data.on_delivery_failed(e)
   if not global.data then return end
 
   local trains = global.data.trains
-  local train = trains[e.train_id] or trains[global.data.invalidated_trains[e.train_id]]
+  local train = trains[e.train_id] or trains[global.active_data.invalidated_trains[e.train_id]]
 
   if train then
     e.planned_shipment = train.shipment
@@ -649,14 +651,13 @@ function ltn_data.on_delivery_failed(e)
   end
 end
 
-function ltn_data.on_train_created(e)
-  if not global.data then return end
-  local trains = global.data.trains
-  local invalidated_trains = global.data.invalidated_trains
+local function migrate_train(e, data)
+  local trains = data.trains
+  local invalidated_trains = global.active_data.invalidated_trains
   local new_train = e.train
   local new_id = new_train.id
   -- migrate train IDs and information
-  for i = 1,2 do
+  for i = 1, 2 do
     local old_id = e["old_train_id_"..i]
     if old_id then
       local train_data = trains[old_id] or trains[invalidated_trains[old_id]]
@@ -669,6 +670,17 @@ function ltn_data.on_train_created(e)
         train_data.main_locomotive = util.train.get_main_locomotive(new_train)
       end
     end
+  end
+end
+
+function ltn_data.on_train_created(e)
+  local data = global.data
+  local working_data = global.working_data
+  if data then
+    migrate_train(e, data)
+  end
+  if working_data then
+    migrate_train(e, working_data)
   end
 end
 
@@ -690,7 +702,7 @@ ltn_data.alert_types = {}
 function ltn_data.init()
   global.data = nil
   global.working_data = nil
-  global.active_data = {history = queue.new(), alerts = queue.new(), deleted_alerts = {}}
+  global.active_data = {history = queue.new(), alerts = queue.new(), deleted_alerts = {}, invalidated_trains = {}}
   global.flags.iterating_ltn_data = false
   global.flags.updating_guis = false
 end
