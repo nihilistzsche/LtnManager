@@ -357,17 +357,46 @@ local function sort_stations_by_status(working_data, iterations_per_tick)
   )
 end
 
+local function update_history(working_data)
+  local active_data = global.active_data
+  local active_history = active_data.history
+  -- delete if necessary
+  if global.flags.deleted_history then
+    active_data.history = queue.new()
+    active_history = active_data.history
+    global.flags.deleted_history = false
+    active_data.added_history = {}
+  end
+
+  -- add new entries
+  for _, entry in pairs(active_data.history_to_add) do
+    local trains = entry.use_working_data and working_data.trains or global.data.trains
+    local train = trains[entry.train_id] or trains[global.active_data.invalidated_trains[entry.train_id]]
+    if train and train.started then
+      -- add remaining info
+      entry.from = train.from
+      entry.to = train.to
+      entry.from_id = train.from_id
+      entry.to_id = train.to_id
+      entry.network_id = train.network_id
+      entry.depot = train.depot
+      entry.route = train.from.." -> "..train.to
+      entry.runtime = entry.finished - train.started
+      -- add to history
+      queue.push_right(active_history, entry)
+      -- limit to 50 entries
+      if queue.length(active_history) > 50 then
+        queue.pop_left(active_history)
+      end
+    end
+  end
+  -- clear add table
+  active_data.history_to_add = {}
+end
+
 local function prepare_history_sort(working_data)
   local active_data = global.active_data
   local active_history = active_data.history
-  local flags = global.flags
-
-  -- delete if necessary
-  if flags.deleted_history then
-    active_data.history = queue.new()
-    active_history = active_data.history
-    flags.deleted_history = false
-  end
 
   -- copy to working data
   working_data.history = table.shallow_copy(active_history)
@@ -382,36 +411,6 @@ local function prepare_history_sort(working_data)
   -- copy to each table
   for key in pairs(sorted_history) do
     sorted_history[key] = table.array_copy(history_ids)
-  end
-end
-
-local function prepare_alerts_sort(working_data)
-  local active_data = global.active_data
-  local active_alerts = active_data.alerts
-  local flags = global.flags
-
-  -- delete alerts if necessary
-  if flags.deleted_all_alerts then
-    active_data.alerts = queue.new()
-    active_alerts = active_data.alerts
-  else
-    queue.pop_multi(active_alerts, active_data.deleted_alerts)
-  end
-  active_data.deleted_alerts = {}
-
-  -- copy to working data
-  working_data.alerts = table.shallow_copy(active_alerts)
-
-  -- populate sorting tables
-  local sorted_alerts = working_data.sorted_alerts
-  -- add IDs to array
-  local alert_ids = {}
-  for i in queue.iter_left(active_alerts) do
-    alert_ids[#alert_ids+1] = i
-  end
-  -- copy to each table
-  for key in pairs(sorted_alerts) do
-    sorted_alerts[key] = table.array_copy(alert_ids)
   end
 end
 
@@ -442,6 +441,36 @@ local function sort_history(working_data, iterations_per_tick)
   end
 
   return key
+end
+
+local function prepare_alerts_sort(working_data)
+  local active_data = global.active_data
+  local active_alerts = active_data.alerts
+  local flags = global.flags
+
+  -- delete alerts if necessary
+  if flags.deleted_all_alerts then
+    active_data.alerts = queue.new()
+    active_alerts = active_data.alerts
+  else
+    queue.pop_multi(active_alerts, active_data.deleted_alerts)
+  end
+  active_data.deleted_alerts = {}
+
+  -- copy to working data
+  working_data.alerts = table.shallow_copy(active_alerts)
+
+  -- populate sorting tables
+  local sorted_alerts = working_data.sorted_alerts
+  -- add IDs to array
+  local alert_ids = {}
+  for i in queue.iter_left(active_alerts) do
+    alert_ids[#alert_ids+1] = i
+  end
+  -- copy to each table
+  for key in pairs(sorted_alerts) do
+    sorted_alerts[key] = table.array_copy(alert_ids)
+  end
 end
 
 local function sort_alerts(working_data, iterations_per_tick)
@@ -494,6 +523,7 @@ function ltn_data.iterate()
     sort_depot_trains_by_composition,
     sort_stations_by_name,
     sort_stations_by_status,
+    update_history,
     prepare_history_sort,
     sort_history,
     prepare_alerts_sort,
@@ -605,36 +635,13 @@ function ltn_data.on_dispatcher_updated(e)
 end
 
 function ltn_data.on_delivery_completed(e)
-  local data = global.data
-  if not data then return end
-  local trains = data.trains
-  local train = trains[e.train_id] or trains[global.active_data.invalidated_trains[e.train_id]]
-  if not train then error("Could not find train of ID ["..e.train_id.."]") end
-
-  if not train.started then
-    log("Shipment of ID ["..e.train_id.."] is missing some data. Skipping!")
-    return
-  end
-
-  -- add to delivery history
-  local active_history = global.active_data.history
-  queue.push_right(active_history, {
-    type = "delivery",
-    from = train.from,
-    to = train.to,
-    from_id = train.from_id,
-    to_id = train.to_id,
-    network_id = train.network_id,
-    depot = train.depot,
-    shipment = e.shipment,
-    runtime = game.tick - train.started,
+  local history_to_add = global.active_data.history_to_add
+  history_to_add[#history_to_add+1] = {
     finished = game.tick,
-    route = train.from.." -> "..train.to
-  })
-  -- limit to 50 entries
-  if queue.length(active_history) > 50 then
-    queue.pop_left(active_history)
-  end
+    shipment = e.shipment,
+    train_id = e.train_id,
+    use_working_data = global.flags.iterating_ltn_data or not global.data
+  }
 end
 
 function ltn_data.on_delivery_failed(e)
@@ -700,7 +707,13 @@ ltn_data.alert_types = {}
 function ltn_data.init()
   global.data = nil
   global.working_data = nil
-  global.active_data = {history = queue.new(), alerts = queue.new(), deleted_alerts = {}, invalidated_trains = {}}
+  global.active_data = {
+    alerts = queue.new(),
+    deleted_alerts = {},
+    history_to_add = {},
+    history = queue.new(),
+    invalidated_trains = {}
+  }
   global.flags.iterating_ltn_data = false
   global.flags.updating_guis = false
 end
