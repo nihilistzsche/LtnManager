@@ -1,0 +1,59 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "factoriomod",
+      "request": "launch",
+      "name": "Debug",
+      "factorioPath": "${env:factorioTestbench1}",
+      "hookMode": "debug",
+      "hookControl": ["level", "LtnManager", "Sandbox"],
+      "hookData": false,
+      "hookSettings": false,
+      "factorioArgs": [
+        "--load-game",
+        "c:/Files/Development/Factorio/Testbenches/1/saves/LTN Manager/LTN Demo 1.13.x.zip"
+      ]
+    },
+    {
+      "type": "factoriomod",
+      "request": "launch",
+      "name": "Debug (trim mods)",
+      "factorioPath": "${env:factorioTestbench1}",
+      "hookMode": "debug",
+      "hookControl": ["level", "LtnManager", "Sandbox"],
+      "hookData": false,
+      "hookSettings": false,
+      "adjustMods": {
+        "EditorExtensions": true,
+        "flib": true,
+        "LogisticTrainNetwork": true,
+        "LtnManager": true,
+        "Sandbox": true
+      },
+      "disableExtraMods": true,
+      "factorioArgs": [
+        "--load-game",
+        "c:/Files/Development/Factorio/Testbenches/1/saves/LTN Manager/LTN Demo 1.13.x.zip"
+      ]
+    },
+    {
+      "type": "factoriomod",
+      "request": "launch",
+      "name": "Debug (main menu)",
+      "factorioPath": "${env:factorioTestbench1}",
+      "hookMode": "debug",
+      "hookControl": ["level", "LtnManager", "Sandbox"]
+    },
+    {
+      "type": "factoriomod",
+      "request": "launch",
+      "name": "Profile",
+      "factorioPath": "${env:factorioTestbench1}",
+      "hookMode": "profile",
+      "hookControl": ["level", "LtnManager"],
+      "hookData": false,
+      "hookSettings": false
+    }
+  ]
+}
