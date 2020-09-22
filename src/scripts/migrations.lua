@@ -31,5 +31,8 @@ return {
         player_table.gui.alert_popup = nil
       end
     end
+  end,
+  ["0.3.3"] = function()
+    global.flags.deleted_alerts = nil
   end
 }

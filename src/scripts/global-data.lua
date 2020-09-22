@@ -3,7 +3,6 @@ local global_data = {}
 function global_data.init()
   global_data.build_translations()
   global.flags = {
-    deleted_alerts = {},
     deleted_all_alerts = false,
     deleted_history = false,
     iterating_ltn_data = false,
