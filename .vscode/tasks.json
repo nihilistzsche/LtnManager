@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "factorio",
+      "label": "Adjust mods",
+      "command": "adjustMods",
+      "modsPath": "${env:factorioTestbench1Mods}",
+      "adjustMods": {
+        "EditorExtensions": true,
+        "flib": true,
+        "LogisticTrainNetwork": true,
+        "LtnManager": true,
+        "Sandbox": true
+      },
+      "disableExtraMods": true
+    }
+  ]
+}
