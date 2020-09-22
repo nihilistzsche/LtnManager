@@ -2,7 +2,9 @@
 Version: 0.3.3
 Date: ????
   Bugfixes:
-    - Fixed a crash when a delivery would be completed for a train that was not yet added to the `data` table
+    - Fixed a crash when attempting to add a delivery to the history whose train doesn't exist in `data` yet
+    - Fixed a crash when attempting to add an alert whose train doesn't exist in `data` yet
+    - Fixed a crash with the LTN data iterator when the first player on the list wouldn't have completed translations yet
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.2
 Date: 2020-09-19
