@@ -239,7 +239,7 @@ local function generate_train_status_strings(working_data, iterations_per_tick)
           end
           next_player = next(players, next_player)
         end
-        if next_player then
+        if next_player and train then
           player = next_player
         else
           -- we have finished, so return `nil` to cease iteration
@@ -290,7 +290,7 @@ local function sort_depot_trains_by_status(working_data)
           end
           next_player = next(players, next_player)
         end
-        if next_player then
+        if next_player and depot then
           player = next_player
         else
           -- we have finished, so return `nil` to cease iteration
