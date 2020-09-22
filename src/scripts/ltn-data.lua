@@ -12,27 +12,14 @@ local constants = require("constants")
 local function add_alert(e)
   -- save train data so it will persist after the delivery is through
   local train_id = e.train_id or e.train.id
-  local trains = global.data.trains
-  local train = trains[train_id] or trains[global.active_data.invalidated_trains[train_id]]
-  if not train then error("Could not find train of ID: "..train_id) end
-
   local alert_type = ltn_data.alert_types[e.name]
 
   -- add common data
   local alert_data = {
     time = game.tick,
     type = alert_type,
-    train = {
-      depot = train.depot,
-      from = train.from,
-      from_id = train.from_id,
-      id = train_id,
-      network_id = train.network_id,
-      pickup_done = train.pickupDone or false,
-      to = train.to,
-      to_id = train.to_id,
-      route = train.from.." -> "..train.to
-    }
+    train_id = train_id,
+    use_working_data = global.flags.iterating_ltn_data or not global.data
   }
 
   -- add unique data
@@ -48,13 +35,8 @@ local function add_alert(e)
     alert_data.planned_shipment = e.planned_shipment
   end
 
-  -- save to data table
-  local active_alerts = global.active_data.alerts
-  queue.push_right(active_alerts, alert_data)
-  -- limit to 30 entries
-  if queue.length(active_alerts) > 30 then
-    queue.pop_left(active_alerts)
-  end
+  -- add to temporary table
+  global.active_data.alerts_to_add[#global.active_data.alerts_to_add+1] = alert_data
 end
 
 -- -----------------------------------------------------------------------------
@@ -443,7 +425,7 @@ local function sort_history(working_data, iterations_per_tick)
   return key
 end
 
-local function prepare_alerts_sort(working_data)
+local function update_alerts(working_data)
   local active_data = global.active_data
   local active_alerts = active_data.alerts
   local flags = global.flags
@@ -453,10 +435,37 @@ local function prepare_alerts_sort(working_data)
     active_data.alerts = queue.new()
     active_alerts = active_data.alerts
   else
-    queue.pop_multi(active_alerts, active_data.deleted_alerts)
+    queue.pop_multi(active_alerts, active_data.alerts_to_delete)
   end
-  active_data.deleted_alerts = {}
+  active_data.alerts_to_delete = {}
 
+  -- add new alerts
+  for _, alert_data in pairs(active_data.alerts_to_add) do
+    local trains = alert_data.use_working_data and working_data.trains or global.data.trains
+    local train = trains[alert_data.train_id] or trains[global.active_data.invalidated_trains[alert_data.train_id]]
+    alert_data.train = {
+      depot = train.depot,
+      from = train.from,
+      from_id = train.from_id,
+      id = alert_data.train_id,
+      network_id = train.network_id,
+      pickup_done = train.pickupDone or false,
+      to = train.to,
+      to_id = train.to_id,
+      route = train.from.." -> "..train.to
+    }
+    -- save to alerts table
+    queue.push_right(active_alerts, alert_data)
+    -- limit to 30 entries
+    if queue.length(active_alerts) > 30 then
+      queue.pop_left(active_alerts)
+    end
+  end
+  active_data.alerts_to_add = {}
+end
+
+local function prepare_alerts_sort(working_data)
+  local active_alerts = global.active_data.alerts
   -- copy to working data
   working_data.alerts = table.shallow_copy(active_alerts)
 
@@ -526,6 +535,7 @@ function ltn_data.iterate()
     update_history,
     prepare_history_sort,
     sort_history,
+    update_alerts,
     prepare_alerts_sort,
     sort_alerts
   }
@@ -708,8 +718,9 @@ function ltn_data.init()
   global.data = nil
   global.working_data = nil
   global.active_data = {
+    alerts_to_add = {},
+    alerts_to_delete = {},
     alerts = queue.new(),
-    deleted_alerts = {},
     history_to_add = {},
     history = queue.new(),
     invalidated_trains = {}

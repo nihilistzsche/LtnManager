@@ -32,7 +32,7 @@ gui.add_handlers{
       on_gui_click = function(e)
         local _,_,alert_id = string_find(e.element.name, "^ltnm_clear_alert__(.-)$")
         alert_id = tonumber(alert_id)
-        global.active_data.deleted_alerts[alert_id] = true
+        global.active_data.alerts_to_delete[alert_id] = true
         alerts_tab.update(game.get_player(e.player_index), global.players[e.player_index], {alerts = true})
       end
     },
@@ -67,7 +67,7 @@ function alerts_tab.update(player, player_table, state_changes, gui_data, data, 
       local finish = sort_value and #sorted_alerts or 1
       local delta = sort_value and 1 or -1
 
-      local deleted_alerts = global.active_data.deleted_alerts
+      local deleted_alerts = global.active_data.alerts_to_delete
 
       for i = start, finish, delta do
         local alert_id = sorted_alerts[i]
