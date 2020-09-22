@@ -541,9 +541,9 @@ function ltn_data.iterate()
   }
 
   if processors[step] then
-    local end_key = processors[step](working_data, iterations_per_tick)
+    local end_key, is_for_n_of, for_n_of_finished = processors[step](working_data, iterations_per_tick)
     working_data.key = end_key
-    if not end_key then
+    if not end_key and (not is_for_n_of or for_n_of_finished) then
       working_data.step = step + 1
     end
   else

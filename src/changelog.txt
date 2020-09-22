@@ -1,7 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.5
 Date: ????
-  Changes:
+  Bugfixes:
+    - Fixed a crash when every train would be deleted during the first step of train processing, causing the iterator to move to the next step prematurely
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.4
 Date: 2020-09-22
