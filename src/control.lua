@@ -3,8 +3,6 @@ local gui = require("__flib__.gui")
 local migration = require("__flib__.migration")
 local translation = require("__flib__.translation")
 
-local constants = require("constants")
-
 local global_data = require("scripts.global-data")
 local ltn_data = require("scripts.ltn-data")
 local main_gui = require("scripts.gui.main")
