@@ -5,7 +5,7 @@
       "type": "factorio",
       "label": "Adjust mods",
       "command": "adjustMods",
-      "modsPath": "${env:factorioTestbench1Mods}",
+      "modsPath": "c:/Files/Development/Factorio/Testbenches/1/mods",
       "adjustMods": {
         "EditorExtensions": true,
         "flib": true,
