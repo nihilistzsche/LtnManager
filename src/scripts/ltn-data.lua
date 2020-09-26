@@ -145,6 +145,19 @@ local function iterate_trains(working_data, iterations_per_tick)
 
   return table.for_n_of(trains, working_data.key, math.ceil(iterations_per_tick / 2), function(train_data, train_id)
     local train = train_data.train
+
+    -- checks
+    if not train.valid then
+      if working_data.aborted_trains[train_id] then
+        -- migrations didn't work, so delete this train and try again next cycle
+        return nil, true
+      else
+        -- abort and try again next tick to allow for migrations
+        working_data.aborted_trains[train_id] = true
+        return nil, nil, true
+      end
+    end
+
     local train_state = train.state
     local schedule = train.schedule
     local depot = schedule.records[1].station
@@ -617,17 +630,10 @@ function ltn_data.on_dispatcher_updated(e)
     return
   end
 
-  -- set up data tables
-  local station_ids = {}
-  local station_index = 0
-  for station_id in pairs(stations) do
-    station_index = station_index + 1
-    station_ids[station_index] = station_id
-  end
-
-  -- reset data table for iteration
+  -- set up working data table
   local data = global.working_data
   data.depots = {}
+  data.trains = {}
   data.stations = stations
   data.inventory = {
     provided = {},
@@ -636,7 +642,6 @@ function ltn_data.on_dispatcher_updated(e)
   }
   data.history = table.shallow_copy(global.active_data.history)
   data.alerts = table.shallow_copy(global.active_data.alerts)
-  data.trains = {}
   -- lookup tables
   data.network_to_stations = {}
   data.material_locations = {}
@@ -661,7 +666,9 @@ function ltn_data.on_dispatcher_updated(e)
   }
   -- iteration data
   data.step = 1
-  data.key = 1
+  data.key = nil -- just for reference
+  -- other
+  data.aborted_trains = {} -- trains that we aborted on during the iterate_trains step
 
   -- enable data iteration handler
   global.flags.iterating_ltn_data = true
