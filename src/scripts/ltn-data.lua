@@ -354,7 +354,18 @@ local function update_history(working_data)
   for _, entry in pairs(active_data.history_to_add) do
     local trains = entry.use_working_data and working_data.trains or global.data.trains
     local train = trains[entry.train_id] or trains[global.active_data.invalidated_trains[entry.train_id]]
-    if train and train.started then
+    -- if the train is returning to its depot or doesn't exist
+    if not train or not train.to then
+      -- check for `data`
+      if entry.use_working_data and not global.data then goto continue end
+      -- try other table
+      trains = entry.use_working_data and global.data.trains or working_data.trains
+      train = trains[entry.train_id] or trains[global.active_data.invalidated_trains[entry.train_id]]
+      -- there's nothing we can do, so skip this one
+      if not train or not train.to then goto continue end
+    end
+    -- sometimes LTN will forget to include `started`, in which case, skip this one
+    if train.started then
       -- add remaining info
       entry.from = train.from
       entry.to = train.to
@@ -371,6 +382,7 @@ local function update_history(working_data)
         queue.pop_left(active_history)
       end
     end
+    ::continue::
   end
   -- clear add table
   active_data.history_to_add = {}
@@ -443,6 +455,16 @@ local function update_alerts(working_data)
   for _, alert_data in pairs(active_data.alerts_to_add) do
     local trains = alert_data.use_working_data and working_data.trains or global.data.trains
     local train = trains[alert_data.train_id] or trains[global.active_data.invalidated_trains[alert_data.train_id]]
+    -- if the train is returning to its depot or doesn't exist
+    if not train or not train.to then
+      -- check for `data`
+      if alert_data.use_working_data and not global.data then goto continue end
+      -- try other table
+      trains = alert_data.use_working_data and global.data.trains or working_data.trains
+      train = trains[alert_data.train_id] or trains[global.active_data.invalidated_trains[alert_data.train_id]]
+      -- there's nothing we can do, so skip this one
+      if not train or not train.to then goto continue end
+    end
     alert_data.train = {
       depot = train.depot,
       from = train.from,
@@ -460,6 +482,7 @@ local function update_alerts(working_data)
     if queue.length(active_alerts) > 30 then
       queue.pop_left(active_alerts)
     end
+    ::continue::
   end
   active_data.alerts_to_add = {}
 end
