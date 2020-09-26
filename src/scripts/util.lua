@@ -1,4 +1,4 @@
-local util = require("__core__.lualib.util")
+local util = {}
 
 -- adds the contents of two material tables together
 -- t1 contains the items we are adding into the table, t2 will be returned
@@ -13,6 +13,8 @@ function util.add_materials(t1, t2)
   end
   return t2
 end
+
+-- TODO add to flib?
 
 -- add commas to separate thousands
 -- from lua-users.org: http://lua-users.org/wiki/FormattingNumbers
@@ -29,6 +31,8 @@ function util.comma_value(input)
   return formatted
 end
 
+-- TODO use flib version
+
 -- convert a number of ticks into runtime
 -- always shows minutes and seconds, hours is optional
 function util.ticks_to_time(ticks)
@@ -44,6 +48,8 @@ function util.ticks_to_time(ticks)
     return mins..":"..secs
   end
 end
+
+-- TODO move to depots file
 
 util.train = require("__flib__.train")
 

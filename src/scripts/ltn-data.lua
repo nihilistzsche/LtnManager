@@ -3,6 +3,7 @@ local ltn_data = {}
 local event = require("__flib__.event")
 local queue = require("lib.queue")
 local table = require("__flib__.table")
+local util = require("scripts.util")
 
 local constants = require("constants")
 

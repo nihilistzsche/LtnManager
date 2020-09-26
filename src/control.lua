@@ -5,7 +5,7 @@ local translation = require("__flib__.translation")
 
 local global_data = require("scripts.global-data")
 local ltn_data = require("scripts.ltn-data")
-local main_gui = require("scripts.gui.main")
+-- local main_gui = require("scripts.gui.main")
 local migrations = require("scripts.migrations")
 local player_data = require("scripts.player-data")
 
@@ -20,8 +20,8 @@ commands.add_command("LtnManager", {"ltnm-message.command-help"},
       local player = game.get_player(e.player_index)
       local player_table = global.players[e.player_index]
       if player_table.gui.main then
-        main_gui.close(player, player_table)
-        main_gui.destroy(player, player_table)
+        -- main_gui.close(player, player_table)
+        -- main_gui.destroy(player, player_table)
       end
       player_data.refresh(game.get_player(e.player_index), player_table)
     end
@@ -71,8 +71,8 @@ event.on_configuration_changed(function(e)
       -- close open GUIs
       local player_table = global.players[i]
       if player_table.gui.main then
-        main_gui.close(player, player_table)
-        main_gui.destroy(player, player_table)
+        -- main_gui.close(player, player_table)
+        -- main_gui.destroy(player, player_table)
       end
       -- refresh data
       player_data.refresh(player, player_table)
@@ -87,7 +87,7 @@ gui.register_handlers()
 event.register("ltnm-search", function(e)
   local player_table = global.players[e.player_index]
   if player_table.flags.gui_open then
-    main_gui.toggle_search(game.get_player(e.player_index), player_table)
+    -- main_gui.toggle_search(game.get_player(e.player_index), player_table)
   end
 end)
 
@@ -125,7 +125,7 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
     local player = game.get_player(e.player_index)
     local player_table = global.players[e.player_index]
     if player_table.flags.can_open_gui then
-      main_gui.toggle(player, player_table)
+      -- main_gui.toggle(player, player_table)
     else
       if player_table.flags.translations_finished then
         player.print{"ltnm-message.ltn-no-data"}
@@ -160,19 +160,19 @@ event.on_tick(function(e)
     local player_table = global.players[player_index]
     local player_flags = player_table.flags
     if player_flags.translations_finished and not player_flags.can_open_gui then
-      -- create GUI
-      local player = game.get_player(player_index)
-      main_gui.create(player, player_table)
-      player_flags.can_open_gui = true
-      player.set_shortcut_available("ltnm-toggle-gui", true)
+      -- -- create GUI
+      -- local player = game.get_player(player_index)
+      -- main_gui.create(player, player_table)
+      -- player_flags.can_open_gui = true
+      -- player.set_shortcut_available("ltnm-toggle-gui", true)
     elseif
       player_table.flags.gui_open
       and player_table.settings.auto_refresh
       and game.tick - player_table.last_update >= 180
     then
       -- update GUI
-      main_gui.update_active_tab(game.get_player(player_index), player_table)
-      player_table.last_update = game.tick
+      -- main_gui.update_active_tab(game.get_player(player_index), player_table)
+      -- player_table.last_update = game.tick
     end
 
     -- get and save next index, or stop iteration
