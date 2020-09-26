@@ -2,21 +2,22 @@ local main_gui = {}
 
 local gui = require("__flib__.gui")
 
+local titlebar = require("scripts.gui.main.titlebar")
+local toolbar = require("scripts.gui.main.toolbar")
+
+local tabs = {}
+for _, tab_name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
+  tabs[tab_name] = require("scripts.gui.main."..tab_name..".tab")
+end
+
 gui.add_handlers{
   main = {
     base = {
-      titlebar = {
-        close_button = {
-          on_gui_click = function(e)
-            main_gui.close(game.get_player(e.player_index), global.players[e.player_index])
-          end
-        }
-      },
+      titlebar = titlebar.handlers,
       window = {
         on_gui_closed = function(e)
           local player_table = global.players[e.player_index]
-          -- this flag will be set if we used the close button to close this GUI
-          if not player_table.flags.closing_gui then
+          if player_table.flags.gui_open then
             main_gui.close(game.get_player(e.player_index), player_table)
           end
         end
@@ -25,76 +26,46 @@ gui.add_handlers{
   }
 }
 
-local function frame_action_button(sprite, handlers, save_as, tooltip)
-  return {
-    type = "sprite-button",
-    style = "frame_action_button",
-    sprite = sprite.."_white",
-    hovered_sprite = sprite.."_black",
-    clicked_sprite = sprite.."_black",
-    tooltip = tooltip,
-    handlers = handlers,
-    save_as = save_as
-  }
-end
-
-local placeholder = {type = "empty-widget", style_mods = {width = 500, height = 350}}
-
-function main_gui.create(player, player_table)
-  local base_elems = gui.build(player.gui.screen, {
-    {
-      type = "frame",
-      direction = "vertical",
-      elem_mods = {visible = false},
-      handlers = "main.base.window",
-      save_as = "window",
-      children = {
-        {type = "flow", save_as = "titlebar_flow", children = {
-          {type = "label", style = "frame_title", caption = {"mod-name.LtnManager"}, ignored_by_interaction = true},
-          {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
-          frame_action_button("ltnm_pin", nil, nil, {"ltnm-gui.keep-open"}),
-          frame_action_button("ltnm_refresh", nil, nil, {"ltnm-gui.refresh"}),
-          frame_action_button("utility/close", "main.base.titlebar.close_button")
-        }},
-        {
-          type = "frame",
-          style = "inside_deep_frame",
-          direction = "vertical",
-          children = {
-            -- main toolbar
-            {type = "frame", style = "subheader_frame", style_mods = {bottom_margin = 12}, children = {
-              {type = "empty-widget", style = "flib_horizontal_pusher"},
-              {type = "sprite-button", style = "tool_button"}
-            }},
-            -- tabbed pane
-            {
-              type = "tabbed-pane",
-              style = "tabbed_pane_with_no_side_padding",
-              save_as = "tabbed_pane.root",
-              children = {
-                {type = "tab-and-content", tab = {type = "tab", caption = {"ltnm-gui.depots"}}, content = placeholder},
-                {
-                  type = "tab-and-content",
-                  tab = {type = "tab", caption = {"ltnm-gui.stations"}},
-                  content = placeholder
-                },
-                {
-                  type = "tab-and-content",
-                  tab = {type = "tab", caption = {"ltnm-gui.inventory"}},
-                  content = placeholder
-                },
-                {type = "tab-and-content", tab = {type = "tab", caption = {"ltnm-gui.history"}}, content = placeholder},
-                {type = "tab-and-content", tab = {type = "tab", caption = {"ltnm-gui.alerts"}}, content = placeholder},
-              }
+local base_template = {
+  {
+    type = "frame",
+    direction = "vertical",
+    elem_mods = {visible = false},
+    handlers_prefix = "main.base.",
+    handlers = "window",
+    save_as = "window",
+    children = {
+      titlebar(),
+      {
+        type = "frame",
+        style = "inside_deep_frame",
+        direction = "vertical",
+        children = {
+          toolbar(),
+          {
+            type = "tabbed-pane",
+            style = "tabbed_pane_with_no_side_padding",
+            save_as = "tabbed_pane.root",
+            children = {
+              tabs.depots(),
+              tabs.stations(),
+              tabs.inventory(),
+              tabs.history(),
+              tabs.alerts(),
             }
           }
         }
       }
     }
-  })
+  }
+}
+
+function main_gui.create(player, player_table)
+  -- create GUI from template
+  local base_elems = gui.build(player.gui.screen, base_template)
 
   -- dragging and centering
-  base_elems.titlebar_flow.drag_target = base_elems.window
+  base_elems.titlebar.flow.drag_target = base_elems.window
   base_elems.window.force_auto_center()
 
   -- save to player table
@@ -156,9 +127,7 @@ function main_gui.close(player, player_table)
 
   -- unset as opened
   if player.opened == base_window then
-    player_table.flags.closing_gui = true
     player.opened = nil
-    player_table.flags.closing_gui = false
   end
 end
 

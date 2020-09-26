@@ -3,6 +3,8 @@ local gui = require("__flib__.gui")
 local migration = require("__flib__.migration")
 local translation = require("__flib__.translation")
 
+local constants = require("constants")
+
 local global_data = require("scripts.global-data")
 local ltn_data = require("scripts.ltn-data")
 local main_gui = require("scripts.gui.main.base")
@@ -65,6 +67,15 @@ event.on_configuration_changed(function(e)
       -- refresh data
       player_data.refresh(player, global.players[i])
     end
+  end
+end)
+
+-- CUSTOM
+
+event.register(constants.events.close_main_gui, function(e)
+  local player_table = global.players[e.player_index]
+  if player_table.flags.gui_open then
+    main_gui.close(game.get_player(e.player_index), player_table)
   end
 end)
 

@@ -1,5 +1,14 @@
 local constants = {}
 
+local event = require("__flib__.event")
+
+if script then
+  constants.events = {
+    close_main_gui = event.generate_id(),
+    update_main_gui = event.generate_id()
+  }
+end
+
 constants.colors = {
   error = {
     str = "255, 90, 90",
