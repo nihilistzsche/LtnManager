@@ -2,6 +2,8 @@ local player_data = {}
 
 local translation = require("__flib__.translation")
 
+-- local main_gui = require("scripts.gui.main.base")
+
 function player_data.init(player, index)
   local player_table = {
     flags = {
@@ -35,6 +37,12 @@ function player_data.update_settings(player, player_table)
 end
 
 function player_data.refresh(player, player_table)
+  -- close and destroy GUI
+  if player_table.gui.main then
+    -- main_gui.close(player, player_table)
+    -- main_gui.destroy(player, player_table)
+  end
+
   -- set flags
   player_table.flags.can_open_gui = false
   player_table.flags.translations_finished = false

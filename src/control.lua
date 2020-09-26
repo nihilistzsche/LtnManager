@@ -17,11 +17,7 @@ commands.add_command("LtnManager", {"ltnm-message.command-help"},
     if e.parameter == "refresh-player-data" then
       local player = game.get_player(e.player_index)
       local player_table = global.players[e.player_index]
-      if player_table.gui.main then
-        -- main_gui.close(player, player_table)
-        -- main_gui.destroy(player, player_table)
-      end
-      player_data.refresh(game.get_player(e.player_index), player_table)
+      player_data.refresh(player, player_table)
     end
   end
 )
@@ -66,14 +62,8 @@ event.on_configuration_changed(function(e)
     ltn_data.init()
     -- refresh all player information
     for i, player in pairs(game.players) do
-      -- close open GUIs
-      local player_table = global.players[i]
-      if player_table.gui.main then
-        -- main_gui.close(player, player_table)
-        -- main_gui.destroy(player, player_table)
-      end
       -- refresh data
-      player_data.refresh(player, player_table)
+      player_data.refresh(player, global.players[i])
     end
   end
 end)
