@@ -2,9 +2,6 @@ local player_data = {}
 
 local translation = require("__flib__.translation")
 
-local string_gsub = string.gsub
-local string_sub = string.sub
-
 function player_data.init(player, index)
   local player_table = {
     flags = {
@@ -29,9 +26,9 @@ end
 function player_data.update_settings(player, player_table)
   local settings = {}
   for name, t in pairs(player.mod_settings) do
-    if string_sub(name, 1,5) == "ltnm-" then
-      name = string_gsub(name, "ltnm%-", "")
-      settings[string_gsub(name, "%-", "_")] = t.value
+    if string.sub(name, 1,5) == "ltnm-" then
+      name = string.gsub(name, "ltnm%-", "")
+      settings[string.gsub(name, "%-", "_")] = t.value
     end
   end
   player_table.settings = settings

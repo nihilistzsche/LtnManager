@@ -9,8 +9,6 @@ local ltn_data = require("scripts.ltn-data")
 local migrations = require("scripts.migrations")
 local player_data = require("scripts.player-data")
 
-local string_sub = string.sub
-
 -- -----------------------------------------------------------------------------
 -- COMMANDS
 
@@ -139,7 +137,7 @@ end)
 -- SETTINGS
 
 event.on_runtime_mod_setting_changed(function(e)
-  if string_sub(e.setting, 1, 5) == "ltnm-" then
+  if string.sub(e.setting, 1, 5) == "ltnm-" then
     for i, p in pairs(game.players) do
       player_data.update_settings(p, global.players[i])
     end
