@@ -25,6 +25,17 @@
     {
       "type": "factoriomod",
       "request": "launch",
+      "name": "Debug (src)",
+      "factorioPath": "${env:factorioSourceDebug}",
+      "hookMode": "debug",
+      "hookControl": ["LtnManager", "level", "Sandbox"],
+      "hookData": false,
+      "hookSettings": false,
+      "factorioArgs": ["--load-game", "${env:factorioTestbench1Saves}/LTN Manager/LTN Demo 1.13.x.zip"]
+    },
+    {
+      "type": "factoriomod",
+      "request": "launch",
       "name": "Profile",
       "factorioPath": "${env:factorioTestbench1}",
       "hookMode": "profile",
