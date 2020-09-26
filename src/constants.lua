@@ -1,15 +1,39 @@
 local constants = {}
 
--- colors
-constants.station_indicator_color = {r = 1, g = 0.2, b = 0.2, a = 0.75}
+constants.colors = {
+  error = {
+    str = "255, 90, 90",
+    tbl = {255, 90, 90}
+  },
+  green = {
+    str = "210, 253, 145",
+    tbl = {210, 253, 145}
+  },
+  heading = {
+    str = "255, 230, 192",
+    tbl = {255, 230, 192}
+  },
+  info = {
+    str = "128, 206, 240",
+    tbl = {128, 206, 240}
+  },
+  station_circle = {
+    str = "255, 50, 50, 190",
+    tbl = {255, 50, 50, 190}
+  },
+  unresearched = {
+    str = "255, 142, 142",
+    tbl = {255, 142, 142}
+  }
+}
 
--- gui
-constants.action_buttons_width = 96
-constants.main_frame_height = 615
-constants.main_frame_width = 830
-constants.search_frame_height = 40
+constants.gui = {
+  constants.action_buttons_width = 96,
+  constants.main_frame_height = 615,
+  constants.main_frame_width = 830,
+  constants.search_frame_height = 40
+}
 
--- other
 constants.input_sanitisers = {
   ["%("] = "%%(",
   ["%)"] = "%%)",
@@ -23,6 +47,7 @@ constants.input_sanitisers = {
   ["%^"] = "%%^",
   ["%$"] = "%%$"
 }
+
 constants.ltn_event_names = {
   on_stops_updated = true,
   on_dispatcher_updated = true,
@@ -35,19 +60,6 @@ constants.ltn_event_names = {
   on_provider_unscheduled_cargo = true,
   on_requester_remaining_cargo = true,
   on_requester_unscheduled_cargo = true
-}
-
--- sorts
-constants.alerts_sorts = {
-  route = true,
-  time = true,
-  type = true
-}
-constants.history_sorts = {
-  depot = true,
-  route = true,
-  runtime = true,
-  finished = true
 }
 
 return constants

@@ -426,7 +426,7 @@ local function sort_history(working_data, iterations_per_tick)
   local history = working_data.history
   local sorted_history = working_data.sorted_history
 
-  local key = working_data.key or {sort = next(constants.history_sorts)}
+  local key = working_data.key or {sort = next(sorted_history)}
   local sort = key.sort
 
   local next_index = table.partial_sort(
@@ -440,7 +440,7 @@ local function sort_history(working_data, iterations_per_tick)
 
   key.index = next_index
   if not next_index then
-    local next_sort = next(constants.history_sorts, sort)
+    local next_sort = next(sorted_history, sort)
     if next_sort then
       key.sort = next_sort
     else
@@ -523,7 +523,7 @@ local function sort_alerts(working_data, iterations_per_tick)
   local alerts = working_data.alerts
   local sorted_alerts = working_data.sorted_alerts
 
-  local key = working_data.key or {sort = next(constants.alerts_sorts)}
+  local key = working_data.key or {sort = next(sorted_alerts)}
   local sort = key.sort
 
   local next_index = table.partial_sort(
@@ -539,7 +539,7 @@ local function sort_alerts(working_data, iterations_per_tick)
 
   key.index = next_index
   if not next_index then
-    local next_sort = next(constants.alerts_sorts, sort)
+    local next_sort = next(sorted_alerts, sort)
     if next_sort then
       key.sort = next_sort
     else
