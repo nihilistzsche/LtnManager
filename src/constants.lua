@@ -28,10 +28,10 @@ constants.colors = {
 }
 
 constants.gui = {
-  constants.action_buttons_width = 96,
-  constants.main_frame_height = 615,
-  constants.main_frame_width = 830,
-  constants.search_frame_height = 40
+  action_buttons_width = 96,
+  main_frame_height = 615,
+  main_frame_width = 830,
+  search_frame_height = 40
 }
 
 constants.input_sanitisers = {

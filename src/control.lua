@@ -5,7 +5,7 @@ local translation = require("__flib__.translation")
 
 local global_data = require("scripts.global-data")
 local ltn_data = require("scripts.ltn-data")
--- local main_gui = require("scripts.gui.main")
+local main_gui = require("scripts.gui.main.base")
 local migrations = require("scripts.migrations")
 local player_data = require("scripts.player-data")
 
@@ -75,6 +75,7 @@ gui.register_handlers()
 event.register("ltnm-search", function(e)
   local player_table = global.players[e.player_index]
   if player_table.flags.gui_open then
+    -- TODO
     -- main_gui.toggle_search(game.get_player(e.player_index), player_table)
   end
 end)
@@ -112,10 +113,16 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
   if e.input_name or (e.prototype_name == "ltnm-toggle-gui") then
     local player = game.get_player(e.player_index)
     local player_table = global.players[e.player_index]
-    if player_table.flags.can_open_gui then
-      -- main_gui.toggle(player, player_table)
+    local flags = player_table.flags
+    if flags.can_open_gui then
+      main_gui.toggle(player, player_table)
     else
-      if player_table.flags.translations_finished then
+      -- close GUI if it is open (just in case)
+      if flags.gui_open then
+        main_gui.close(player, player_table)
+      end
+      -- print warning message
+      if flags.translations_finished then
         player.print{"ltnm-message.ltn-no-data"}
       else
         player.print{"ltnm-message.translations-not-finished"}
@@ -148,16 +155,13 @@ event.on_tick(function(e)
     local player_table = global.players[player_index]
     local player_flags = player_table.flags
     if player_flags.translations_finished and not player_flags.can_open_gui then
-      -- -- create GUI
-      -- local player = game.get_player(player_index)
-      -- main_gui.create(player, player_table)
-      -- player_flags.can_open_gui = true
-      -- player.set_shortcut_available("ltnm-toggle-gui", true)
+      main_gui.create(game.get_player(player_index), player_table)
     elseif
       player_table.flags.gui_open
       and player_table.settings.auto_refresh
       and game.tick - player_table.last_update >= 180
     then
+      -- TODO
       -- update GUI
       -- main_gui.update_active_tab(game.get_player(player_index), player_table)
       -- player_table.last_update = game.tick
