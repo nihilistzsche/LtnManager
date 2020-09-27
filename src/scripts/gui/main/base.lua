@@ -68,7 +68,7 @@ function main_gui.create(player, player_table)
   local elems = gui.build(player.gui.screen, template)
 
   -- dragging and centering
-  elems.base.titlebar.flow.drag_target = elems.window
+  elems.base.titlebar.flow.drag_target = elems.base.window
   elems.base.window.force_auto_center()
 
   -- save to player table

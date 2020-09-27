@@ -1,5 +1,7 @@
 local util = {}
 
+local data_util = require("__flib__.data-util")
+
 for key, value in pairs(require("__core__.lualib.util")) do
   util[key] = value
 end
@@ -10,7 +12,7 @@ util.paths = {
 }
 
 util.empty_checkmark = {
-  filename = "__core__/graphics/empty.png",
+  filename = data_util.empty_image,
   priority = "very-low",
   width = 1,
   height = 1,

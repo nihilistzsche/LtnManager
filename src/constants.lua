@@ -36,11 +36,11 @@ constants.colors = {
   }
 }
 
+-- dictionary locale identifier -> dictionary of hardcoded GUI sizes
 constants.gui = {
-  action_buttons_width = 96,
-  main_frame_height = 615,
-  main_frame_width = 830,
-  search_frame_height = 40
+  en = {
+
+  }
 }
 
 constants.input_sanitisers = {
@@ -63,7 +63,6 @@ constants.ltn_event_names = {
   -- on_delivery_pickup_complete = true,
   on_delivery_completed = true,
   on_delivery_failed = true,
-  -- alerts
   -- on_dispatcher_no_train_found = true,
   on_provider_missing_cargo = true,
   on_provider_unscheduled_cargo = true,
