@@ -24,8 +24,9 @@ styles.ltnm_depot_button = {
   -- ! TODO this is temporary - remove it!!!
   width = 194,
   -- !
-  height = 85,
+  height = 89,
   padding = 4,
+  top_padding = 1,
   -- horizontally_stretchable = "on",
   horizontally_squashable = "on",
   hovered_font_color = button_hovered_font_color,
@@ -128,6 +129,11 @@ styles.ltnm_tab_horizontal_flow = {
   bottom_padding = 12
 }
 
+styles.ltnm_depot_button_inner_flow = {
+  type = "vertical_flow_style",
+  vertical_spacing = 0
+}
+
 -- FRAME STYLES
 
 styles.ltnm_table_row_frame = {
@@ -156,19 +162,40 @@ styles.ltnm_table_toolbar_frame = {
   }
 }
 
+-- LABEL STYLES
+
+styles.ltnm_black_label = {
+  type = "label_style",
+  parent = "label",
+  font_color = button_default_font_color
+}
+
+styles.ltnm_bold_black_label = {
+  type = "label_style",
+  parent = "bold_label",
+  font_color = button_default_bold_font_color
+}
+
+styles.ltnm_semibold_black_label = {
+  type = "label_style",
+  parent = "bold_label",
+  font = "default-semibold",
+  font_color = button_default_font_color
+}
+
 -- SCROLL PANE STYLES
 
 styles.ltnm_depot_select_scroll_pane = {
   type = "scroll_pane_style",
   parent = "flib_naked_scroll_pane_no_padding",
   width = 206,
-  height = 510,
+  height = 623,
   background_graphical_set = {
     position = {282, 17},
     corner_size = 8,
     overall_tiling_horizontal_padding = 6,
     overall_tiling_vertical_padding = 6,
-    overall_tiling_vertical_size = 73,
+    overall_tiling_vertical_size = 77,
     overall_tiling_vertical_spacing = 12
   },
   vertical_flow_style = {
