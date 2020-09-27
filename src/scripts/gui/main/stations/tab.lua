@@ -1,6 +1,6 @@
 local component = require("lib.gui-component")()
 
-component.base_template = (
+component.template = (
   {
     type = "tab-and-content",
     tab = {type = "tab", caption = {"ltnm-gui.stations"}},

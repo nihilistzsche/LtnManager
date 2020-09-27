@@ -26,13 +26,14 @@ gui.add_handlers{
   }
 }
 
-local base_template = {
+local template = {
   {
     type = "frame",
     direction = "vertical",
     elem_mods = {visible = false},
     handlers_prefix = "main.base.",
     handlers = "window",
+    save_as_prefix = "base.",
     save_as = "window",
     children = {
       titlebar(),
@@ -45,6 +46,8 @@ local base_template = {
           {
             type = "tabbed-pane",
             style = "tabbed_pane_with_no_side_padding",
+            reset_handlers_prefix = true,
+            handlers_prefix = "main.",
             save_as = "tabbed_pane.root",
             children = {
               tabs.depots(),
@@ -62,15 +65,15 @@ local base_template = {
 
 function main_gui.create(player, player_table)
   -- create GUI from template
-  local base_elems = gui.build(player.gui.screen, base_template)
+  local elems = gui.build(player.gui.screen, template)
 
   -- dragging and centering
-  base_elems.titlebar.flow.drag_target = base_elems.window
-  base_elems.window.force_auto_center()
+  elems.base.titlebar.flow.drag_target = elems.window
+  elems.base.window.force_auto_center()
 
   -- save to player table
   player_table.gui.main = {
-    base = base_elems,
+    base = elems.base,
     flags = {
       pinned = false
     }

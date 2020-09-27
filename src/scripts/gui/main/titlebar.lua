@@ -25,7 +25,7 @@ local function frame_action_button(sprite, tooltip, handlers, save_as)
   }
 end
 
-component.base_template = (
+component.template = (
   {type = "flow", handlers_prefix = "titlebar.", save_as_prefix = "titlebar.", save_as = "flow", children = {
     {type = "label", style = "frame_title", caption = {"mod-name.LtnManager"}, ignored_by_interaction = true},
     {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
