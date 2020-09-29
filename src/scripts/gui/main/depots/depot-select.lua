@@ -9,20 +9,14 @@ component.template = (
     save_as_prefix = "depot_select",
     children = {
       {type = "scroll-pane", style = "ltnm_depot_select_scroll_pane", children = {
-        {type = "button", style = "ltnm_depot_button", enabled = false, children = {
-          {type = "flow", style = "ltnm_depot_button_inner_flow", direction = "vertical", children = {
-            {type = "label", style ="ltnm_bold_black_label", caption = "Depot"},
-            {type = "flow", children = {
-              {type = "label", style = "ltnm_semibold_black_label", caption = "Trains:"},
-              {type = "label", style = "ltnm_black_label", caption = "0/5"}
-            }},
-            {type = "label", style = "ltnm_semibold_black_label", caption = "Status:"},
-            {type = "label", style = "ltnm_semibold_black_label", caption = "Network ID:"},
-          }}
-        }},
+
       }}
     }
   }
 )
+
+function component.update(player, player_table, gui_data)
+
+end
 
 return component
