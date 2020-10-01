@@ -1,13 +1,11 @@
 local event = require("__flib__.event")
-local gui = require("__flib__.gui")
+local gui = require("__flib__.gui-new")
 local migration = require("__flib__.migration")
 local translation = require("__flib__.translation")
 
-local constants = require("constants")
-
 local global_data = require("scripts.global-data")
 local ltn_data = require("scripts.ltn-data")
-local main_gui = require("scripts.gui.main.base")
+local main_gui = require("scripts.gui.main.controller")
 local migrations = require("scripts.migrations")
 local player_data = require("scripts.player-data")
 
@@ -33,7 +31,6 @@ commands.add_command("LtnManager", {"ltnm-message.command-help"},
 
 event.on_init(function()
   gui.init()
-  gui.build_lookup_tables()
   translation.init()
 
   global_data.init()
@@ -48,15 +45,14 @@ event.on_init(function()
 end)
 
 event.on_load(function()
-  gui.build_lookup_tables()
-
   ltn_data.connect()
 end)
 
 event.on_configuration_changed(function(e)
   if migration.on_config_changed(e, migrations) then
     -- migrate flib modules
-    gui.check_filter_validity()
+    -- TODO
+    -- gui.init()
     translation.init()
     -- update translation data
     global_data.build_translations()
@@ -70,14 +66,15 @@ event.on_configuration_changed(function(e)
   end
 end)
 
--- CUSTOM
+-- TODO
+-- -- CUSTOM
 
-event.register(constants.events.close_main_gui, function(e)
-  local player_table = global.players[e.player_index]
-  if player_table.flags.gui_open then
-    main_gui.close(game.get_player(e.player_index), player_table)
-  end
-end)
+-- event.register(constants.events.close_main_gui, function(e)
+--   local player_table = global.players[e.player_index]
+--   if player_table.flags.gui_open then
+--     main_gui.close(game.get_player(e.player_index), player_table)
+--   end
+-- end)
 
 -- GUI
 

@@ -5,7 +5,6 @@ component.template = (
     type = "frame",
     style = "deep_frame_in_shallow_frame",
     direction = "vertical",
-    save_as_prefix = "trains_list.",
     children = {
       {type = "frame", style = "ltnm_table_toolbar_frame", children = {
         {

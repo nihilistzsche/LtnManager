@@ -1,7 +1,7 @@
 local component = require("lib.gui-component")()
 
-local depot_select = require("scripts.gui.main.depots.depot-select")
-local trains_list = require("scripts.gui.main.depots.trains-list")
+local depot_select = require("scripts.gui.main.components.depots.depot-select")
+local trains_list = require("scripts.gui.main.components.depots.trains-list")
 
 component.template = (
   {

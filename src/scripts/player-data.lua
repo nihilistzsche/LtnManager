@@ -2,7 +2,7 @@ local player_data = {}
 
 local translation = require("__flib__.translation")
 
-local main_gui = require("scripts.gui.main.base")
+local main_gui = require("scripts.gui.main.controller")
 
 function player_data.init(player, index)
   local player_table = {
