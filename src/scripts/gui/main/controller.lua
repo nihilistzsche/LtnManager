@@ -16,7 +16,6 @@ function main_gui.update(msg, e)
   local gui_data = player_table.gui.main
   local state = gui_data.state
   local refs = gui_data.refs
-  local handlers = gui_data.handlers
 
   local comp = msg.comp
   local action = msg.action
@@ -35,6 +34,9 @@ function main_gui.update(msg, e)
         player.opened = base_window
       end
     elseif action == "close" then
+      -- don't actually close if we just pinned the GUI
+      if state.base.pinning then return end
+
       local base_window = refs.base.window
 
       base_window.visible = false
@@ -46,6 +48,8 @@ function main_gui.update(msg, e)
         player.opened = nil
       end
     end
+  elseif comp == "titlebar" then
+    titlebar.update(player, state, refs, action)
   end
 end
 
@@ -97,6 +101,7 @@ function main_gui.create(player, player_table)
     state = {
       base = {
         pinned = false,
+        pinning = false,
         visible = false
       }
     }
