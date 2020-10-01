@@ -22,11 +22,13 @@ function component.get_handlers_outline()
   }
 end
 
-function component.update(player, player_table, state, refs, handlers, msg)
+function component.update(player, player_table, state, refs, handlers, msg, e)
   if msg.update then
-    depot_select.update(player, player_table, state, refs, handlers, msg)
+    depot_select.update(player, player_table, state, refs, handlers, msg, e)
     -- TODO
     -- trains_list.update(player, player_table, state, refs, msg)
+  elseif msg.comp == "depot_select" then
+    depot_select.update(player, player_table, state, refs, handlers, msg, e)
   end
 end
 

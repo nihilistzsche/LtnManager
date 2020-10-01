@@ -55,7 +55,7 @@ function main_gui.update(msg, e)
       titlebar.update(player, state, refs, action, e)
     end
   elseif tab == "depots" then
-    tabs.depots.update(player, player_table, state, refs, handlers, msg)
+    tabs.depots.update(player, player_table, state, refs, handlers, msg, e)
   end
 end
 

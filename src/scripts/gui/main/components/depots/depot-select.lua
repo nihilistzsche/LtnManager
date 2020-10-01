@@ -11,7 +11,7 @@ local function status_icon(color, value, ref)
   )
 end
 
-function component.update(player, player_table, state, refs, handlers, msg)
+function component.update(player, player_table, state, refs, handlers, msg, e)
   if msg.update then
     -- LTN data
     local ltn_data = global.data
@@ -83,7 +83,7 @@ function component.update(player, player_table, state, refs, handlers, msg)
             player.index,
             btn_refs.button.index,
             defines.events.on_gui_click,
-            {tab = "depots", comp = "depot_select", action = "update_selected_depot"},
+            {tab = "depots", comp = "depot_select", action = "update_selected_depot", depot = depot_name},
             "main"
           )
         else
@@ -99,28 +99,34 @@ function component.update(player, player_table, state, refs, handlers, msg)
               type = "button",
               style = "ltnm_depot_button",
               enabled = not is_selected_depot,
-              on_click = {tab = "depots", comp = "depot_select", action = "update_selected_depot"},
+              on_click = {tab = "depots", comp = "depot_select", action = "update_selected_depot", depot = depot_name},
               ref = "button",
               children = {
-                {type = "flow", style = "ltnm_depot_button_inner_flow", direction = "vertical", children = {
-                  {type = "label", style ="ltnm_bold_black_label", caption = depot_name, ref = "depot_name"},
-                  {type = "flow", children = {
-                    {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.trains-label"}},
-                    {
-                      type = "label",
-                      style = "ltnm_black_label",
-                      caption = available_trains_count.." / "..depot_data.num_trains,
-                      ref = "trains"
+                {
+                  type = "flow",
+                  style = "ltnm_depot_button_inner_flow",
+                  direction = "vertical",
+                  ignored_by_interaction = true,
+                  children = {
+                    {type = "label", style ="ltnm_bold_black_label", caption = depot_name, ref = "depot_name"},
+                    {type = "flow", children = {
+                      {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.trains-label"}},
+                      {
+                        type = "label",
+                        style = "ltnm_black_label",
+                        caption = available_trains_count.." / "..depot_data.num_trains,
+                        ref = "trains"
+                      }
+                    }},
+                    {type = "flow", children = {
+                      {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.status-label"}},
+                      {type = "flow", ref = "status_flow", children = status_elems}
+                    }},
+                    {type = "flow", children = {
+                      {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.network-id-label"}},
+                      {type = "label", style = "ltnm_black_label", caption = depot_data.network_id, ref = "network_id"}
                     }
-                  }},
-                  {type = "flow", children = {
-                    {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.status-label"}},
-                    {type = "flow", ref = "status_flow", children = status_elems}
-                  }},
-                  {type = "flow", children = {
-                    {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.network-id-label"}},
-                    {type = "label", style = "ltnm_black_label", caption = depot_data.network_id, ref = "network_id"}
-                  }}
+                  }
                 }}
               }
             }
@@ -136,6 +142,18 @@ function component.update(player, player_table, state, refs, handlers, msg)
       gui.remove_handler(player.index, child.index)
       child.destroy()
     end
+  elseif msg.action == "update_selected_depot" then
+    local prev_depot= state.depots.selected_depot
+    for _, button_refs in ipairs(refs.depots.depot_select.buttons) do
+      local name_ref = button_refs.depot_name
+      if name_ref.caption == prev_depot then
+        button_refs.button.enabled = true
+        break
+      end
+    end
+
+    e.element.enabled = false
+    state.depots.selected_depot = msg.depot
   end
 end
 
