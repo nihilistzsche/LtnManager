@@ -1,6 +1,6 @@
 local component = require("lib.gui-component")()
 
-function component.create(depot_data)
+function component.build()
   return {type = "button", style = "ltnm_depot_button", enabled = false, children = {
     {type = "flow", style = "ltnm_depot_button_inner_flow", direction = "vertical", children = {
       {type = "label", style ="ltnm_bold_black_label", caption = "Depot"},

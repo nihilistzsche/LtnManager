@@ -57,7 +57,7 @@ function component.build()
               style = "tabbed_pane_with_no_side_padding",
               ref = {"base", "tabbed_pane"},
               children = {
-                -- tabs.depots(),
+                tabs.depots(),
                 tabs.stations(),
                 tabs.inventory(),
                 tabs.history(),
