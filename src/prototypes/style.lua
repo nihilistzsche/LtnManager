@@ -22,7 +22,7 @@ styles.ltnm_depot_button = {
   type = "button_style",
   parent = "button",
   -- ! TODO this is temporary - remove it!!!
-  width = 194,
+  width = 206,
   -- !
   height = 89,
   padding = 4,
@@ -160,6 +160,14 @@ styles.ltnm_table_toolbar_frame = {
     horizontal_spacing = 12,
     vertical_align = "center"
   }
+}
+
+-- IMAGE STYLES
+
+styles.ltnm_status_icon = {
+  type = "image_style",
+  stretch_image_to_widget_size = true,
+  size = 14
 }
 
 -- LABEL STYLES

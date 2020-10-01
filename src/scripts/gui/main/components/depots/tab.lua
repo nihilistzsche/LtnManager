@@ -3,9 +3,28 @@ local component = require("lib.gui-component")()
 local depot_select = require("scripts.gui.main.components.depots.depot-select")
 local trains_list = require("scripts.gui.main.components.depots.trains-list")
 
-function component.update(player, player_table, state, refs, msg)
+function component.get_default_state()
+  return {}
+end
+
+function component.get_refs_outline()
+  return {
+    depot_select = {
+      buttons = {}
+    }
+  }
+end
+
+function component.get_handlers_outline()
+  return {
+    depot_buttons = {},
+    train_rows = {}
+  }
+end
+
+function component.update(player, player_table, state, refs, handlers, msg)
   if msg.update then
-    depot_select.update(player, player_table, state, refs, msg)
+    depot_select.update(player, player_table, state, refs, handlers, msg)
     -- TODO
     -- trains_list.update(player, player_table, state, refs, msg)
   end

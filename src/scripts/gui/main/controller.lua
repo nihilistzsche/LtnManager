@@ -16,6 +16,7 @@ function main_gui.update(msg, e)
   local gui_data = player_table.gui.main
   local state = gui_data.state
   local refs = gui_data.refs
+  local handlers = gui_data.handlers
 
   local tab = msg.tab
   local comp = msg.comp
@@ -54,7 +55,7 @@ function main_gui.update(msg, e)
       titlebar.update(player, state, refs, action, e)
     end
   elseif tab == "depots" then
-    tabs.depots.update(player, player_table, state, refs, msg)
+    tabs.depots.update(player, player_table, state, refs, handlers, msg)
   end
 end
 
@@ -62,7 +63,10 @@ gui.updaters.main = main_gui.update
 
 function main_gui.create(player, player_table)
   -- create GUI from template
-  local refs, handlers = gui.build(player.gui.screen, "main", {
+  local refs_outline = {
+    depots = tabs.depots.get_refs_outline()
+  }
+  local refs = gui.build(player.gui.screen, "main", {
     {
       type = "frame",
       direction = "vertical",
@@ -93,7 +97,7 @@ function main_gui.create(player, player_table)
         }
       }
     }
-  })
+  }, refs_outline)
 
   -- dragging and centering
   refs.base.titlebar.flow.drag_target = refs.base.window
@@ -101,10 +105,13 @@ function main_gui.create(player, player_table)
 
   -- save to player table
   player_table.gui.main = {
-    handlers = handlers,
+    handlers = {
+      depots = tabs.depots.get_handlers_outline()
+    },
     refs = refs,
     state = {
       base = {
+        active_tab = "depots",
         auto_refresh = false,
         pinned = false,
         pinning = false,
@@ -114,7 +121,8 @@ function main_gui.create(player, player_table)
         network_id = -1,
         query = "",
         surface = -1
-      }
+      },
+      depots = tabs.depots.get_default_state()
     }
   }
 
