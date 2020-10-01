@@ -32,7 +32,7 @@ function component.build()
       {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
       frame_action_button("ltnm_pin", {"ltnm-gui.keep-open"}),
       frame_action_button("ltnm_refresh", {"ltnm-gui.refresh"}),
-      frame_action_button("utility/close", nil, {"base", "titlebar", "close_button"})
+      frame_action_button("utility/close", nil, {comp = "base", action = "close"})
     }}
   )
 end

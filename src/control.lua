@@ -123,7 +123,7 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
     local player_table = global.players[e.player_index]
     local flags = player_table.flags
     if flags.can_open_gui then
-      main_gui.toggle(player, player_table)
+      main_gui.toggle(e.player_index, player_table)
     else
       -- close GUI if it is open (just in case)
       if flags.gui_open then

@@ -1,12 +1,96 @@
 local gui = require("__flib__.gui-new")
 
-local base = require("scripts.gui.main.components.base")
+local titlebar = require("scripts.gui.main.components.titlebar")
+local toolbar = require("scripts.gui.main.components.toolbar")
+
+local tabs = {}
+for _, tab_name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
+  tabs[tab_name] = require("scripts.gui.main.components."..tab_name..".tab")
+end
 
 local main_gui = {}
 
+function main_gui.update(msg, e)
+  local player = game.get_player(e.player_index)
+  local player_table = global.players[e.player_index]
+  local gui_data = player_table.gui.main
+  local state = gui_data.state
+  local refs = gui_data.refs
+  local handlers = gui_data.assigned_handlers
+
+  local comp = msg.comp
+  local action = msg.action
+
+  if comp == "base" then
+    if action == "open" then
+      local base_window = refs.base.window
+
+      -- show window
+      base_window.visible = true
+      -- TODO bring to front
+
+      -- set flag and shortcut state
+      player_table.flags.gui_open = true
+      player.set_shortcut_toggled("ltnm-toggle-gui", true)
+
+      -- set as opened
+      if not gui_data.state.pinned then
+        player.opened = base_window
+      end
+    elseif action == "close" then
+      local base_window = refs.base.window
+
+      -- hide window
+      base_window.visible = false
+
+      -- set flag and shortcut state
+      player_table.flags.gui_open = false
+      player.set_shortcut_toggled("ltnm-toggle-gui", false)
+
+      -- unset as opened
+      if player.opened == base_window then
+        player.opened = nil
+      end
+    end
+  end
+end
+
+gui.updaters.main = main_gui.update
+
 function main_gui.create(player, player_table)
   -- create GUI from template
-  local refs, assigned_handlers = gui.build(player.gui.screen, "main", {base()})
+  local refs, assigned_handlers = gui.build(player.gui.screen, "main", {
+    {
+      type = "frame",
+      direction = "vertical",
+      visible = false,
+      on_closed = {comp = "base", action = "close"},
+      ref = {"base", "window"},
+      children = {
+        titlebar(),
+        {
+          type = "frame",
+          style = "inside_deep_frame",
+          direction = "vertical",
+          children = {
+            toolbar(),
+            {
+              type = "tabbed-pane",
+              style = "tabbed_pane_with_no_side_padding",
+              ref = {"base", "tabbed_pane"},
+              children = {
+                tabs.depots(),
+                tabs.stations(),
+                tabs.inventory(),
+                tabs.history(),
+                tabs.alerts(),
+              }
+            }
+          }
+        }
+      }
+    }
+  })
 
   -- dragging and centering
   refs.base.titlebar.flow.drag_target = refs.base.window
@@ -16,7 +100,9 @@ function main_gui.create(player, player_table)
   player_table.gui.main = {
     assigned_handlers = assigned_handlers,
     refs = refs,
-    state = base.init()
+    state = {
+      pinned = false
+    }
   }
 
   -- set flag and shortcut state
@@ -39,53 +125,9 @@ function main_gui.destroy(player, player_table)
   player.set_shortcut_available("ltnm-toggle-gui", false)
 end
 
-function main_gui.open(player, player_table)
-  local gui_data = player_table.gui.main
-  local base_window = gui_data.refs.base.window
-
-  -- show window
-  base_window.visible = true
-  -- TODO bring to front
-
-  -- set flag and shortcut state
-  player_table.flags.gui_open = true
-  player.set_shortcut_toggled("ltnm-toggle-gui", true)
-
-  -- set as opened
-  if not gui_data.state.pinned then
-    player.opened = base_window
-  end
+function main_gui.toggle(player_index, player_table)
+  local action = player_table.flags.gui_open and "close" or "open"
+  main_gui.update({comp = "base", action = action}, {player_index = player_index})
 end
-
-function main_gui.close(player, player_table)
-  local gui_data = player_table.gui.main
-  local base_window = gui_data.refs.base.window
-
-  -- hide window
-  base_window.visible = false
-
-  -- set flag and shortcut state
-  player_table.flags.gui_open = false
-  player.set_shortcut_toggled("ltnm-toggle-gui", false)
-
-  -- unset as opened
-  if player.opened == base_window then
-    player.opened = nil
-  end
-end
-
-function main_gui.toggle(player, player_table)
-  if player_table.flags.gui_open then
-    main_gui.close(player, player_table)
-  else
-    main_gui.open(player, player_table)
-  end
-end
-
-function main_gui.update(msg, e)
-  base.update(msg, e)
-end
-
-gui.updaters.main = main_gui.update
 
 return main_gui
