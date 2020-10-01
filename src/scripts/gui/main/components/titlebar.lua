@@ -1,7 +1,24 @@
 local component = require("lib.gui-component")()
 
-function component.update(player, state, refs, action)
-  if action == "toggle_pinned" then
+function component.update(player, state, refs, action, e)
+  if action == "handle_refresh_click" then
+    -- toggle auto refresh
+    if e.shift then
+      local auto_refresh = state.base.auto_refresh
+      local refresh_button = refs.base.titlebar.refresh_button
+
+      if auto_refresh then
+        refresh_button.style = "frame_action_button"
+        state.base.auto_refresh = false
+      else
+        refresh_button.style = "flib_selected_frame_action_button"
+        state.base.auto_refresh = true
+      end
+    -- refresh now
+    else
+      -- TODO
+    end
+  elseif action == "toggle_pinned" then
     local pinned = state.base.pinned
     local pin_button = refs.base.titlebar.pin_button
 
@@ -44,11 +61,16 @@ function component.build()
       frame_action_button(
         "ltnm_pin",
         {"ltnm-gui.keep-open"},
-        {comp = "titlebar", action = "toggle_pinned"},
+        {tab = "base", comp = "titlebar", action = "toggle_pinned"},
         {"base", "titlebar", "pin_button"}
       ),
-      frame_action_button("ltnm_refresh", {"ltnm-gui.refresh"}),
-      frame_action_button("utility/close", nil, {comp = "base", action = "close"})
+      frame_action_button(
+        "ltnm_refresh",
+        {"ltnm-gui.refresh"},
+        {tab = "base", comp = "titlebar", action = "handle_refresh_click"},
+        {"base", "titlebar", "refresh_button"}
+      ),
+      frame_action_button("utility/close", nil, {tab = "base", comp = "base", action = "close"})
     }}
   )
 end

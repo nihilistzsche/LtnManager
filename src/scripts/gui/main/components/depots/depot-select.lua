@@ -1,5 +1,12 @@
 local component = require("lib.gui-component")()
 
+function component.update(player, player_table, state, refs, msg)
+  if msg.update then
+    local ltn_data = global.data
+
+  end
+end
+
 function component.build()
   return (
     {

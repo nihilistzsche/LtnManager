@@ -17,39 +17,44 @@ function main_gui.update(msg, e)
   local state = gui_data.state
   local refs = gui_data.refs
 
+  local tab = msg.tab
   local comp = msg.comp
   local action = msg.action
 
-  if comp == "base" then
-    if action == "open" then
-      local base_window = refs.base.window
+  if tab == "base" then
+    if comp == "base" then
+      if action == "open" then
+        local base_window = refs.base.window
 
-      base_window.visible = true
-      -- TODO bring to front
+        base_window.visible = true
+        -- TODO bring to front
 
-      state.base.visible = true
-      player.set_shortcut_toggled("ltnm-toggle-gui", true)
+        state.base.visible = true
+        player.set_shortcut_toggled("ltnm-toggle-gui", true)
 
-      if not gui_data.state.base.pinned then
-        player.opened = base_window
+        if not gui_data.state.base.pinned then
+          player.opened = base_window
+        end
+      elseif action == "close" then
+        -- don't actually close if we just pinned the GUI
+        if state.base.pinning then return end
+
+        local base_window = refs.base.window
+
+        base_window.visible = false
+
+        state.base.visible = false
+        player.set_shortcut_toggled("ltnm-toggle-gui", false)
+
+        if player.opened == base_window then
+          player.opened = nil
+        end
       end
-    elseif action == "close" then
-      -- don't actually close if we just pinned the GUI
-      if state.base.pinning then return end
-
-      local base_window = refs.base.window
-
-      base_window.visible = false
-
-      state.base.visible = false
-      player.set_shortcut_toggled("ltnm-toggle-gui", false)
-
-      if player.opened == base_window then
-        player.opened = nil
-      end
+    elseif comp == "titlebar" then
+      titlebar.update(player, state, refs, action, e)
     end
-  elseif comp == "titlebar" then
-    titlebar.update(player, state, refs, action)
+  elseif tab == "depots" then
+    tabs.depots.update(player, player_table, state, refs, msg)
   end
 end
 
@@ -62,7 +67,7 @@ function main_gui.create(player, player_table)
       type = "frame",
       direction = "vertical",
       visible = false,
-      on_closed = {comp = "base", action = "close"},
+      on_closed = {tab = "base", comp = "base", action = "close"},
       ref = {"base", "window"},
       children = {
         titlebar(),
@@ -100,9 +105,15 @@ function main_gui.create(player, player_table)
     refs = refs,
     state = {
       base = {
+        auto_refresh = false,
         pinned = false,
         pinning = false,
         visible = false
+      },
+      search = {
+        network_id = -1,
+        query = "",
+        surface = -1
       }
     }
   }
@@ -129,7 +140,12 @@ end
 
 function main_gui.toggle(player_index, player_table)
   local action = player_table.gui.main.state.base.visible and "close" or "open"
-  main_gui.update({comp = "base", action = action}, {player_index = player_index})
+  main_gui.update({tab = "base", comp = "base", action = action}, {player_index = player_index})
+end
+
+function main_gui.update_active_tab(player_index, player_table)
+  local active_tab = player_table.gui.main.state.base.active_tab
+  main_gui.update({tab = active_tab, update = true}, {player_index = player_index})
 end
 
 return main_gui

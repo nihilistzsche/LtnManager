@@ -157,13 +157,9 @@ event.on_tick(function(e)
     elseif
       player_table.flags.can_open_gui
       and player_table.gui.main.state.base.visible
-      and player_table.settings.auto_refresh
-      and game.tick - player_table.last_update >= 180
+      and player_table.gui.main.state.base.auto_refresh
     then
-      -- TODO
-      -- update GUI
-      -- main_gui.update_active_tab(game.get_player(player_index), player_table)
-      -- player_table.last_update = game.tick
+      main_gui.update_active_tab(player_index, player_table)
     end
 
     -- get and save next index, or stop iteration
