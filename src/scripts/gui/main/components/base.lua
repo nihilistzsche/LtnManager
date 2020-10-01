@@ -32,6 +32,10 @@ function component.init()
   }
 end
 
+function component.update(msg, e)
+
+end
+
 function component.build()
   return (
     {

@@ -82,4 +82,10 @@ function main_gui.toggle(player, player_table)
   end
 end
 
+function main_gui.update(msg, e)
+  base.update(msg, e)
+end
+
+gui.updaters.main = main_gui.update
+
 return main_gui
