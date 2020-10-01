@@ -66,27 +66,17 @@ event.on_configuration_changed(function(e)
   end
 end)
 
--- TODO
--- -- CUSTOM
-
--- event.register(constants.events.close_main_gui, function(e)
---   local player_table = global.players[e.player_index]
---   if player_table.flags.gui_open then
---     main_gui.close(game.get_player(e.player_index), player_table)
---   end
--- end)
-
 -- GUI
 
 gui.register_handlers()
 
-event.register("ltnm-search", function(e)
-  local player_table = global.players[e.player_index]
-  if player_table.flags.gui_open then
-    -- TODO
-    -- main_gui.toggle_search(game.get_player(e.player_index), player_table)
-  end
-end)
+-- TODO
+-- event.register("ltnm-search", function(e)
+--   local player_table = global.players[e.player_index]
+--   if player_table.flags.gui_open then
+--     -- main_gui.toggle_search(game.get_player(e.player_index), player_table)
+--   end
+-- end)
 
 -- PLAYER
 
@@ -126,7 +116,7 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
       main_gui.toggle(e.player_index, player_table)
     else
       -- close GUI if it is open (just in case)
-      if flags.gui_open then
+      if player_table.gui.main.state.base.visible then
         main_gui.close(player, player_table)
       end
       -- print warning message
@@ -165,7 +155,8 @@ event.on_tick(function(e)
     if player_flags.translations_finished and not player_flags.can_open_gui then
       main_gui.create(game.get_player(player_index), player_table)
     elseif
-      player_table.flags.gui_open
+      player_table.flags.can_open_gui
+      and player_table.gui.main.state.base.visible
       and player_table.settings.auto_refresh
       and game.tick - player_table.last_update >= 180
     then

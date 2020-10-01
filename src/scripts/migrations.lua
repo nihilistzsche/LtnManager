@@ -38,7 +38,7 @@ return {
   ["0.4.0"] = function()
     for _, player_table in pairs(global.players) do
       local flags = player_table.flags
-      flags.closing_gui = false
+      flags.gui_open = nil
       flags.search_open = nil
       flags.toggling_search = nil
     end
