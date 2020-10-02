@@ -148,6 +148,10 @@ end
 
 function main_gui.toggle(player_index, player_table)
   local action = player_table.gui.main.state.base.visible and "close" or "open"
+  if action == "open" then
+    local active_tab = player_table.gui.main.state.base.active_tab
+    main_gui.update({tab = active_tab, update = true}, {player_index = player_index})
+  end
   main_gui.update({tab = "base", comp = "base", action = action}, {player_index = player_index})
 end
 

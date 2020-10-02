@@ -1,3 +1,5 @@
+local gui = require("__flib__.gui-new")
+
 local component = require("lib.gui-component")()
 
 function component.update(player, state, refs, action, e)
@@ -16,7 +18,7 @@ function component.update(player, state, refs, action, e)
       end
     -- refresh now
     else
-      -- TODO
+      gui.updaters.main({tab = state.base.active_tab, update = true}, {player_index = e.player_index})
     end
   elseif action == "toggle_pinned" then
     local pinned = state.base.pinned
