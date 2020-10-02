@@ -1,4 +1,4 @@
-local gui = require("__flib__.gui")
+local gui = require("__flib__.gui-new")
 
 local component = {}
 
@@ -58,14 +58,21 @@ function component.create(depot_data, is_selected_depot, depot_name, available_t
   )
 end
 
-function component.update(index, button_refs, depot_name, available_trains_count, depot_data, statuses)
-  local btn_refs = button_refs[index]
+function component.update(
+  button_refs,
+  depot_data,
+  is_selected_depot,
+  depot_name,
+  available_trains_count,
+  statuses,
+  player_index
+)
+  button_refs.button.enabled = not is_selected_depot
+  button_refs.depot_name.caption = depot_name
+  button_refs.trains.caption = available_trains_count.." / "..depot_data.num_trains
+  button_refs.network_id.caption = depot_data.network_id
 
-  btn_refs.depot_name.caption = depot_name
-  btn_refs.trains.caption = available_trains_count.." / "..depot_data.num_trains
-  btn_refs.network_id.caption = depot_data.network_id
-
-  local status_flow = btn_refs.status_flow
+  local status_flow = button_refs.status_flow
   local status_children = status_flow.children
   local status_index = 0
   for name, count in pairs(statuses) do
@@ -84,8 +91,8 @@ function component.update(index, button_refs, depot_name, available_trains_count
 
   -- update button handler
   gui.add_handler(
-    player.index,
-    btn_refs.button.index,
+    player_index,
+    button_refs.button.index,
     defines.events.on_gui_click,
     {tab = "depots", comp = "depot_select", action = "update_selected_depot", depot = depot_name},
     "main"

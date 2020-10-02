@@ -51,7 +51,15 @@ function component.update(player, _, state, refs, handlers, msg, e)
         local child = children[index]
         if child then
           -- update
-          depot_button.update(index, button_refs, depot_name, available_trains_count, depot_data, statuses)
+          depot_button.update(
+            button_refs[index],
+            depot_data,
+            is_selected_depot,
+            depot_name,
+            available_trains_count,
+            statuses,
+            player.index
+          )
         else
           -- create
           local btn_refs, btn_handlers = gui.build(
