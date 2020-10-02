@@ -3,6 +3,11 @@ Version: 0.4.0
 Date: ????
   Changes:
 ---------------------------------------------------------------------------------------------------
+Version: 0.3.7
+Date: 2020-10-02
+  Bugfixes:
+    - Fixed a crash when a train was put into manual mode between iteration steps
+---------------------------------------------------------------------------------------------------
 Version: 0.3.6
 Date: 2020-09-26
   Bugfixes:
