@@ -4,8 +4,8 @@ local component = require("lib.gui-component")()
 
 function component.update(player, state, refs, action, e)
   if action == "handle_refresh_click" then
-    -- toggle auto refresh
     if e.shift then
+      -- toggle auto refresh
       local auto_refresh = state.base.auto_refresh
       local refresh_button = refs.base.titlebar.refresh_button
 
@@ -16,8 +16,8 @@ function component.update(player, state, refs, action, e)
         refresh_button.style = "flib_selected_frame_action_button"
         state.base.auto_refresh = true
       end
-    -- refresh now
     else
+      -- refresh now
       gui.updaters.main({tab = state.base.active_tab, update = true}, {player_index = e.player_index})
     end
   elseif action == "toggle_pinned" then
