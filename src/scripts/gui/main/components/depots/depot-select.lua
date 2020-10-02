@@ -113,6 +113,7 @@ function component.build()
         {
           type = "scroll-pane",
           style = "ltnm_depot_select_scroll_pane",
+          horizontal_scroll_policy = "never",
           ref = {"depots", "depot_select", "scroll_pane"}
         }
       }
