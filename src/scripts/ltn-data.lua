@@ -160,6 +160,10 @@ local function iterate_trains(working_data, iterations_per_tick)
 
     local train_state = train.state
     local schedule = train.schedule
+
+    -- if `schedule` is `nil`, the train was put into manual mode between the previous step and this one
+    if not schedule then return nil, true end
+
     local depot = schedule.records[1].station
     local depot_data = depots[depot]
 
