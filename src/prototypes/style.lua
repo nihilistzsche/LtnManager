@@ -95,8 +95,8 @@ styles.ltnm_sort_checkbox = {
   text_padding = 5
 }
 
--- active is orange by default
-styles.ltnm_active_sort_checkbox = {
+-- selected is orange by default
+styles.ltnm_selected_sort_checkbox = {
   type = "checkbox_style",
   parent = "ltnm_sort_checkbox",
   -- font_color = bold_font_color,

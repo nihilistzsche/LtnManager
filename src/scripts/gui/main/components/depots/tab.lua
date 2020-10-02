@@ -11,6 +11,9 @@ function component.get_refs_outline()
   return {
     depot_select = {
       buttons = {}
+    },
+    trains_list = {
+      rows = {}
     }
   }
 end
@@ -25,10 +28,11 @@ end
 function component.update(player, player_table, state, refs, handlers, msg, e)
   if msg.update then
     depot_select.update(player, player_table, state, refs, handlers, msg, e)
-    -- TODO
-    -- trains_list.update(player, player_table, state, refs, msg)
+    trains_list.update(player, player_table, state, refs, msg, e)
   elseif msg.comp == "depot_select" then
     depot_select.update(player, player_table, state, refs, handlers, msg, e)
+  elseif msg.comp == "trains_list" then
+    trains_list.update(player, player_table, state, refs, handlers, msg, e)
   end
 end
 
