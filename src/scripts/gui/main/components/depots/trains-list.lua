@@ -1,11 +1,103 @@
+local gui = require("__flib__.gui-new")
+
+local constants = require("constants")
+
+local train_row = require("scripts.gui.main.components.depots.train-row")
+
 local component = require("lib.gui-component")()
 
-function component.update(player, player_table, state, refs, handlers, msg, e)
-  local selected_depot = state.depots.selected_depot
-  local breakpoint
+function component.get_default_state()
+  return {
+    active_sort = "composition",
+    sort_composition = true,
+    sort_status = false,
+    sort_contents = false
+  }
 end
 
-function component.build()
+function component.update(player, player_table, state, refs, handlers, msg, e)
+  -- ----- UPDATE -----
+  if msg.update then
+    local selected_depot = state.depots.selected_depot
+    local depot_data = global.data.depots[selected_depot]
+    if not depot_data then return end
+
+    -- train data
+    local trains = global.data.trains
+
+    -- states
+    local depots_state = state.depots
+    local search_state = state.search
+
+    -- get train IDs based on active sort
+    local active_sort = depots_state.active_sort
+    local train_ids
+    if active_sort == "composition" then
+      train_ids = depot_data.sorted_trains.composition
+    else
+      train_ids = depot_data.sorted_trains.status[player.index]
+    end
+    local active_sort_state = depots_state["sort_"..active_sort]
+
+    -- search
+    local search_query = search_state.query
+    local search_surface = search_state.surface
+
+    -- refs
+    local trains_list_refs = refs.depots.trains_list
+    local scroll_pane = trains_list_refs.scroll_pane
+    local children = scroll_pane.children
+    local rows_refs = trains_list_refs.rows
+
+    -- handlers
+    local rows_handlers = handlers.depots.train_rows
+
+    -- player locale
+    local player_locale = player_table.translations.gui.locale_identifier
+
+    -- iteration data
+    local start = active_sort_state and 1 or #train_ids
+    local finish = active_sort_state and #train_ids or 1
+    local step = active_sort_state and 1 or -1
+
+    -- build / update rows
+    local train_index = 0
+    for i = start, finish, step do
+      local train_id = train_ids[i]
+      local train_data = trains[train_id]
+      local train_status = train_data.status[player.index]
+      local search_comparator = active_sort == "composition" and train_data.composition or train_status.string
+
+      -- test against search queries
+      if
+        string.find(search_comparator, search_query)
+        and (search_surface == -1 or train_data.main_locomotive.surface.index == search_surface)
+      then
+        train_index = train_index + 1
+
+        -- build the component if it doesn't exist
+        if not children[train_index] then
+          local row_refs, row_handlers = gui.build(scroll_pane, "main", {train_row.build(player_locale)})
+          rows_refs[train_index] = row_refs
+          rows_handlers[train_index] = row_handlers
+        end
+
+        -- update the component's data
+        train_row.update(rows_refs[train_index], train_id, train_data, train_status, player.index)
+      end
+    end
+    -- delete extraneous rows
+    for j = train_index + 1, #children do
+      for index in pairs(rows_handlers[j]) do
+        gui.remove_handler(player.index, index)
+      end
+      children[j].destroy()
+    end
+  end
+end
+
+function component.build(player_locale)
+  local gui_constants = constants.gui[player_locale].trains_list
   return (
     {
       type = "frame",
@@ -16,6 +108,7 @@ function component.build()
           {
             type = "checkbox",
             style = "ltnm_selected_sort_checkbox",
+            width = gui_constants.composition,
             caption = {"ltnm-gui.composition"},
             tooltip = {"ltnm-gui.composition-tooltip"},
             state = true,
@@ -24,20 +117,20 @@ function component.build()
           {
             type = "checkbox",
             style = "ltnm_sort_checkbox",
+            width = gui_constants.status,
+            -- horizontally_stretchable = true,
             caption = {"ltnm-gui.train-status"},
             tooltip = {"ltnm-gui.train-status-tooltip"},
             state = true,
             ref = {"depots", "trains_list", "sorters", "status"}
           },
           {
-            type = "checkbox",
-            style = "ltnm_sort_checkbox",
+            type = "label",
+            style = "caption_label",
+            width = gui_constants.contents,
             caption = {"ltnm-gui.contents"},
             tooltip = {"ltnm-gui.contents-tooltip"},
-            state = true,
-            ref = {"depots", "trains_list", "sorters", "contents"}
-          },
-          {type = "empty-widget", style = "flib_horizontal_pusher"}
+          }
         }},
         {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"depots", "trains_list", "scroll_pane"}}
       }

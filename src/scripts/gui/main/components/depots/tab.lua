@@ -4,7 +4,7 @@ local depot_select = require("scripts.gui.main.components.depots.depot-select")
 local trains_list = require("scripts.gui.main.components.depots.trains-list")
 
 function component.get_default_state()
-  return {}
+  return trains_list.get_default_state()
 end
 
 function component.get_refs_outline()
@@ -28,7 +28,7 @@ end
 function component.update(player, player_table, state, refs, handlers, msg, e)
   if msg.update then
     depot_select.update(player, player_table, state, refs, handlers, msg, e)
-    trains_list.update(player, player_table, state, refs, msg, e)
+    trains_list.update(player, player_table, state, refs, handlers, msg, e)
   elseif msg.comp == "depot_select" then
     depot_select.update(player, player_table, state, refs, handlers, msg, e)
   elseif msg.comp == "trains_list" then
@@ -36,7 +36,7 @@ function component.update(player, player_table, state, refs, handlers, msg, e)
   end
 end
 
-function component.build()
+function component.build(player_locale)
   return (
     {
       type = "tab-and-content",
@@ -44,7 +44,7 @@ function component.build()
       content = (
         {type = "flow", style = "ltnm_tab_horizontal_flow", children = {
           depot_select(),
-          trains_list()
+          trains_list(player_locale)
         }}
       )
     }

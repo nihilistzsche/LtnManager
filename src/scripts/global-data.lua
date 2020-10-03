@@ -15,12 +15,12 @@ function global_data.build_translations()
   local translation_data = {
     -- train status
     {dictionary = "gui", internal = "locale_identifier", localised = {"locale-identifier"}},
-    {dictionary = "gui", internal = "delivering_to", localised = {"ltnm-gui.delivering-to"}},
-    {dictionary = "gui", internal = "fetching_from", localised = {"ltnm-gui.fetching-from"}},
-    {dictionary = "gui", internal = "loading_at", localised = {"ltnm-gui.loading-at"}},
+    {dictionary = "gui", internal = "delivering_to", localised = {"ltnm-gui.delivering-to-label"}},
+    {dictionary = "gui", internal = "fetching_from", localised = {"ltnm-gui.fetching-from-label"}},
+    {dictionary = "gui", internal = "loading_at", localised = {"ltnm-gui.loading-at-label"}},
     {dictionary = "gui", internal = "parked_at_depot", localised = {"ltnm-gui.parked-at-depot"}},
     {dictionary = "gui", internal = "returning_to_depot", localised = {"ltnm-gui.returning-to-depot"}},
-    {dictionary = "gui", internal = "unloading_at", localised = {"ltnm-gui.unloading-at"}}
+    {dictionary = "gui", internal = "unloading_at", localised = {"ltnm-gui.unloading-at-label"}}
   }
   -- materials
   for _, type in ipairs{"fluid", "item"} do

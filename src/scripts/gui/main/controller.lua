@@ -86,7 +86,7 @@ function main_gui.create(player, player_table)
               style = "tabbed_pane_with_no_side_padding",
               ref = {"base", "tabbed_pane"},
               children = {
-                tabs.depots(),
+                tabs.depots(player_table.translations.gui.locale_identifier),
                 tabs.stations(),
                 tabs.inventory(),
                 tabs.history(),

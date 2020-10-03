@@ -1,8 +1,8 @@
 local constants = {}
 
-local event = require("__flib__.event")
-
 if script then
+  local event = require("__flib__.event")
+
   constants.events = {
     close_main_gui = event.generate_id(),
     update_main_gui = event.generate_id()
@@ -39,7 +39,11 @@ constants.colors = {
 -- dictionary locale identifier -> dictionary of hardcoded GUI sizes
 constants.gui = {
   en = {
-
+    trains_list = {
+      composition = 200,
+      status = 306,
+      contents = 192
+    }
   }
 }
 
