@@ -53,6 +53,8 @@ function main_gui.update(msg, e)
       end
     elseif comp == "titlebar" then
       titlebar.update(player, state, refs, action, e)
+    elseif comp == "toolbar" then
+      toolbar.update(msg, e)
     end
   elseif tab == "depots" then
     tabs.depots.update(player, player_table, state, refs, handlers, msg, e)
@@ -117,11 +119,7 @@ function main_gui.create(player, player_table)
         pinning = false,
         visible = false
       },
-      search = {
-        network_id = -1,
-        query = "",
-        surface = -1
-      },
+      search = toolbar.get_default_state(),
       depots = tabs.depots.get_default_state()
     }
   }

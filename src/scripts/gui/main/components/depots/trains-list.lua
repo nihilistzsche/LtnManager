@@ -70,7 +70,7 @@ function component.update(player, player_table, state, refs, handlers, msg, e)
 
       -- test against search queries
       if
-        string.find(search_comparator, search_query)
+        string.find(string.lower(search_comparator), search_query)
         and (search_surface == -1 or train_data.main_locomotive.surface.index == search_surface)
       then
         train_index = train_index + 1

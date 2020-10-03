@@ -47,7 +47,7 @@ constants.gui = {
   }
 }
 
-constants.input_sanitisers = {
+constants.input_sanitizers = {
   ["%("] = "%%(",
   ["%)"] = "%%)",
   ["%.^[%*]"] = "%%.",
