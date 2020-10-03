@@ -41,8 +41,8 @@ constants.gui = {
   en = {
     trains_list = {
       composition = 200,
-      status = 306,
-      shipment = 192
+      status = 312,
+      shipment = 180
     }
   }
 }

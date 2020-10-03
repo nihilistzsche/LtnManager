@@ -88,6 +88,7 @@ function component.build(player_locale)
     {
       type = "frame",
       style = "ltnm_table_row_frame",
+      horizontally_stretchable = true,
       children = {
         {
           type = "label",
@@ -125,8 +126,7 @@ function component.build(player_locale)
               {type = "table", style = "slot_table", width = (36 * 5), column_count = 5, ref = {"shipment", "table"}}
             }
           }
-        }},
-        {type = "empty-widget", left_margin = -12, horizontally_stretchable = true}
+        }}
       }
     }
   )

@@ -6,7 +6,7 @@ function component.build()
       type = "tab-and-content",
       tab = {type = "tab", caption = {"ltnm-gui.alerts"}},
       content = (
-        {type = "empty-widget", width = 1000, height = 500}
+        {type = "empty-widget"}
       )
     }
   )

@@ -29,6 +29,7 @@ function component.create(depot_data, is_selected_depot, depot_name, available_t
       children = {
         {
           type = "flow",
+          -- TODO limit the width to clip long names
           style = "ltnm_depot_button_inner_flow",
           direction = "vertical",
           ignored_by_interaction = true,
