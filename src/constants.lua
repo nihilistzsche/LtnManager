@@ -10,29 +10,29 @@ if script then
 end
 
 constants.colors = {
-  error = {
-    str = "255, 90, 90",
-    tbl = {255, 90, 90}
-  },
   green = {
-    str = "210, 253, 145",
-    tbl = {210, 253, 145}
-  },
-  heading = {
-    str = "255, 230, 192",
-    tbl = {255, 230, 192}
+    str = "69, 255, 69",
+    tbl = {69, 255, 69}
   },
   info = {
     str = "128, 206, 240",
     tbl = {128, 206, 240}
   },
+  red = {
+    str = "255, 69, 69",
+    tbl = {255, 69, 69}
+  },
   station_circle = {
     str = "255, 50, 50, 190",
     tbl = {255, 50, 50, 190}
   },
-  unresearched = {
-    str = "255, 142, 142",
-    tbl = {255, 142, 142}
+  yellow = {
+    str = "255, 240, 69",
+    tbl = {255, 240, 69}
+  },
+  white = {
+    str = "255, 255, 255",
+    tbl = {255, 255, 255}
   }
 }
 
@@ -42,7 +42,7 @@ constants.gui = {
     trains_list = {
       composition = 200,
       status = 306,
-      contents = 192
+      shipment = 192
     }
   }
 }

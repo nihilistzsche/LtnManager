@@ -11,7 +11,7 @@ function component.get_default_state()
     active_sort = "composition",
     sort_composition = true,
     sort_status = false,
-    sort_contents = false
+    sort_shipment = false
   }
 end
 
@@ -127,9 +127,9 @@ function component.build(player_locale)
           {
             type = "label",
             style = "caption_label",
-            width = gui_constants.contents,
-            caption = {"ltnm-gui.contents"},
-            tooltip = {"ltnm-gui.contents-tooltip"},
+            width = gui_constants.shipment,
+            caption = {"ltnm-gui.shipment"},
+            tooltip = {"ltnm-gui.shipment-tooltip"},
           }
         }},
         {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"depots", "trains_list", "scroll_pane"}}

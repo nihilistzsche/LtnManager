@@ -217,7 +217,7 @@ styles.ltnm_bold_green_label = {
 styles.ltnm_bold_red_label = {
   type = "label_style",
   parent = "bold_label",
-  font_color = constants.colors.error.tbl
+  font_color = constants.colors.red.tbl
 }
 
 styles.ltnm_semibold_black_label = {

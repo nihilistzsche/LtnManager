@@ -1,3 +1,5 @@
+local constants = require("constants")
+
 local util = {}
 
 -- adds the contents of two material tables together
@@ -56,6 +58,7 @@ util.train = require("__flib__.train")
 -- create a string naming the status of the train
 -- first return is the string used for sorting, second return is the formatted string data for display
 function util.train.get_status_string(train_data, translations)
+  local train = train_data.train
   local state = train_data.state
   local def = defines.train_state
   if
@@ -66,7 +69,8 @@ function util.train.get_status_string(train_data, translations)
   then
     if train_data.returning_to_depot then
       return {
-        returning_to_depot = true,
+        color = constants.colors.white.tbl,
+        msg = translations.returning_to_depot,
         string = translations.returning_to_depot
       }
     else
@@ -79,7 +83,8 @@ function util.train.get_status_string(train_data, translations)
       else
         if not train_data.from then
           return {
-            n_a = true,
+            color = constants.colors.red.tbl,
+            msg = translations.not_available,
             string = "N/A"
           }
         else
@@ -93,10 +98,19 @@ function util.train.get_status_string(train_data, translations)
     end
   elseif state == def.wait_station then
     if train_data.surface or train_data.returning_to_depot then
-      return {
-        parked_at_depot = true,
-        string = translations.parked_at_depot
-      }
+      if train_data.has_contents then
+        return {
+          color = constants.colors.red.tbl,
+          msg = translations.parked_at_depot_with_residue,
+          string = translations.parked_at_depot_with_residue,
+        }
+      else
+        return {
+          color = constants.colors.green.tbl,
+          msg = translations.parked_at_depot,
+          string = translations.parked_at_depot
+        }
+      end
     else
       if train_data.pickupDone then
         return {
@@ -105,16 +119,26 @@ function util.train.get_status_string(train_data, translations)
           type = translations.unloading_at
         }
       else
-        return {
-          station = "to",
-          string = translations.loading_at.." "..train_data.from,
-          type = translations.loading_at
-        }
+        local station = train.station
+        if station and station.backer_name == train_data.depot then
+          return {
+            color = constants.colors.yellow.tbl,
+            msg = translations.leaving_depot,
+            string = translations.parked_at_depot,
+          }
+        else
+          return {
+            station = "to",
+            string = translations.loading_at.." "..train_data.from,
+            type = translations.loading_at
+          }
+        end
       end
     end
   else
     return {
-      n_a = true,
+      color = constants.colors.red.tbl,
+      msg = translations.not_available,
       string = "N/A"
     }
   end

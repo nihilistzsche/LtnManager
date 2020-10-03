@@ -182,7 +182,21 @@ local function iterate_trains(working_data, iterations_per_tick)
       depot_data.available_trains[#depot_data.available_trains+1] = train_id
     end
 
+    -- construct train contents
+    local contents = {}
+    local has_contents = false
+    for name, count in pairs(train.get_contents()) do
+      has_contents = true
+      contents["item,"..name] = count
+    end
+    for name, count in pairs(train.get_fluid_contents()) do
+      has_contents = true
+      contents["fluid,"..name] = count
+    end
+
     -- construct train data
+    train_data.contents = contents
+    train_data.has_contents = has_contents
     train_data.state = train_state
     train_data.depot = depot
     train_data.composition = util.train.get_composition_string(train)

@@ -18,23 +18,28 @@ function component.update(refs, train_id, train_data, train_status, player_index
 
   -- status
   local status_refs = refs.status
-  for _, element in pairs(status_refs) do element.visible = false end
-  if train_status.n_a then
-    status_refs.n_a.visible = true
-  elseif train_status.parked_at_depot then
-    status_refs.parked_at_depot.visible = true
-  elseif train_status.returning_to_depot then
-    status_refs.returning_to_depot.visible = true
+  local type_label = status_refs.type
+  local station_label = status_refs.station
+  local msg_label = status_refs.msg
+  if train_status.msg then
+    -- style
+    type_label.visible = false
+    station_label.visible = false
+    msg_label.visible = true
+    msg_label.style.font_color = train_status.color
+
+    msg_label.caption = train_status.msg
   else
-    -- type
-    local type_label = status_refs.type
-    type_label.caption = train_status.type
+    -- style
     type_label.visible = true
+    station_label.visible = true
+    msg_label.visible = false
+
+    -- type
+    type_label.caption = train_status.type
 
     -- station
-    local station_label = status_refs.station
     station_label.caption = train_data[train_status.station]
-    station_label.visible = true
     gui.add_handler(
       player_index,
       station_label.index,
@@ -44,23 +49,23 @@ function component.update(refs, train_id, train_data, train_status, player_index
     )
   end
 
-  -- contents
-  local contents_table = refs.contents.table
-  local children = contents_table.children
-  local contents = train_data.shipment
-  local contents_index = 0
+  -- shipment
+  local shipment_table = refs.shipment.table
+  local children = shipment_table.children
+  local shipment = train_data.shipment
+  local shipment_index = 0
   -- update or build children
-  for name, count in pairs(contents or {}) do
-    contents_index = contents_index + 1
-    local child = children[contents_index]
+  for name, count in pairs(shipment or {}) do
+    shipment_index = shipment_index + 1
+    local child = children[shipment_index]
     if child then
       child.sprite = string.gsub(name, ",", "/")
       child.number = count
     else
       -- TODO make clicking work
-      contents_table.add{
+      shipment_table.add{
         type = "sprite-button",
-        name = "ltnm_material_button__"..contents_index,
+        name = "ltnm_material_button__"..shipment_index,
         style = "ltnm_small_slot_button_default",
         sprite = string.gsub(name, ",", "/"),
         number = count
@@ -68,7 +73,7 @@ function component.update(refs, train_id, train_data, train_status, player_index
     end
   end
   -- destroy extraneous children
-  for i = contents_index + 1, #children do
+  for i = shipment_index + 1, #children do
     children[i].destroy()
   end
 end
@@ -97,35 +102,24 @@ function component.build(player_locale)
           direction = "vertical",
           children = {
             {type = "label", ref = {"status", "type"}},
-            -- placeholder on_click to make it insert into the handlers table
-            {type = "label", style = "ltnm_clickable_bold_label", on_click = {}, ref = {"status", "station"}},
             {
               type = "label",
-              style = "bold_label",
-              caption = {"ltnm-gui.returning-to-depot"},
-              ref = {"status", "returning_to_depot"}
+              style = "ltnm_clickable_bold_label",
+              tooltip = {"ltnm-gui.open-station-on-map"},
+              -- placeholder on_click to make it insert into the handlers table
+              on_click = {},
+              ref = {"status", "station"}
             },
-            {
-              type = "label",
-              style = "ltnm_bold_green_label",
-              caption = {"ltnm-gui.parked-at-depot"},
-              ref = {"status", "parked_at_depot"}
-            },
-            {
-              type = "label",
-              style = "ltnm_bold_red_label",
-              caption = {"ltnm-gui.not-available"},
-              ref = {"status", "n_a"}
-            },
+            {type = "label", style = "bold_label", ref = {"status", "msg"}},
           }
         },
-        {type = "frame", style = "deep_frame_in_shallow_frame", ref = {"contents", "frame"}, children = {
+        {type = "frame", style = "deep_frame_in_shallow_frame", ref = {"shipment", "frame"}, children = {
           {
             type = "scroll-pane",
             style = "ltnm_small_slot_table_scroll_pane",
-            ref = {"contents", "scroll_pane"},
+            ref = {"shipment", "scroll_pane"},
             children = {
-              {type = "table", style = "slot_table", width = (36 * 5), column_count = 5, ref = {"contents", "table"}}
+              {type = "table", style = "slot_table", width = (36 * 5), column_count = 5, ref = {"shipment", "table"}}
             }
           }
         }},

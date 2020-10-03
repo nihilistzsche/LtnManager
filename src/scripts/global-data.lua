@@ -17,7 +17,14 @@ function global_data.build_translations()
     {dictionary = "gui", internal = "locale_identifier", localised = {"locale-identifier"}},
     {dictionary = "gui", internal = "delivering_to", localised = {"ltnm-gui.delivering-to-label"}},
     {dictionary = "gui", internal = "fetching_from", localised = {"ltnm-gui.fetching-from-label"}},
+    {dictionary = "gui", internal = "leaving_depot", localised = {"ltnm-gui.leaving-depot"}},
     {dictionary = "gui", internal = "loading_at", localised = {"ltnm-gui.loading-at-label"}},
+    {dictionary = "gui", internal = "not_available", localised = {"ltnm-gui.not-available"}},
+    {
+      dictionary = "gui",
+      internal = "parked_at_depot_with_residue",
+      localised = {"ltnm-gui.parked-at-depot-with-residue"}
+    },
     {dictionary = "gui", internal = "parked_at_depot", localised = {"ltnm-gui.parked-at-depot"}},
     {dictionary = "gui", internal = "returning_to_depot", localised = {"ltnm-gui.returning-to-depot"}},
     {dictionary = "gui", internal = "unloading_at", localised = {"ltnm-gui.unloading-at-label"}}
