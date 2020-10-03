@@ -17,7 +17,7 @@ end
 
 function component.update(player, player_table, state, refs, handlers, msg, e)
   -- ----- UPDATE -----
-  if msg.update then
+  if msg.update or msg.action == "update" then
     local selected_depot = state.depots.selected_depot
     local depot_data = global.data.depots[selected_depot]
     if not depot_data then return end
@@ -93,6 +93,27 @@ function component.update(player, player_table, state, refs, handlers, msg, e)
       end
       children[j].destroy()
     end
+
+  -- ----- SORT -----
+  elseif msg.action == "update_sort" then
+    local sort = msg.sort
+    local depots_state = state.depots
+    local sorters = refs.depots.trains_list.sorters
+
+    local active_sort = depots_state.active_sort
+    if active_sort ~= sort then
+      -- deselect previous sorter
+      sorters[active_sort].style = "ltnm_sort_checkbox"
+      -- select new sorter and flip back around
+      e.element.style = "ltnm_selected_sort_checkbox"
+      e.element.state = not e.element.state
+      -- set as active sort
+      depots_state.active_sort = sort
+    end
+
+    -- update state and update trains list
+    depots_state["sort_"..sort] = e.element.state
+    gui.updaters.main({tab = "depots", comp = "trains_list", action = "update"}, {player_index = e.player_index})
   end
 end
 
@@ -112,6 +133,7 @@ function component.build(player_locale)
             caption = {"ltnm-gui.composition"},
             tooltip = {"ltnm-gui.composition-tooltip"},
             state = true,
+            on_click = {tab = "depots", comp = "trains_list", action = "update_sort", sort = "composition"},
             ref = {"depots", "trains_list", "sorters", "composition"}
           },
           {
@@ -122,8 +144,10 @@ function component.build(player_locale)
             caption = {"ltnm-gui.train-status"},
             tooltip = {"ltnm-gui.train-status-tooltip"},
             state = true,
+            on_click = {tab = "depots", comp = "trains_list", action = "update_sort", sort = "status"},
             ref = {"depots", "trains_list", "sorters", "status"}
           },
+          -- TODO make train contents sortable and searchable
           {
             type = "label",
             style = "caption_label",
