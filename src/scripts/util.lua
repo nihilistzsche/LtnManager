@@ -144,4 +144,11 @@ function util.train.get_status_string(train_data, translations)
   end
 end
 
+function util.material_button_tooltip(translations, name, count)
+  return (
+    "[img="..string.gsub(name, ",", "/").."]  [font=default-bold]"..translations.materials[name].."[/font]".."\n"
+    .."[font=default-semibold]"..translations.gui.count.."[/font] "..util.comma_value(math.floor(count))
+  )
+end
+
 return util

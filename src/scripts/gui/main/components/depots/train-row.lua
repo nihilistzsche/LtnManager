@@ -2,9 +2,11 @@ local gui = require("__flib__.gui-new")
 
 local constants = require("constants")
 
+local util = require("scripts.util")
+
 local component = {}
 
-function component.update(refs, train_id, train_data, train_status, player_index)
+function component.update(refs, train_id, train_data, train_status, player_index, translations)
   -- composition
   local composition_label = refs.composition
   composition_label.caption = train_data.composition
@@ -68,7 +70,8 @@ function component.update(refs, train_id, train_data, train_status, player_index
         name = "ltnm_material_button__"..shipment_index,
         style = "ltnm_small_slot_button_default",
         sprite = string.gsub(name, ",", "/"),
-        number = count
+        number = count,
+        tooltip = util.material_button_tooltip(translations, name, count)
       }
     end
   end

@@ -83,7 +83,14 @@ function component.update(player, player_table, state, refs, handlers, msg, e)
         end
 
         -- update the component's data
-        train_row.update(rows_refs[train_index], train_id, train_data, train_status, player.index)
+        train_row.update(
+          rows_refs[train_index],
+          train_id,
+          train_data,
+          train_status,
+          player.index,
+          player_table.translations
+        )
       end
     end
     -- delete extraneous rows

@@ -14,11 +14,12 @@ end
 function global_data.build_translations()
   local translation_data = {
     -- train status
-    {dictionary = "gui", internal = "locale_identifier", localised = {"locale-identifier"}},
+    {dictionary = "gui", internal = "count", localised = {"ltnm-gui.count-label"}},
     {dictionary = "gui", internal = "delivering_to", localised = {"ltnm-gui.delivering-to-label"}},
     {dictionary = "gui", internal = "fetching_from", localised = {"ltnm-gui.fetching-from-label"}},
     {dictionary = "gui", internal = "leaving_depot", localised = {"ltnm-gui.leaving-depot"}},
     {dictionary = "gui", internal = "loading_at", localised = {"ltnm-gui.loading-at-label"}},
+    {dictionary = "gui", internal = "locale_identifier", localised = {"locale-identifier"}},
     {dictionary = "gui", internal = "not_available", localised = {"ltnm-gui.not-available"}},
     {
       dictionary = "gui",
