@@ -9,7 +9,6 @@ function component.update(player, _, state, refs, handlers, msg, e)
   if msg.update then
     -- LTN data
     local ltn_data = global.data
-    local stations = ltn_data.stations
     -- GUI data
     local comp_refs = refs.depots.depot_select
     local button_refs = comp_refs.buttons
@@ -37,47 +36,19 @@ function component.update(player, _, state, refs, handlers, msg, e)
         end
         local is_selected_depot = selected_depot == depot_name
 
-        -- depot information
-        local available_trains_count = #depot_data.available_trains
-        -- TODO pre-process this information in ltn_data
-        local statuses = {}
-        for _, station_id in ipairs(depot_data.stations) do
-          local station_data = stations[station_id]
-          local status = station_data.status
-          statuses[status.name] = (statuses[status.name] or 0) + status.count
-        end
-
-        -- create or update button
-        local child = children[index]
-        if child then
-          -- update
-          depot_button.update(
-            button_refs[index],
-            depot_data,
-            is_selected_depot,
-            depot_name,
-            available_trains_count,
-            statuses,
-            player.index
-          )
-        else
-          -- create
-          local btn_refs, btn_handlers = gui.build(
-            scroll_pane,
-            "main",
-            {
-              depot_button.create(
-                depot_data,
-                is_selected_depot,
-                depot_name,
-                available_trains_count,
-                statuses
-              )
-            }
-          )
+        if not children[index] then
+          -- create button
+          local btn_refs, btn_handlers = gui.build(scroll_pane, "main", {depot_button.build()})
           button_refs[index] = btn_refs
           button_handlers[index] = btn_handlers
         end
+        -- update
+        depot_button.update(
+          button_refs[index],
+          depot_name,
+          depot_data,
+          is_selected_depot
+        )
       end
     end
     -- remove extraneous buttons

@@ -110,10 +110,13 @@ local function iterate_stations(working_data, iterations_per_tick)
     end
 
     -- add station to depot
+    local status = station_data.status
     if station_data.is_depot then
       local depot = depots[station_name]
       if depot then
         depot.stations[#depot.stations+1] = station_id
+        local statuses = depot.statuses
+        statuses[status.name] = (statuses[status.name] or 0) + status.count
         depot.surfaces[station_data.entity.surface.index] = true
       else
         depots[station_name] = {
@@ -122,6 +125,7 @@ local function iterate_stations(working_data, iterations_per_tick)
           network_id = network_id,
           num_trains = #station_trains,
           stations = {station_id},
+          statuses = {[status.name] = status.count},
           surfaces = {[station_data.entity.surface.index] = true},
           train_ids = {},
           sorted_trains = {

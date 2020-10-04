@@ -11,20 +11,13 @@ local function status_icon(color, value, ref)
   )
 end
 
-function component.create(depot_data, is_selected_depot, depot_name, available_trains_count, statuses)
-  local status_elems = {}
-  local status_elems_index = 0
-  for status_name, status_count in pairs(statuses) do
-    status_elems_index = status_elems_index + 1
-    status_elems[#status_elems+1] = status_icon(status_name, status_count, {"statuses", status_elems_index})
-  end
-
+function component.build()
   return (
     {
       type = "button",
       style = "ltnm_depot_button",
-      enabled = not is_selected_depot,
-      on_click = {tab = "depots", comp = "depot_select", action = "update_selected_depot", depot = depot_name},
+      -- placeholder on_click so it gets included in the handlers table
+      on_click = {},
       ref = {"button"},
       children = {
         {
@@ -34,23 +27,22 @@ function component.create(depot_data, is_selected_depot, depot_name, available_t
           direction = "vertical",
           ignored_by_interaction = true,
           children = {
-            {type = "label", style ="ltnm_bold_black_label", caption = depot_name, ref = {"depot_name"}},
+            {type = "label", style ="ltnm_bold_black_label", ref = {"depot_name"}},
             {type = "flow", children = {
               {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.trains-label"}},
               {
                 type = "label",
                 style = "ltnm_black_label",
-                caption = available_trains_count.." / "..depot_data.num_trains,
                 ref = {"trains"}
               }
             }},
             {type = "flow", children = {
               {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.status-label"}},
-              {type = "flow", ref = {"status_flow"}, children = status_elems}
+              {type = "flow", ref = {"status_flow"}}
             }},
             {type = "flow", children = {
               {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.network-id-label"}},
-              {type = "label", style = "ltnm_black_label", caption = depot_data.network_id, ref = {"network_id"}}
+              {type = "label", style = "ltnm_black_label", ref = {"network_id"}}
             }
           }
         }}
@@ -59,24 +51,16 @@ function component.create(depot_data, is_selected_depot, depot_name, available_t
   )
 end
 
-function component.update(
-  button_refs,
-  depot_data,
-  is_selected_depot,
-  depot_name,
-  available_trains_count,
-  statuses,
-  player_index
-)
+function component.update(button_refs, depot_name, depot_data, is_selected_depot)
   button_refs.button.enabled = not is_selected_depot
   button_refs.depot_name.caption = depot_name
-  button_refs.trains.caption = available_trains_count.." / "..depot_data.num_trains
+  button_refs.trains.caption = #depot_data.available_trains.." / "..depot_data.num_trains
   button_refs.network_id.caption = depot_data.network_id
 
   local status_flow = button_refs.status_flow
   local status_children = status_flow.children
   local status_index = 0
-  for name, count in pairs(statuses) do
+  for name, count in pairs(depot_data.statuses) do
     status_index = status_index + 1
     local icon_flow = status_children[status_index]
     if icon_flow then
@@ -92,7 +76,7 @@ function component.update(
 
   -- update button handler
   gui.add_handler(
-    player_index,
+    button_refs.button.player_index,
     button_refs.button.index,
     defines.events.on_gui_click,
     {tab = "depots", comp = "depot_select", action = "update_selected_depot", depot = depot_name},
