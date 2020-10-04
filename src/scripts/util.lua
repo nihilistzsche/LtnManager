@@ -136,7 +136,7 @@ function util.train.get_status_string(train_data, translations)
           }
         else
           return {
-            station = "to",
+            station = "from",
             string = translations.loading_at.." "..train_data.from,
             type = translations.loading_at
           }

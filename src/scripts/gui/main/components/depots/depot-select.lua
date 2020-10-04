@@ -56,6 +56,7 @@ function component.update(msg, e)
       end
     end
     -- remove extraneous buttons
+    -- TODO show blurred panel if search shows zero buttons
     for i = index + 1, #children do
       gui.remove_handlers(player.index, button_handlers[i])
       button_handlers[i] = nil
