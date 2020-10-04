@@ -11,6 +11,39 @@ local function status_icon(color, value, ref)
   )
 end
 
+function component.update(button_refs, depot_name, depot_data, is_selected_depot)
+  button_refs.button.enabled = not is_selected_depot
+  button_refs.depot_name.caption = depot_name
+  button_refs.trains.caption = #depot_data.available_trains.." / "..depot_data.num_trains
+  button_refs.network_id.caption = depot_data.network_id
+
+  local status_flow = button_refs.status_flow
+  local status_children = status_flow.children
+  local status_index = 0
+  for name, count in pairs(depot_data.statuses) do
+    status_index = status_index + 1
+    local icon_flow = status_children[status_index]
+    if icon_flow then
+      icon_flow.children[1].sprite = "ltnm_indicator_"..name
+      icon_flow.children[2].caption = count
+    else
+      gui.build(status_flow, nil, {status_icon(name, count)})
+    end
+  end
+  for i = status_index + 1, #status_children do
+    status_children[i].destroy()
+  end
+
+  -- update button handler
+  gui.add_handler(
+    button_refs.button.player_index,
+    button_refs.button.index,
+    defines.events.on_gui_click,
+    {tab = "depots", comp = "depot_select", action = "update_selected_depot", depot = depot_name},
+    "main"
+  )
+end
+
 function component.build()
   return (
     {
@@ -48,39 +81,6 @@ function component.build()
         }}
       }
     }
-  )
-end
-
-function component.update(button_refs, depot_name, depot_data, is_selected_depot)
-  button_refs.button.enabled = not is_selected_depot
-  button_refs.depot_name.caption = depot_name
-  button_refs.trains.caption = #depot_data.available_trains.." / "..depot_data.num_trains
-  button_refs.network_id.caption = depot_data.network_id
-
-  local status_flow = button_refs.status_flow
-  local status_children = status_flow.children
-  local status_index = 0
-  for name, count in pairs(depot_data.statuses) do
-    status_index = status_index + 1
-    local icon_flow = status_children[status_index]
-    if icon_flow then
-      icon_flow.children[1].sprite = "ltnm_indicator_"..name
-      icon_flow.children[2].caption = count
-    else
-      gui.build(status_flow, nil, {status_icon(name, count)})
-    end
-  end
-  for i = status_index + 1, #status_children do
-    status_children[i].destroy()
-  end
-
-  -- update button handler
-  gui.add_handler(
-    button_refs.button.player_index,
-    button_refs.button.index,
-    defines.events.on_gui_click,
-    {tab = "depots", comp = "depot_select", action = "update_selected_depot", depot = depot_name},
-    "main"
   )
 end
 
