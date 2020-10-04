@@ -66,7 +66,9 @@ function main_gui.create(player, player_table)
     depots = tabs.depots.get_refs_outline()
   }
   local handlers_outline = {
-    base = {},
+    base = {
+      ltnm_material_button = "ltnm_material_button"
+    },
     depots = tabs.depots.get_handlers_outline()
   }
   local refs, handlers = gui.build(
@@ -111,6 +113,15 @@ function main_gui.create(player, player_table)
   -- dragging and centering
   refs.base.titlebar.flow.drag_target = refs.base.window
   refs.base.window.force_auto_center()
+
+  -- generic handler
+  gui.add_handler(
+    player.index,
+    "ltnm_material_button",
+    defines.events.on_gui_click,
+    {action = "open_material_from_name"},
+    "main"
+  )
 
   -- save to player table
   player_table.gui.main = {
