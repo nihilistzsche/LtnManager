@@ -125,7 +125,7 @@ function component.update(msg, e)
 
     -- update state and update trains list
     depots_state["sort_"..sort] = e.element.state
-    gui.updaters.main({tab = "depots", comp = "trains_list", action = "update"}, {player_index = e.player_index})
+    gui.update("main", {tab = "depots", comp = "trains_list", action = "update"}, {player_index = e.player_index})
   end
 end
 

@@ -24,7 +24,7 @@ function component.update(msg, e)
       end
     else
       -- refresh now
-      gui.updaters.main({tab = state.base.active_tab, update = true}, {player_index = e.player_index})
+      gui.update("main", {tab = state.base.active_tab, update = true}, {player_index = e.player_index})
     end
   elseif msg.action == "toggle_pinned" then
     local _, _, state, refs = util.get_updater_properties(e.player_index)

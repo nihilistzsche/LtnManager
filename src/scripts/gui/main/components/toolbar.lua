@@ -27,7 +27,7 @@ function component.update(msg, e)
 
     state.search.query = string.lower(query)
 
-    gui.updaters.main({tab = state.base.active_tab, update = true}, {player_index = e.player_index})
+    gui.update("main", {tab = state.base.active_tab, update = true}, {player_index = e.player_index})
   elseif msg.action == "update_network_id_query" then
     local _, _, state = util.get_updater_properties(e.player_index)
 
@@ -36,7 +36,7 @@ function component.update(msg, e)
 
     state.search.network_id = query
 
-    gui.updaters.main({tab = state.base.active_tab, update = true}, {player_index = e.player_index})
+    gui.update("main", {tab = state.base.active_tab, update = true}, {player_index = e.player_index})
   end
 end
 
