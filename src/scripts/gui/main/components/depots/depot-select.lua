@@ -82,9 +82,9 @@ function component.update(player, _, state, refs, handlers, msg, e)
     end
     -- remove extraneous buttons
     for i = index + 1, #children do
-      local child = children[i]
-      gui.remove_handler(player.index, child.index)
-      child.destroy()
+      gui.remove_handlers(player.index, button_handlers[i])
+      button_handlers[i] = nil
+      children[i].destroy()
     end
 
   -- ----- UPDATE SELECTED -----

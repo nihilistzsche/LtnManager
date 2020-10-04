@@ -95,9 +95,8 @@ function component.update(player, player_table, state, refs, handlers, msg, e)
     end
     -- delete extraneous rows
     for j = train_index + 1, #children do
-      for index in pairs(rows_handlers[j]) do
-        gui.remove_handler(player.index, index)
-      end
+      gui.remove_handlers(player.index, rows_handlers[j])
+      rows_handlers[j] = nil
       children[j].destroy()
     end
 

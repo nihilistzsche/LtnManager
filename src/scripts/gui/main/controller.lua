@@ -68,38 +68,48 @@ function main_gui.create(player, player_table)
   local refs_outline = {
     depots = tabs.depots.get_refs_outline()
   }
-  local refs = gui.build(player.gui.screen, "main", {
+  local handlers_outline = {
+    base = {},
+    depots = tabs.depots.get_handlers_outline()
+  }
+  local refs, handlers = gui.build(
+    player.gui.screen,
+    "main",
     {
-      type = "frame",
-      direction = "vertical",
-      visible = false,
-      on_closed = {tab = "base", comp = "base", action = "close"},
-      ref = {"base", "window"},
-      children = {
-        titlebar(),
-        {
-          type = "frame",
-          style = "inside_deep_frame",
-          direction = "vertical",
-          children = {
-            toolbar(),
-            {
-              type = "tabbed-pane",
-              style = "tabbed_pane_with_no_side_padding",
-              ref = {"base", "tabbed_pane"},
-              children = {
-                tabs.depots(player_table.translations.gui.locale_identifier),
-                tabs.stations(),
-                tabs.inventory(),
-                tabs.history(),
-                tabs.alerts(),
+      {
+        type = "frame",
+        direction = "vertical",
+        visible = false,
+        on_closed = {tab = "base", comp = "base", action = "close"},
+        ref = {"base", "window"},
+        children = {
+          titlebar(),
+          {
+            type = "frame",
+            style = "inside_deep_frame",
+            direction = "vertical",
+            children = {
+              toolbar(),
+              {
+                type = "tabbed-pane",
+                style = "tabbed_pane_with_no_side_padding",
+                ref = {"base", "tabbed_pane"},
+                children = {
+                  tabs.depots(player_table.translations.gui.locale_identifier),
+                  tabs.stations(),
+                  tabs.inventory(),
+                  tabs.history(),
+                  tabs.alerts(),
+                }
               }
             }
           }
         }
       }
-    }
-  }, refs_outline)
+    },
+    refs_outline,
+    handlers_outline
+  )
 
   -- dragging and centering
   refs.base.titlebar.flow.drag_target = refs.base.window
@@ -107,9 +117,7 @@ function main_gui.create(player, player_table)
 
   -- save to player table
   player_table.gui.main = {
-    handlers = {
-      depots = tabs.depots.get_handlers_outline()
-    },
+    handlers = handlers,
     refs = refs,
     state = {
       base = {
@@ -130,11 +138,10 @@ function main_gui.create(player, player_table)
 end
 
 function main_gui.destroy(player, player_table)
-  -- deregister all handlers
-  gui.update_filters("main", player.index, nil, "remove")
-
-  -- destroy window
-  player_table.gui.main.base.window.destroy()
+  -- deregister and destroy GUI
+  local gui_data = player_table.gui.main
+  gui.remove_handlers(player.index, gui_data.handlers)
+  gui_data.refs.base.window.destroy()
 
   -- remove from player table
   player_table.gui.main = nil

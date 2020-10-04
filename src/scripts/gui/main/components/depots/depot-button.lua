@@ -25,7 +25,7 @@ function component.create(depot_data, is_selected_depot, depot_name, available_t
       style = "ltnm_depot_button",
       enabled = not is_selected_depot,
       on_click = {tab = "depots", comp = "depot_select", action = "update_selected_depot", depot = depot_name},
-      ref = "button",
+      ref = {"button"},
       children = {
         {
           type = "flow",
@@ -34,23 +34,23 @@ function component.create(depot_data, is_selected_depot, depot_name, available_t
           direction = "vertical",
           ignored_by_interaction = true,
           children = {
-            {type = "label", style ="ltnm_bold_black_label", caption = depot_name, ref = "depot_name"},
+            {type = "label", style ="ltnm_bold_black_label", caption = depot_name, ref = {"depot_name"}},
             {type = "flow", children = {
               {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.trains-label"}},
               {
                 type = "label",
                 style = "ltnm_black_label",
                 caption = available_trains_count.." / "..depot_data.num_trains,
-                ref = "trains"
+                ref = {"trains"}
               }
             }},
             {type = "flow", children = {
               {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.status-label"}},
-              {type = "flow", ref = "status_flow", children = status_elems}
+              {type = "flow", ref = {"status_flow"}, children = status_elems}
             }},
             {type = "flow", children = {
               {type = "label", style = "ltnm_semibold_black_label", caption = {"ltnm-gui.network-id-label"}},
-              {type = "label", style = "ltnm_black_label", caption = depot_data.network_id, ref = "network_id"}
+              {type = "label", style = "ltnm_black_label", caption = depot_data.network_id, ref = {"network_id"}}
             }
           }
         }}
