@@ -2,9 +2,9 @@ local gui = require("__flib__.gui-new")
 
 local constants = require("constants")
 
-local train_row = require("scripts.gui.main.components.depots.train-row")
-
 local util = require("scripts.util")
+
+local train_row = require("scripts.gui.main.components.depots.train-row")
 
 local component = gui.component()
 
@@ -18,8 +18,31 @@ function component.get_default_state()
 end
 
 function component.update(msg, e)
+  -- ----- SORT -----
+  if msg.action == "update_sort" then
+    local _, _, state, refs = util.get_updater_properties(e.player_index)
+
+    local sort = msg.sort
+    local depots_state = state.depots
+    local sorters = refs.depots.trains_list.sorters
+
+    local active_sort = depots_state.active_sort
+    if active_sort ~= sort then
+      -- deselect previous sorter
+      sorters[active_sort].style = "ltnm_sort_checkbox"
+      -- select new sorter and flip back around
+      e.element.style = "ltnm_selected_sort_checkbox"
+      e.element.state = not e.element.state
+      -- set as active sort
+      depots_state.active_sort = sort
+    end
+
+    -- update sort on state
+    depots_state["sort_"..sort] = e.element.state
+  end
+
   -- ----- UPDATE -----
-  if msg.update or msg.action == "update" then
+  if msg.action == "update_sort" or msg.update or msg.action == "update" then
     local player, player_table, state, refs, handlers = util.get_updater_properties(e.player_index)
 
     local selected_depot = state.depots.selected_depot
@@ -97,35 +120,13 @@ function component.update(msg, e)
         )
       end
     end
+
     -- delete extraneous rows
     for j = train_index + 1, #children do
       gui.remove_handlers(player.index, rows_handlers[j])
       rows_handlers[j] = nil
       children[j].destroy()
     end
-
-  -- ----- SORT -----
-  elseif msg.action == "update_sort" then
-    local _, _, state, refs = util.get_updater_properties(e.player_index)
-
-    local sort = msg.sort
-    local depots_state = state.depots
-    local sorters = refs.depots.trains_list.sorters
-
-    local active_sort = depots_state.active_sort
-    if active_sort ~= sort then
-      -- deselect previous sorter
-      sorters[active_sort].style = "ltnm_sort_checkbox"
-      -- select new sorter and flip back around
-      e.element.style = "ltnm_selected_sort_checkbox"
-      e.element.state = not e.element.state
-      -- set as active sort
-      depots_state.active_sort = sort
-    end
-
-    -- update state and update trains list
-    depots_state["sort_"..sort] = e.element.state
-    gui.update("main", {tab = "depots", comp = "trains_list", action = "update"}, {player_index = e.player_index})
   end
 end
 

@@ -28,8 +28,8 @@ function component.update(msg, e)
       -- TODO search depots by name
       -- match against surface and network ID
       if
-      bit32.btest(depot_data.network_id, network_id_query)
-      and (surface_query == -1 or depot_data.surfaces[surface_query])
+        bit32.btest(depot_data.network_id, network_id_query)
+        and (surface_query == -1 or depot_data.surfaces[surface_query])
       then
         index = index + 1
         -- if the selected depot does not exist, create it
