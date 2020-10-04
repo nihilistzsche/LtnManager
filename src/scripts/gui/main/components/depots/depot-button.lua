@@ -1,6 +1,6 @@
 local gui = require("__flib__.gui-new")
 
-local component = {}
+local component = gui.component()
 
 local function status_icon(color, value, ref)
   return (

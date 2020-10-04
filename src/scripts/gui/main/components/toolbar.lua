@@ -4,7 +4,7 @@ local constants = require("constants")
 
 local util = require("scripts.util")
 
-local component = require("lib.gui-component")()
+local component = gui.component()
 
 function component.get_default_state()
   return {

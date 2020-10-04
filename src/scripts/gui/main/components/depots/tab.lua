@@ -1,7 +1,9 @@
-local component = require("lib.gui-component")()
+local gui = require("__flib__.gui-new")
 
 local depot_select = require("scripts.gui.main.components.depots.depot-select")
 local trains_list = require("scripts.gui.main.components.depots.trains-list")
+
+local component = gui.component()
 
 function component.get_default_state()
   return trains_list.get_default_state()

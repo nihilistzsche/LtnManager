@@ -6,7 +6,7 @@ local train_row = require("scripts.gui.main.components.depots.train-row")
 
 local util = require("scripts.util")
 
-local component = require("lib.gui-component")()
+local component = gui.component()
 
 function component.get_default_state()
   return {
@@ -81,7 +81,7 @@ function component.update(msg, e)
 
         -- build the component if it doesn't exist
         if not children[train_index] then
-          local row_refs, row_handlers = gui.build(scroll_pane, "main", {train_row.build(player_locale)})
+          local row_refs, row_handlers = gui.build(scroll_pane, "main", {train_row(player_locale)})
           rows_refs[train_index] = row_refs
           rows_handlers[train_index] = row_handlers
         end

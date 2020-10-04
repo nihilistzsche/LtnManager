@@ -2,7 +2,7 @@ local gui = require("__flib__.gui-new")
 
 local util = require("scripts.util")
 
-local component = require("lib.gui-component")()
+local component = gui.component()
 
 function component.update(msg, e)
   if msg.action == "handle_refresh_click" then

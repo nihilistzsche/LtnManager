@@ -4,7 +4,7 @@ local constants = require("constants")
 
 local util = require("scripts.util")
 
-local component = {}
+local component = gui.component()
 
 function component.update(refs, train_id, train_data, train_status, player_index, translations)
   -- composition

@@ -1,4 +1,6 @@
-local component = require("lib.gui-component")()
+local gui = require("__flib__.gui-new")
+
+local component = gui.component()
 
 function component.build()
   return (

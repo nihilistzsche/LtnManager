@@ -4,7 +4,7 @@ local depot_button = require("scripts.gui.main.components.depots.depot-button")
 
 local util = require("scripts.util")
 
-local component = require("lib.gui-component")()
+local component = gui.component()
 
 function component.update(msg, e)
   -- ----- UPDATE -----
@@ -42,7 +42,7 @@ function component.update(msg, e)
 
         if not children[index] then
           -- create button
-          local btn_refs, btn_handlers = gui.build(scroll_pane, "main", {depot_button.build()})
+          local btn_refs, btn_handlers = gui.build(scroll_pane, "main", {depot_button()})
           button_refs[index] = btn_refs
           button_handlers[index] = btn_handlers
         end
