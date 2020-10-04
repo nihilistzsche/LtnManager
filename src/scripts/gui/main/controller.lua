@@ -3,6 +3,8 @@ local gui = require("__flib__.gui-new")
 local titlebar = require("scripts.gui.main.components.titlebar")
 local toolbar = require("scripts.gui.main.components.toolbar")
 
+local util = require("scripts.util")
+
 local tabs = {}
 for _, tab_name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
   tabs[tab_name] = require("scripts.gui.main.components."..tab_name..".tab")
@@ -11,19 +13,14 @@ end
 local main_gui = {}
 
 function main_gui.update(msg, e)
-  local player = game.get_player(e.player_index)
-  local player_table = global.players[e.player_index]
-  local gui_data = player_table.gui.main
-  local state = gui_data.state
-  local refs = gui_data.refs
-  local handlers = gui_data.handlers
-
   local tab = msg.tab
   local comp = msg.comp
   local action = msg.action
 
   if tab == "base" then
     if comp == "base" then
+      local player, _, state, refs = util.get_updater_properties(e.player_index)
+
       if action == "open" then
         local base_window = refs.base.window
 
@@ -33,7 +30,7 @@ function main_gui.update(msg, e)
         state.base.visible = true
         player.set_shortcut_toggled("ltnm-toggle-gui", true)
 
-        if not gui_data.state.base.pinned then
+        if not state.base.pinned then
           player.opened = base_window
         end
       elseif action == "close" then
@@ -52,12 +49,12 @@ function main_gui.update(msg, e)
         end
       end
     elseif comp == "titlebar" then
-      titlebar.update(player, state, refs, action, e)
+      titlebar.update(msg, e)
     elseif comp == "toolbar" then
       toolbar.update(msg, e)
     end
   elseif tab == "depots" then
-    tabs.depots.update(player, player_table, state, refs, handlers, msg, e)
+    tabs.depots.update(msg, e)
   end
 end
 

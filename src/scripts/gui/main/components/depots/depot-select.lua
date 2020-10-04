@@ -2,11 +2,15 @@ local gui = require("__flib__.gui-new")
 
 local depot_button = require("scripts.gui.main.components.depots.depot-button")
 
+local util = require("scripts.util")
+
 local component = require("lib.gui-component")()
 
-function component.update(player, _, state, refs, handlers, msg, e)
+function component.update(msg, e)
   -- ----- UPDATE -----
   if msg.update then
+    local _, _, state, refs, handlers = util.get_updater_properties(e.player_index)
+
     -- LTN data
     local ltn_data = global.data
     -- GUI data
@@ -60,6 +64,8 @@ function component.update(player, _, state, refs, handlers, msg, e)
 
   -- ----- UPDATE SELECTED -----
   elseif msg.action == "update_selected_depot" then
+    local _, _, state, refs = util.get_updater_properties(e.player_index)
+
     local prev_depot= state.depots.selected_depot
     for _, button_refs in ipairs(refs.depots.depot_select.buttons) do
       local name_ref = button_refs.depot_name

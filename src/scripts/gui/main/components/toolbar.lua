@@ -2,6 +2,8 @@ local gui = require("__flib__.gui-new")
 
 local constants = require("constants")
 
+local util = require("scripts.util")
+
 local component = require("lib.gui-component")()
 
 function component.get_default_state()
@@ -12,18 +14,9 @@ function component.get_default_state()
   }
 end
 
-local function get_updater_properties(player_index)
-  local player = game.get_player(player_index)
-  local player_table = global.players[player_index]
-  local gui_data = player_table.gui.main
-
-  return player, player_table, gui_data.state, gui_data.refs, gui_data.handlers
-end
-
 function component.update(msg, e)
   if msg.action == "update_search_query" then
-    -- TODO refactor all updaters to use this
-    local _, _, state = get_updater_properties(e.player_index)
+    local _, _, state = util.get_updater_properties(e.player_index)
 
     local query = e.element.text
 
@@ -36,8 +29,7 @@ function component.update(msg, e)
 
     gui.updaters.main({tab = state.base.active_tab, update = true}, {player_index = e.player_index})
   elseif msg.action == "update_network_id_query" then
-    -- TODO refactor all updaters to use this
-    local _, _, state = get_updater_properties(e.player_index)
+    local _, _, state = util.get_updater_properties(e.player_index)
 
     -- we don't need to sanitize this input, since it is a numeric textfield
     local query = tonumber(e.element.text) or -1

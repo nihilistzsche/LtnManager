@@ -16,6 +16,14 @@ function util.add_materials(t1, t2)
   return t2
 end
 
+function util.get_updater_properties(player_index)
+  local player = game.get_player(player_index)
+  local player_table = global.players[player_index]
+  local gui_data = player_table.gui.main
+
+  return player, player_table, gui_data.state, gui_data.refs, gui_data.handlers
+end
+
 -- TODO add to flib?
 
 -- add commas to separate thousands

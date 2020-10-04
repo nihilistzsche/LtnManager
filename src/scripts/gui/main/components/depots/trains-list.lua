@@ -4,6 +4,8 @@ local constants = require("constants")
 
 local train_row = require("scripts.gui.main.components.depots.train-row")
 
+local util = require("scripts.util")
+
 local component = require("lib.gui-component")()
 
 function component.get_default_state()
@@ -15,9 +17,11 @@ function component.get_default_state()
   }
 end
 
-function component.update(player, player_table, state, refs, handlers, msg, e)
+function component.update(msg, e)
   -- ----- UPDATE -----
   if msg.update or msg.action == "update" then
+    local player, player_table, state, refs, handlers = util.get_updater_properties(e.player_index)
+
     local selected_depot = state.depots.selected_depot
     local depot_data = global.data.depots[selected_depot]
     if not depot_data then return end
@@ -102,6 +106,8 @@ function component.update(player, player_table, state, refs, handlers, msg, e)
 
   -- ----- SORT -----
   elseif msg.action == "update_sort" then
+    local _, _, state, refs = util.get_updater_properties(e.player_index)
+
     local sort = msg.sort
     local depots_state = state.depots
     local sorters = refs.depots.trains_list.sorters

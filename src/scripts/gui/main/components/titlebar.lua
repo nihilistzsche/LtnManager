@@ -1,9 +1,13 @@
 local gui = require("__flib__.gui-new")
 
+local util = require("scripts.util")
+
 local component = require("lib.gui-component")()
 
-function component.update(player, state, refs, action, e)
-  if action == "handle_refresh_click" then
+function component.update(msg, e)
+  if msg.action == "handle_refresh_click" then
+    local _, _, state, refs = util.get_updater_properties(e.player_index)
+
     if e.shift then
       -- toggle auto refresh
       local auto_refresh = state.base.auto_refresh
@@ -22,7 +26,9 @@ function component.update(player, state, refs, action, e)
       -- refresh now
       gui.updaters.main({tab = state.base.active_tab, update = true}, {player_index = e.player_index})
     end
-  elseif action == "toggle_pinned" then
+  elseif msg.action == "toggle_pinned" then
+    local _, _, state, refs = util.get_updater_properties(e.player_index)
+
     local pinned = state.base.pinned
     local pin_button = refs.base.titlebar.pin_button
 

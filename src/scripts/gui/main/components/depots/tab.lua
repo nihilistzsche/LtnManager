@@ -25,14 +25,14 @@ function component.get_handlers_outline()
   }
 end
 
-function component.update(player, player_table, state, refs, handlers, msg, e)
+function component.update(msg, e)
   if msg.update then
-    depot_select.update(player, player_table, state, refs, handlers, msg, e)
-    trains_list.update(player, player_table, state, refs, handlers, msg, e)
+    depot_select.update(msg, e)
+    trains_list.update(msg, e)
   elseif msg.comp == "depot_select" then
-    depot_select.update(player, player_table, state, refs, handlers, msg, e)
+    depot_select.update(msg, e)
   elseif msg.comp == "trains_list" then
-    trains_list.update(player, player_table, state, refs, handlers, msg, e)
+    trains_list.update(msg, e)
   end
 end
 
