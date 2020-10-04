@@ -77,6 +77,8 @@ function component.update(msg, e)
 
     e.element.enabled = false
     state.depots.selected_depot = msg.depot
+
+    gui.update("main", {tab = "depots", comp = "trains_list", action = "update"}, {player_index = e.player_index})
   end
 end
 
