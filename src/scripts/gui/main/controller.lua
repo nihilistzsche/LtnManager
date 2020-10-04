@@ -1,9 +1,9 @@
 local gui = require("__flib__.gui-new")
 
+local util = require("scripts.util")
+
 local titlebar = require("scripts.gui.main.components.titlebar")
 local toolbar = require("scripts.gui.main.components.toolbar")
-
-local util = require("scripts.util")
 
 local tabs = {}
 for _, tab_name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do

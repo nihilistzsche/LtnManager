@@ -27,7 +27,7 @@ function component.update(msg, e)
       gui.update("main", {tab = state.base.active_tab, update = true}, {player_index = e.player_index})
     end
   elseif msg.action == "toggle_pinned" then
-    local _, _, state, refs = util.get_updater_properties(e.player_index)
+    local player, _, state, refs = util.get_updater_properties(e.player_index)
 
     local pinned = state.base.pinned
     local pin_button = refs.base.titlebar.pin_button
