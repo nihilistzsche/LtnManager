@@ -300,7 +300,7 @@ function inventory_tab.update(player, player_table, state_changes, gui_data, dat
                   {type = "label", style = "caption_label", caption={"ltnm-gui.to"}},
                   {
                     type = "label",
-                    name = "ltnm_view_station__"..train.from_id,
+                    name = "ltnm_view_station__"..train.to_id,
                     style = "ltnm_hoverable_bold_label",
                     style_mods = {horizontally_squashable = true},
                     caption = train.to,
