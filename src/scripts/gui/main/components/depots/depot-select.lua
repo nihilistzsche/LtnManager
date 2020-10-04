@@ -9,7 +9,7 @@ local component = gui.component()
 function component.update(msg, e)
   -- ----- UPDATE -----
   if msg.update then
-    local _, _, state, refs, handlers = util.get_updater_properties(e.player_index)
+    local player, _, state, refs, handlers = util.get_updater_properties(e.player_index)
 
     -- LTN data
     local ltn_data = global.data
@@ -25,13 +25,13 @@ function component.update(msg, e)
 
     local index = 0
     for depot_name, depot_data in pairs(ltn_data.depots) do
-      index = index + 1
       -- TODO search depots by name
       -- match against surface and network ID
       if
-        bit32.btest(depot_data.network_id, network_id_query)
-        and (surface_query == -1 or depot_data.surfaces[surface_query])
+      bit32.btest(depot_data.network_id, network_id_query)
+      and (surface_query == -1 or depot_data.surfaces[surface_query])
       then
+        index = index + 1
         -- if the selected depot does not exist, create it
         local selected_depot = state.depots.selected_depot
         if not selected_depot then
