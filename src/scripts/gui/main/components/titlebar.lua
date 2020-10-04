@@ -11,9 +11,11 @@ function component.update(player, state, refs, action, e)
 
       if auto_refresh then
         refresh_button.style = "frame_action_button"
+        refresh_button.sprite = "ltnm_refresh_white"
         state.base.auto_refresh = false
       else
         refresh_button.style = "flib_selected_frame_action_button"
+        refresh_button.sprite = "ltnm_refresh_black"
         state.base.auto_refresh = true
       end
     else
@@ -26,12 +28,14 @@ function component.update(player, state, refs, action, e)
 
     if pinned then
       pin_button.style = "frame_action_button"
+      pin_button.sprite = "ltnm_pin_white"
       state.base.pinned = false
 
       player.opened = refs.base.window
       refs.base.window.force_auto_center()
     else
       pin_button.style = "flib_selected_frame_action_button"
+      pin_button.sprite = "ltnm_pin_black"
       state.base.pinned = true
 
       -- a `pinning` flag is needed so the GUI doesn't close when we pin it
