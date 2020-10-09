@@ -1,71 +1,44 @@
 local gui = require("__flib__.gui3")
 
-local util = require("scripts.util")
+-- local util = require("scripts.util")
 
 local component = {}
 
-function component.update(msg, e)
-  if msg.action == "handle_refresh_click" then
-    local _, _, state, refs = util.get_updater_properties(e.player_index)
-
-    if e.shift then
-      -- toggle auto refresh
-      local auto_refresh = state.base.auto_refresh
-      local refresh_button = refs.base.titlebar.refresh_button
-
-      if auto_refresh then
-        refresh_button.style = "frame_action_button"
-        refresh_button.sprite = "ltnm_refresh_white"
-        state.base.auto_refresh = false
-      else
-        refresh_button.style = "flib_selected_frame_action_button"
-        refresh_button.sprite = "ltnm_refresh_black"
-        state.base.auto_refresh = true
-      end
-    else
-      -- refresh now
-      gui.update("main", {tab = state.base.active_tab, update = true}, {player_index = e.player_index})
-    end
-  elseif msg.action == "toggle_pinned" then
-    local player, _, state, refs = util.get_updater_properties(e.player_index)
-
+function component.update(state, msg, e, refs)
+  if msg.action == "toggle_pinned" then
     local pinned = state.base.pinned
-    local pin_button = refs.base.titlebar.pin_button
 
     if pinned then
-      pin_button.style = "frame_action_button"
-      pin_button.sprite = "ltnm_pin_white"
       state.base.pinned = false
 
       player.opened = refs.base.window
       refs.base.window.force_auto_center()
     else
-      pin_button.style = "flib_selected_frame_action_button"
-      pin_button.sprite = "ltnm_pin_black"
       state.base.pinned = true
 
       -- a `pinning` flag is needed so the GUI doesn't close when we pin it
       state.base.pinning = true
       player.opened = nil
       state.base.pinning = false
+
+      refs.base.window.auto_center = false
     end
   end
 end
 
-local function frame_action_button(sprite, tooltip, on_click, ref)
+local function frame_action_button(sprite, tooltip, on_click, enabled)
   return {
     type = "sprite-button",
-    style = "frame_action_button",
-    sprite = sprite.."_white",
+    style = enabled and "flib_selected_frame_action_button"  or "frame_action_button",
+    sprite = sprite..(enabled and "_black" or "_white"),
     hovered_sprite = sprite.."_black",
     clicked_sprite = sprite.."_black",
     tooltip = tooltip,
-    on_click = on_click,
-    ref = ref
+    on_click = on_click
   }
 end
 
-function component.build()
+function component.view(state)
   return (
     {type = "flow", ref = {"base", "titlebar", "flow"}, children = {
       {type = "label", style = "frame_title", caption = {"mod-name.LtnManager"}, ignored_by_interaction = true},
@@ -76,12 +49,12 @@ function component.build()
         {tab = "base", comp = "titlebar", action = "toggle_pinned"},
         {"base", "titlebar", "pin_button"}
       ),
-      frame_action_button(
-        "ltnm_refresh",
-        {"ltnm-gui.refresh"},
-        {tab = "base", comp = "titlebar", action = "handle_refresh_click"},
-        {"base", "titlebar", "refresh_button"}
-      ),
+      -- frame_action_button(
+      --   "ltnm_refresh",
+      --   {"ltnm-gui.refresh"},
+      --   {tab = "base", comp = "titlebar", action = "handle_refresh_click"},
+      --   {"base", "titlebar", "refresh_button"}
+      -- ),
       frame_action_button("utility/close", nil, {tab = "base", comp = "base", action = "close"})
     }}
   )

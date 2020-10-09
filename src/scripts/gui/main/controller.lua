@@ -24,7 +24,9 @@ function main_gui.destroy(player, player_table)
 end
 
 function main_gui.toggle(player_index, player_table)
-  player_table.gui.Main:dispatch({comp = "base", action = "toggle"}, {player_index = player_index})
+  local MainGui = player_table.gui.Main
+  local action = MainGui.state.base.visible and "close" or "open"
+  MainGui:dispatch({comp = "base", action = action}, {player_index = player_index})
 end
 
 function main_gui.update_active_tab(player_index, player_table)

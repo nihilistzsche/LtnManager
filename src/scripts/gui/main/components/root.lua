@@ -2,7 +2,7 @@ local gui = require("__flib__.gui3")
 
 local util = require("scripts.util")
 
--- local titlebar = require("scripts.gui.main.components.titlebar")
+local titlebar = require("scripts.gui.main.components.titlebar")
 -- local toolbar = require("scripts.gui.main.components.toolbar")
 
 -- local tabs = {}
@@ -27,54 +27,37 @@ function root.init()
 end
 
 function root.setup(refs)
-  refs.titlebar_flow.drag_target = refs.window
+  -- refs.titlebar_flow.drag_target = refs.window
   refs.window.force_auto_center()
 end
 
-function root.update(state, msg, e)
-  -- local tab = msg.tab
-  -- local comp = msg.comp
-  -- local action = msg.action
+function root.update(state, msg, e, refs)
+  if msg.comp == "base" then
+    local player = game.get_player(e.player_index)
 
-  -- if tab == "base" then
-  --   if comp == "base" then
-  --     local player, _, state, refs = util.get_updater_properties(e.player_index)
+    if msg.action == "open" then
+      state.base.visible = true
+      player.set_shortcut_toggled("ltnm-toggle-gui", true)
 
-  --     if action == "open" then
-  --       local base_window = refs.base.window
+      if not state.base.pinned then
+        player.opened = refs.window
+      end
+    elseif msg.action == "close" then
+      -- don't actually close if we just pinned the GUI
+      if state.base.pinning then return end
 
-  --       base_window.visible = true
-  --       -- TODO bring to front
+      state.base.visible = false
+      player.set_shortcut_toggled("ltnm-toggle-gui", false)
 
-  --       state.base.visible = true
-  --       player.set_shortcut_toggled("ltnm-toggle-gui", true)
-
-  --       if not state.base.pinned then
-  --         player.opened = base_window
-  --       end
-  --     elseif action == "close" then
-  --       -- don't actually close if we just pinned the GUI
-  --       if state.base.pinning then return end
-
-  --       local base_window = refs.base.window
-
-  --       base_window.visible = false
-
-  --       state.base.visible = false
-  --       player.set_shortcut_toggled("ltnm-toggle-gui", false)
-
-  --       if player.opened == base_window then
-  --         player.opened = nil
-  --       end
-  --     end
-  --   elseif comp == "titlebar" then
-  --     titlebar.update(msg, e)
-  --   elseif comp == "toolbar" then
-  --     toolbar.update(msg, e)
-  --   end
-  -- elseif tab == "depots" then
-  --   tabs.depots.update(msg, e)
-  -- end
+      if player.opened == refs.window then
+        player.opened = nil
+      end
+    end
+  elseif msg.comp == "titlebar" then
+    titlebar.update(state, msg, e, refs)
+  elseif msg.comp == "toolbar" then
+    -- toolbar.update(msg, e)
+  end
 end
 
 function root.view(state)
@@ -96,8 +79,7 @@ function root.view(state)
             {
               type = "tabbed-pane",
               style = "tabbed_pane_with_no_side_padding",
-              ref = {"base", "tabbed_pane"},
-              children = {
+              tabs = {
                 -- tabs.depots.view(player_table.translations.gui.locale_identifier),
                 -- tabs.stations.view(),
                 -- tabs.inventory.view(),
