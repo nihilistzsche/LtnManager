@@ -1,7 +1,5 @@
 local gui = require("__flib__.gui3")
 
-local util = require("scripts.util")
-
 local titlebar = require("scripts.gui.main.components.titlebar")
 -- local toolbar = require("scripts.gui.main.components.toolbar")
 
@@ -27,7 +25,7 @@ function root.init()
 end
 
 function root.setup(refs)
-  -- refs.titlebar_flow.drag_target = refs.window
+  refs.titlebar_flow.drag_target = refs.window
   refs.window.force_auto_center()
 end
 
@@ -69,7 +67,7 @@ function root.view(state)
       on_closed = {comp = "base", action = "close"},
       ref = "window",
       children = {
-        -- titlebar.view(),
+        titlebar.view(state),
         {
           type = "frame",
           style = "inside_deep_frame",
