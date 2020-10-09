@@ -1,7 +1,7 @@
 local gui = require("__flib__.gui3")
 
 local titlebar = require("scripts.gui.main.components.titlebar")
--- local toolbar = require("scripts.gui.main.components.toolbar")
+local toolbar = require("scripts.gui.main.components.toolbar")
 
 local tabs = {}
 for _, tab_name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
@@ -19,7 +19,7 @@ function root.init()
       pinning = false,
       visible = false
     },
-    -- search = toolbar.init(),
+    search = toolbar.init(),
     -- depots = tabs.depots.init()
   }
 end
@@ -54,7 +54,7 @@ function root.update(state, msg, e, refs)
   elseif msg.comp == "titlebar" then
     titlebar.update(state, msg, e, refs)
   elseif msg.comp == "toolbar" then
-    -- toolbar.update(msg, e)
+    toolbar.update(state, msg, e)
   end
 end
 
@@ -73,7 +73,7 @@ function root.view(state)
           style = "inside_deep_frame",
           direction = "vertical",
           children = {
-            -- toolbar.view(),
+            toolbar.view(state),
             {
               type = "tabbed-pane",
               style = "tabbed_pane_with_no_side_padding",
