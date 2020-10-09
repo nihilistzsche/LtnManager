@@ -1,11 +1,8 @@
-local gui = require("__flib__.gui3")
+local component = {}
 
-local component = gui.component()
-
-function component.build()
+function component.view()
   return (
     {
-      type = "tab-and-content",
       tab = {type = "tab", caption = {"ltnm-gui.stations"}},
       content = (
         {type = "empty-widget"}

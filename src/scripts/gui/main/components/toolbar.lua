@@ -1,10 +1,6 @@
-local gui = require("__flib__.gui3")
-
 local constants = require("constants")
 
-local util = require("scripts.util")
-
-local component = gui.component()
+local component = {}
 
 function component.get_default_state()
   return {

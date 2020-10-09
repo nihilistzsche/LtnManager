@@ -3,10 +3,10 @@ local gui = require("__flib__.gui3")
 local titlebar = require("scripts.gui.main.components.titlebar")
 -- local toolbar = require("scripts.gui.main.components.toolbar")
 
--- local tabs = {}
--- for _, tab_name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
---   tabs[tab_name] = require("scripts.gui.main.components."..tab_name..".tab")
--- end
+local tabs = {}
+for _, tab_name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
+  tabs[tab_name] = require("scripts.gui.main.components."..tab_name..".tab")
+end
 
 local root = gui.root("main")
 
@@ -78,11 +78,11 @@ function root.view(state)
               type = "tabbed-pane",
               style = "tabbed_pane_with_no_side_padding",
               tabs = {
-                -- tabs.depots.view(player_table.translations.gui.locale_identifier),
-                -- tabs.stations.view(),
-                -- tabs.inventory.view(),
-                -- tabs.history.view(),
-                -- tabs.alerts.view(),
+                tabs.depots.view(state),
+                tabs.stations.view(),
+                tabs.inventory.view(),
+                tabs.history.view(),
+                tabs.alerts.view(),
               }
             }
           }

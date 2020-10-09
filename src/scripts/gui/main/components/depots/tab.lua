@@ -1,52 +1,32 @@
-local gui = require("__flib__.gui3")
+-- local depot_select = require("scripts.gui.main.components.depots.depot-select")
+-- local trains_list = require("scripts.gui.main.components.depots.trains-list")
 
-local depot_select = require("scripts.gui.main.components.depots.depot-select")
-local trains_list = require("scripts.gui.main.components.depots.trains-list")
+local component = {}
 
-local component = gui.component()
-
-function component.get_default_state()
-  return trains_list.get_default_state()
+function component.init()
+  -- return trains_list.init()
 end
 
-function component.get_refs_outline()
-  return {
-    depot_select = {
-      buttons = {}
-    },
-    trains_list = {
-      rows = {}
-    }
-  }
+function component.update(state, msg, e)
+  -- if msg.update then
+  --   depot_select.update(state, msg, e)
+  --   trains_list.update(state, msg, e)
+  -- elseif msg.comp == "depot_select" then
+  --   depot_select.update(state, msg, e)
+  -- elseif msg.comp == "trains_list" then
+  --   trains_list.update(state, msg, e)
+  -- end
 end
 
-function component.get_handlers_outline()
-  return {
-    depot_buttons = {},
-    train_rows = {}
-  }
-end
-
-function component.update(msg, e)
-  if msg.update then
-    depot_select.update(msg, e)
-    trains_list.update(msg, e)
-  elseif msg.comp == "depot_select" then
-    depot_select.update(msg, e)
-  elseif msg.comp == "trains_list" then
-    trains_list.update(msg, e)
-  end
-end
-
-function component.build(player_locale)
+function component.view(state)
   return (
     {
       type = "tab-and-content",
       tab = {type = "tab", caption = {"ltnm-gui.depots"}},
       content = (
         {type = "flow", style = "ltnm_tab_horizontal_flow", children = {
-          depot_select(),
-          trains_list(player_locale)
+          -- depot_select.view(state),
+          -- trains_list.view(state)
         }}
       )
     }
