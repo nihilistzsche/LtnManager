@@ -1,4 +1,4 @@
-local gui = require("__flib__.gui-new")
+local gui = require("__flib__.gui3")
 
 local depot_select = require("scripts.gui.main.components.depots.depot-select")
 local trains_list = require("scripts.gui.main.components.depots.trains-list")

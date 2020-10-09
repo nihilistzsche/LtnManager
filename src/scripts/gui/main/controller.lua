@@ -1,144 +1,12 @@
-local gui = require("__flib__.gui-new")
+local gui = require("__flib__.gui3")
 
-local util = require("scripts.util")
-
-local titlebar = require("scripts.gui.main.components.titlebar")
-local toolbar = require("scripts.gui.main.components.toolbar")
-
-local tabs = {}
-for _, tab_name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
-  tabs[tab_name] = require("scripts.gui.main.components."..tab_name..".tab")
-end
+local root = require("scripts.gui.main.components.root")
 
 local main_gui = {}
 
-function main_gui.update(msg, e)
-  local tab = msg.tab
-  local comp = msg.comp
-  local action = msg.action
-
-  if tab == "base" then
-    if comp == "base" then
-      local player, _, state, refs = util.get_updater_properties(e.player_index)
-
-      if action == "open" then
-        local base_window = refs.base.window
-
-        base_window.visible = true
-        -- TODO bring to front
-
-        state.base.visible = true
-        player.set_shortcut_toggled("ltnm-toggle-gui", true)
-
-        if not state.base.pinned then
-          player.opened = base_window
-        end
-      elseif action == "close" then
-        -- don't actually close if we just pinned the GUI
-        if state.base.pinning then return end
-
-        local base_window = refs.base.window
-
-        base_window.visible = false
-
-        state.base.visible = false
-        player.set_shortcut_toggled("ltnm-toggle-gui", false)
-
-        if player.opened == base_window then
-          player.opened = nil
-        end
-      end
-    elseif comp == "titlebar" then
-      titlebar.update(msg, e)
-    elseif comp == "toolbar" then
-      toolbar.update(msg, e)
-    end
-  elseif tab == "depots" then
-    tabs.depots.update(msg, e)
-  end
-end
-
-gui.updaters.main = main_gui.update
-
 function main_gui.create(player, player_table)
-  -- create GUI from template
-  local refs_outline = {
-    depots = tabs.depots.get_refs_outline()
-  }
-  local handlers_outline = {
-    base = {
-      ltnm_material_button = "ltnm_material_button"
-    },
-    depots = tabs.depots.get_handlers_outline()
-  }
-  local refs, handlers = gui.build(
-    player.gui.screen,
-    "main",
-    {
-      {
-        type = "frame",
-        direction = "vertical",
-        visible = false,
-        on_closed = {tab = "base", comp = "base", action = "close"},
-        ref = {"base", "window"},
-        children = {
-          titlebar(),
-          {
-            type = "frame",
-            style = "inside_deep_frame",
-            direction = "vertical",
-            children = {
-              toolbar(),
-              {
-                type = "tabbed-pane",
-                style = "tabbed_pane_with_no_side_padding",
-                ref = {"base", "tabbed_pane"},
-                children = {
-                  tabs.depots(player_table.translations.gui.locale_identifier),
-                  tabs.stations(),
-                  tabs.inventory(),
-                  tabs.history(),
-                  tabs.alerts(),
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    refs_outline,
-    handlers_outline
-  )
-
-  -- dragging and centering
-  refs.base.titlebar.flow.drag_target = refs.base.window
-  refs.base.window.force_auto_center()
-
-  -- generic handler
-  gui.add_handler(
-    player.index,
-    "ltnm_material_button",
-    defines.events.on_gui_click,
-    {action = "open_material_from_name"},
-    "main"
-  )
-
-  -- save to player table
-  player_table.gui.main = {
-    handlers = handlers,
-    refs = refs,
-    state = {
-      base = {
-        active_tab = "depots",
-        auto_refresh = false,
-        pinned = false,
-        pinning = false,
-        visible = false
-      },
-      search = toolbar.get_default_state(),
-      depots = tabs.depots.get_default_state()
-    }
-  }
+  -- create GUI
+  player_table.gui.Main = gui.new(root, player.gui.screen)
 
   -- set flag and shortcut state
   player_table.flags.can_open_gui = true
@@ -146,13 +14,9 @@ function main_gui.create(player, player_table)
 end
 
 function main_gui.destroy(player, player_table)
-  -- deregister and destroy GUI
-  local gui_data = player_table.gui.main
-  gui.remove_handlers(player.index, gui_data.handlers)
-  gui_data.refs.base.window.destroy()
-
-  -- remove from player table
-  player_table.gui.main = nil
+  -- destroy and remove GUI from player table
+  player_table.gui.Main:destroy()
+  player_table.gui.Main = nil
 
   -- set flag and shortcut state
   player_table.flags.can_open_gui = false
@@ -160,17 +24,12 @@ function main_gui.destroy(player, player_table)
 end
 
 function main_gui.toggle(player_index, player_table)
-  local action = player_table.gui.main.state.base.visible and "close" or "open"
-  if action == "open" then
-    local active_tab = player_table.gui.main.state.base.active_tab
-    main_gui.update({tab = active_tab, update = true}, {player_index = player_index})
-  end
-  main_gui.update({tab = "base", comp = "base", action = action}, {player_index = player_index})
+  player_table.gui.Main:dispatch({comp = "base", action = "toggle"}, {player_index = player_index})
 end
 
 function main_gui.update_active_tab(player_index, player_table)
-  local active_tab = player_table.gui.main.state.base.active_tab
-  main_gui.update({tab = active_tab, update = true}, {player_index = player_index})
+  -- use an empty message to do nothing to state, but update the view based on new LTN data
+  player_table.gui.Main:dispatch({}, {player_index = player_index})
 end
 
 return main_gui

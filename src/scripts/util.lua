@@ -19,7 +19,7 @@ end
 function util.get_updater_properties(player_index)
   local player = game.get_player(player_index)
   local player_table = global.players[player_index]
-  local gui_data = player_table.gui.main
+  local gui_data = player_table.gui.Main
 
   return player, player_table, gui_data.state, gui_data.refs, gui_data.handlers
 end

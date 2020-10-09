@@ -36,7 +36,7 @@ end
 
 function player_data.refresh(player, player_table)
   -- close and destroy GUI
-  if player_table.gui.main then
+  if player_table.gui.Main then
     main_gui.update({comp = "base", action = "close"}, {player_index = player.index})
     main_gui.destroy(player, player_table)
   end

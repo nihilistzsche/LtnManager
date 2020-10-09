@@ -1,4 +1,4 @@
-local gui = require("__flib__.gui-new")
+local gui = require("__flib__.gui3")
 
 local constants = require("constants")
 

@@ -1,5 +1,5 @@
 local event = require("__flib__.event")
-local gui = require("__flib__.gui-new")
+local gui = require("__flib__.gui3")
 local migration = require("__flib__.migration")
 local translation = require("__flib__.translation")
 
@@ -45,6 +45,7 @@ event.on_init(function()
 end)
 
 event.on_load(function()
+  gui.load()
   ltn_data.connect()
 end)
 
@@ -116,7 +117,7 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
       main_gui.toggle(e.player_index, player_table)
     else
       -- close GUI if it is open (just in case)
-      if player_table.gui.main.state.base.visible then
+      if player_table.gui.Main.state.base.visible then
         main_gui.close(player, player_table)
       end
       -- print warning message
@@ -156,8 +157,8 @@ event.on_tick(function(e)
       main_gui.create(game.get_player(player_index), player_table)
     elseif
       player_table.flags.can_open_gui
-      and player_table.gui.main.state.base.visible
-      and player_table.gui.main.state.base.auto_refresh
+      and player_table.gui.Main.state.base.visible
+      and player_table.gui.Main.state.base.auto_refresh
     then
       main_gui.update_active_tab(player_index, player_table)
     end
