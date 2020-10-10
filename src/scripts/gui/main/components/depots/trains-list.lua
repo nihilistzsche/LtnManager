@@ -6,8 +6,7 @@ function component.init()
   return {
     active_sort = "composition",
     sort_composition = true,
-    sort_status = false,
-    sort_shipment = false
+    sort_status = true
   }
 end
 

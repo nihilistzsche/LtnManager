@@ -1,4 +1,4 @@
--- local depot_button = require("scripts.gui.main.components.depots.depot-button")
+local depot_button = require("scripts.gui.main.components.depots.depot-button")
 
 local component = {}
 
@@ -66,6 +66,25 @@ function component.update(state, msg, e)
 end
 
 function component.view(state)
+  local surface_query = state.search.surface
+  local network_id_query = state.search.network_id
+  local selected_depot = state.depots.selected_depot
+
+  -- build depot buttons
+  local depot_buttons = {}
+  local index = 0
+  -- TODO use state.ltn_data
+  -- TODO search depots by name
+  for depot_name, depot_data in pairs(global.data.depots) do
+    if
+      bit32.btest(depot_data.network_id, network_id_query)
+      and (surface_query == -1 or depot_data.surfaces[surface_query])
+    then
+      index = index + 1
+      depot_buttons[index] = depot_button.view(depot_name, depot_data, selected_depot)
+    end
+  end
+
   return (
     {
       type = "frame",
@@ -76,7 +95,7 @@ function component.view(state)
           type = "scroll-pane",
           style = "ltnm_depot_select_scroll_pane",
           horizontal_scroll_policy = "never",
-          ref = {"depots", "depot_select", "scroll_pane"}
+          children = depot_buttons
         }
       }
     }
