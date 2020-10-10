@@ -5,8 +5,9 @@ local constants = require("constants")
 local titlebar = require("scripts.gui.main.components.titlebar")
 local toolbar = require("scripts.gui.main.components.toolbar")
 
+local tab_names = {"depots", "stations", "inventory", "history", "alerts"}
 local tabs = {}
-for _, tab_name in ipairs{"depots", "stations", "inventory", "history", "alerts"} do
+for _, tab_name in ipairs(tab_names) do
   tabs[tab_name] = require("scripts.gui.main.components."..tab_name..".tab")
 end
 
@@ -16,7 +17,7 @@ function root.init(player_index)
   local player_table = global.players[player_index]
   return {
     base = {
-      active_tab = "depots",
+      selected_tab = "depots",
       auto_refresh = false,
       pinned = false,
       pinning = false,
@@ -24,6 +25,7 @@ function root.init(player_index)
     },
     search = toolbar.init(),
     depots = tabs.depots.init(),
+    stations = tabs.stations.init(),
     -- LTN data
     ltn_data = global.data,
     -- meta
@@ -63,13 +65,15 @@ function root.update(state, msg, e, refs)
       if player.opened == refs.window then
         player.opened = nil
       end
+    elseif msg.action == "update_selected_tab" then
+      state.base.selected_tab = tab_names[e.element.selected_tab_index]
     end
   elseif msg.comp == "titlebar" then
     titlebar.update(state, msg, e, refs)
   elseif msg.comp == "toolbar" then
     toolbar.update(state, msg, e)
   else
-    tabs[state.base.active_tab].update(state, msg, e, refs)
+    tabs[state.base.selected_tab].update(state, msg, e, refs)
   end
 end
 
@@ -91,10 +95,11 @@ function root.view(state)
             toolbar.view(state),
             {
               type = "tabbed-pane",
-              style = "tabbed_pane_with_no_side_padding",
+              style = "ltnm_tabbed_pane",
+              on_selected_tab_changed = {comp = "base", action = "update_selected_tab"},
               tabs = {
                 tabs.depots.view(state),
-                tabs.stations.view(),
+                tabs.stations.view(state),
                 tabs.inventory.view(),
                 tabs.history.view(),
                 tabs.alerts.view(),

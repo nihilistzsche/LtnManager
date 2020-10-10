@@ -18,7 +18,6 @@ end
 function component.view(state)
   return (
     {
-      type = "tab-and-content",
       tab = {type = "tab", caption = {"ltnm-gui.depots"}},
       content = (
         {type = "flow", style = "ltnm_tab_horizontal_flow", children = {

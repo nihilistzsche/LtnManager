@@ -143,9 +143,6 @@ styles.ltnm_table_header_spacer = {
 styles.ltnm_tab_horizontal_flow = {
   type = "horizontal_flow_style",
   horizontal_spacing = 12,
-  left_padding = 12,
-  right_padding = 12,
-  bottom_padding = 12
 }
 
 styles.ltnm_depot_button_inner_flow = {
@@ -310,5 +307,18 @@ styles.ltnm_table_scroll_pane = {
   vertical_flow_style = {
     type = "vertical_flow_style",
     vertical_spacing = 0
+  }
+}
+
+-- TABBED PANE STYLES
+
+styles.ltnm_tabbed_pane = {
+  type = "tabbed_pane_style",
+  tab_content_frame = {
+    type = "frame_style",
+    parent = "tabbed_pane_frame",
+    left_padding = 12,
+    right_padding = 12,
+    bottom_padding = 8
   }
 }

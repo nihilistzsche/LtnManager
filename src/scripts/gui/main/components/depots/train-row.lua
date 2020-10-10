@@ -32,7 +32,8 @@ function component.view(state, train_id, train_data, train_status)
       style = "ltnm_small_slot_button_default",
       sprite = string.gsub(name, ",", "/"),
       number = count,
-      tooltip = util.material_button_tooltip(state.translations, name, count)
+      tooltip = util.material_button_tooltip(state.translations, name, count),
+      on_click = {action = "open_material", material = name}
     }
   end
 
@@ -48,7 +49,7 @@ function component.view(state, train_id, train_data, train_status)
           width = gui_constants.composition,
           caption = train_data.composition,
           tooltip = {"ltnm-gui.open-train-gui"},
-          on_click = {comp = "trains_list", action = "open_train", train_id = train_id},
+          on_click = {action = "open_train", train_id = train_id},
         },
         {
           type = "flow",

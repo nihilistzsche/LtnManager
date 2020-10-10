@@ -43,6 +43,14 @@ constants.gui = {
       composition = 200,
       status = 312,
       shipment = 180
+    },
+    stations_list = {
+      station_name = nil,
+      status = nil,
+      network_id = nil,
+      provided_requested = nil,
+      shipments = nil,
+      control_signals = nil,
     }
   }
 }
