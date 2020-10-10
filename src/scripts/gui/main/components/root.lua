@@ -1,5 +1,7 @@
 local gui = require("__flib__.gui3")
 
+local constants = require("constants")
+
 local titlebar = require("scripts.gui.main.components.titlebar")
 local toolbar = require("scripts.gui.main.components.toolbar")
 
@@ -10,7 +12,7 @@ end
 
 local root = gui.root("main")
 
-function root.init()
+function root.init(player_index)
   return {
     base = {
       active_tab = "depots",
@@ -20,7 +22,8 @@ function root.init()
       visible = false
     },
     search = toolbar.init(),
-    -- depots = tabs.depots.init()
+    depots = tabs.depots.init(),
+    constants = constants.gui[global.players[player_index].translations.gui.locale_identifier]
   }
 end
 
@@ -55,6 +58,8 @@ function root.update(state, msg, e, refs)
     titlebar.update(state, msg, e, refs)
   elseif msg.comp == "toolbar" then
     toolbar.update(state, msg, e)
+  else
+    tabs[state.base.active_tab].update(state, msg, e, refs)
   end
 end
 
