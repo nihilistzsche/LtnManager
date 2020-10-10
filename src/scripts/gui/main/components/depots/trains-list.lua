@@ -37,8 +37,7 @@ local function sort_checkbox(sort_name, depots_state, constants, caption)
 end
 
 local function generate_train_rows(state, depots_state, depot_data)
-  -- TODO use state.ltn_data
-  local trains = global.data.trains
+  local trains = state.ltn_data.trains
 
   -- get train IDs based on active sort
   local active_sort = depots_state.active_sort
@@ -86,8 +85,7 @@ function component.view(state)
   local constants = state.constants.trains_list
   local depots_state = state.depots
 
-  -- TODO use state.ltn_data
-  local depot_data = global.data.depots[depots_state.selected_depot]
+  local depot_data = state.ltn_data.depots[depots_state.selected_depot]
 
   local train_rows
 

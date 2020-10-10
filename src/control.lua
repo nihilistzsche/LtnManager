@@ -160,7 +160,7 @@ event.on_tick(function(e)
       and player_table.gui.Main.state.base.visible
       and player_table.gui.Main.state.base.auto_refresh
     then
-      main_gui.update_active_tab(player_index, player_table)
+      main_gui.update(player_index, player_table)
     end
 
     -- get and save next index, or stop iteration

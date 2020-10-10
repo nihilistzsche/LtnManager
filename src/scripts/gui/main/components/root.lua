@@ -24,6 +24,8 @@ function root.init(player_index)
     },
     search = toolbar.init(),
     depots = tabs.depots.init(),
+    -- LTN data
+    ltn_data = global.data,
     -- meta
     constants = constants.gui[player_table.translations.gui.locale_identifier],
     translations = player_table.translations,
@@ -37,6 +39,10 @@ function root.setup(refs)
 end
 
 function root.update(state, msg, e, refs)
+  if msg.update_ltn_data then
+    state.ltn_data = global.data
+  end
+
   if msg.comp == "base" then
     local player = game.get_player(e.player_index)
 

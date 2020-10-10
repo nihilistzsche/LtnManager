@@ -1,8 +1,10 @@
 local component = {}
 
 function component.update(state, msg, e, refs)
-  if msg.action == "handle_refresh_click" and e.shift then
-    state.base.auto_refresh = not state.base.auto_refresh
+  if msg.action == "handle_refresh_click" then
+    if e.shift then
+      state.base.auto_refresh = not state.base.auto_refresh
+    end
   elseif msg.action == "toggle_pinned" then
     local player = game.get_player(e.player_index)
     local pinned = state.base.pinned
@@ -51,7 +53,7 @@ function component.view(state)
       frame_action_button(
         "ltnm_refresh",
         {"ltnm-gui.refresh"},
-        {comp = "titlebar", action = "handle_refresh_click"},
+        {comp = "titlebar", action = "handle_refresh_click", update_ltn_data = true},
         state.base.auto_refresh
       ),
       frame_action_button("utility/close", nil, {comp = "base", action = "close"})

@@ -29,9 +29,8 @@ function main_gui.toggle(player_index, player_table)
   MainGui:dispatch({comp = "base", action = action}, {player_index = player_index})
 end
 
-function main_gui.update_active_tab(player_index, player_table)
-  -- use an empty message to do nothing to state, but update the view based on new LTN data
-  player_table.gui.Main:dispatch({}, {player_index = player_index})
+function main_gui.update(player_index, player_table)
+  player_table.gui.Main:dispatch({update_ltn_data = true}, {player_index = player_index})
 end
 
 return main_gui

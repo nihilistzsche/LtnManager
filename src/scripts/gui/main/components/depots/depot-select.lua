@@ -16,9 +16,8 @@ function component.view(state)
   -- build depot buttons
   local depot_buttons = {}
   local index = 0
-  -- TODO use state.ltn_data
   -- TODO search depots by name
-  for depot_name, depot_data in pairs(global.data.depots) do
+  for depot_name, depot_data in pairs(state.ltn_data.depots) do
     if
       bit32.btest(depot_data.network_id, network_id_query)
       and (surface_query == -1 or depot_data.surfaces[surface_query])
