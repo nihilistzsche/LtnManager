@@ -13,6 +13,7 @@ end
 local root = gui.root("main")
 
 function root.init(player_index)
+  local player_table = global.players[player_index]
   return {
     base = {
       active_tab = "depots",
@@ -23,7 +24,10 @@ function root.init(player_index)
     },
     search = toolbar.init(),
     depots = tabs.depots.init(),
-    constants = constants.gui[global.players[player_index].translations.gui.locale_identifier]
+    -- meta
+    constants = constants.gui[player_table.translations.gui.locale_identifier],
+    translations = player_table.translations,
+    player_index = player_index
   }
 end
 
