@@ -393,18 +393,6 @@ local function sort_stations_by_name(working_data, iterations_per_tick)
   )
 end
 
-local function sort_stations_by_network_id(working_data, iterations_per_tick)
-  local stations = working_data.stations
-  return table.partial_sort(
-    working_data.sorted_stations.network_id,
-    working_data.key,
-    math.ceil(iterations_per_tick / 2),
-    function(id_1, id_2)
-      return stations[id_1].network_id < stations[id_2].network_id
-    end
-  )
-end
-
 local function sort_stations_by_status(working_data, iterations_per_tick)
   local stations = working_data.stations
   return table.partial_sort(
@@ -413,6 +401,18 @@ local function sort_stations_by_status(working_data, iterations_per_tick)
     math.ceil(iterations_per_tick / 2),
     function(id_1, id_2)
       return stations[id_1].status.sort_key < stations[id_2].status.sort_key
+    end
+  )
+end
+
+local function sort_stations_by_network_id(working_data, iterations_per_tick)
+  local stations = working_data.stations
+  return table.partial_sort(
+    working_data.sorted_stations.network_id,
+    working_data.key,
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
+      return stations[id_1].network_id < stations[id_2].network_id
     end
   )
 end
@@ -632,8 +632,8 @@ function ltn_data.iterate()
     sort_depot_trains_by_status,
     sort_depot_trains_by_composition,
     sort_stations_by_name,
-    sort_stations_by_network_id,
     sort_stations_by_status,
+    sort_stations_by_network_id,
     update_history,
     prepare_history_sort,
     sort_history,
