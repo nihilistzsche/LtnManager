@@ -53,11 +53,11 @@ local function generate_station_rows(state, stations_state)
   for i = start, finish, step do
     local station_id = station_ids[i]
     local station_data = stations[station_id]
-    local search_comparator = selected_sort == "status" and station_data.status.sort_key or station_data[selected_sort]
 
     -- test against search queries
     if
-      string.find(string.lower(search_comparator), search_query)
+      string.find(string.lower(station_data.name), search_query)
+      -- TODO search against provided/requested and shipments
       and bit32.btest(station_data.network_id, search_network_id)
       and (search_surface == -1 or station_data.entity.surface.index == search_surface)
     then
