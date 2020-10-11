@@ -42,7 +42,6 @@ local function generate_train_rows(state, depots_state, depot_data)
 
   -- search
   local search_state = state.search
-  local search_query = search_state.query
   local search_surface = search_state.surface
 
   -- iteration data
@@ -59,13 +58,8 @@ local function generate_train_rows(state, depots_state, depot_data)
     local train_status = train_data.status[state.player_index]
 
     -- test against search queries
-    -- TODO search shipment
     if
-      (search_surface == -1 or train_data.main_locomotive.surface.index == search_surface)
-      and (
-        string.find(string.lower(train_data.composition), search_query)
-        or string.find(string.lower(train_status.string), search_query)
-      )
+      search_surface == -1 or train_data.main_locomotive.surface.index == search_surface
     then
       index = index + 1
       train_rows[index] = train_row(state, train_id, train_data, train_status)
@@ -78,12 +72,17 @@ end
 function component.view(state)
   local constants = state.constants.trains_list
   local depots_state = state.depots
+  local selected_depot = depots_state.selected_depot
 
-  local depot_data = state.ltn_data.depots[depots_state.selected_depot]
+  local depot_data = state.ltn_data.depots[selected_depot]
 
-  local train_rows
+  local train_rows = {}
 
-  if depot_data then
+  if
+    selected_depot
+    and string.find(selected_depot, state.search.query)
+    and bit32.btest(depot_data.network_id, state.search.network_id)
+  then
     train_rows = generate_train_rows(state, depots_state, depot_data)
   end
 

@@ -12,16 +12,17 @@ end
 
 function component.view(state)
   local surface_query = state.search.surface
-  local network_id_query = state.search.network_id
+  local search_query = state.search.query
+  local search_network_id = state.search.network_id
   local selected_depot = state.depots.selected_depot
 
   -- build depot buttons
   local depot_buttons = {}
   local index = 0
-  -- TODO search depots by name
   for depot_name, depot_data in pairs(state.ltn_data.depots) do
     if
-      bit32.btest(depot_data.network_id, network_id_query)
+      string.find(depot_name, search_query)
+      and bit32.btest(depot_data.network_id, search_network_id)
       and (surface_query == -1 or depot_data.surfaces[surface_query])
     then
       index = index + 1
