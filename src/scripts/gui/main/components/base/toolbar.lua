@@ -7,6 +7,7 @@ local component = gui.component()
 function component.init()
   return {
     network_id = -1,
+    network_id_text = "-1",
     query = "",
     query_text = "",
     surface = -1
@@ -25,8 +26,10 @@ function component.update(state, msg, e)
     state.search.query_text = e.element.text
     state.search.query = string.lower(query)
   elseif msg.action == "update_network_id_query" then
-    -- we don't need to sanitize this input, since it is a numeric textfield
-    state.search.network_id = tonumber(e.element.text) or -1
+    local text = e.element.text
+    -- default to -1 if the nubmer can't be read
+    state.search.network_id = tonumber(text) or -1
+    state.search.network_id_text = text
   end
 end
 
@@ -51,7 +54,7 @@ function component.view(state)
         allow_negative = true,
         lose_focus_on_confirm = true,
         clear_and_focus_on_right_click = true,
-        text = tostring(state.search.network_id),
+        text = state.search.network_id_text,
         on_text_changed = {comp = "toolbar", action = "update_network_id_query"}
       },
       {type = "label", style = "subheader_caption_label", right_margin = 8, caption = "Surface:"},
