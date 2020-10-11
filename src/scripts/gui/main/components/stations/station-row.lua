@@ -77,7 +77,7 @@ function component.view(state, station_id, station_data)
         tooltip = {"ltnm-gui.open-train-gui"},
         on_click = {action = "open_station", station_id = station_id},
       },
-      status_indicator(status.name, status.count, nil, gui_constants.status),
+      status_indicator(status.color, status.count, nil, gui_constants.status),
       {
         type = "label",
         horizontal_align = "center",

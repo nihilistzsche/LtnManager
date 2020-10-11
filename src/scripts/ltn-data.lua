@@ -72,12 +72,12 @@ local function iterate_stations(working_data, iterations_per_tick)
     end
 
     -- get status
-
     local lamp_signal = station_data.lamp_control.get_control_behavior().get_signal(1)
+    local status_color = string.gsub(lamp_signal.signal.name, "signal%-", "")
     station_data.status = {
-      name = lamp_signal.signal.name,
+      color = status_color,
       count = lamp_signal.count,
-      sort_key = lamp_signal.signal.name..lamp_signal.count
+      sort_key = status_color..lamp_signal.count
     }
 
     -- process station materials
@@ -135,7 +135,7 @@ local function iterate_stations(working_data, iterations_per_tick)
       if depot then
         depot.stations[#depot.stations+1] = station_id
         local statuses = depot.statuses
-        statuses[status.name] = (statuses[status.name] or 0) + status.count
+        statuses[status.color] = (statuses[status.color] or 0) + status.count
         depot.surfaces[station_data.entity.surface.index] = true
       else
         depots[station_name] = {
@@ -144,7 +144,7 @@ local function iterate_stations(working_data, iterations_per_tick)
           network_id = network_id,
           num_trains = #station_trains,
           stations = {station_id},
-          statuses = {[status.name] = status.count},
+          statuses = {[status.color] = status.count},
           surfaces = {[station_data.entity.surface.index] = true},
           train_ids = {},
           sorted_trains = {
