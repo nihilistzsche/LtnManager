@@ -57,12 +57,15 @@ local function generate_train_rows(state, depots_state, depot_data)
     local train_id = train_ids[i]
     local train_data = trains[train_id]
     local train_status = train_data.status[state.player_index]
-    local search_comparator = selected_sort == "composition" and train_data.composition or train_status.string
 
     -- test against search queries
+    -- TODO search shipment
     if
-      string.find(string.lower(search_comparator), search_query)
-      and (search_surface == -1 or train_data.main_locomotive.surface.index == search_surface)
+      (search_surface == -1 or train_data.main_locomotive.surface.index == search_surface)
+      and (
+        string.find(string.lower(train_data.composition), search_query)
+        or string.find(string.lower(train_status.string), search_query)
+      )
     then
       index = index + 1
       train_rows[index] = train_row(state, train_id, train_data, train_status)
