@@ -40,17 +40,17 @@ constants.colors = {
 constants.gui = {
   en = {
     trains_list = {
-      composition = 200,
-      status = 312,
-      shipment = 180
+      composition = 230,
+      status = 366,
+      shipment = (36 * 6)
     },
     stations_list = {
-      station_name = nil,
-      status = nil,
-      network_id = nil,
-      provided_requested = nil,
-      shipments = nil,
-      control_signals = nil,
+      station_name = 210,
+      status = 53,
+      network_id = 84,
+      provided_requested = (36 * 6),
+      shipments = (36 * 5),
+      control_signals = (36 * 7)
     }
   }
 }

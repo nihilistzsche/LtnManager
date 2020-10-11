@@ -4,6 +4,8 @@ local util = require("prototypes.util")
 
 local styles = data.raw["gui-style"]["default"]
 
+local depot_button_height = 89
+
 -- BUTTON STYLES
 
 -- TODO move to flib in 1.1 (this one is different)
@@ -177,7 +179,7 @@ styles.ltnm_table_toolbar_frame = {
   type = "frame_style",
   parent = "subheader_frame",
   left_padding = 13, -- optical correction
-  right_padding = 24 - 4, -- two scroll bars' worth
+  right_padding = 24, -- two scroll bars' worth
   horizontal_flow_style = {
     type = "horizontal_flow_style",
     horizontal_spacing = 12,
@@ -251,13 +253,13 @@ styles.ltnm_depot_select_scroll_pane = {
   type = "scroll_pane_style",
   parent = "flib_naked_scroll_pane_no_padding",
   width = 206,
-  height = 623,
+  height = (depot_button_height * 8),
   background_graphical_set = {
     position = {282, 17},
     corner_size = 8,
     overall_tiling_horizontal_padding = 6,
     overall_tiling_vertical_padding = 6,
-    overall_tiling_vertical_size = 77,
+    overall_tiling_vertical_size = depot_button_height - 12,
     overall_tiling_vertical_spacing = 12
   },
   vertical_flow_style = {

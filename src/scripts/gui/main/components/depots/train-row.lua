@@ -38,37 +38,33 @@ function component.view(state, train_id, train_data, train_status)
   end
 
   return (
-    {
-      type = "frame",
-      style = "ltnm_table_row_frame",
-      horizontally_stretchable = true,
-      children = {
+    {type = "frame", style = "ltnm_table_row_frame", horizontally_stretchable = true, children = {
+      {
+        type = "label",
+        style = "ltnm_clickable_bold_label",
+        width = gui_constants.composition,
+        caption = train_data.composition,
+        tooltip = {"ltnm-gui.open-train-gui"},
+        on_click = {action = "open_train", train_id = train_id},
+      },
+      {
+        type = "flow",
+        style = "ltnm_train_status_flow",
+        -- horizontally_stretchable = true,
+        width = gui_constants.status,
+        direction = "vertical",
+        children = status_elems
+      },
+      {type = "frame", style = "deep_frame_in_shallow_frame", children = {
         {
-          type = "label",
-          style = "ltnm_clickable_bold_label",
-          width = gui_constants.composition,
-          caption = train_data.composition,
-          tooltip = {"ltnm-gui.open-train-gui"},
-          on_click = {action = "open_train", train_id = train_id},
-        },
-        {
-          type = "flow",
-          style = "ltnm_train_status_flow",
-          width = gui_constants.status,
-          direction = "vertical",
-          children = status_elems
-        },
-        {type = "frame", style = "deep_frame_in_shallow_frame", children = {
-          {
-            type = "scroll-pane",
-            style = "ltnm_small_slot_table_scroll_pane",
-            children = {
-              {type = "table", style = "slot_table", width = (36 * 5), column_count = 5, children = shipment_elems}
-            }
+          type = "scroll-pane",
+          style = "ltnm_small_slot_table_scroll_pane",
+          children = {
+            {type = "table", style = "slot_table", width = (36 * 6), column_count = 5, children = shipment_elems}
           }
-        }}
-      }
-    }
+        }
+      }}
+    }}
   )
 end
 

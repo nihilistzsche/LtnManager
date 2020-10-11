@@ -1,4 +1,4 @@
-local sort_checkbox = require("scripts.gui.main.components.sort-checkbox")
+local sort_checkbox = require("scripts.gui.main.components.common.sort-checkbox")
 local train_row = require("scripts.gui.main.components.depots.train-row")
 
 local component = {}

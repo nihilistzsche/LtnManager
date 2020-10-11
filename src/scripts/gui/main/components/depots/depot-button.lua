@@ -1,3 +1,5 @@
+local status_indicator = require("scripts.gui.main.components.common.status-indicator")
+
 local component = {}
 
 function component.view(depot_name, depot_data, selected_depot)
@@ -5,12 +7,7 @@ function component.view(depot_name, depot_data, selected_depot)
   local index = 0
   for name, count in pairs(depot_data.statuses) do
     index = index + 1
-    statuses[index] = (
-      {type = "flow", vertical_align = "center", children = {
-        {type = "sprite", style = "ltnm_status_icon", sprite = "ltnm_indicator_"..name},
-        {type = "label", style = "ltnm_black_label", caption = count}
-      }}
-    )
+    statuses[index] = status_indicator(name, count, true)
   end
 
   return (

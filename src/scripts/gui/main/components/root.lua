@@ -2,8 +2,8 @@ local gui = require("__flib__.gui3")
 
 local constants = require("constants")
 
-local titlebar = require("scripts.gui.main.components.titlebar")
-local toolbar = require("scripts.gui.main.components.toolbar")
+local titlebar = require("scripts.gui.main.components.base.titlebar")
+local toolbar = require("scripts.gui.main.components.base.toolbar")
 
 local tab_names = {"depots", "stations", "inventory", "history", "alerts"}
 local tabs = {}
