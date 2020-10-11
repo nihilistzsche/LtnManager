@@ -113,6 +113,41 @@ local function parse_train_status(train_data, translations)
   end
 end
 
+-- multi-level next functionality
+-- will iterate over the objects table once for each player in the players table
+local function multilevel_next(players, objects, key, callback)
+  key = key or {}
+  local player = key.player
+  local obj = key.obj
+
+  -- find new keys
+  local next_obj = next(objects, key.obj)
+  if next_obj and player then
+    obj = next_obj
+    player = key.player
+  else
+    obj = next(objects)
+    local next_player = next(players, player)
+    while next_player do
+      if players[next_player].flags.translations_finished then
+        break
+      end
+      next_player = next(players, next_player)
+    end
+    if next_player and obj then
+      player = next_player
+    else
+      -- we have finished, so return `nil` to cease iteration
+      return nil, nil
+    end
+  end
+
+  -- return tables
+  return
+    {player = player, obj = obj},
+    callback(player, obj)
+end
+
 local function add_alert(e)
   -- save train data so it will persist after the delivery is through
   local train_id = e.train_id or e.train.id
@@ -411,40 +446,16 @@ local function generate_train_statuses(working_data, iterations_per_tick)
 
   return table.for_n_of({}, working_data.key, iterations_per_tick,
     function(data, key)
-      local train = trains[key.train]
+      local train = trains[key.obj]
       train.status[key.player] = parse_train_status(train, data.translations)
     end,
     function(_, key)
-      key = key or {}
-      local player = key.player
-      local train = key.train
-
-      -- find new keys
-      local next_train = next(trains, key.train)
-      if next_train and player then
-        train = next_train
-        player = key.player
-      else
-        train = next(trains)
-        local next_player = next(players, player)
-        while next_player do
-          if players[next_player].flags.translations_finished then
-            break
-          end
-          next_player = next(players, next_player)
-        end
-        if next_player and train then
-          player = next_player
-        else
-          -- we have finished, so return `nil` to cease iteration
-          return nil, nil
-        end
-      end
-
-      -- return tables
-      return
-        {player = player, train = train},
-        {translations = players[player].translations.gui, train = trains[train]}
+      return multilevel_next(players, trains, key, function(player, train)
+        return {
+          translations = players[player].translations.gui,
+          train = trains[train]
+        }
+      end)
     end
   )
 end
@@ -475,36 +486,7 @@ local function sort_depot_trains_by_status(working_data)
       depot_data.sorted_trains.status[player_index] = train_ids
     end,
     function(_, key)
-      key = key or {}
-      local player = key.player
-      local depot = key.depot
-
-      -- find new keys
-      local next_depot = next(depots, key.depot)
-      if next_depot and player then
-        depot = next_depot
-        player = key.player
-      else
-        depot = next(depots)
-        local next_player = next(players, player)
-        while next_player do
-          if players[next_player].flags.translations_finished then
-            break
-          end
-          next_player = next(players, next_player)
-        end
-        if next_player and depot then
-          player = next_player
-        else
-          -- we have finished, so return `nil` to cease iteration
-          return nil, nil
-        end
-      end
-
-      -- return tables
-      return
-        {player = player, depot = depot},
-        depots[depot]
+      return multilevel_next(players, depots, key, function(_, depot) return depots[depot] end)
     end
   )
 end
@@ -552,6 +534,10 @@ local function sort_stations_by_network_id(working_data, iterations_per_tick)
       return stations[id_1].network_id < stations[id_2].network_id
     end
   )
+end
+
+local function generate_station_provided_requested_strings(working_data, iterations_per_tick)
+
 end
 
 local function sort_stations_by_provided_requested(working_data, iterations_per_tick)
