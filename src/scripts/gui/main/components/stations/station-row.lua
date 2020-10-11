@@ -1,7 +1,5 @@
 local gui = require("__flib__.gui3")
 
--- local constants = require("constants")
-
 local status_indicator = require("scripts.gui.main.components.common.status-indicator")
 local util = require("scripts.util")
 
@@ -57,7 +55,6 @@ local function slot_table(translations, width, contents)
     {
       type = "frame",
       style = "ltnm_small_slot_table_frame",
-      -- height = math.max(math.ceil(i / columns), 1) * 36,
       children = {
         {type = "table", style = "slot_table", width = width, column_count = columns, children = buttons}
       }
