@@ -117,7 +117,8 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
       main_gui.toggle(e.player_index, player_table)
     else
       -- close GUI if it is open (just in case)
-      if player_table.gui.Main.state.base.visible then
+      local MainGui = player_table.gui.Main
+      if MainGui and MainGui.state.base.visible then
         main_gui.close(player, player_table)
       end
       -- print warning message
