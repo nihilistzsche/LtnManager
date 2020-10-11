@@ -3,12 +3,115 @@ local ltn_data = {}
 local event = require("__flib__.event")
 local queue = require("lib.queue")
 local table = require("__flib__.table")
-local util = require("scripts.util")
+local train_util = require("__flib__.train")
 
 local constants = require("constants")
 
+
 -- -----------------------------------------------------------------------------
 -- HELPER FUNCTIONS
+
+-- add the contents of two material tables together
+-- t1 contains the items we are adding into the table, t2 will be returned
+local function add_materials(t1, t2)
+  for name, count in pairs(t1) do
+    local existing = t2[name]
+    if existing then
+      t2[name] = existing + count
+    else
+      t2[name] = count
+    end
+  end
+  return t2
+end
+
+-- parse the train's status and return metadata related to that status
+local function parse_train_status(train_data, translations)
+  local train = train_data.train
+  local state = train_data.state
+  local def = defines.train_state
+  if
+    state == def.on_the_path
+    or state == def.arrive_signal
+    or state == def.wait_signal
+    or state == def.arrive_station
+  then
+    if train_data.returning_to_depot then
+      return {
+        color = constants.colors.white.tbl,
+        msg = translations.returning_to_depot,
+        string = translations.returning_to_depot
+      }
+    else
+      if train_data.pickupDone then
+        return {
+          station = "to",
+          string = translations.delivering_to.." "..train_data.to,
+          type = translations.delivering_to
+        }
+      else
+        if not train_data.from then
+          return {
+            color = constants.colors.red.tbl,
+            msg = translations.not_available,
+            string = "N/A"
+          }
+        else
+          return {
+            station = "from",
+            string = translations.fetching_from.." "..train_data.from,
+            type = translations.fetching_from
+          }
+        end
+      end
+    end
+  elseif state == def.wait_station then
+    if train_data.surface or train_data.returning_to_depot then
+      if train_data.has_contents then
+        return {
+          color = constants.colors.red.tbl,
+          msg = translations.parked_at_depot_with_residue,
+          string = translations.parked_at_depot_with_residue,
+        }
+      else
+        return {
+          color = constants.colors.green.tbl,
+          msg = translations.parked_at_depot,
+          string = translations.parked_at_depot
+        }
+      end
+    else
+      if train_data.pickupDone then
+        return {
+          station = "to",
+          string = translations.unloading_at.." "..train_data.to,
+          type = translations.unloading_at
+        }
+      else
+        local station = train.station
+        if station and station.backer_name == train_data.depot then
+          return {
+            color = constants.colors.yellow.tbl,
+            msg = translations.leaving_depot,
+            string = translations.parked_at_depot,
+          }
+        else
+          return {
+            station = "from",
+            string = translations.loading_at.." "..train_data.from,
+            type = translations.loading_at
+          }
+        end
+      end
+    end
+  else
+    return {
+      color = constants.colors.red.tbl,
+      msg = translations.not_available,
+      string = "N/A"
+    }
+  end
+end
 
 local function add_alert(e)
   -- save train data so it will persist after the delivery is through
@@ -103,7 +206,7 @@ local function iterate_stations(working_data, iterations_per_tick)
         if not inv then
           inventory[mode][network_id] = materials
         else
-          inv = util.add_materials(materials, inv)
+          inv = add_materials(materials, inv)
         end
       end
     end
@@ -223,8 +326,8 @@ local function iterate_trains(working_data, iterations_per_tick)
     train_data.has_contents = has_contents
     train_data.state = train_state
     train_data.depot = depot
-    train_data.composition = util.train.get_composition_string(train)
-    train_data.main_locomotive = util.train.get_main_locomotive(train)
+    train_data.composition = train_util.get_composition_string(train)
+    train_data.main_locomotive = train_util.get_main_locomotive(train)
     train_data.status = {}
     trains[train_id] = train_data
     for key, value in pairs(
@@ -252,7 +355,7 @@ local function iterate_in_transit(working_data, iterations_per_tick)
     iterations_per_tick,
     function(delivery_data, delivery_id)
       -- add to in transit inventory
-      in_transit[delivery_data.network_id] = util.add_materials(
+      in_transit[delivery_data.network_id] = add_materials(
         delivery_data.shipment,
         in_transit[delivery_data.network_id] or {}
       )
@@ -270,21 +373,21 @@ local function iterate_in_transit(working_data, iterations_per_tick)
       for station_direction, subtable_name in pairs{from = "outbound", to = "inbound"} do
         local station = stations[delivery_data[station_direction.."_id"]]
         if station then
-          util.add_materials(delivery_data.shipment, station[subtable_name])
+          add_materials(delivery_data.shipment, station[subtable_name])
         end
       end
     end
   )
 end
 
-local function generate_train_status_strings(working_data, iterations_per_tick)
+local function generate_train_statuses(working_data, iterations_per_tick)
   local players = global.players
   local trains  = working_data.trains
 
   return table.for_n_of({}, working_data.key, iterations_per_tick,
     function(data, key)
       local train = trains[key.train]
-      train.status[key.player] = util.train.get_status_string(train, data.translations)
+      train.status[key.player] = parse_train_status(train, data.translations)
     end,
     function(_, key)
       key = key or {}
@@ -628,7 +731,7 @@ function ltn_data.iterate()
     iterate_stations,
     iterate_trains,
     iterate_in_transit,
-    generate_train_status_strings,
+    generate_train_statuses,
     sort_depot_trains_by_status,
     sort_depot_trains_by_composition,
     sort_stations_by_name,
@@ -774,7 +877,7 @@ local function migrate_train(e, data)
         invalidated_trains[old_id] = nil
         -- replace train and main_locomotive, the actual IDs and such will be updated on the next LTN update cycle
         train_data.train = new_train
-        train_data.main_locomotive = util.train.get_main_locomotive(new_train)
+        train_data.main_locomotive = train_util.get_main_locomotive(new_train)
       end
     end
   end

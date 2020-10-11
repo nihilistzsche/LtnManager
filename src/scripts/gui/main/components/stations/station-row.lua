@@ -1,4 +1,5 @@
 local gui = require("__flib__.gui3")
+local misc_util = require("__flib__.misc")
 
 local status_indicator = require("scripts.gui.main.components.common.status-indicator")
 local util = require("scripts.util")
@@ -15,7 +16,7 @@ local tooltip_funcs = {
     .."[font=default-semibold]"
     ..translations.gui.count
     .."[/font] "
-    ..util.comma_value(math.floor(count))
+    ..misc_util.delineate_number(math.floor(count))
   )
   end,
   material = util.material_button_tooltip,
