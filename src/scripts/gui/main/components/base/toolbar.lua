@@ -8,6 +8,7 @@ function component.init()
   return {
     network_id = -1,
     query = "",
+    query_text = "",
     surface = -1
   }
 end
@@ -21,6 +22,7 @@ function component.update(state, msg, e)
       query = string.gsub(query, pattern, replacement)
     end
 
+    state.search.query_text = e.element.text
     state.search.query = string.lower(query)
   elseif msg.action == "update_network_id_query" then
     -- we don't need to sanitize this input, since it is a numeric textfield
@@ -37,7 +39,7 @@ function component.view(state)
         type = "textfield",
         lose_focus_on_confirm = true,
         clear_and_focus_on_right_click = true,
-        text = state.search.query,
+        text = state.search.query_text,
         on_text_changed = {comp = "toolbar", action = "update_search_query"}
       },
       {type = "empty-widget", style = "flib_horizontal_pusher"},
