@@ -14,8 +14,18 @@ function component.init()
   }
 end
 
-function component.update()
+function component.update(state, msg, e)
+  if msg.action == "update_sort" then
+    local sort = msg.sort
+    local stations_state = state.stations
 
+    if stations_state.selected_sort ~= sort then
+      e.element.state = not e.element.state
+    end
+
+    stations_state.selected_sort = sort
+    stations_state["sort_"..sort] = e.element.state
+  end
 end
 
 local function generate_station_rows(state, stations_state, gui_constants)
