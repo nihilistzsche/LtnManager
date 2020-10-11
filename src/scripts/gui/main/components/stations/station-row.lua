@@ -97,8 +97,8 @@ function component.view(state, station_id, station_data)
         translations,
         gui_constants.shipments,
         {
-          -- green = station_data.inbound,
-          -- red = station_data.outbound
+          {color = "green", enabled = true, materials = station_data.inbound, tooltip = "material"},
+          {color = "red", enabled = true, materials = station_data.outbound, tooltip = "material"}
         }
       ),
       slot_table(

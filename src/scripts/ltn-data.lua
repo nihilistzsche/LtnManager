@@ -103,6 +103,10 @@ local function iterate_stations(working_data, iterations_per_tick)
       end
     end
 
+    -- other data tables (will be populated later)
+    station_data.inbound = {}
+    station_data.outbound = {}
+
     -- add station trains to trains table
     local station_trains = station_data.entity.get_train_stop_trains()
     for _, train in ipairs(station_trains) do
@@ -244,6 +248,14 @@ local function iterate_in_transit(working_data, iterations_per_tick)
           material_locations[name] = {stations = {}, trains = {delivery_id}}
         else
           locations.trains[#locations.trains+1] = delivery_id
+        end
+      end
+      -- add materials to stations
+      local stations = working_data.stations
+      for station_direction, subtable_name in pairs{from = "outbound", to = "inbound"} do
+        local station = stations[delivery_data[station_direction.."_id"]]
+        if station then
+          util.add_materials(delivery_data.shipment, station[subtable_name])
         end
       end
     end
