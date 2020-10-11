@@ -1,5 +1,7 @@
 local gui = require("__flib__.gui3")
 
+local constants = require("constants")
+
 local component = gui.component()
 
 function component.update(state, msg, e, refs)
@@ -46,6 +48,15 @@ function component.view(state)
     {type = "flow", ref = "titlebar_flow", children = {
       {type = "label", style = "frame_title", caption = {"mod-name.LtnManager"}, ignored_by_interaction = true},
       {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
+      {
+        type = "label",
+        style = "bold_label",
+        font_color = constants.colors.red.tbl,
+        right_margin = 8,
+        caption = {"ltnm-gui.dispatcher-not-enabled"},
+        tooltip = {"ltnm-gui.dispatcher-not-enabled-tooltip"},
+        visible = not settings.global["ltn-dispatcher-enabled"].value
+      },
       frame_action_button(
         "ltnm_pin",
         {"ltnm-gui.keep-open"},
