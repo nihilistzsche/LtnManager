@@ -160,6 +160,25 @@ styles.ltnm_train_status_flow = {
 
 -- FRAME STYLES
 
+styles.ltnm_small_slot_table_frame = {
+  type = "frame_style",
+  parent = "deep_frame_in_shallow_frame",
+  bottom_margin = 4,
+  minimal_height = 36,
+  background_graphical_set = {
+    base = {
+      position = {282, 17},
+      corner_size = 8,
+      overall_tiling_horizontal_padding = 4,
+      overall_tiling_horizontal_size = 28,
+      overall_tiling_horizontal_spacing = 8,
+      overall_tiling_vertical_padding = 4,
+      overall_tiling_vertical_size = 28,
+      overall_tiling_vertical_spacing = 8
+    }
+  }
+}
+
 styles.ltnm_table_row_frame = {
   type = "frame_style",
   parent = "statistics_table_item_frame",
@@ -167,7 +186,7 @@ styles.ltnm_table_row_frame = {
   bottom_padding = 2,
   left_padding = 10,
   right_padding = -4, -- padding will be handled by the slot table
-  height = 52,
+  minimal_height = 52,
   horizontal_flow_style = {
     type = "horizontal_flow_style",
     vertical_align = "center",
@@ -178,8 +197,8 @@ styles.ltnm_table_row_frame = {
 styles.ltnm_table_toolbar_frame = {
   type = "frame_style",
   parent = "subheader_frame",
-  left_padding = 13, -- optical correction
-  right_padding = 24, -- two scroll bars' worth
+  left_padding = 14, -- optical correction
+  right_padding = 22, -- two scroll bars' worth
   horizontal_flow_style = {
     type = "horizontal_flow_style",
     horizontal_spacing = 12,
@@ -275,6 +294,7 @@ styles.ltnm_small_slot_table_scroll_pane = {
   margin = 0,
   extra_padding_when_activated = 0,
   minimal_height = 36,
+  dont_force_clipping_rect_for_contents = false,
   background_graphical_set = {
     base = {
       position = {282, 17},

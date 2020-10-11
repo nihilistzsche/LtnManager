@@ -41,6 +41,14 @@ function global_data.build_translations()
       }
     end
   end
+  -- virtual signals
+  for name, prototype in pairs(game.virtual_signal_prototypes) do
+    translation_data[#translation_data+1] = {
+      dictionary = "virtual_signals",
+      internal = name,
+      localised = prototype.localised_name
+    }
+  end
   global.translation_data = translation_data
 end
 

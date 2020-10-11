@@ -15,7 +15,8 @@ function player_data.init(player, index)
     last_update = game.tick,
     translations = {
       gui = {},
-      materials = {}
+      materials = {},
+      virtual_signals = {}
     }
   }
   player.set_shortcut_available("ltnm-toggle-gui", false)
@@ -55,7 +56,8 @@ function player_data.refresh(player, player_table)
   -- run translations
   player_table.translations = {
     gui = {},
-    materials = {}
+    materials = {},
+    virtual_signals = {}
   }
   if player.connected then
     player_data.start_translations(player.index)

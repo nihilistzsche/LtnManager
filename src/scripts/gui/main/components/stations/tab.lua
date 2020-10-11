@@ -1,14 +1,14 @@
 local gui = require("__flib__.gui3")
 
 local sort_checkbox = require("scripts.gui.main.components.common.sort-checkbox")
-local status_indicator = require("scripts.gui.main.components.common.status-indicator")
+local station_row = require("scripts.gui.main.components.stations.station-row")
 
 local component = gui.component()
 
 function component.init()
   return {
-    selected_sort = "station_name",
-    sort_station_name = true,
+    selected_sort = "name",
+    sort_name = true,
     sort_status = true,
     sort_network_id = true
   }
@@ -28,25 +28,63 @@ function component.update(state, msg, e)
   end
 end
 
-local function generate_station_rows(state, stations_state, gui_constants)
+local function generate_station_rows(state, stations_state)
+  local stations = state.ltn_data.stations
 
+  -- get station IDs based on active sort
+  local selected_sort = stations_state.selected_sort
+  local station_ids = state.ltn_data.sorted_stations[selected_sort]
+  local selected_sort_state = stations_state["sort_"..stations_state.selected_sort]
+
+  -- search
+  local search_state = state.search
+  local search_query = search_state.query
+  local search_network_id = search_state.network_id
+  local search_surface = search_state.surface
+
+  -- iteration data
+  local start = selected_sort_state and 1 or #station_ids
+  local finish = selected_sort_state and #station_ids or 1
+  local step = selected_sort_state and 1 or -1
+
+  -- build station rows
+  local station_rows = {}
+  local index = 0
+  for i = start, finish, step do
+    local station_id = station_ids[i]
+    local station_data = stations[station_id]
+    local search_comparator = selected_sort == "status" and station_data.status.sort_key or station_data[selected_sort]
+
+    -- test against search queries
+    if
+      string.find(string.lower(search_comparator), search_query)
+      and bit32.btest(station_data.network_id, search_network_id)
+      and (search_surface == -1 or station_data.entity.surface.index == search_surface)
+    then
+      index = index + 1
+      station_rows[index] = station_row(state, station_id, station_data)
+    end
+  end
+
+  return station_rows
 end
 
 function component.view(state)
   local gui_constants = state.constants.stations_list
   local stations_state = state.stations
 
-  local station_rows = generate_station_rows(state, stations_state, gui_constants)
+  local station_rows = generate_station_rows(state, stations_state)
 
   return (
     {
       tab = {type = "tab", caption = {"ltnm-gui.stations"}},
       content = (
         {type = "frame", style = "deep_frame_in_shallow_frame", direction = "vertical", children = {
+          -- toolbar
           {type = "frame", style = "ltnm_table_toolbar_frame", children = {
             sort_checkbox(
               "stations_list",
-              "station_name",
+              "name",
               "station-name",
               nil,
               stations_state,
@@ -90,6 +128,7 @@ function component.view(state)
               tooltip = {"ltnm-gui.control-signals-tooltip"},
             }
           }},
+          -- content
           {type = "scroll-pane", style = "ltnm_table_scroll_pane", children = station_rows}
         }}
       )

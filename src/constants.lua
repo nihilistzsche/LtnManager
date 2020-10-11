@@ -41,11 +41,11 @@ constants.gui = {
   en = {
     trains_list = {
       composition = 230,
-      status = 366,
+      status = 367,
       shipment = (36 * 6)
     },
     stations_list = {
-      station_name = 210,
+      name = 210,
       status = 53,
       network_id = 84,
       provided_requested = (36 * 6),
@@ -69,6 +69,23 @@ constants.input_sanitizers = {
   ["%$"] = "%%$"
 }
 
+constants.ltn_virtual_signals = {
+  ["ltn-depot"] = true,
+  ["ltn-depot-priority"] = true,
+  ["ltn-network-id"] = true,
+  ["ltn-min-train-length"] = true,
+  ["ltn-max-train-length"] = true,
+  ["ltn-max-trains"] = true,
+  ["ltn-provider-threshold"] = true,
+  ["ltn-provider-stack-threshold"] = true,
+  ["ltn-provider-priority"] = true,
+  ["ltn-locked-slots"] = true,
+  ["ltn-requester-threshold"] = true,
+  ["ltn-requester-stack-threshold"] = true,
+  ["ltn-requester-priority"] = true,
+  ["ltn-disable-warnings"] = true
+}
+
 constants.ltn_event_names = {
   on_stops_updated = true,
   on_dispatcher_updated = true,
@@ -81,5 +98,7 @@ constants.ltn_event_names = {
   on_requester_remaining_cargo = true,
   on_requester_unscheduled_cargo = true
 }
+
+constants.max_slot_table_height = 3
 
 return constants
