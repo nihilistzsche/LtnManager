@@ -184,7 +184,8 @@ local function iterate_stations(working_data, iterations_per_tick)
     }
 
     -- process station materials
-    for _, mode in ipairs{"provided", "requested"} do
+    local provided_requested_count = 0
+    for mode, count_multiplier in pairs{provided = 1, requested = -1} do
       local materials = working_data[mode.."_by_stop"][station_id]
       if materials then
         local materials_copy = {}
@@ -198,6 +199,8 @@ local function iterate_stations(working_data, iterations_per_tick)
           end
           -- copy
           materials_copy[name] = count
+          -- update total count
+          provided_requested_count = provided_requested_count + (count * count_multiplier)
         end
         -- add to station
         station_data[mode] = materials_copy
@@ -210,20 +213,20 @@ local function iterate_stations(working_data, iterations_per_tick)
         end
       end
     end
+    station_data.provided_requested_count = provided_requested_count
 
     -- process LTN control signals
     local signals = {}
+    local signals_count = 0
     for _, signal in ipairs(station_data.input.get_merged_signals()) do
       local id = signal.signal
       if id.type == "virtual" and constants.ltn_control_signals[id.name] then
         signals[id.name] = signal.count
+        signals_count = signals_count + signal.count
       end
     end
     station_data.control_signals = signals
-
-    -- other data tables (will be populated later)
-    station_data.inbound = {}
-    station_data.outbound = {}
+    station_data.control_signals_count = signals_count
 
     -- add station trains to trains table
     local station_trains = station_data.entity.get_train_stop_trains()
@@ -258,11 +261,15 @@ local function iterate_stations(working_data, iterations_per_tick)
       end
     else
       -- add to sorting tables
-      sorted_stations.name[#sorted_stations.name+1] = station_id
-      sorted_stations.network_id[#sorted_stations.network_id+1] = station_id
-      sorted_stations.status[#sorted_stations.status+1] = station_id
+      for _, sort_table in pairs(sorted_stations) do
+        sort_table[#sort_table+1] = station_id
+      end
     end
 
+    -- other data (will be populated later)
+    station_data.inbound = {}
+    station_data.outbound = {}
+    station_data.shipments_count = 0
   end)
 end
 
@@ -359,7 +366,7 @@ local function iterate_in_transit(working_data, iterations_per_tick)
         delivery_data.shipment,
         in_transit[delivery_data.network_id] or {}
       )
-      -- sort materials into locations
+      -- add to locations table
       for name in pairs(delivery_data.shipment) do
         local locations = material_locations[name]
         if not locations then
@@ -368,12 +375,18 @@ local function iterate_in_transit(working_data, iterations_per_tick)
           locations.trains[#locations.trains+1] = delivery_id
         end
       end
-      -- add materials to stations
+      -- add shipment to station
       local stations = working_data.stations
       for station_direction, subtable_name in pairs{from = "outbound", to = "inbound"} do
-        local station = stations[delivery_data[station_direction.."_id"]]
-        if station then
-          add_materials(delivery_data.shipment, station[subtable_name])
+        local station_data = stations[delivery_data[station_direction.."_id"]]
+        if station_data then
+          -- add materials
+          add_materials(delivery_data.shipment, station_data[subtable_name])
+          -- update count
+          local multiplier = station_direction == "from" and -1 or 1
+          station_data.shipments_count = table.reduce(delivery_data.shipment, function(acc, count)
+            return acc + (count * multiplier)
+          end, station_data.shipments_count)
         end
       end
     end
@@ -516,6 +529,42 @@ local function sort_stations_by_network_id(working_data, iterations_per_tick)
     math.ceil(iterations_per_tick / 2),
     function(id_1, id_2)
       return stations[id_1].network_id < stations[id_2].network_id
+    end
+  )
+end
+
+local function sort_stations_by_provided_requested(working_data, iterations_per_tick)
+  local stations = working_data.stations
+  return table.partial_sort(
+    working_data.sorted_stations.provided_requested,
+    working_data.key,
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
+      return stations[id_1].provided_requested_count > stations[id_2].provided_requested_count
+    end
+  )
+end
+
+local function sort_stations_by_shipments(working_data, iterations_per_tick)
+  local stations = working_data.stations
+  return table.partial_sort(
+    working_data.sorted_stations.shipments,
+    working_data.key,
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
+      return stations[id_1].shipments_count > stations[id_2].shipments_count
+    end
+  )
+end
+
+local function sort_stations_by_control_signals(working_data, iterations_per_tick)
+  local stations = working_data.stations
+  return table.partial_sort(
+    working_data.sorted_stations.control_signals,
+    working_data.key,
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
+      return stations[id_1].control_signals_count > stations[id_2].control_signals_count
     end
   )
 end
@@ -737,6 +786,9 @@ function ltn_data.iterate()
     sort_stations_by_name,
     sort_stations_by_status,
     sort_stations_by_network_id,
+    sort_stations_by_provided_requested,
+    sort_stations_by_shipments,
+    sort_stations_by_control_signals,
     update_history,
     prepare_history_sort,
     sort_history,
@@ -817,7 +869,14 @@ function ltn_data.on_dispatcher_updated(e)
   working_data.deliveries = e.deliveries
   working_data.available_trains = e.available_trains
   -- sorting tables
-  working_data.sorted_stations = {name = {}, network_id = {}, status = {}}
+  working_data.sorted_stations = {
+    name = {},
+    status = {},
+    network_id = {},
+    provided_requested = {},
+    shipments = {},
+    control_signals = {}
+  }
   working_data.sorted_history = {
     depot = {},
     route = {},

@@ -10,7 +10,10 @@ function component.init()
     selected_sort = "name",
     sort_name = true,
     sort_status = true,
-    sort_network_id = true
+    sort_network_id = true,
+    sort_provided_requested = true,
+    sort_shipments = true,
+    sort_control_signals = true
   }
 end
 
@@ -106,27 +109,30 @@ function component.view(state)
               stations_state,
               gui_constants
             ),
-            {
-              type = "label",
-              style = "caption_label",
-              width = gui_constants.provided_requested,
-              caption = {"ltnm-gui.provided-requested"},
-              tooltip = {"ltnm-gui.provided-requested-tooltip"},
-            },
-            {
-              type = "label",
-              style = "caption_label",
-              width = gui_constants.shipments,
-              caption = {"ltnm-gui.shipments"},
-              tooltip = {"ltnm-gui.shipments-tooltip"},
-            },
-            {
-              type = "label",
-              style = "caption_label",
-              width = gui_constants.control_signals,
-              caption = {"ltnm-gui.control-signals"},
-              tooltip = {"ltnm-gui.control-signals-tooltip"},
-            }
+            sort_checkbox(
+              "stations_list",
+              "provided_requested",
+              "provided-requested",
+              "provided-requested",
+              stations_state,
+              gui_constants
+            ),
+            sort_checkbox(
+              "stations_list",
+              "shipments",
+              "shipments",
+              "shipments",
+              stations_state,
+              gui_constants
+            ),
+            sort_checkbox(
+              "stations_list",
+              "control_signals",
+              "control-signals",
+              "control-signals",
+              stations_state,
+              gui_constants
+            ),
           }},
           -- content
           {type = "scroll-pane", style = "ltnm_table_scroll_pane", children = station_rows}
