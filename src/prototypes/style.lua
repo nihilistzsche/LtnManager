@@ -155,7 +155,7 @@ styles.ltnm_depot_button_inner_flow = {
 styles.ltnm_train_status_flow = {
   type = "vertical_flow_style",
   vertical_spacing = 0,
-  vertical_align = "center"
+  vertical_align = "center",
 }
 
 -- FRAME STYLES
@@ -164,6 +164,8 @@ styles.ltnm_small_slot_table_frame = {
   type = "frame_style",
   parent = "deep_frame_in_shallow_frame",
   minimal_height = 36,
+  -- top_margin = 2,
+  bottom_margin = 4,
   background_graphical_set = {
     base = {
       position = {282, 17},
@@ -181,8 +183,8 @@ styles.ltnm_small_slot_table_frame = {
 styles.ltnm_table_row_frame = {
   type = "frame_style",
   parent = "statistics_table_item_frame",
-  top_padding = 4,
-  bottom_padding = 4,
+  top_padding = 2,
+  bottom_padding = 2,
   left_padding = 10,
   right_padding = 7,
   minimal_height = 52,

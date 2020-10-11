@@ -128,9 +128,9 @@ local function iterate_stations(working_data, iterations_per_tick)
       trains[train.id] = {train = train}
     end
 
-    -- add station to depot
     local status = station_data.status
     if station_data.is_depot then
+      -- add station to depot
       local depot = depots[station_name]
       if depot then
         depot.stations[#depot.stations+1] = station_id
@@ -153,13 +153,13 @@ local function iterate_stations(working_data, iterations_per_tick)
           }
         }
       end
+    else
+      -- add to sorting tables
+      sorted_stations.name[#sorted_stations.name+1] = station_id
+      sorted_stations.network_id[#sorted_stations.network_id+1] = station_id
+      sorted_stations.status[#sorted_stations.status+1] = station_id
     end
 
-    -- sorting data
-    sorted_stations.name[#sorted_stations.name+1] = station_id
-    sorted_stations.network_id[#sorted_stations.network_id+1] = station_id
-    sorted_stations.status[#sorted_stations.status+1] = station_id
-    working_data.num_stations = working_data.num_stations + 1
   end)
 end
 
@@ -665,8 +665,6 @@ function ltn_data.iterate()
       sorted_stations = working_data.sorted_stations,
       sorted_history = working_data.sorted_history,
       sorted_alerts = working_data.sorted_alerts,
-      -- other
-      num_stations = working_data.num_stations
     }
 
     -- reset working data
@@ -712,7 +710,6 @@ function ltn_data.on_dispatcher_updated(e)
   data.network_to_stations = {}
   data.material_locations = {}
   -- data tables
-  data.num_stations = 0
   data.provided_by_stop = e.provided_by_stop
   data.requested_by_stop = e.requests_by_stop
   data.deliveries = e.deliveries
