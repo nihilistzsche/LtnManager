@@ -207,13 +207,7 @@ styles.ltnm_table_toolbar_frame = {
   }
 }
 
--- IMAGE STYLES
-
-styles.ltnm_status_icon = {
-  type = "image_style",
-  stretch_image_to_widget_size = true,
-  size = 14
-}
+styles.status_image.stretch_image_to_widget_size = true
 
 -- LABEL STYLES
 

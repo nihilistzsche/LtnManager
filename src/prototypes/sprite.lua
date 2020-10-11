@@ -6,7 +6,7 @@ local util = require("prototypes.util")
 local indicator_sprites = {
   {
     type = "sprite",
-    name = "ltnm_indicator_signal-white",
+    name = "ltnm_status_signal-white",
     filename = "__core__/graphics/gui-new.png",
     position = {128, 96},
     size = 28,
@@ -19,12 +19,10 @@ local indicator_sprites = {
 for i, t in ipairs(data.raw.lamp["small-lamp"].signal_to_color_mapping) do
   indicator_sprites[i + 1] = {
     type = "sprite",
-    name = "ltnm_indicator_"..t.name,
-    filename = "__core__/graphics/gui-new.png",
-    position = {128, 96},
-    size = 28,
+    name = "ltnm_status_"..t.name,
+    filename = "__LtnManager__/graphics/gui/status.png",
+    size = 32,
     scale = 0.5,
-    shift = {0, 1},
     tint = t.color,
     flags = {"icon"}
   }
