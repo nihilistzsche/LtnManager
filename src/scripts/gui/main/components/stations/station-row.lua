@@ -8,7 +8,9 @@ local util = require("scripts.util")
 local tooltip_funcs = {
   ltn_control_signal = function(translations, name, count)
     return (
-    "[virtual-signal=name]  [font=default-bold]"
+    "[img=virtual-signal/"
+    ..name
+    .."]  [font=default-bold]"
     ..translations.virtual_signals[name]
     .."[/font]"
     .."\n"
@@ -30,13 +32,13 @@ local function slot_table(translations, width, contents)
   local i = 0
 
   for _, data in pairs(contents) do
-    if data.materials then
+    if data.contents then
       local color = data.color
       local enabled = data.enabled
       local sprite_class = data.sprite_class
       local tooltip_func = tooltip_funcs[data.tooltip]
       local on_click = data.on_click
-      for name, count in pairs(data.materials) do
+      for name, count in pairs(data.contents) do
         i = i + 1
         buttons[i] = {
           type = "sprite-button",
@@ -89,23 +91,29 @@ function component.view(state, station_id, station_data)
         translations,
         gui_constants.provided_requested,
         {
-          {color = "green", enabled = true, materials = station_data.provided, tooltip = "material"},
-          {color = "red", enabled = true, materials = station_data.requested, tooltip = "material"}
+          {color = "green", contents = station_data.provided, enabled = true, tooltip = "material"},
+          {color = "red", contents = station_data.requested, enabled = true, tooltip = "material"}
         }
       ),
       slot_table(
         translations,
         gui_constants.shipments,
         {
-          {color = "green", enabled = true, materials = station_data.inbound, tooltip = "material"},
-          {color = "red", enabled = true, materials = station_data.outbound, tooltip = "material"}
+          {color = "green", contents = station_data.inbound, enabled = true, tooltip = "material"},
+          {color = "red", contents = station_data.outbound, enabled = true, tooltip = "material"}
         }
       ),
       slot_table(
         translations,
         gui_constants.control_signals,
         {
-          -- default = station_data.control_signals
+          {
+            color = "default",
+            contents = station_data.control_signals,
+            enabled = false,
+            sprite_class = "virtual-signal",
+            tooltip = "ltn_control_signal"
+          }
         }
       )
     }}

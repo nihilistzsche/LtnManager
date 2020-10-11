@@ -57,14 +57,8 @@ function component.view(state, train_id, train_data, train_status)
         direction = "vertical",
         children = status_elems
       },
-      {type = "frame", style = "deep_frame_in_shallow_frame", children = {
-        {
-          type = "scroll-pane",
-          style = "ltnm_small_slot_table_scroll_pane",
-          children = {
-            {type = "table", style = "slot_table", width = (36 * 6), column_count = 5, children = shipment_elems}
-          }
-        }
+      {type = "frame", style = "ltnm_small_slot_table_frame", children = {
+        {type = "table", style = "slot_table", width = (36 * 6), column_count = 6, children = shipment_elems}
       }}
     }}
   )

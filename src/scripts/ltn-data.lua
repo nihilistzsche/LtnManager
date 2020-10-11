@@ -72,8 +72,13 @@ local function iterate_stations(working_data, iterations_per_tick)
     end
 
     -- get status
-    local signal = station_data.lamp_control.get_control_behavior().get_signal(1)
-    station_data.status = {name = signal.signal.name, count = signal.count, sort_key = signal.signal.name..signal.count}
+
+    local lamp_signal = station_data.lamp_control.get_control_behavior().get_signal(1)
+    station_data.status = {
+      name = lamp_signal.signal.name,
+      count = lamp_signal.count,
+      sort_key = lamp_signal.signal.name..lamp_signal.count
+    }
 
     -- process station materials
     for _, mode in ipairs{"provided", "requested"} do
@@ -102,6 +107,16 @@ local function iterate_stations(working_data, iterations_per_tick)
         end
       end
     end
+
+    -- process LTN control signals
+    local signals = {}
+    for _, signal in ipairs(station_data.input.get_merged_signals()) do
+      local id = signal.signal
+      if id.type == "virtual" and constants.ltn_control_signals[id.name] then
+        signals[id.name] = signal.count
+      end
+    end
+    station_data.control_signals = signals
 
     -- other data tables (will be populated later)
     station_data.inbound = {}

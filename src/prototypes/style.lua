@@ -163,7 +163,6 @@ styles.ltnm_train_status_flow = {
 styles.ltnm_small_slot_table_frame = {
   type = "frame_style",
   parent = "deep_frame_in_shallow_frame",
-  bottom_margin = 4,
   minimal_height = 36,
   background_graphical_set = {
     base = {
@@ -182,26 +181,26 @@ styles.ltnm_small_slot_table_frame = {
 styles.ltnm_table_row_frame = {
   type = "frame_style",
   parent = "statistics_table_item_frame",
-  top_padding = 2,
-  bottom_padding = 2,
+  top_padding = 4,
+  bottom_padding = 4,
   left_padding = 10,
-  right_padding = -4, -- padding will be handled by the slot table
+  right_padding = 7,
   minimal_height = 52,
   horizontal_flow_style = {
     type = "horizontal_flow_style",
     vertical_align = "center",
-    horizontal_spacing = 12,
+    horizontal_spacing = 10,
   }
 }
 
 styles.ltnm_table_toolbar_frame = {
   type = "frame_style",
   parent = "subheader_frame",
-  left_padding = 14, -- optical correction
-  right_padding = 22, -- two scroll bars' worth
+  left_padding = 14,
+  right_padding = 23,
   horizontal_flow_style = {
     type = "horizontal_flow_style",
-    horizontal_spacing = 12,
+    horizontal_spacing = 10,
     vertical_align = "center"
   }
 }

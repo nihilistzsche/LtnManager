@@ -41,7 +41,7 @@ constants.gui = {
   en = {
     trains_list = {
       composition = 230,
-      status = 367,
+      status = 361,
       shipment = (36 * 6)
     },
     stations_list = {
@@ -69,10 +69,11 @@ constants.input_sanitizers = {
   ["%$"] = "%%$"
 }
 
-constants.ltn_virtual_signals = {
+constants.ltn_control_signals = {
   ["ltn-depot"] = true,
   ["ltn-depot-priority"] = true,
-  ["ltn-network-id"] = true,
+  -- excluded because it's shown as a separate column
+  -- ["ltn-network-id"] = true,
   ["ltn-min-train-length"] = true,
   ["ltn-max-train-length"] = true,
   ["ltn-max-trains"] = true,
