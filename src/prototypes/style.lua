@@ -65,49 +65,49 @@ styles.ltnm_depot_button = {
 -- CHECKBOX STYLES
 
 -- inactive is grey until hovered
--- checked = descending, unchecked = ascending
+-- checked = ascending, unchecked = descending
 styles.ltnm_sort_checkbox = {
   type = "checkbox_style",
   font = "default-bold",
   font_color = bold_font_color,
   padding = 0,
   default_graphical_set = {
-    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-down-white.png",
     size = {16, 16},
     scale = 0.5
   },
   hovered_graphical_set = {
-    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-hover.png",
-    size = {16, 16},
-    scale = 0.5
-  },
-  clicked_graphical_set = {
-    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
-    size = {16, 16},
-    scale = 0.5
-  },
-  disabled_graphical_set = {
-    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
-    size = {16, 16},
-    scale = 0.5
-  },
-  selected_graphical_set = {
-    filename = "__core__/graphics/arrows/table-header-sort-arrow-down-white.png",
-    size = {16, 16},
-    scale = 0.5
-  },
-  selected_hovered_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-down-hover.png",
     size = {16, 16},
     scale = 0.5
   },
-  selected_clicked_graphical_set = {
+  clicked_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-down-white.png",
     size = {16, 16},
     scale = 0.5
   },
-  selected_disabled_graphical_set = {
+  disabled_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-down-white.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  selected_graphical_set = {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  selected_hovered_graphical_set = {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-hover.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  selected_clicked_graphical_set = {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
+    size = {16, 16},
+    scale = 0.5
+  },
+  selected_disabled_graphical_set = {
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
     size = {16, 16},
     scale = 0.5
   },
@@ -122,15 +122,15 @@ styles.ltnm_selected_sort_checkbox = {
   parent = "ltnm_sort_checkbox",
   -- font_color = bold_font_color,
   default_graphical_set = {
-    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-active.png",
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-down-active.png",
     size = {16, 16},
     scale = 0.5
   },
   selected_graphical_set = {
-    filename = "__core__/graphics/arrows/table-header-sort-arrow-down-active.png",
+    filename = "__core__/graphics/arrows/table-header-sort-arrow-up-active.png",
     size = {16, 16},
     scale = 0.5
-  }
+  },
 }
 
 -- EMPTY WIDGET STYLES
