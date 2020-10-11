@@ -7,7 +7,7 @@ function component.update() end
 function component.view()
   return (
     {
-      tab = {type = "tab", caption = {"ltnm-gui.history"}},
+      tab = {type = "tab", caption = {"ltnm-gui.history"}, enabled = false},
       content = (
         {type = "empty-widget"}
       )
