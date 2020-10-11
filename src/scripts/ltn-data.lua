@@ -138,6 +138,7 @@ local function iterate_stations(working_data, iterations_per_tick)
 
     -- sorting data
     sorted_stations.name[#sorted_stations.name+1] = station_id
+    sorted_stations.network_id[#sorted_stations.network_id+1] = station_id
     sorted_stations.status[#sorted_stations.status+1] = station_id
     working_data.num_stations = working_data.num_stations + 1
   end)
@@ -361,6 +362,18 @@ local function sort_stations_by_name(working_data, iterations_per_tick)
     math.ceil(iterations_per_tick / 2),
     function(id_1, id_2)
       return stations[id_1].name < stations[id_2].name
+    end
+  )
+end
+
+local function sort_stations_by_network_id(working_data, iterations_per_tick)
+  local stations = working_data.stations
+  return table.partial_sort(
+    working_data.sorted_stations.network_id,
+    working_data.key,
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
+      return stations[id_1].network_id < stations[id_2].network_id
     end
   )
 end
@@ -592,6 +605,7 @@ function ltn_data.iterate()
     sort_depot_trains_by_status,
     sort_depot_trains_by_composition,
     sort_stations_by_name,
+    sort_stations_by_network_id,
     sort_stations_by_status,
     update_history,
     prepare_history_sort,
@@ -677,7 +691,7 @@ function ltn_data.on_dispatcher_updated(e)
   data.deliveries = e.deliveries
   data.available_trains = e.available_trains
   -- sorting tables
-  data.sorted_stations = {name = {}, status = {}}
+  data.sorted_stations = {name = {}, network_id = {}, status = {}}
   data.sorted_history = {
     depot = {},
     route = {},
