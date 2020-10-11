@@ -687,51 +687,50 @@ end
 
 function ltn_data.on_dispatcher_updated(e)
   if global.flags.iterating_ltn_data or global.flags.updating_guis then return end
-  local stations = global.working_data.stations
-  if not stations then
+  local working_data = global.working_data
+  if not working_data then
     log("LTN event desync: did not receive stations in time! Skipping iteration.")
-    global.working_data = nil
     return
   end
+  local stations = global.working_data.stations
 
   -- set up working data table
-  local data = global.working_data
-  data.depots = {}
-  data.trains = {}
-  data.stations = stations
-  data.inventory = {
+  working_data.depots = {}
+  working_data.trains = {}
+  working_data.stations = stations
+  working_data.inventory = {
     provided = {},
     requested = {},
     in_transit = {}
   }
-  data.history = table.shallow_copy(global.active_data.history)
-  data.alerts = table.shallow_copy(global.active_data.alerts)
+  working_data.history = table.shallow_copy(global.active_data.history)
+  working_data.alerts = table.shallow_copy(global.active_data.alerts)
   -- lookup tables
-  data.network_to_stations = {}
-  data.material_locations = {}
+  working_data.network_to_stations = {}
+  working_data.material_locations = {}
   -- data tables
-  data.provided_by_stop = e.provided_by_stop
-  data.requested_by_stop = e.requests_by_stop
-  data.deliveries = e.deliveries
-  data.available_trains = e.available_trains
+  working_data.provided_by_stop = e.provided_by_stop
+  working_data.requested_by_stop = e.requests_by_stop
+  working_data.deliveries = e.deliveries
+  working_data.available_trains = e.available_trains
   -- sorting tables
-  data.sorted_stations = {name = {}, network_id = {}, status = {}}
-  data.sorted_history = {
+  working_data.sorted_stations = {name = {}, network_id = {}, status = {}}
+  working_data.sorted_history = {
     depot = {},
     route = {},
     runtime = {},
     finished = {}
   }
-  data.sorted_alerts = {
+  working_data.sorted_alerts = {
     route = {},
     time = {},
     type = {}
   }
   -- iteration data
-  data.step = 1
-  data.key = nil -- just for reference
+  working_data.step = 1
+  working_data.key = nil -- just for reference
   -- other
-  data.aborted_trains = {} -- trains that we aborted on during the iterate_trains step
+  working_data.aborted_trains = {} -- trains that we aborted on during the iterate_trains step
 
   -- enable data iteration handler
   global.flags.iterating_ltn_data = true
