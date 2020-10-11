@@ -255,7 +255,8 @@ local function iterate_stations(working_data, iterations_per_tick)
           train_ids = {},
           sorted_trains = {
             composition = {},
-            status = {}
+            status = {},
+            shipment = {}
           }
         }
       end
@@ -310,8 +311,11 @@ local function iterate_trains(working_data, iterations_per_tick)
     -- add to depot trains lists
     local train_ids = depot_data.train_ids
     train_ids[#train_ids+1] = train_id
-    local sorted_trains = depot_data.sorted_trains
-    sorted_trains.composition[#sorted_trains.composition+1] = train_id
+    for name, sort_table in pairs(depot_data.sorted_trains) do
+      if name ~= "status" then
+        sort_table[#sort_table+1] = train_id
+      end
+    end
     if train_state == defines.train_state.wait_station and schedule.records[schedule.current].station == depot then
       depot_data.available_trains[#depot_data.available_trains+1] = train_id
     end
@@ -335,6 +339,7 @@ local function iterate_trains(working_data, iterations_per_tick)
     train_data.depot = depot
     train_data.composition = train_util.get_composition_string(train)
     train_data.main_locomotive = train_util.get_main_locomotive(train)
+    train_data.shipment_count = 0
     train_data.status = {}
     trains[train_id] = train_data
     for key, value in pairs(
@@ -366,14 +371,18 @@ local function iterate_in_transit(working_data, iterations_per_tick)
         delivery_data.shipment,
         in_transit[delivery_data.network_id] or {}
       )
-      -- add to locations table
-      for name in pairs(delivery_data.shipment) do
+      -- iterate shipment
+      local shipment_count = 0
+      for name, count in pairs(delivery_data.shipment) do
+        -- add to locations table
         local locations = material_locations[name]
         if not locations then
           material_locations[name] = {stations = {}, trains = {delivery_id}}
         else
           locations.trains[#locations.trains+1] = delivery_id
         end
+        -- add to count
+        shipment_count = shipment_count + count
       end
       -- add shipment to station
       local stations = working_data.stations
@@ -384,10 +393,13 @@ local function iterate_in_transit(working_data, iterations_per_tick)
           add_materials(delivery_data.shipment, station_data[subtable_name])
           -- update count
           local multiplier = station_direction == "from" and -1 or 1
-          station_data.shipments_count = table.reduce(delivery_data.shipment, function(acc, count)
-            return acc + (count * multiplier)
-          end, station_data.shipments_count)
+          station_data.shipments_count = station_data.shipments_count + (shipment_count * multiplier)
         end
+      end
+      -- add shipment
+      local train_data = working_data.trains[delivery_id]
+      if train_data then
+        train_data.shipment_count = shipment_count
       end
     end
   )
@@ -435,6 +447,15 @@ local function generate_train_statuses(working_data, iterations_per_tick)
         {translations = players[player].translations.gui, train = trains[train]}
     end
   )
+end
+
+local function sort_depot_trains_by_composition(working_data)
+  local trains = working_data.trains
+  return table.for_n_of(working_data.depots, working_data.key, 1, function(depot)
+    table.sort(depot.sorted_trains.composition, function(id_1, id_2)
+      return trains[id_1].composition < trains[id_2].composition
+    end)
+  end)
 end
 
 local function sort_depot_trains_by_status(working_data)
@@ -488,11 +509,11 @@ local function sort_depot_trains_by_status(working_data)
   )
 end
 
-local function sort_depot_trains_by_composition(working_data)
+local function sort_depot_trains_by_shipment(working_data)
   local trains = working_data.trains
   return table.for_n_of(working_data.depots, working_data.key, 1, function(depot)
-    table.sort(depot.sorted_trains.composition, function(id_1, id_2)
-      return trains[id_1].composition < trains[id_2].composition
+    table.sort(depot.sorted_trains.shipment, function(id_1, id_2)
+      return trains[id_1].shipment_count < trains[id_2].shipment_count
     end)
   end)
 end
@@ -540,7 +561,7 @@ local function sort_stations_by_provided_requested(working_data, iterations_per_
     working_data.key,
     math.ceil(iterations_per_tick / 2),
     function(id_1, id_2)
-      return stations[id_1].provided_requested_count > stations[id_2].provided_requested_count
+      return stations[id_1].provided_requested_count < stations[id_2].provided_requested_count
     end
   )
 end
@@ -552,7 +573,7 @@ local function sort_stations_by_shipments(working_data, iterations_per_tick)
     working_data.key,
     math.ceil(iterations_per_tick / 2),
     function(id_1, id_2)
-      return stations[id_1].shipments_count > stations[id_2].shipments_count
+      return stations[id_1].shipments_count < stations[id_2].shipments_count
     end
   )
 end
@@ -564,7 +585,7 @@ local function sort_stations_by_control_signals(working_data, iterations_per_tic
     working_data.key,
     math.ceil(iterations_per_tick / 2),
     function(id_1, id_2)
-      return stations[id_1].control_signals_count > stations[id_2].control_signals_count
+      return stations[id_1].control_signals_count < stations[id_2].control_signals_count
     end
   )
 end
@@ -781,8 +802,9 @@ function ltn_data.iterate()
     iterate_trains,
     iterate_in_transit,
     generate_train_statuses,
-    sort_depot_trains_by_status,
     sort_depot_trains_by_composition,
+    sort_depot_trains_by_status,
+    sort_depot_trains_by_shipment,
     sort_stations_by_name,
     sort_stations_by_status,
     sort_stations_by_network_id,

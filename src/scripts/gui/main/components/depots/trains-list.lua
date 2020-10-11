@@ -9,7 +9,8 @@ function component.init()
   return {
     selected_sort = "composition",
     sort_composition = true,
-    sort_status = true
+    sort_status = true,
+    sort_shipment = false
   }
 end
 
@@ -33,10 +34,10 @@ local function generate_train_rows(state, depots_state, depot_data)
   -- get train IDs based on active sort
   local selected_sort = depots_state.selected_sort
   local train_ids
-  if selected_sort == "composition" then
-    train_ids = depot_data.sorted_trains.composition
-  else
+  if selected_sort == "status" then
     train_ids = depot_data.sorted_trains.status[state.player_index]
+  else
+    train_ids = depot_data.sorted_trains[selected_sort]
   end
   local selected_sort_state = depots_state["sort_"..depots_state.selected_sort]
 
@@ -95,14 +96,7 @@ function component.view(state)
         {type = "frame", style = "ltnm_table_toolbar_frame", children = {
           sort_checkbox("trains_list", "composition", "composition", "composition", depots_state, constants),
           sort_checkbox("trains_list", "status", "train-status", "train-status", depots_state, constants),
-          -- TODO make train contents sortable and searchable
-          {
-            type = "label",
-            style = "caption_label",
-            width = constants.shipment,
-            caption = {"ltnm-gui.shipment"},
-            tooltip = {"ltnm-gui.shipment-tooltip"},
-          }
+          sort_checkbox("trains_list", "shipment", "shipment", "shipment", depots_state, constants)
         }},
         {type = "scroll-pane", style = "ltnm_table_scroll_pane", children = train_rows}
       }

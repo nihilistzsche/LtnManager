@@ -10,10 +10,10 @@ function component.init()
     selected_sort = "name",
     sort_name = true,
     sort_status = true,
-    sort_network_id = true,
-    sort_provided_requested = true,
-    sort_shipments = true,
-    sort_control_signals = true
+    sort_network_id = false,
+    sort_provided_requested = false,
+    sort_shipments = false,
+    sort_control_signals = false
   }
 end
 
