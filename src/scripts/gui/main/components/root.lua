@@ -86,23 +86,23 @@ function root.view(state)
       on_closed = {comp = "base", action = "close"},
       ref = "window",
       children = {
-        titlebar.view(state),
+        titlebar(state),
         {
           type = "frame",
           style = "inside_deep_frame",
           direction = "vertical",
           children = {
-            toolbar.view(state),
+            toolbar(state),
             {
               type = "tabbed-pane",
               style = "ltnm_tabbed_pane",
               on_selected_tab_changed = {comp = "base", action = "update_selected_tab"},
               tabs = {
-                tabs.depots.view(state),
-                tabs.stations.view(state),
-                tabs.inventory.view(),
-                tabs.history.view(),
-                tabs.alerts.view(),
+                tabs.depots(state),
+                tabs.stations(state),
+                tabs.inventory(),
+                tabs.history(),
+                tabs.alerts(),
               }
             }
           }

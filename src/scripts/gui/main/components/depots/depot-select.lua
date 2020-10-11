@@ -1,6 +1,8 @@
+local gui = require("__flib__.gui3")
+
 local depot_button = require("scripts.gui.main.components.depots.depot-button")
 
-local component = {}
+local component = gui.component()
 
 function component.update(state, msg, e)
   if msg.action == "update_selected_depot" then
@@ -23,7 +25,7 @@ function component.view(state)
       and (surface_query == -1 or depot_data.surfaces[surface_query])
     then
       index = index + 1
-      depot_buttons[index] = depot_button.view(depot_name, depot_data, selected_depot)
+      depot_buttons[index] = depot_button(depot_name, depot_data, selected_depot)
     end
   end
 

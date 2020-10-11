@@ -1,4 +1,6 @@
-local component = {}
+local gui = require("__flib__.gui3")
+
+local component = gui.component()
 
 function component.view()
   return (

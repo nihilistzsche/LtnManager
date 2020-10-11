@@ -1,7 +1,9 @@
+local gui = require("__flib__.gui3")
+
 local depot_select = require("scripts.gui.main.components.depots.depot-select")
 local trains_list = require("scripts.gui.main.components.depots.trains-list")
 
-local component = {}
+local component = gui.component()
 
 function component.init()
   return trains_list.init()
@@ -21,8 +23,8 @@ function component.view(state)
       tab = {type = "tab", caption = {"ltnm-gui.depots"}},
       content = (
         {type = "flow", style = "ltnm_tab_horizontal_flow", children = {
-          depot_select.view(state),
-          trains_list.view(state)
+          depot_select(state),
+          trains_list(state)
         }}
       )
     }

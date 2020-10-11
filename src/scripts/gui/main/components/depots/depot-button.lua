@@ -1,6 +1,8 @@
+local gui = require("__flib__.gui3")
+
 local status_indicator = require("scripts.gui.main.components.common.status-indicator")
 
-local component = {}
+local component = gui.component()
 
 function component.view(depot_name, depot_data, selected_depot)
   local statuses = {}

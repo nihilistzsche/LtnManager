@@ -1,6 +1,8 @@
+local gui = require("__flib__.gui3")
+
 local util = require("scripts.util")
 
-local component = {}
+local component = gui.component()
 
 function component.view(state, train_id, train_data, train_status)
   local gui_constants = state.constants.trains_list

@@ -1,6 +1,8 @@
+local gui = require("__flib__.gui3")
+
 local constants = require("constants")
 
-local component = {}
+local component = gui.component()
 
 function component.init()
   return {

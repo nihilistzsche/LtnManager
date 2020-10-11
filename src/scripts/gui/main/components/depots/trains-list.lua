@@ -1,7 +1,9 @@
+local gui = require("__flib__.gui3")
+
 local sort_checkbox = require("scripts.gui.main.components.common.sort-checkbox")
 local train_row = require("scripts.gui.main.components.depots.train-row")
 
-local component = {}
+local component = gui.component()
 
 function component.init()
   return {
@@ -63,7 +65,7 @@ local function generate_train_rows(state, depots_state, depot_data)
       and (search_surface == -1 or train_data.main_locomotive.surface.index == search_surface)
     then
       index = index + 1
-      train_rows[index] = train_row.view(state, train_id, train_data, train_status)
+      train_rows[index] = train_row(state, train_id, train_data, train_status)
     end
   end
 
