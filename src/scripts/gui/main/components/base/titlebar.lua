@@ -52,6 +52,7 @@ function component.view(state)
         type = "label",
         style = "bold_label",
         font_color = constants.colors.red.tbl,
+        top_margin = 1,
         right_margin = 8,
         caption = {"ltnm-gui.dispatcher-not-enabled"},
         tooltip = {"ltnm-gui.dispatcher-not-enabled-tooltip"},
