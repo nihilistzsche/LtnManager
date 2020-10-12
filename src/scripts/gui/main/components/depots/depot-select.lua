@@ -21,9 +21,9 @@ function component.view(state)
   local index = 0
   for depot_name, depot_data in pairs(state.ltn_data.depots) do
     if
-      string.find(depot_name, search_query)
+      (surface_query == -1 or depot_data.surfaces[surface_query])
       and bit32.btest(depot_data.network_id, search_network_id)
-      and (surface_query == -1 or depot_data.surfaces[surface_query])
+      and string.find(string.lower(depot_name), search_query)
     then
       index = index + 1
       depot_buttons[index] = depot_button(depot_name, depot_data, selected_depot)

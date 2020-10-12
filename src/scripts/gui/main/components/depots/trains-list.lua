@@ -81,8 +81,8 @@ function component.view(state)
 
   if
     selected_depot
-    and string.find(selected_depot, state.search.query)
     and bit32.btest(depot_data.network_id, state.search.network_id)
+    and string.find(string.lower(selected_depot), state.search.query)
   then
     train_rows = generate_train_rows(state, depots_state, depot_data)
   end
