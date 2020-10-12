@@ -36,6 +36,15 @@
     {
       "type": "factoriomod",
       "request": "launch",
+      "name": "Profile (src release)",
+      "factorioPath": "c:/Files/Development/Factorio/Factorio/bin/Releasex64vs2017/factorio-run.exe",
+      "hookMode": "profile",
+      "hookControl": ["LtnManager", "level", "Sandbox"],
+      "factorioArgs": ["--load-game", "${env:factorioTestbench1Saves}/LTN Manager/LTN Demo 1.13.x.zip"]
+    },
+    {
+      "type": "factoriomod",
+      "request": "launch",
       "name": "Profile",
       "factorioPath": "${env:factorioTestbench1}",
       "hookMode": "profile",

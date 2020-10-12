@@ -200,6 +200,7 @@ local function iterate_stations(working_data, iterations_per_tick)
 
     -- add name to data
     station_data.name = station_name
+    station_data.lowercase_name = string.lower(station_name)
 
     -- add station to by-network lookup
     local network_stations = network_to_stations[network_id]
@@ -558,7 +559,7 @@ local function sort_stations_by_name(working_data, iterations_per_tick)
     working_data.key,
     math.ceil(iterations_per_tick / 2),
     function(id_1, id_2)
-      return stations[id_1].name < stations[id_2].name
+      return stations[id_1].lowercase_name < stations[id_2].lowercase_name
     end
   )
 end
