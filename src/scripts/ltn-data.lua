@@ -115,7 +115,7 @@ end
 
 -- multi-level next functionality
 -- will iterate over the objects table once for each player in the players table
-local function multilevel_next(players, objects, key, callback)
+local function per_player_next(players, objects, key, callback)
   key = key or {}
   local player = key.player
   local obj = key.obj
@@ -306,6 +306,9 @@ local function iterate_stations(working_data, iterations_per_tick)
     station_data.inbound = {}
     station_data.outbound = {}
     station_data.shipments_count = 0
+    station_data.provided_requested_strings = {}
+    station_data.shipments_strings = {}
+    station_data.control_signals_strings = {}
   end)
 end
 
@@ -444,13 +447,16 @@ local function generate_train_statuses(working_data, iterations_per_tick)
   local players = global.players
   local trains  = working_data.trains
 
-  return table.for_n_of({}, working_data.key, iterations_per_tick,
+  return table.for_n_of(
+    {},
+    working_data.key,
+    iterations_per_tick,
     function(data, key)
       local train = trains[key.obj]
       train.status[key.player] = parse_train_status(train, data.translations)
     end,
     function(_, key)
-      return multilevel_next(players, trains, key, function(player, train)
+      return per_player_next(players, trains, key, function(player, train)
         return {
           translations = players[player].translations.gui,
           train = trains[train]
@@ -474,7 +480,10 @@ local function sort_depot_trains_by_status(working_data)
   local depots = working_data.depots
   local trains = working_data.trains
 
-  return table.for_n_of({}, working_data.key, 1,
+  return table.for_n_of(
+    {},
+    working_data.key,
+    1,
     function(depot_data, key)
       local train_ids = table.array_copy(depot_data.train_ids)
       local player_index = key.player
@@ -486,7 +495,7 @@ local function sort_depot_trains_by_status(working_data)
       depot_data.sorted_trains.status[player_index] = train_ids
     end,
     function(_, key)
-      return multilevel_next(players, depots, key, function(_, depot) return depots[depot] end)
+      return per_player_next(players, depots, key, function(_, depot) return depots[depot] end)
     end
   )
 end
@@ -536,8 +545,39 @@ local function sort_stations_by_network_id(working_data, iterations_per_tick)
   )
 end
 
-local function generate_station_provided_requested_strings(working_data, iterations_per_tick)
+local function generate_station_provided_requested_strings(working_data)
+  local players = global.players
+  local stations = working_data.stations
 
+  return table.for_n_of(
+    {},
+    working_data.key,
+    1,
+    function(data)
+      local station_data = data.station
+      local translations = data.translations
+
+      local str = {}
+      local str_i = 0
+      for _, material_type in ipairs{"provided", "requested"} do
+        for name in pairs(station_data[material_type] or {}) do
+          str_i = str_i + 1
+          str[str_i] = string.lower(translations.materials[name])
+        end
+      end
+
+      station_data.provided_requested_strings[data.player_index] = table.concat(str, " ")
+    end,
+    function(_, key)
+      return per_player_next(players, stations, key, function(player, station)
+        return {
+          station = stations[station],
+          player_index = player,
+          translations = players[player].translations,
+        }
+      end)
+    end
+  )
 end
 
 local function sort_stations_by_provided_requested(working_data, iterations_per_tick)
@@ -794,6 +834,7 @@ function ltn_data.iterate()
     sort_stations_by_name,
     sort_stations_by_status,
     sort_stations_by_network_id,
+    generate_station_provided_requested_strings,
     sort_stations_by_provided_requested,
     sort_stations_by_shipments,
     sort_stations_by_control_signals,
