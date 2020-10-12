@@ -306,9 +306,7 @@ local function iterate_stations(working_data, iterations_per_tick)
     station_data.inbound = {}
     station_data.outbound = {}
     station_data.shipments_count = 0
-    station_data.provided_requested_strings = {}
-    station_data.shipments_strings = {}
-    station_data.control_signals_strings = {}
+    station_data.search_strings = {}
   end)
 end
 
@@ -509,6 +507,50 @@ local function sort_depot_trains_by_shipment(working_data)
   end)
 end
 
+local function generate_station_search_strings(working_data)
+  local players = global.players
+  local stations = working_data.stations
+
+  local subtables = {
+    provided = "materials",
+    requested = "materials",
+    inbound = "materials",
+    outbound = "materials",
+    control_signals = "virtual_signals"
+  }
+
+  return table.for_n_of(
+    {},
+    working_data.key,
+    1,
+    function(data)
+      local station_data = data.station
+      local translations = data.translations
+
+      local str = {string.lower(station_data.name)}
+      local str_i = 1
+      for station_table, dictionary_name in pairs(subtables) do
+        local dictionary = translations[dictionary_name]
+        for name in pairs(station_data[station_table] or {}) do
+          str_i = str_i + 1
+          str[str_i] = string.lower(dictionary[name])
+        end
+      end
+
+      station_data.search_strings[data.player_index] = table.concat(str, " ")
+    end,
+    function(_, key)
+      return per_player_next(players, stations, key, function(player, station)
+        return {
+          station = stations[station],
+          player_index = player,
+          translations = players[player].translations,
+        }
+      end)
+    end
+  )
+end
+
 local function sort_stations_by_name(working_data, iterations_per_tick)
   local stations = working_data.stations
   return table.partial_sort(
@@ -545,41 +587,6 @@ local function sort_stations_by_network_id(working_data, iterations_per_tick)
   )
 end
 
-local function generate_station_provided_requested_strings(working_data)
-  local players = global.players
-  local stations = working_data.stations
-
-  return table.for_n_of(
-    {},
-    working_data.key,
-    1,
-    function(data)
-      local station_data = data.station
-      local translations = data.translations
-
-      local str = {}
-      local str_i = 0
-      for _, material_type in ipairs{"provided", "requested"} do
-        for name in pairs(station_data[material_type] or {}) do
-          str_i = str_i + 1
-          str[str_i] = string.lower(translations[name])
-        end
-      end
-
-      station_data.provided_requested_strings[data.player_index] = table.concat(str, " ")
-    end,
-    function(_, key)
-      return per_player_next(players, stations, key, function(player, station)
-        return {
-          station = stations[station],
-          player_index = player,
-          translations = players[player].translations.materials,
-        }
-      end)
-    end
-  )
-end
-
 local function sort_stations_by_provided_requested(working_data, iterations_per_tick)
   local stations = working_data.stations
   return table.partial_sort(
@@ -592,41 +599,6 @@ local function sort_stations_by_provided_requested(working_data, iterations_per_
   )
 end
 
-local function generate_station_shipments_strings(working_data)
-  local players = global.players
-  local stations = working_data.stations
-
-  return table.for_n_of(
-    {},
-    working_data.key,
-    1,
-    function(data)
-      local station_data = data.station
-      local translations = data.translations
-
-      local str = {}
-      local str_i = 0
-      for _, material_type in ipairs{"inbound", "outbound"} do
-        for name in pairs(station_data[material_type] or {}) do
-          str_i = str_i + 1
-          str[str_i] = string.lower(translations[name])
-        end
-      end
-
-      station_data.shipments_strings[data.player_index] = table.concat(str, " ")
-    end,
-    function(_, key)
-      return per_player_next(players, stations, key, function(player, station)
-        return {
-          station = stations[station],
-          player_index = player,
-          translations = players[player].translations.materials,
-        }
-      end)
-    end
-  )
-end
-
 local function sort_stations_by_shipments(working_data, iterations_per_tick)
   local stations = working_data.stations
   return table.partial_sort(
@@ -635,39 +607,6 @@ local function sort_stations_by_shipments(working_data, iterations_per_tick)
     math.ceil(iterations_per_tick / 2),
     function(id_1, id_2)
       return stations[id_1].shipments_count < stations[id_2].shipments_count
-    end
-  )
-end
-
-local function generate_station_control_signals_strings(working_data)
-  local players = global.players
-  local stations = working_data.stations
-
-  return table.for_n_of(
-    {},
-    working_data.key,
-    1,
-    function(data)
-      local station_data = data.station
-      local translations = data.translations
-
-      local str = {}
-      local str_i = 0
-      for name in pairs(station_data.control_signals) do
-        str_i = str_i + 1
-        str[str_i] = string.lower(translations[name])
-      end
-
-      station_data.control_signals_strings[data.player_index] = table.concat(str, " ")
-    end,
-    function(_, key)
-      return per_player_next(players, stations, key, function(player, station)
-        return {
-          station = stations[station],
-          player_index = player,
-          translations = players[player].translations.virtual_signals,
-        }
-      end)
     end
   )
 end
@@ -899,14 +838,12 @@ function ltn_data.iterate()
     sort_depot_trains_by_composition,
     sort_depot_trains_by_status,
     sort_depot_trains_by_shipment,
+    generate_station_search_strings,
     sort_stations_by_name,
     sort_stations_by_status,
     sort_stations_by_network_id,
-    generate_station_provided_requested_strings,
     sort_stations_by_provided_requested,
-    generate_station_shipments_strings,
     sort_stations_by_shipments,
-    generate_station_control_signals_strings,
     sort_stations_by_control_signals,
     update_history,
     prepare_history_sort,

@@ -61,12 +61,7 @@ local function generate_station_rows(state, stations_state)
     if
       (search_surface == -1 or station_data.entity.surface.index == search_surface)
       and bit32.btest(station_data.network_id, search_network_id)
-      and (
-        string.find(string.lower(station_data.name), search_query)
-        or string.find(station_data.provided_requested_strings[state.player_index], search_query)
-        or string.find(station_data.shipments_strings[state.player_index], search_query)
-        or string.find(station_data.control_signals_strings[state.player_index], search_query)
-      )
+      and string.find(station_data.search_strings[state.player_index], search_query)
     then
       index = index + 1
       station_rows[index] = station_row(state, station_id, station_data)
