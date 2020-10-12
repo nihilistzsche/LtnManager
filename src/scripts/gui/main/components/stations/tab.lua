@@ -64,6 +64,8 @@ local function generate_station_rows(state, stations_state)
       and (
         string.find(string.lower(station_data.name), search_query)
         or string.find(station_data.provided_requested_strings[state.player_index], search_query)
+        or string.find(station_data.shipments_strings[state.player_index], search_query)
+        or string.find(station_data.control_signals_strings[state.player_index], search_query)
       )
     then
       index = index + 1
