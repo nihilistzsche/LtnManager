@@ -52,6 +52,8 @@ function root.update(state, msg, e, refs)
       state.base.visible = true
       player.set_shortcut_toggled("ltnm-toggle-gui", true)
 
+      refs.window.bring_to_front()
+
       if not state.base.pinned then
         player.opened = refs.window
       end
