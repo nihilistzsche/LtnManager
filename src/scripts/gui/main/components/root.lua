@@ -102,9 +102,9 @@ function root.view(state)
               tabs = {
                 tabs.depots(state),
                 tabs.stations(state),
-                tabs.inventory(),
-                tabs.history(),
-                tabs.alerts(),
+                tabs.inventory(state),
+                tabs.history(state),
+                tabs.alerts(state),
               }
             }
           }

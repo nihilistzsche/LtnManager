@@ -40,12 +40,12 @@ constants.colors = {
 constants.gui = {
   en = {
     trains_list = {
-      composition = 230,
-      status = 361,
+      composition = 240,
+      status = 373,
       shipment = (36 * 6)
     },
     stations_list = {
-      name = 210,
+      name = 232,
       status = 53,
       network_id = 84,
       provided_requested = (36 * 6),

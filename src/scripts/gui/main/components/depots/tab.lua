@@ -6,12 +6,13 @@ local trains_list = require("scripts.gui.main.components.depots.trains-list")
 local component = gui.component()
 
 function component.init()
+  -- TODO split this up?
   return trains_list.init()
 end
 
 function component.update(state, msg, e)
   if msg.comp == "depot_select" then
-    depot_select.update(state, msg, e)
+    depot_select.update(state, msg)
   elseif msg.comp == "trains_list" then
     trains_list.update(state, msg, e)
   end

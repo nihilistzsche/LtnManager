@@ -4,7 +4,7 @@ local depot_button = require("scripts.gui.main.components.depots.depot-button")
 
 local component = gui.component()
 
-function component.update(state, msg, e)
+function component.update(state, msg)
   if msg.action == "update_selected_depot" then
     state.depots.selected_depot = msg.depot
   end

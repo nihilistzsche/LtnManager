@@ -282,6 +282,27 @@ styles.ltnm_depot_select_scroll_pane = {
   }
 }
 
+styles.ltnm_slot_table_scroll_pane = {
+  type = "scroll_pane_style",
+  parent = "flib_naked_scroll_pane",
+  padding = 0,
+  margin = 0,
+  extra_padding_when_activated = 0,
+  horizontally_squashable = "off",
+  background_graphical_set = {
+    base = {
+      position = {282, 17},
+      corner_size = 8,
+      overall_tiling_horizontal_padding = 4,
+      overall_tiling_horizontal_size = 32,
+      overall_tiling_horizontal_spacing = 8,
+      overall_tiling_vertical_padding = 4,
+      overall_tiling_vertical_size = 32,
+      overall_tiling_vertical_spacing = 8
+    }
+  }
+}
+
 styles.ltnm_small_slot_table_scroll_pane = {
   type = "scroll_pane_style",
   parent = "flib_naked_scroll_pane",
