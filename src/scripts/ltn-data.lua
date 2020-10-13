@@ -25,6 +25,24 @@ local function add_materials(t1, t2)
   return t2
 end
 
+-- adds the given material to the global inventory
+local function add_to_inventory(inventory, surface_index, network_id, name, count)
+  for _, surface in ipairs{-1, surface_index} do
+    local surface_stock = inventory[surface]
+    if not surface_stock then
+      inventory[surface] = {}
+      surface_stock = inventory[surface]
+    end
+    local material_stock = surface_stock[name]
+    if not material_stock then
+      surface_stock[name] = {combined_id = 0}
+      material_stock = surface_stock[name]
+    end
+    material_stock.combined_id = bit32.bor(material_stock.combined_id, network_id)
+    material_stock[network_id] = (material_stock[network_id] or 0) + count
+  end
+end
+
 -- parse the train's status and return metadata related to that status
 local function parse_train_status(train_data, translations)
   local train = train_data.train
@@ -194,6 +212,7 @@ local function iterate_stations(working_data, iterations_per_tick)
 
     local network_id = station_data.network_id
     local station_name = station_data.entity.backer_name
+    local surface_index = station_data.entity.surface.index
 
     -- add name to data
     station_data.name = station_name
@@ -219,16 +238,11 @@ local function iterate_stations(working_data, iterations_per_tick)
           materials_copy[name] = count
           -- update total count
           provided_requested_count = provided_requested_count + (count * count_multiplier)
+          -- add to global inventory
+          add_to_inventory(inventory[mode], surface_index, network_id, name, count)
         end
         -- add to station
         station_data[mode] = materials_copy
-        -- add to network
-        local inv = inventory[mode][network_id]
-        if not inv then
-          inventory[mode][network_id] = materials
-        else
-          inv = add_materials(materials, inv)
-        end
       end
     end
     station_data.provided_requested_count = provided_requested_count
@@ -260,7 +274,7 @@ local function iterate_stations(working_data, iterations_per_tick)
         depot.stations[#depot.stations+1] = station_id
         local statuses = depot.statuses
         statuses[status.color] = (statuses[status.color] or 0) + status.count
-        depot.surfaces[station_data.entity.surface.index] = true
+        depot.surfaces[surface_index] = true
       else
         depots[station_name] = {
           available_trains = {},
@@ -269,7 +283,7 @@ local function iterate_stations(working_data, iterations_per_tick)
           num_trains = #station_trains,
           stations = {station_id},
           statuses = {[status.color] = status.count},
-          surfaces = {[station_data.entity.surface.index] = true},
+          surfaces = {[surface_index] = true},
           train_ids = {},
           sorted_trains = {
             composition = {},
@@ -384,28 +398,29 @@ local function iterate_in_transit(working_data, iterations_per_tick)
     working_data.key,
     iterations_per_tick,
     function(delivery_data, delivery_id)
-      -- add to in transit inventory
-      in_transit[delivery_data.network_id] = add_materials(
-        delivery_data.shipment,
-        in_transit[delivery_data.network_id] or {}
-      )
-      -- get shipment sorting value
-      local shipment_count = table.reduce(delivery_data.shipment, function(acc, count) return acc + count end, 0)
-      -- add shipment to station
-      local stations = working_data.stations
-      for station_direction, subtable_name in pairs{from = "outbound", to = "inbound"} do
-        local station_data = stations[delivery_data[station_direction.."_id"]]
-        if station_data then
-          -- add materials
-          add_materials(delivery_data.shipment, station_data[subtable_name])
-          -- update count
-          local multiplier = station_direction == "from" and -1 or 1
-          station_data.shipments_count = station_data.shipments_count + (shipment_count * multiplier)
-        end
-      end
-      -- add shipment count to train
       local train_data = working_data.trains[delivery_id]
       if train_data then
+        local network_id = delivery_data.network_id
+        local surface_index = train_data.main_locomotive.surface.index
+        -- add to in transit inventory
+        for name, count in pairs(delivery_data.shipment) do
+          add_to_inventory(in_transit, surface_index, network_id, name, count)
+        end
+        -- get shipment sorting value
+        local shipment_count = table.reduce(delivery_data.shipment, function(acc, count) return acc + count end, 0)
+        -- add shipment to station
+        local stations = working_data.stations
+        for station_direction, subtable_name in pairs{from = "outbound", to = "inbound"} do
+          local station_data = stations[delivery_data[station_direction.."_id"]]
+          if station_data then
+            -- add materials
+            add_materials(delivery_data.shipment, station_data[subtable_name])
+            -- update count
+            local multiplier = station_direction == "from" and -1 or 1
+            station_data.shipments_count = station_data.shipments_count + (shipment_count * multiplier)
+          end
+        end
+        -- add shipment count to train
         train_data.shipment_count = shipment_count
       end
     end
