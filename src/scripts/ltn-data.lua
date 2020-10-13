@@ -186,9 +186,6 @@ local function iterate_stations(working_data, iterations_per_tick)
   local sorted_stations = working_data.sorted_stations
   local trains = working_data.trains
 
-  local network_to_stations = working_data.network_to_stations
-  local material_locations = working_data.material_locations
-
   local inventory = working_data.inventory
 
   return table.for_n_of(working_data.stations, working_data.key, iterations_per_tick, function(station_data, station_id)
@@ -201,14 +198,6 @@ local function iterate_stations(working_data, iterations_per_tick)
     -- add name to data
     station_data.name = station_name
     station_data.lowercase_name = string.lower(station_name)
-
-    -- add station to by-network lookup
-    local network_stations = network_to_stations[network_id]
-    if network_stations then
-      network_stations[#network_stations+1] = station_id
-    else
-      network_to_stations[network_id] = {station_id}
-    end
 
     -- get status
     local lamp_signal = station_data.lamp_control.get_control_behavior().get_signal(1)
@@ -226,13 +215,6 @@ local function iterate_stations(working_data, iterations_per_tick)
       if materials then
         local materials_copy = {}
         for name, count in pairs(materials) do
-          -- add to lookup
-          local locations = material_locations[name]
-          if not locations then
-            material_locations[name] = {stations = {station_id}, trains = {}}
-          else
-            locations.stations[#locations.stations+1] = station_id
-          end
           -- copy
           materials_copy[name] = count
           -- update total count
@@ -396,7 +378,6 @@ end
 
 local function iterate_in_transit(working_data, iterations_per_tick)
   local in_transit = working_data.inventory.in_transit
-  local material_locations = working_data.material_locations
 
   return table.for_n_of(
     working_data.deliveries,
@@ -408,19 +389,8 @@ local function iterate_in_transit(working_data, iterations_per_tick)
         delivery_data.shipment,
         in_transit[delivery_data.network_id] or {}
       )
-      -- iterate shipment
-      local shipment_count = 0
-      for name, count in pairs(delivery_data.shipment) do
-        -- add to locations table
-        local locations = material_locations[name]
-        if not locations then
-          material_locations[name] = {stations = {}, trains = {delivery_id}}
-        else
-          locations.trains[#locations.trains+1] = delivery_id
-        end
-        -- add to count
-        shipment_count = shipment_count + count
-      end
+      -- get shipment sorting value
+      local shipment_count = table.reduce(delivery_data.shipment, function(acc, count) return acc + count end, 0)
       -- add shipment to station
       local stations = working_data.stations
       for station_direction, subtable_name in pairs{from = "outbound", to = "inbound"} do
@@ -433,7 +403,7 @@ local function iterate_in_transit(working_data, iterations_per_tick)
           station_data.shipments_count = station_data.shipments_count + (shipment_count * multiplier)
         end
       end
-      -- add shipment
+      -- add shipment count to train
       local train_data = working_data.trains[delivery_id]
       if train_data then
         train_data.shipment_count = shipment_count
@@ -870,9 +840,6 @@ function ltn_data.iterate()
       trains = working_data.trains,
       history = working_data.history,
       alerts = working_data.alerts,
-      -- lookup tables
-      network_to_stations = working_data.network_to_stations,
-      material_locations = working_data.material_locations,
       -- sorting tables
       sorted_stations = working_data.sorted_stations,
       sorted_history = working_data.sorted_history,
@@ -917,9 +884,6 @@ function ltn_data.on_dispatcher_updated(e)
   }
   working_data.history = table.shallow_copy(global.active_data.history)
   working_data.alerts = table.shallow_copy(global.active_data.alerts)
-  -- lookup tables
-  working_data.network_to_stations = {}
-  working_data.material_locations = {}
   -- data tables
   working_data.provided_by_stop = e.provided_by_stop
   working_data.requested_by_stop = e.requests_by_stop
