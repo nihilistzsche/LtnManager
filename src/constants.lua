@@ -51,6 +51,15 @@ constants.gui = {
       provided_requested = (36 * 6),
       shipments = (36 * 5),
       control_signals = (36 * 7)
+    },
+    history = {
+      depot = 100,
+      train_id = 100,
+      network_id = 100,
+      route = 100,
+      finished = 100,
+      runtime = 100,
+      shipment = 100
     }
   }
 }

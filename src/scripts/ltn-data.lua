@@ -7,7 +7,6 @@ local train_util = require("__flib__.train")
 
 local constants = require("constants")
 
-
 -- -----------------------------------------------------------------------------
 -- HELPER FUNCTIONS
 
@@ -72,7 +71,7 @@ local function parse_train_status(train_data, translations)
           return {
             color = constants.colors.red.tbl,
             msg = translations.not_available,
-            string = "N/A"
+            string = translations.not_available
           }
         else
           return {
@@ -126,7 +125,7 @@ local function parse_train_status(train_data, translations)
     return {
       color = constants.colors.red.tbl,
       msg = translations.not_available,
-      string = "N/A"
+      string = translations.not_available
     }
   end
 end
@@ -146,6 +145,7 @@ local function per_player_next(players, objects, key, callback)
   else
     obj = next(objects)
     local next_player = next(players, player)
+    -- check if the player is ready to be iterated, and if not, keep going until we finish or find a player to process
     while next_player do
       if players[next_player].flags.translations_finished then
         break

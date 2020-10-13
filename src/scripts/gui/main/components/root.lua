@@ -26,6 +26,7 @@ function root.init(player_index)
     search = toolbar.init(),
     depots = tabs.depots.init(),
     stations = tabs.stations.init(),
+    history = tabs.history.init(),
     -- LTN data
     ltn_data = global.data,
     -- meta
