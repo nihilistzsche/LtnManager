@@ -59,7 +59,7 @@ local function generate_station_rows(state, stations_state)
 
     -- test against search queries
     if
-      (search_surface == -1 or station_data.entity.surface.index == search_surface)
+      (search_surface == -1 or station_data.surface_index == search_surface)
       and bit32.btest(station_data.network_id, search_network_id)
       and string.find(station_data.search_strings[state.player_index], search_query)
     then

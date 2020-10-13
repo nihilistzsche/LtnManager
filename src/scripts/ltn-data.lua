@@ -212,11 +212,17 @@ local function iterate_stations(working_data, iterations_per_tick)
 
     local network_id = station_data.network_id
     local station_name = station_data.entity.backer_name
-    local surface_index = station_data.entity.surface.index
+    local surface = station_data.entity.surface
+    local surface_name = surface.name
+    local surface_index = surface.index
 
-    -- add name to data
+    -- generic data
     station_data.name = station_name
     station_data.lowercase_name = string.lower(station_name)
+    station_data.surface_index = surface_index
+
+    -- add to surfaces table
+    working_data.surfaces[surface_name] = true
 
     -- get status
     local lamp_signal = station_data.lamp_control.get_control_behavior().get_signal(1)
@@ -806,6 +812,22 @@ local function sort_alerts(working_data, iterations_per_tick)
   return key
 end
 
+local function process_surfaces(working_data)
+  local surface_data = {
+    items = {{"ltnm-gui.all-paren"}},
+    selected_to_index = {-1}
+  }
+  local i = 1
+  local surfaces = game.surfaces
+  for surface_name in pairs(working_data.surfaces) do
+    i = i + 1
+    surface_data.items[i] = surface_name
+    surface_data.selected_to_index[i] = surfaces[surface_name].index
+  end
+
+  working_data.surfaces = surface_data
+end
+
 -- -----------------------------------------------------------------------------
 -- HANDLERS
 
@@ -836,7 +858,8 @@ function ltn_data.iterate()
     sort_history,
     update_alerts,
     prepare_alerts_sort,
-    sort_alerts
+    sort_alerts,
+    process_surfaces
   }
 
   if processors[step] then
@@ -855,6 +878,8 @@ function ltn_data.iterate()
       trains = working_data.trains,
       history = working_data.history,
       alerts = working_data.alerts,
+      -- lookup tables
+      surfaces = working_data.surfaces,
       -- sorting tables
       sorted_stations = working_data.sorted_stations,
       sorted_history = working_data.sorted_history,
@@ -904,6 +929,8 @@ function ltn_data.on_dispatcher_updated(e)
   working_data.requested_by_stop = e.requests_by_stop
   working_data.deliveries = e.deliveries
   working_data.available_trains = e.available_trains
+  -- lookup tables
+  working_data.surfaces = {}
   -- sorting tables
   working_data.sorted_stations = {
     name = {},

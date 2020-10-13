@@ -30,6 +30,8 @@ function component.update(state, msg, e)
     -- default to -1 if the nubmer can't be read
     state.search.network_id = tonumber(text) or -1
     state.search.network_id_text = text
+  elseif msg.action == "update_surface" then
+    state.search.surface = state.ltn_data.surfaces.selected_to_index[e.element.selected_index] or -1
   end
 end
 
@@ -58,7 +60,12 @@ function component.view(state)
         on_text_changed = {comp = "toolbar", action = "update_network_id_query"}
       },
       {type = "label", style = "subheader_caption_label", right_margin = 8, caption = "Surface:"},
-      {type = "drop-down", items = {"(all)", "nauvis"}, selected_index = 1}
+      {
+        type = "drop-down",
+        items = state.ltn_data.surfaces.items,
+        selected_index = 1,
+        on_selection_state_changed = {comp = "toolbar", action = "update_surface"}
+      }
     }}
   )
 end

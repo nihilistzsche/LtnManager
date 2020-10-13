@@ -13,7 +13,6 @@ end
 
 function global_data.build_translations()
   local translation_data = {
-    -- train status
     {dictionary = "gui", internal = "count", localised = {"ltnm-gui.count-label"}},
     {dictionary = "gui", internal = "delivering_to", localised = {"ltnm-gui.delivering-to-label"}},
     {dictionary = "gui", internal = "fetching_from", localised = {"ltnm-gui.fetching-from-label"}},
