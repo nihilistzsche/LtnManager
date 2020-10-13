@@ -36,7 +36,6 @@ local function slot_table(translations, width, contents)
       local enabled = data.enabled
       local sprite_class = data.sprite_class
       local tooltip_func = tooltip_funcs[data.tooltip]
-      local on_click = data.on_click
       for name, count in pairs(data.contents) do
         i = i + 1
         buttons[i] = {
@@ -45,8 +44,7 @@ local function slot_table(translations, width, contents)
           sprite = sprite_class and sprite_class.."/"..name or string.gsub(name, ",", "/"),
           number = count,
           tooltip = tooltip_func(translations, name, count),
-          enabled = enabled,
-          on_click = on_click or {action = "open_material", material = name}
+          enabled = enabled
         }
       end
     end
@@ -89,16 +87,16 @@ function component.view(state, station_id, station_data)
         translations,
         gui_constants.provided_requested,
         {
-          {color = "green", contents = station_data.provided, enabled = true, tooltip = "material"},
-          {color = "red", contents = station_data.requested, enabled = true, tooltip = "material"}
+          {color = "green", contents = station_data.provided, enabled = false, tooltip = "material"},
+          {color = "red", contents = station_data.requested, enabled = false, tooltip = "material"}
         }
       ),
       slot_table(
         translations,
         gui_constants.shipments,
         {
-          {color = "green", contents = station_data.inbound, enabled = true, tooltip = "material"},
-          {color = "red", contents = station_data.outbound, enabled = true, tooltip = "material"}
+          {color = "green", contents = station_data.inbound, enabled = false, tooltip = "material"},
+          {color = "red", contents = station_data.outbound, enabled = false, tooltip = "material"}
         }
       ),
       slot_table(

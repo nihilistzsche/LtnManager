@@ -35,7 +35,7 @@ function component.view(state, train_id, train_data, train_status)
       sprite = string.gsub(name, ",", "/"),
       number = count,
       tooltip = util.material_button_tooltip(state.translations, name, count),
-      on_click = {action = "open_material", material = name}
+      enabled = false
     }
   end
 
