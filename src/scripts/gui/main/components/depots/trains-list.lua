@@ -96,7 +96,7 @@ function component.view(state)
         {type = "frame", style = "ltnm_table_toolbar_frame", children = {
           sort_checkbox("trains_list", "composition", "composition", "composition", depots_state, constants),
           sort_checkbox("trains_list", "status", "train-status", "train-status", depots_state, constants),
-          sort_checkbox("trains_list", "shipment", "shipment", "shipment", depots_state, constants)
+          sort_checkbox("trains_list", "shipment", "shipment", nil, depots_state, constants)
         }},
         {type = "scroll-pane", style = "ltnm_table_scroll_pane", children = train_rows}
       }

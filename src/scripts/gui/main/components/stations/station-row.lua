@@ -1,65 +1,9 @@
 local gui = require("__flib__.gui3")
-local misc_util = require("__flib__.misc")
 
+local slot_table = require("scripts.gui.main.components.common.slot-table")
 local status_indicator = require("scripts.gui.main.components.common.status-indicator")
-local util = require("scripts.util")
-
-local tooltip_funcs = {
-  ltn_control_signal = function(translations, name, count)
-    return (
-    "[img=virtual-signal/"
-    ..name
-    .."]  [font=default-bold]"
-    ..translations.virtual_signals[name]
-    .."[/font]"
-    .."\n"
-    .."[font=default-semibold]"
-    ..translations.gui.count
-    .."[/font] "
-    ..misc_util.delineate_number(math.floor(count))
-  )
-  end,
-  material = util.material_button_tooltip,
-}
 
 local component = gui.component()
-
-local function slot_table(translations, width, contents)
-  local columns = width / 36
-
-  local buttons = {}
-  local i = 0
-
-  for _, data in pairs(contents) do
-    if data.contents then
-      local color = data.color
-      local enabled = data.enabled
-      local sprite_class = data.sprite_class
-      local tooltip_func = tooltip_funcs[data.tooltip]
-      for name, count in pairs(data.contents) do
-        i = i + 1
-        buttons[i] = {
-          type = "sprite-button",
-          style = "ltnm_small_slot_button_"..color,
-          sprite = sprite_class and sprite_class.."/"..name or string.gsub(name, ",", "/"),
-          number = count,
-          tooltip = tooltip_func(translations, name, count),
-          enabled = enabled
-        }
-      end
-    end
-  end
-
-  return (
-    {
-      type = "frame",
-      style = "ltnm_small_slot_table_frame",
-      children = {
-        {type = "table", style = "slot_table", width = width, column_count = columns, children = buttons}
-      }
-    }
-  )
-end
 
 function component.view(state, station_id, station_data)
   local gui_constants = state.constants.stations_list
@@ -73,7 +17,7 @@ function component.view(state, station_id, station_data)
         style = "ltnm_clickable_bold_label",
         width = gui_constants.name,
         caption = station_data.name,
-        tooltip = {"ltnm-gui.open-train-gui"},
+        tooltip = {"ltnm-gui.open-station-on-map"},
         on_click = {action = "open_station", station_id = station_id},
       },
       status_indicator(status.color, status.count, nil, gui_constants.status),

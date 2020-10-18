@@ -53,13 +53,13 @@ constants.gui = {
       control_signals = (36 * 7)
     },
     history = {
-      depot = 100,
-      train_id = 100,
-      network_id = 100,
-      route = 100,
-      finished = 100,
-      runtime = 100,
-      shipment = 100
+      depot = 160,
+      train_id = 60,
+      network_id = 84,
+      route = 351,
+      runtime = 68,
+      finished = 68,
+      shipment = (36 * 6)
     }
   }
 }

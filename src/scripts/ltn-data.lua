@@ -651,6 +651,9 @@ local function update_history(working_data)
       entry.depot = train.depot
       entry.route = train.from.." -> "..train.to
       entry.runtime = entry.finished - train.started
+      entry.surface_index = train.main_locomotive.surface.index
+      entry.search_strings = {}
+      entry.shipment_count = table.reduce(entry.shipment, function(acc, count) return acc + count end, 0)
       -- add to history
       queue.push_right(active_history, entry)
       -- limit to 50 entries
@@ -684,6 +687,45 @@ local function prepare_history_sort(working_data)
   end
 end
 
+local function generate_history_search_strings(working_data)
+  local players = global.players
+  local history = working_data.history
+
+  return table.for_n_of(
+    {},
+    working_data.key,
+    1,
+    function(data, key)
+      if key.obj == "first" or key.obj == "last" then return end
+
+      local history_data = data.history
+      local translations = data.translations
+
+      local str = {
+        string.lower(history_data.depot),
+        string.lower(history_data.from),
+        string.lower(history_data.to)
+      }
+      local str_i = 3
+      for name in pairs(history_data.shipment) do
+        str_i = str_i + 1
+        str[str_i] = string.lower(translations[name])
+      end
+
+      history_data.search_strings[data.player_index] = table.concat(str, " ")
+    end,
+    function(_, key)
+      return per_player_next(players, history, key, function(player, history_index)
+        return {
+          history = history[history_index],
+          player_index = player,
+          translations = players[player].translations.materials,
+        }
+      end)
+    end
+  )
+end
+
 local function sort_history(working_data, iterations_per_tick)
   local history = working_data.history
   local sorted_history = working_data.sorted_history
@@ -696,7 +738,11 @@ local function sort_history(working_data, iterations_per_tick)
     key.index,
     math.ceil(iterations_per_tick / 2),
     function(id_1, id_2)
-      return history[id_1][sort] < history[id_2][sort]
+      if sort == "shipment" then
+        return history[id_1].shipment_count < history[id_2].shipment_count
+      else
+        return history[id_1][sort] < history[id_2][sort]
+      end
     end
   )
 
@@ -855,6 +901,7 @@ function ltn_data.iterate()
     sort_stations_by_control_signals,
     update_history,
     prepare_history_sort,
+    generate_history_search_strings,
     sort_history,
     update_alerts,
     prepare_alerts_sort,
@@ -942,9 +989,12 @@ function ltn_data.on_dispatcher_updated(e)
   }
   working_data.sorted_history = {
     depot = {},
+    train_id = {},
+    network_id = {},
     route = {},
+    finished = {},
     runtime = {},
-    finished = {}
+    shipment = {}
   }
   working_data.sorted_alerts = {
     route = {},
