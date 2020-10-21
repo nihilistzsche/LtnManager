@@ -1,4 +1,4 @@
-local gui = require("__flib__.gui3")
+local gui = require("__flib__.gui-new")
 
 local sort_checkbox = require("scripts.gui.main.components.common.sort-checkbox")
 local station_row = require("scripts.gui.main.components.stations.station-row")

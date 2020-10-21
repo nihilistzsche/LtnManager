@@ -1,4 +1,4 @@
-local gui = require("__flib__.gui3")
+local gui = require("__flib__.gui-new")
 local misc = require("__flib__.misc")
 
 local util = require("scripts.util")

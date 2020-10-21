@@ -1,4 +1,4 @@
-local gui = require("__flib__.gui3")
+local gui = require("__flib__.gui-new")
 
 local status_indicator = require("scripts.gui.main.components.common.status-indicator")
 
