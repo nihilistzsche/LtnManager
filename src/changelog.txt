@@ -1,7 +1,9 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.8
 Date: ????
-  Changes:
+  Bugfixes:
+    - Fixed a crash related to LTN data desyncing
+    - Fixed that clicking a requester station on the inventory screen would open the shipment's provider station instead
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.7
 Date: 2020-10-02

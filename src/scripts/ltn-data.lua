@@ -627,12 +627,12 @@ end
 
 function ltn_data.on_dispatcher_updated(e)
   if global.flags.iterating_ltn_data or global.flags.updating_guis then return end
-  local stations = global.working_data.stations
-  if not stations then
+  local working_data = global.working_data
+  if not working_data then
     log("LTN event desync: did not receive stations in time! Skipping iteration.")
-    global.working_data = nil
     return
   end
+  local stations = global.working_data.stations
 
   -- set up working data table
   local data = global.working_data
