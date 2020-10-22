@@ -5,6 +5,7 @@ Date: ????
     - Fixed a crash related to LTN data desyncing
     - Fixed a crash when a player's translations would finish in the middle of LTN data iteration
     - Fixed that clicking a requester station on the inventory screen would open the shipment's provider station instead
+    - Fixed the clear all alerts button clearing all alerts for the rest of time
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.7
 Date: 2020-10-02
