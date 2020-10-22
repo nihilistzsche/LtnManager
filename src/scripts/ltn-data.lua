@@ -42,6 +42,17 @@ end
 -- -----------------------------------------------------------------------------
 -- PROCESSORS
 
+-- get a list of players who are ready for iteration
+local function get_ready_players(working_data)
+  local players = {}
+  for i, player_table in pairs(global.players) do
+    if player_table.flags.translations_finished then
+      players[i] = true
+    end
+  end
+  working_data.players = players
+end
+
 local function iterate_stations(working_data, iterations_per_tick)
   local depots = working_data.depots
   local sorted_stations = working_data.sorted_stations
@@ -229,7 +240,7 @@ local function iterate_in_transit(working_data, iterations_per_tick)
 end
 
 local function generate_train_status_strings(working_data, iterations_per_tick)
-  local players = global.players
+  local players = working_data.players
   local trains  = working_data.trains
 
   return table.for_n_of({}, working_data.key, iterations_per_tick,
@@ -250,12 +261,6 @@ local function generate_train_status_strings(working_data, iterations_per_tick)
       else
         train = next(trains)
         local next_player = next(players, player)
-        while next_player do
-          if players[next_player].flags.translations_finished then
-            break
-          end
-          next_player = next(players, next_player)
-        end
         if next_player and train then
           player = next_player
         else
@@ -267,13 +272,13 @@ local function generate_train_status_strings(working_data, iterations_per_tick)
       -- return tables
       return
         {player = player, train = train},
-        {translations = players[player].translations.gui, train = trains[train]}
+        {translations = global.players[player].translations.gui, train = trains[train]}
     end
   )
 end
 
 local function sort_depot_trains_by_status(working_data)
-  local players = global.players
+  local players = working_data.players
   local depots = working_data.depots
   local trains = working_data.trains
 
@@ -301,12 +306,6 @@ local function sort_depot_trains_by_status(working_data)
       else
         depot = next(depots)
         local next_player = next(players, player)
-        while next_player do
-          if players[next_player].flags.translations_finished then
-            break
-          end
-          next_player = next(players, next_player)
-        end
         if next_player and depot then
           player = next_player
         else
@@ -564,6 +563,7 @@ function ltn_data.iterate()
   local iterations_per_tick = settings.global["ltnm-iterations-per-tick"].value
 
   local processors = {
+    get_ready_players,
     iterate_stations,
     iterate_trains,
     iterate_in_transit,
@@ -604,7 +604,8 @@ function ltn_data.iterate()
       sorted_history = working_data.sorted_history,
       sorted_alerts = working_data.sorted_alerts,
       -- other
-      num_stations = working_data.num_stations
+      num_stations = working_data.num_stations,
+      players = working_data.players
     }
 
     -- reset working data
@@ -615,8 +616,11 @@ function ltn_data.iterate()
 
     -- start updating GUIs
     global.flags.iterating_ltn_data = false
-    global.flags.updating_guis = true
-    global.next_update_index = next(global.players)
+    local first_index = next(global.data.players)
+    if first_index then
+      global.flags.updating_guis = true
+      global.next_update_index = first_index
+    end
   end
 end
 
@@ -673,6 +677,7 @@ function ltn_data.on_dispatcher_updated(e)
   data.key = nil -- just for reference
   -- other
   data.aborted_trains = {} -- trains that we aborted on during the iterate_trains step
+  data.players = {} -- players whose translations are finished and can be sorted for
 
   -- enable data iteration handler
   global.flags.iterating_ltn_data = true

@@ -3,6 +3,7 @@ Version: 0.3.8
 Date: ????
   Bugfixes:
     - Fixed a crash related to LTN data desyncing
+    - Fixed a crash when a player's translations would finish in the middle of LTN data iteration
     - Fixed that clicking a requester station on the inventory screen would open the shipment's provider station instead
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.7

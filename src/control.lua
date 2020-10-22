@@ -159,7 +159,7 @@ event.on_tick(function(e)
     local player_index = global.next_update_index
     local player_table = global.players[player_index]
     local player_flags = player_table.flags
-    if player_flags.translations_finished and not player_flags.can_open_gui then
+    if not player_flags.can_open_gui then
       -- create GUI
       local player = game.get_player(player_index)
       main_gui.create(player, player_table)
@@ -176,7 +176,7 @@ event.on_tick(function(e)
     end
 
     -- get and save next index, or stop iteration
-    local next_index = next(global.players, global.next_update_index)
+    local next_index = next(global.data.players, global.next_update_index)
     if next_index then
       global.next_update_index = next_index
     else
