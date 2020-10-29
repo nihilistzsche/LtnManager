@@ -158,21 +158,23 @@ event.on_tick(function(e)
   if flags.updating_guis then
     local player_index = global.next_update_index
     local player_table = global.players[player_index]
-    local player_flags = player_table.flags
-    if not player_flags.can_open_gui then
-      -- create GUI
-      local player = game.get_player(player_index)
-      main_gui.create(player, player_table)
-      player_flags.can_open_gui = true
-      player.set_shortcut_available("ltnm-toggle-gui", true)
-    elseif
-      player_table.flags.gui_open
-      and player_table.settings.auto_refresh
-      and game.tick - player_table.last_update >= 180
-    then
-      -- update GUI
-      main_gui.update_active_tab(game.get_player(player_index), player_table)
-      player_table.last_update = game.tick
+    if player_table then
+      local player_flags = player_table.flags
+      if not player_flags.can_open_gui then
+        -- create GUI
+        local player = game.get_player(player_index)
+        main_gui.create(player, player_table)
+        player_flags.can_open_gui = true
+        player.set_shortcut_available("ltnm-toggle-gui", true)
+      elseif
+        player_table.flags.gui_open
+        and player_table.settings.auto_refresh
+        and game.tick - player_table.last_update >= 180
+      then
+        -- update GUI
+        main_gui.update_active_tab(game.get_player(player_index), player_table)
+        player_table.last_update = game.tick
+      end
     end
 
     -- get and save next index, or stop iteration
