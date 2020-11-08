@@ -7,8 +7,8 @@ local main_gui = {}
 function main_gui.create(player, player_table)
   -- create GUI
   local refs = gui.build(player.gui.screen, {root.build(player)})
-  root.setup(refs)
   local state = root.init(player.index)
+  root.setup(refs, state.ltn_data)
 
   player_table.gui.main = {
     refs = refs,

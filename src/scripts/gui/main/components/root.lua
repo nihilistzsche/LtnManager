@@ -4,8 +4,8 @@ local constants = require("constants")
 
 local util = require("scripts.util")
 
+local search_bar = require("scripts.gui.main.components.base.search-bar")
 local titlebar = require("scripts.gui.main.components.base.titlebar")
--- local toolbar = require("scripts.gui.main.components.base.toolbar")
 
 -- local tab_names = {"depots", "stations", "inventory", "history", "alerts"}
 -- local tabs = {}
@@ -32,7 +32,7 @@ function root.build(player)
           style = "inside_deep_frame",
           direction = "vertical",
           children = {
-            -- toolbar(state),
+            search_bar.build(),
             {
               type = "tabbed-pane",
               style = "ltnm_tabbed_pane",
@@ -54,9 +54,11 @@ function root.build(player)
   )
 end
 
-function root.setup(refs)
+function root.setup(refs, ltn_data)
   refs.base.titlebar_flow.drag_target = refs.base.window
   refs.base.window.force_auto_center()
+
+  search_bar.setup(refs, ltn_data)
 end
 
 function root.init(player_index)
@@ -69,7 +71,7 @@ function root.init(player_index)
       pinning = false,
       visible = false
     },
-    -- search = toolbar.init(),
+    search = search_bar.init(),
     -- depots = tabs.depots.init(),
     -- stations = tabs.stations.init(),
     -- history = tabs.history.init(),
