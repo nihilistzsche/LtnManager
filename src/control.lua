@@ -151,13 +151,13 @@ event.on_tick(function(e)
     local player_table = global.players[player_index]
     local player_flags = player_table.flags
     if player_flags.translations_finished and not player_flags.can_open_gui then
-      main_gui.create(game.get_player(player_index), player_table)
+      main_gui.build(game.get_player(player_index), player_table)
     elseif
       player_table.flags.can_open_gui
       and player_table.gui.main.state.base.visible
       and player_table.gui.main.state.base.auto_refresh
     then
-      main_gui.update(player_index, player_table)
+      main_gui.update_ltn_data(player_index)
     end
 
     -- get and save next index, or stop iteration

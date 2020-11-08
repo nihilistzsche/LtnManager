@@ -1,7 +1,5 @@
 local gui = require("__flib__.gui-beta")
 
-local constants = require("constants")
-
 local util = require("scripts.util")
 
 local search_bar = require("scripts.gui.main.components.base.search-bar")
@@ -13,9 +11,9 @@ for _, tab_name in ipairs(tab_names) do
   tabs[tab_name] = require("scripts.gui.main.components."..tab_name..".tab")
 end
 
-local root = {}
+local component = {}
 
-function root.build(_, widths)
+function component.build(widths)
   return (
     {
       type = "frame",
@@ -54,15 +52,14 @@ function root.build(_, widths)
   )
 end
 
-function root.setup(refs, ltn_data)
+function component.setup(refs, ltn_data)
   refs.base.titlebar_flow.drag_target = refs.base.window
   refs.base.window.force_auto_center()
 
   search_bar.setup(refs, ltn_data)
 end
 
-function root.init(player_index)
-  local player_table = global.players[player_index]
+function component.init()
   return {
     base = {
       selected_tab = "depots",
@@ -76,16 +73,11 @@ function root.init(player_index)
     -- stations = tabs.stations.init(),
     -- history = tabs.history.init(),
     -- LTN data
-    ltn_data = global.data,
-    -- meta
-    constants = constants.gui[player_table.translations.gui.locale_identifier],
-    player_index = player_index
+    ltn_data = global.data
   }
 end
 
--- HANDLERS
-
-function root.open(e)
+function component.open(e)
   local player, _, state, refs = util.get_gui_data(e.player_index)
 
   state.base.visible = true
@@ -98,7 +90,8 @@ function root.open(e)
   end
 end
 
-function root.close(e)
+-- both called directly and used as an element handler
+function component.close(e)
   local player, _, state, refs = util.get_gui_data(e.player_index)
 
   -- don't actually close if we just pinned the GUI
@@ -114,53 +107,13 @@ function root.close(e)
   end
 end
 
-function root.update(e)
-  -- TODO
+function component.update(player, player_table, state, refs)
+  -- update active tab
+  tabs[state.base.selected_tab].update(player, player_table, state, refs)
 end
 
 gui.add_handlers{
-  main_open = root.open,
-  main_close = root.close,
-  main_update = root.update
+  main_close = component.close
 }
 
--- function root.update(state, msg, e, refs)
---   if msg.update_ltn_data then
---     state.ltn_data = global.data
---   end
-
---   if msg.comp == "base" then
---     local player = game.get_player(e.player_index)
-
---     if msg.action == "open" then
---       state.base.visible = true
---       player.set_shortcut_toggled("ltnm-toggle-gui", true)
-
---       refs.window.bring_to_front()
-
---       if not state.base.pinned then
---         player.opened = refs.window
---       end
---     elseif msg.action == "close" then
---       -- don't actually close if we just pinned the GUI
---       if state.base.pinning then return end
-
---       state.base.visible = false
---       player.set_shortcut_toggled("ltnm-toggle-gui", false)
-
---       if player.opened == refs.window then
---         player.opened = nil
---       end
---     elseif msg.action == "update_selected_tab" then
---       state.base.selected_tab = tab_names[e.element.selected_tab_index]
---     end
---   elseif msg.comp == "titlebar" then
---     titlebar.update(state, msg, e, refs)
---   elseif msg.comp == "toolbar" then
---     toolbar.update(state, msg, e)
---   else
---     tabs[state.base.selected_tab].update(state, msg, e, refs)
---   end
--- end
-
-return root
+return component

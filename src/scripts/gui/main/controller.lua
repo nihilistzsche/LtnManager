@@ -2,15 +2,17 @@ local gui = require("__flib__.gui-beta")
 
 local constants = require("constants")
 
+local util = require("scripts.util")
+
 local root = require("scripts.gui.main.components.root")
 
 local main_gui = {}
 
-function main_gui.create(player, player_table)
+function main_gui.build(player, player_table)
   local widths = constants.gui[player_table.translations.gui.locale_identifier]
-  -- create GUI
-  local refs = gui.build(player.gui.screen, {root.build(player, widths)})
-  local state = root.init(player.index)
+  -- build GUI
+  local refs = gui.build(player.gui.screen, {root.build(widths)})
+  local state = root.init()
   root.setup(refs, state.ltn_data)
 
   player_table.gui.main = {
@@ -36,11 +38,25 @@ end
 function main_gui.toggle(player_index, player_table)
   local gui_data = player_table.gui.main
   local action = gui_data.state.base.visible and "close" or "open"
+  -- update LTN data and dynamic content before opening
+  if action == "open" then
+    main_gui.update_ltn_data(player_index)
+  end
   root[action]{player_index = player_index}
 end
 
+-- update dynamic content
 function main_gui.update(player_index)
-  root.update{player_index = player_index}
+  local player, player_table, state, refs = util.get_gui_data(player_index)
+  root.update(player, player_table, state, refs)
+end
+
+-- update LTN data, then dynamic content
+function main_gui.update_ltn_data(player_index)
+  local player, player_table, state, refs = util.get_gui_data(player_index)
+  state.ltn_data = global.data
+  -- TODO update surface dropdown
+  root.update(player, player_table, state, refs)
 end
 
 function main_gui.focus_search(gui_data)

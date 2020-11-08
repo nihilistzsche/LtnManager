@@ -21,15 +21,12 @@ end
 
 function component.init()
   -- TODO split this up?
-  -- return trains_list.init()
+  return trains_list.init()
 end
 
--- function component.update(state, msg, e)
---   if msg.comp == "depot_select" then
---     depot_select.update(state, msg)
---   elseif msg.comp == "trains_list" then
---     trains_list.update(state, msg, e)
---   end
--- end
+function component.update(player, player_table, state, refs)
+  depot_select.update(player, player_table, state, refs)
+  trains_list.update(player, player_table, state, refs)
+end
 
 return component
