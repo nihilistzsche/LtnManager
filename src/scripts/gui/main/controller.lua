@@ -1,12 +1,15 @@
 local gui = require("__flib__.gui-beta")
 
+local constants = require("constants")
+
 local root = require("scripts.gui.main.components.root")
 
 local main_gui = {}
 
 function main_gui.create(player, player_table)
+  local widths = constants.gui[player_table.translations.gui.locale_identifier]
   -- create GUI
-  local refs = gui.build(player.gui.screen, {root.build(player)})
+  local refs = gui.build(player.gui.screen, {root.build(player, widths)})
   local state = root.init(player.index)
   root.setup(refs, state.ltn_data)
 
@@ -38,6 +41,12 @@ end
 
 function main_gui.update(player_index)
   root.update{player_index = player_index}
+end
+
+function main_gui.focus_search(gui_data)
+  local textfield = gui_data.refs.base.search_query_textfield
+  textfield.select_all()
+  textfield.focus()
 end
 
 return main_gui

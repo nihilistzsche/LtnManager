@@ -7,15 +7,15 @@ local util = require("scripts.util")
 local search_bar = require("scripts.gui.main.components.base.search-bar")
 local titlebar = require("scripts.gui.main.components.base.titlebar")
 
--- local tab_names = {"depots", "stations", "inventory", "history", "alerts"}
--- local tabs = {}
--- for _, tab_name in ipairs(tab_names) do
---   tabs[tab_name] = require("scripts.gui.main.components."..tab_name..".tab")
--- end
+local tab_names = {"depots"}
+local tabs = {}
+for _, tab_name in ipairs(tab_names) do
+  tabs[tab_name] = require("scripts.gui.main.components."..tab_name..".tab")
+end
 
 local root = {}
 
-function root.build(player)
+function root.build(_, widths)
   return (
     {
       type = "frame",
@@ -40,7 +40,7 @@ function root.build(player)
                 on_selected_tab_changed = "main_change_selected_tab",
               },
               tabs = {
-                -- tabs.depots(state),
+                tabs.depots.build(widths),
                 -- tabs.stations(state),
                 -- tabs.inventory(state),
                 -- tabs.history(state),
@@ -72,7 +72,7 @@ function root.init(player_index)
       visible = false
     },
     search = search_bar.init(),
-    -- depots = tabs.depots.init(),
+    depots = tabs.depots.init(),
     -- stations = tabs.stations.init(),
     -- history = tabs.history.init(),
     -- LTN data

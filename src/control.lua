@@ -67,11 +67,11 @@ end)
 
 gui.hook_gui_events()
 
--- TODO
 event.register("ltnm-search", function(e)
   local player_table = global.players[e.player_index]
-  if player_table.flags.gui_open then
-    -- main_gui.toggle_search(game.get_player(e.player_index), player_table)
+  local gui_data = player_table.gui.main
+  if gui_data and gui_data.state.base.visible and not gui_data.state.base.pinned then
+    main_gui.focus_search(gui_data)
   end
 end)
 

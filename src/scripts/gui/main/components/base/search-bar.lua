@@ -22,7 +22,8 @@ function component.build()
         clear_and_focus_on_right_click = true,
         handlers = {
           on_text_changed = "main_update_search_query"
-        }
+        },
+        ref = {"base", "search_query_textfield"}
       },
       {type = "empty-widget", style = "flib_horizontal_pusher"},
       {
