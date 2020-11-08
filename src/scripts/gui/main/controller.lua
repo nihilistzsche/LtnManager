@@ -33,11 +33,11 @@ end
 function main_gui.toggle(player_index, player_table)
   local gui_data = player_table.gui.main
   local action = gui_data.state.base.visible and "close" or "open"
-  root.handlers[action]{player_index = player_index}
+  root[action]{player_index = player_index}
 end
 
 function main_gui.update(player_index)
-  root.handlers.update{player_index = player_index}
+  root.update{player_index = player_index}
 end
 
 return main_gui

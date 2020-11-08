@@ -4,7 +4,7 @@ local constants = require("constants")
 
 local util = require("scripts.util")
 
--- local titlebar = require("scripts.gui.main.components.base.titlebar")
+local titlebar = require("scripts.gui.main.components.base.titlebar")
 -- local toolbar = require("scripts.gui.main.components.base.toolbar")
 
 -- local tab_names = {"depots", "stations", "inventory", "history", "alerts"}
@@ -26,7 +26,7 @@ function root.build(player)
       },
       ref = {"base", "window"},
       children = {
-        -- titlebar(state),
+        titlebar.build(),
         {
           type = "frame",
           style = "inside_deep_frame",
@@ -55,8 +55,8 @@ function root.build(player)
 end
 
 function root.setup(refs)
-  -- refs.titlebar_flow.drag_target = refs.window
-  refs.window.force_auto_center()
+  refs.base.titlebar_flow.drag_target = refs.base.window
+  refs.base.window.force_auto_center()
 end
 
 function root.init(player_index)
@@ -81,13 +81,13 @@ function root.init(player_index)
   }
 end
 
-root.handlers = {}
+-- HANDLERS
 
-function root.handlers.open(e)
+function root.open(e)
   local player, _, state, refs = util.get_gui_data(e.player_index)
 
   state.base.visible = true
-  refs.window.visible = true
+  refs.base.window.visible = true
 
   player.set_shortcut_toggled("ltnm-toggle-gui", true)
 
@@ -96,20 +96,31 @@ function root.handlers.open(e)
   end
 end
 
-function root.handlers.close(e)
+function root.close(e)
   local player, _, state, refs = util.get_gui_data(e.player_index)
 
+  -- don't actually close if we just pinned the GUI
+  if state.base.pinning then return end
+
   state.base.visible = false
-  refs.window.visible = false
+  refs.base.window.visible = false
 
   player.set_shortcut_toggled("ltnm-toggle-gui", false)
+
+  if player.opened == refs.base.window then
+    player.opened = nil
+  end
 end
 
-function root.handlers.update(e)
+function root.update(e)
   -- TODO
 end
 
-gui.add_handlers("main", util.generate_component_handlers(root.handlers))
+gui.add_handlers{
+  main_open = root.open,
+  main_close = root.close,
+  main_update = root.update
+}
 
 -- function root.update(state, msg, e, refs)
 --   if msg.update_ltn_data then
