@@ -1,4 +1,4 @@
-local gui = require("__flib__.gui-new")
+local gui = require("__flib__.gui-beta")
 
 local root = require("scripts.gui.main.components.root")
 
@@ -6,7 +6,14 @@ local main_gui = {}
 
 function main_gui.create(player, player_table)
   -- create GUI
-  player_table.gui.Main = gui.new(root, player.gui.screen)
+  local refs = gui.build(player.gui.screen, {root.build(player)})
+  root.setup(refs)
+  local state = root.init(player.index)
+
+  player_table.gui.main = {
+    refs = refs,
+    state = state
+  }
 
   -- set flag and shortcut state
   player_table.flags.can_open_gui = true
@@ -15,8 +22,8 @@ end
 
 function main_gui.destroy(player, player_table)
   -- destroy and remove GUI from player table
-  player_table.gui.Main:destroy()
-  player_table.gui.Main = nil
+  player_table.gui.main.refs.window.destroy()
+  player_table.gui.main = nil
 
   -- set flag and shortcut state
   player_table.flags.can_open_gui = false
@@ -24,13 +31,13 @@ function main_gui.destroy(player, player_table)
 end
 
 function main_gui.toggle(player_index, player_table)
-  local MainGui = player_table.gui.Main
-  local action = MainGui.state.base.visible and "close" or "open"
-  MainGui:dispatch({comp = "base", action = action}, {player_index = player_index})
+  local gui_data = player_table.gui.main
+  local action = gui_data.state.base.visible and "close" or "open"
+  root.handlers[action]{player_index = player_index}
 end
 
-function main_gui.update(player_index, player_table)
-  player_table.gui.Main:dispatch({update_ltn_data = true}, {player_index = player_index})
+function main_gui.update(player_index)
+  root.handlers.update{player_index = player_index}
 end
 
 return main_gui

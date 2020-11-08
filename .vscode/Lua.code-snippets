@@ -1,0 +1,7 @@
+{
+  "guidata": {
+    "prefix": "guidata",
+    "body": "local player, player_table, state, refs = util.get_gui_data(e.player_index)",
+    "description": "Commonly-required tables in GUI handlers."
+  }
+}

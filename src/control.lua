@@ -1,5 +1,5 @@
 local event = require("__flib__.event")
-local gui = require("__flib__.gui-new")
+local gui = require("__flib__.gui-beta")
 local migration = require("__flib__.migration")
 local translation = require("__flib__.translation")
 
@@ -30,7 +30,6 @@ commands.add_command("LtnManager", {"ltnm-message.command-help"},
 -- BOOTSTRAP
 
 event.on_init(function()
-  gui.init()
   translation.init()
 
   global_data.init()
@@ -45,15 +44,12 @@ event.on_init(function()
 end)
 
 event.on_load(function()
-  gui.load()
   ltn_data.connect()
 end)
 
 event.on_configuration_changed(function(e)
   if migration.on_config_changed(e, migrations) then
     -- migrate flib modules
-    -- TODO
-    -- gui.init()
     translation.init()
     -- update translation data
     global_data.build_translations()
@@ -69,15 +65,15 @@ end)
 
 -- GUI
 
-gui.register_handlers()
+gui.hook_gui_events()
 
 -- TODO
--- event.register("ltnm-search", function(e)
---   local player_table = global.players[e.player_index]
---   if player_table.flags.gui_open then
---     -- main_gui.toggle_search(game.get_player(e.player_index), player_table)
---   end
--- end)
+event.register("ltnm-search", function(e)
+  local player_table = global.players[e.player_index]
+  if player_table.flags.gui_open then
+    -- main_gui.toggle_search(game.get_player(e.player_index), player_table)
+  end
+end)
 
 -- PLAYER
 
@@ -117,7 +113,7 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
       main_gui.toggle(e.player_index, player_table)
     else
       -- close GUI if it is open (just in case)
-      local MainGui = player_table.gui.Main
+      local MainGui = player_table.gui.main
       if MainGui and MainGui.state.base.visible then
         main_gui.close(player, player_table)
       end
@@ -158,8 +154,8 @@ event.on_tick(function(e)
       main_gui.create(game.get_player(player_index), player_table)
     elseif
       player_table.flags.can_open_gui
-      and player_table.gui.Main.state.base.visible
-      and player_table.gui.Main.state.base.auto_refresh
+      and player_table.gui.main.state.base.visible
+      and player_table.gui.main.state.base.auto_refresh
     then
       main_gui.update(player_index, player_table)
     end
