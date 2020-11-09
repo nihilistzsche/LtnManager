@@ -6,7 +6,7 @@ local component = {}
 
 function component.build(widths)
   return (
-    {type = "frame", style = "ltnm_table_row_frame", horizontally_stretchable = true, children = {
+    {type = "frame", style = "ltnm_table_row_frame", style_mods = {horizontally_stretchable = true}, children = {
       {
         type = "label",
         style = "ltnm_clickable_bold_label",
@@ -19,13 +19,26 @@ function component.build(widths)
         style = "ltnm_train_status_flow",
         -- horizontally_stretchable = true,
         style_mods = {width = widths.status},
-        direction = "vertical"
+        direction = "vertical",
+        children = {
+          {type = "label"},
+          {
+            type = "label",
+            style = "ltnm_clickable_bold_label",
+            tooltip = {"ltnm-gui.open-station-on-map"},
+            handlers = {
+              {on_click = "main_open_station_on_map"}
+            }
+          }
+        }
       },
       {type = "frame", style = "ltnm_small_slot_table_frame", children = {
         {
           type = "table",
           style = "slot_table",
-          width = (36 * 6),
+          style_mods = {
+            width = (36 * 6),
+          },
           column_count = 6
         }
       }}
@@ -33,38 +46,56 @@ function component.build(widths)
   )
 end
 
-function component.update()
-  -- local status_elems
-  -- if train_status.msg then
-  --   status_elems = {
-  --     {type = "label", style = "bold_label", font_color = train_status.color, caption = train_status.msg}
-  --   }
-  -- else
-  --   status_elems = {
-  --     {type = "label", style = "label", font_color = {255, 255, 255}, caption = train_status.type},
-  --     {
-  --       type = "label",
-  --       style = "ltnm_clickable_bold_label",
-  --       caption = train_data[train_status.station],
-  --       tooltip = {"ltnm-gui.open-station-on-map"},
-  --       on_click = {action = "open_station", station_id = train_data[train_status.station.."_id"]}
-  --     }
-  --   }
-  -- end
-
-  -- local shipment_elems = {}
-  -- local index = 0
-  -- for name, count in pairs(train_data.shipment or {}) do
-  --   index = index + 1
-  --   shipment_elems[index] = {
-  --     type = "sprite-button",
-  --     style = "ltnm_small_slot_button_default",
-  --     sprite = string.gsub(name, ",", "/"),
-  --     number = count,
-  --     tooltip = util.material_button_tooltip(state.translations, name, count),
-  --     enabled = false
-  --   }
-  -- end
+function component.update(train_data, _, _, _, player_index, translations)
+  local train_status = train_data.status[player_index]
+  local single_label = train_status.msg
+  return (
+    {children = {
+      {elem_mods = {
+        caption = train_data.composition
+      }},
+      {children = {
+        {
+          style_mods = {
+            font_color = single_label and train_status.color or {255, 255, 255}
+          },
+          elem_mods = {
+            caption = train_status.msg or train_status.type,
+            style = single_label and "bold_label" or "label",
+          }
+        },
+        {elem_mods = {
+          caption = train_data[train_status.station],
+          visible = not single_label
+        }}
+      }},
+      {children = {
+        {cb = function(shipment_table)
+          util.gui_list(
+            shipment_table,
+            {pairs(train_data.shipment or {})},
+            function() return true end,
+            function()
+              return {
+                type = "sprite-button",
+                style = "ltnm_small_slot_button_default",
+                enabled = false
+              }
+            end,
+            function(count, name)
+              return {
+                elem_mods = {
+                  number = count,
+                  sprite = string.gsub(name, ",", "/"),
+                  tooltip = util.material_button_tooltip(translations, name, count)
+                }
+              }
+            end
+          )
+        end}
+      }}
+    }}
+  )
 end
 
 return component

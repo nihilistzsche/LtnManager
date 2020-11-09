@@ -45,7 +45,7 @@ function util.gui_list(parent, iterator, test, build, update, ...)
       i = i + 1
       local child = children[i]
       if not child then
-        gui.build(parent, {build(v, k, i, ...)})
+        gui.build(parent, {build(...)})
         child = parent.children[i]
       end
       gui.update(child, update(v, k, i, ...))

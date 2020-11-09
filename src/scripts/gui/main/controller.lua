@@ -12,7 +12,7 @@ function main_gui.build(player, player_table)
   local widths = constants.gui[player_table.translations.gui.locale_identifier]
   -- build GUI
   local refs = gui.build(player.gui.screen, {root.build(widths)})
-  local state = root.init()
+  local state = root.init(widths)
   root.setup(refs, state.ltn_data)
 
   player_table.gui.main = {

@@ -1,9 +1,11 @@
 local gui = require("__flib__.gui-beta")
 
+local constants = require("constants")
+
 local util = require("scripts.util")
 
 local sort_checkbox = require("scripts.gui.main.components.common.sort-checkbox")
--- local train_row = require("scripts.gui.main.components.depots.train-row")
+local train_row = require("scripts.gui.main.components.depots.train-row")
 
 local component = {}
 
@@ -70,57 +72,20 @@ function component.update(player, player_table, state, refs)
   end
 
   local search_surface = state.search.surface
-  local scroll_pane = refs.depots.trains_list
+  local scroll_pane = refs.depots.trains_list_scroll_pane
 
---   util.gui_list(
---     scroll_pane,
---     util.sorted_iterator(train_ids, trains, state.depots["sort_"..selected_sort]),
---     function(train_data)
---       return search_surface == -1 or search_surface == train_data.main_locomotive.surface.index
---     end
---   )
-end
-
-local function generate_train_rows(state, depots_state, depot_data)
-  local trains = state.ltn_data.trains
-
-  -- get train IDs based on active sort
-  local selected_sort = depots_state.selected_sort
-  local train_ids
-  if selected_sort == "status" then
-    train_ids = depot_data.sorted_trains.status[state.player_index]
-  else
-    train_ids = depot_data.sorted_trains[selected_sort]
-  end
-  local selected_sort_state = depots_state["sort_"..depots_state.selected_sort]
-
-  -- search
-  local search_state = state.search
-  local search_surface = search_state.surface
-
-  -- iteration data
-  local start = selected_sort_state and 1 or #train_ids
-  local finish = selected_sort_state and #train_ids or 1
-  local step = selected_sort_state and 1 or -1
-
-  -- build train rows
-  local train_rows = {}
-  local index = 0
-  for i = start, finish, step do
-    local train_id = train_ids[i]
-    local train_data = trains[train_id]
-    local train_status = train_data.status[state.player_index]
-
-    -- test against search queries
-    if
-      search_surface == -1 or train_data.main_locomotive.surface.index == search_surface
-    then
-      index = index + 1
-      -- train_rows[index] = train_row(state, train_id, train_data, train_status)
-    end
-  end
-
-  return train_rows
+  util.gui_list(
+    scroll_pane,
+    {util.sorted_iterator(train_ids, trains, state.depots["sort_"..selected_sort])},
+    function(train_data)
+      return search_surface == -1 or search_surface == train_data.main_locomotive.surface.index
+    end,
+    train_row.build,
+    train_row.update,
+    constants.gui[player_table.translations.gui.locale_identifier].trains_list,
+    player.index,
+    player_table.translations
+  )
 end
 
 return component
