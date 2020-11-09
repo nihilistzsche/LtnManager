@@ -14,4 +14,17 @@ function component.build(width, black)
   )
 end
 
+function component.build_for_list()
+  return component.build(nil, true)
+end
+
+function component.update(count, name)
+  return (
+    {children = {
+      {elem_mods = {sprite = "flib_indicator_"..name}},
+      {elem_mods = {caption = count}}
+    }}
+  )
+end
+
 return component

@@ -1,5 +1,7 @@
 local gui = require("__flib__.gui-beta")
 
+local util = require("scripts.util")
+
 local status_indicator = require("scripts.gui.main.components.common.status-indicator")
 
 local component = {}
@@ -41,10 +43,10 @@ function component.build()
   )
 end
 
-function component.update(button, depot_name, depot_data, selected_depot)
+function component.update(depot_data, depot_name, _, selected_depot)
   local is_selected = depot_name == selected_depot
 
-  gui.update(button, (
+  return (
     {elem_mods = {enabled = not is_selected}, children = {
       {children = {
         {elem_mods = {caption = depot_name}},
@@ -56,20 +58,20 @@ function component.update(button, depot_name, depot_data, selected_depot)
           {},
           {
             cb = function(statuses_flow)
-              local children = statuses_flow.children
-              local i = 0
-              for name, count in pairs(depot_data.statuses) do
-                i = i + 1
-                local child = children[i]
-                if not child then
-                  child = gui.build(statuses_flow, {status_indicator.build(nil, true)}).flow
+              util.gui_list(
+                statuses_flow,
+                depot_data.statuses,
+                function() return true end,
+                status_indicator.build_for_list,
+                function(count, name)
+                  return (
+                    {children = {
+                      {elem_mods = {sprite = "flib_indicator_"..name}},
+                      {elem_mods = {caption = count}}
+                    }}
+                  )
                 end
-                child.icon.sprite = "flib_indicator_"..name
-                child.label.caption = count
-              end
-              for j = i + 1, #children do
-                children[j].destroy()
-              end
+              )
             end
           }
         }},
@@ -79,7 +81,7 @@ function component.update(button, depot_name, depot_data, selected_depot)
         }}
       }}
     }}
-  ))
+  )
 end
 
 return component

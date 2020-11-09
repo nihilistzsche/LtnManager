@@ -1,5 +1,7 @@
 local gui = require("__flib__.gui-beta")
 
+local util = require("scripts.util")
+
 local depot_button = require("scripts.gui.main.components.depots.depot-button")
 
 local component = {}
@@ -26,7 +28,7 @@ function component.init()
   return {} -- the default selected depot will be set in update()
 end
 
-function component.update(player, player_table, state, refs)
+function component.update(_, _, state, refs)
   -- set default selected depot
   if not state.depots.selected_depot then
     local first_depot = next(state.ltn_data.depots)
@@ -41,26 +43,23 @@ function component.update(player, player_table, state, refs)
   local selected_depot = state.depots.selected_depot
 
   local scroll_pane = refs.depots.depot_select
-  local children = scroll_pane.children
 
-  local i = 0
-  for depot_name, depot_data in pairs(state.ltn_data.depots) do
-    if
-      (surface_query == -1 or depot_data.surfaces[surface_query])
-      and bit32.btest(depot_data.network_id, search_network_id)
-      and string.find(string.lower(depot_name), search_query)
-    then
-      i = i + 1
-      local child = children[i]
-      if not child then
-        child = gui.build(scroll_pane, {depot_button.build()}).button
+  util.gui_list(
+    scroll_pane,
+    state.ltn_data.depots,
+    function(depot_data, depot_name)
+      if
+        (surface_query == -1 or depot_data.surfaces[surface_query])
+        and bit32.btest(depot_data.network_id, search_network_id)
+        and string.find(string.lower(depot_name), search_query)
+      then
+        return true
       end
-      depot_button.update(child, depot_name, depot_data, selected_depot)
-    end
-  end
-  for j = i + 1, #children do
-    children[j].destroy()
-  end
+    end,
+    depot_button.build,
+    depot_button.update,
+    selected_depot
+  )
 end
 
 return component
