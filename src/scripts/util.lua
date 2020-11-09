@@ -34,14 +34,14 @@ function util.generate_component_handlers(component_name, handlers)
   return new_handlers
 end
 
-function util.gui_list(parent, tbl_to_iterate, search, build, update, ...)
+function util.gui_list(parent, iterator, test, build, update, ...)
   local children = parent.children
   local i = 0
 
   -- create or update items
-  for k, v in pairs(tbl_to_iterate) do
-    local structure = search(v, k, i, ...)
-    if structure then
+  for k, v in table.unpack(iterator) do
+    local passed = test(v, k, i, ...)
+    if passed then
       i = i + 1
       local child = children[i]
       if not child then
@@ -56,6 +56,22 @@ function util.gui_list(parent, tbl_to_iterate, search, build, update, ...)
   for j = i + 1, #children do
     children[j].destroy()
   end
+end
+
+function util.sorted_iterator(arr, src_tbl, sort_state)
+  local step = sort_state and 1 or -1
+  local i = sort_state and 1 or #arr
+
+  return
+    function()
+      local j = i + step
+      if arr[j] then
+        i = j
+        local arr_value = arr[j]
+        return arr_value, src_tbl[arr_value]
+      end
+    end,
+    arr
 end
 
 return util

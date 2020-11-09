@@ -57,7 +57,7 @@ function component.update(depot_data, depot_name, _, selected_depot)
             cb = function(statuses_flow)
               util.gui_list(
                 statuses_flow,
-                depot_data.statuses,
+                {pairs(depot_data.statuses)},
                 function() return true end,
                 status_indicator.build_for_list,
                 function(count, name)

@@ -46,7 +46,7 @@ function component.update(_, _, state, refs)
 
   util.gui_list(
     scroll_pane,
-    state.ltn_data.depots,
+    {pairs(state.ltn_data.depots)},
     function(depot_data, depot_name)
       if
         (surface_query == -1 or depot_data.surfaces[surface_query])
