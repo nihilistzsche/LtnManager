@@ -1,5 +1,3 @@
-local gui = require("__flib__.gui-beta")
-
 local util = require("scripts.util")
 
 local status_indicator = require("scripts.gui.main.components.common.status-indicator")
@@ -14,7 +12,6 @@ function component.build()
       handlers = {
         on_click = "main_change_selected_depot",
       },
-      ref = {"button"},
       children = {
         {
           type = "flow",
