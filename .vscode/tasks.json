@@ -3,7 +3,7 @@
   "tasks": [
     {
       "type": "factorio",
-      "label": "Adjust mods",
+      "label": "Set minimal mods",
       "command": "adjustMods",
       "modsPath": "c:/Files/Development/Factorio/Testbenches/1/mods",
       "adjustMods": {

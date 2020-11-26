@@ -353,7 +353,7 @@ stations_tab.search_template = {
 function stations_tab.set_search_initial_state(player, player_table, gui_data)
   local stations_gui_data = gui_data.stations.search
   stations_gui_data.name_textfield.text = stations_gui_data.query
-  stations_gui_data.network_id_textfield.text = stations_gui_data.network_id
+  stations_gui_data.network_id_textfield.text = tostring(stations_gui_data.network_id)
   stations_gui_data.name_textfield.focus()
 end
 

@@ -262,7 +262,7 @@ history_tab.search_template = {
 function history_tab.set_search_initial_state(player, player_table, gui_data)
   local search_gui_data = gui_data.history.search
   search_gui_data.name_textfield.text = search_gui_data.query
-  search_gui_data.network_id_textfield.text = search_gui_data.network_id
+  search_gui_data.network_id_textfield.text = tostring(search_gui_data.network_id)
   search_gui_data.name_textfield.focus()
 end
 
