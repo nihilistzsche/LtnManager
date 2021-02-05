@@ -70,8 +70,20 @@ function main_gui.build(player, player_table)
               }
             },
             {type = "empty-widget", style = "flib_horizontal_pusher"},
-            -- TODO: network ID search
-            -- TODO: surface dropdown
+            {type = "label", style = "caption_label", caption = {"gui.ltnm-network-id-label"}},
+            {
+              type = "textfield",
+              style_mods = {left_margin = 8, width = 120},
+              numeric = true,
+              allow_negative = true,
+              clear_and_focus_on_right_click = true,
+              text = "-1",
+              ref = {"toolbar", "network_id_field"},
+              actions = {
+                on_text_changed = {gui = "main", action = "update_network_id_query"}
+              }
+            }
+            -- TODO: maybe surface dropdown?
           }},
           -- tabbed pane
           {type = "tabbed-pane", tabs = {
@@ -110,8 +122,10 @@ function main_gui.build(player, player_table)
     refs = refs,
     state = {
       auto_refresh = false,
+      network_id_query = -1,
       pinned = false,
       pinning = false,
+      search_query = "",
       visible = false
     }
   }
@@ -210,6 +224,12 @@ function main_gui.handle_action(e, msg)
       player.opened = refs.window
       refs.window.force_auto_center()
     end
+  elseif msg.action == "update_text_search_query" then
+    state.text_search_query = refs.toolbar.text_search_field.text
+    msg.refresh = true
+  elseif msg.action == "update_network_id_query" then
+    state.network_id_query = tonumber(refs.toolbar.network_id_field.text) or -1
+    msg.refresh = true
   end
 
   if msg.refresh then
