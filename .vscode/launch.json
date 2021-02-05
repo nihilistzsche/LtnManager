@@ -10,7 +10,7 @@
       "hookControl": ["LtnManager", "level", "Sandbox"],
       "hookData": false,
       "hookSettings": false,
-      "factorioArgs": ["--load-game", "${env:factorioTestbench1Saves}/LTN Manager/LTN Demo 1.13.x.zip"]
+      "factorioArgs": ["--load-scenario", "LTNM"]
     },
     {
       "type": "factoriomod",
@@ -19,7 +19,7 @@
       "factorioPath": "${env:factorioTestbench1}",
       "hookMode": "profile",
       "hookControl": ["LtnManager", "level", "Sandbox"],
-      "factorioArgs": ["--load-game", "${env:factorioTestbench1Saves}/LTN Manager/LTN Demo 1.13.x.zip"]
+      "factorioArgs": ["--load-scenario", "LTNM"]
     }
   ]
 }

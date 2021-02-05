@@ -1,4 +1,5 @@
 local event = require("__flib__.event")
+local gui = require("__flib__.gui-beta")
 local migration = require("__flib__.migration")
 local translation = require("__flib__.translation")
 
@@ -6,6 +7,8 @@ local global_data = require("scripts.global-data")
 local ltn_data = require("scripts.ltn-data")
 local migrations = require("scripts.migrations")
 local player_data = require("scripts.player-data")
+
+local main_gui = require("scripts.gui.main.base")
 
 -- -----------------------------------------------------------------------------
 -- COMMANDS
@@ -61,6 +64,17 @@ event.on_configuration_changed(function(e)
   end
 end)
 
+-- GUI
+
+gui.hook_events(function(e)
+  local msg = gui.read_action(e)
+  if msg then
+    if msg.gui == "main" then
+      main_gui.handle_action(e, msg)
+    end
+  end
+end)
+
 -- PLAYER
 
 event.on_player_created(function(e)
@@ -96,9 +110,13 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
     local player_table = global.players[e.player_index]
     local flags = player_table.flags
     if flags.can_open_gui then
-      -- TODO: open GUI
+      main_gui.toggle(player, player_table)
     else
-      -- TODO: close GUI if it is open (just in case)
+      -- close GUI if it is open (just in case)
+      local gui_data = player_table.guis.main
+      if gui_data and gui_data.state.visible == true then
+        main_gui.close(player, player_table)
+      end
       -- print warning message
       if flags.translations_finished then
         player.print{"ltnm-message.ltn-no-data"}
@@ -130,14 +148,16 @@ event.on_tick(function(e)
 
   if flags.updating_guis then
     local player_index = global.next_update_index
+    local player = game.get_player(player_index)
     local player_table = global.players[player_index]
     local player_flags = player_table.flags
     if player_flags.translations_finished and not player_flags.can_open_gui then
-      -- TODO: build GUI
+      main_gui.build(player, player_table)
     elseif
       player_table.flags.can_open_gui
-      and player_table.gui.main.state.base.visible
-      and player_table.gui.main.state.base.auto_refresh
+      -- TODO:
+      -- and player_table.gui.main.state.base.visible
+      -- and player_table.gui.main.state.base.auto_refresh
     then
       -- TODO: update GUI LTN data
     end
