@@ -61,20 +61,6 @@ constants.gui = {
   }
 }
 
-constants.input_sanitizers = {
-  ["%("] = "%%(",
-  ["%)"] = "%%)",
-  ["%.^[%*]"] = "%%.",
-  ["%+"] = "%%+",
-  ["%-"] = "%%-",
-  ["^[%.]%*"] = "%%*",
-  ["%?"] = "%%?",
-  ["%["] = "%%[",
-  ["%]"] = "%%]",
-  ["%^"] = "%%^",
-  ["%$"] = "%%$"
-}
-
 constants.ltn_control_signals = {
   ["ltn-depot"] = true,
   ["ltn-depot-priority"] = true,
@@ -105,7 +91,5 @@ constants.ltn_event_names = {
   on_requester_remaining_cargo = true,
   on_requester_unscheduled_cargo = true
 }
-
-constants.max_slot_table_height = 3
 
 return constants

@@ -1,5 +1,11 @@
 local gui = require("__flib__.gui-beta")
 
+local tabs = {}
+
+for _, tab_name in ipairs{"trains", "stations", "inventory", "history", "alerts"} do
+  tabs[tab_name] = require("scripts.gui.main."..tab_name)
+end
+
 local main_gui = {}
 
 function main_gui.build(player, player_table)
@@ -87,26 +93,11 @@ function main_gui.build(player, player_table)
           }},
           -- tabbed pane
           {type = "tabbed-pane", tabs = {
-            {
-              tab = {type = "tab", caption = {"gui.ltnm-trains"}, ref = {"trains", "tab"}},
-              content = {type = "empty-widget", style_mods = {width = 1000, height = 700}}
-            },
-            {
-              tab = {type = "tab", caption = {"gui.ltnm-stations"}, enabled = false, ref = {"stations", "tab"}},
-              content = {type = "empty-widget", style_mods = {width = 1000, height = 700}}
-            },
-            {
-              tab = {type = "tab", caption = {"gui.ltnm-inventory"}, enabled = false, ref = {"inventory", "tab"}},
-              content = {type = "empty-widget", style_mods = {width = 1000, height = 700}}
-            },
-            {
-              tab = {type = "tab", caption = {"gui.ltnm-history"}, enabled = false, ref = {"history", "tab"}},
-              content = {type = "empty-widget", style_mods = {width = 1000, height = 700}}
-            },
-            {
-              tab = {type = "tab", caption = {"gui.ltnm-alerts"}, enabled = false, ref = {"alerts", "tab"}},
-              content = {type = "empty-widget", style_mods = {width = 1000, height = 700}}
-            }
+            tabs.trains.build(),
+            tabs.stations.build(),
+            tabs.inventory.build(),
+            tabs.history.build(),
+            tabs.alerts.build(),
           }}
         }}
       }
