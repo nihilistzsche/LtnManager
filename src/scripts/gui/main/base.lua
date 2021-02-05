@@ -92,7 +92,7 @@ function main_gui.build(player, player_table)
             -- TODO: maybe surface dropdown?
           }},
           -- tabbed pane
-          {type = "tabbed-pane", tabs = {
+          {type = "tabbed-pane", style = "ltnm_tabbed_pane", tabs = {
             tabs.trains.build(),
             tabs.stations.build(),
             tabs.inventory.build(),

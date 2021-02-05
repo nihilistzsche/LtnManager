@@ -41,6 +41,17 @@ styles.ltnm_depot_button = {
   }
 }
 
+styles.ltnm_train_minimap_button = {
+	type = "button_style",
+	parent = "button",
+	size = 90,
+	default_graphical_set = {},
+	hovered_graphical_set = {
+		base = {position = {81, 80}, size = 1, opacity = 0.7},
+	},
+	clicked_graphical_set = {position = {70, 146}, size = 1, opacity = 0.7},
+}
+
 -- CHECKBOX STYLES
 
 -- inactive is grey until hovered
@@ -238,6 +249,13 @@ styles.ltnm_semibold_black_label = {
   parent = "bold_label",
   font = "default-semibold",
   font_color = button_default_font_color
+}
+
+-- MINIMAP STYLES
+
+styles.ltnm_train_minimap = {
+	type = "minimap_style",
+	size = 90
 }
 
 -- SCROLL PANE STYLES
