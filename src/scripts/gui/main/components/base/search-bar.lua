@@ -110,10 +110,4 @@ local function update_surface_query(e)
   -- TODO update searchable content
 end
 
-gui.add_handlers{
-  main_update_search_query = update_search_query,
-  main_update_network_id_query = update_network_id_query,
-  main_update_surface_query = update_surface_query
-}
-
 return component

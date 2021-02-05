@@ -1,4 +1,4 @@
-local gui = require("__flib__.gui-new")
+local gui = require("__flib__.gui-beta")
 local translation = require("__flib__.translation")
 
 return {

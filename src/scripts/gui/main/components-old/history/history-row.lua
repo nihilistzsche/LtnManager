@@ -1,4 +1,4 @@
-local gui = require("__flib__.gui-new")
+local gui = require("__flib__.gui-beta")
 local misc = require("__flib__.misc")
 
 local slot_table = require("scripts.gui.main.components.common.slot-table")

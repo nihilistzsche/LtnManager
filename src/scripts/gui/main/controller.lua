@@ -65,4 +65,13 @@ function main_gui.focus_search(gui_data)
   textfield.focus()
 end
 
+function main_gui.handle_action(msg, e)
+  local player = game.get_player(e.player_index)
+  local player_table = global.players[e.player_index]
+  local gui_data = player_table.gui.main
+  local refs = gui_data.refs
+  local state = gui_data.state
+
+end
+
 return main_gui

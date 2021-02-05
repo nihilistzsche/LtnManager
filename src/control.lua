@@ -65,7 +65,14 @@ end)
 
 -- GUI
 
-gui.hook_gui_events()
+gui.hook_events(function(e)
+  local msg = gui.read_action(e)
+  if msg then
+    if msg.gui == "main" then
+      main_gui.handle_action(msg, e)
+    end
+  end
+end)
 
 event.register("ltnm-search", function(e)
   local player_table = global.players[e.player_index]

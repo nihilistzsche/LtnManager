@@ -112,8 +112,4 @@ function component.update(player, player_table, state, refs)
   tabs[state.base.selected_tab].update(player, player_table, state, refs)
 end
 
-gui.add_handlers{
-  main_close = component.close
-}
-
 return component

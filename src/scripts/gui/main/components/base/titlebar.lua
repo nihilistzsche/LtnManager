@@ -23,7 +23,7 @@ local component = {}
 
 function component.build()
   return (
-    {type = "flow", ref = {"base", "titlebar_flow"}, children = {
+    {type = "flow", style = "flib_titlebar_flow", ref = {"base", "titlebar_flow"}, children = {
       {type = "label", style = "frame_title", caption = {"mod-name.LtnManager"}, ignored_by_interaction = true},
       {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
       {
@@ -97,10 +97,5 @@ local function handle_refresh_click(e)
     -- TODO
   end
 end
-
-gui.add_handlers{
-  main_toggle_pinned = toggle_pinned,
-  main_handle_refresh_click = handle_refresh_click
-}
 
 return component
