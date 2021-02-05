@@ -1,8 +1,9 @@
-local player_data = {}
-
+local table = require("__flib__.table")
 local translation = require("__flib__.translation")
 
-local main_gui = require("scripts.gui.main.controller")
+local constants = require("constants")
+
+local player_data = {}
 
 function player_data.init(player, index)
   local player_table = {
@@ -11,36 +12,16 @@ function player_data.init(player, index)
       translate_on_join = false,
       translations_finished = false
     },
-    gui = {},
+    guis = {},
     last_update = game.tick,
-    translations = {
-      gui = {},
-      materials = {},
-      virtual_signals = {}
-    }
+    translations = table.shallow_copy(constants.empty_translation_tables)
   }
   player.set_shortcut_available("ltnm-toggle-gui", false)
   global.players[index] = player_table
 end
 
-function player_data.update_settings(player, player_table)
-  local settings = {}
-  -- TODO
-  -- for name, t in pairs(player.mod_settings) do
-  --   if string.sub(name, 1,5) == "ltnm-" then
-  --     name = string.gsub(name, "ltnm%-", "")
-  --     settings[string.gsub(name, "%-", "_")] = t.value
-  --   end
-  -- end
-  player_table.settings = settings
-end
-
 function player_data.refresh(player, player_table)
-  -- close and destroy GUI
-  if player_table.gui.main then
-    main_gui.update({comp = "base", action = "close"}, {player_index = player.index})
-    main_gui.destroy(player, player_table)
-  end
+  -- TODO: destroy GUIs
 
   -- set flags
   player_table.flags.can_open_gui = false
@@ -50,15 +31,8 @@ function player_data.refresh(player, player_table)
   player.set_shortcut_toggled("ltnm-toggle-gui", false)
   player.set_shortcut_available("ltnm-toggle-gui", false)
 
-  -- update settings
-  player_data.update_settings(player, player_table)
-
   -- run translations
-  player_table.translations = {
-    gui = {},
-    materials = {},
-    virtual_signals = {}
-  }
+  player_table.translations = table.shallow_copy(constants.empty_translation_tables)
   if player.connected then
     player_data.start_translations(player.index)
   else

@@ -1,14 +1,5 @@
 local constants = {}
 
-if script then
-  local event = require("__flib__.event")
-
-  constants.events = {
-    close_main_gui = event.generate_id(),
-    update_main_gui = event.generate_id()
-  }
-end
-
 constants.colors = {
   green = {
     str = "69, 255, 69",
@@ -34,6 +25,12 @@ constants.colors = {
     str = "255, 255, 255",
     tbl = {255, 255, 255}
   }
+}
+
+constants.empty_translation_tables = {
+  gui = {},
+  materials = {},
+  virtual_signals = {}
 }
 
 -- dictionary locale identifier -> dictionary of hardcoded GUI sizes
