@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.11
-Date: ????
+Date: 2021-08-08
   Changes:
     - Removed the "ALPHA" label from the mod, since it is effectively complete
     - Updated to flib 0.8.0 to fix a crash
