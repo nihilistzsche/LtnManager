@@ -219,7 +219,7 @@ styles.ltnm_titlebar_drag_handle = {
   height = 24,
   minimal_width = 24,
   left_margin = -1,
-  right_margin = 7
+  right_margin = 2
 }
 
 -- -----------------------------------------------------------------------------
@@ -306,9 +306,10 @@ styles.ltnm_titlebar_right_frame = {
       draw_type = "outer"
     }
   },
-  -- horizontal_flow_style = {
-  --   type = "horizontal_flow_style",
-  -- }
+  horizontal_flow_style = {
+    type = "horizontal_flow_style",
+    horizontal_spacing = 8,
+  }
 }
 
 styles.ltnm_main_content_frame = {

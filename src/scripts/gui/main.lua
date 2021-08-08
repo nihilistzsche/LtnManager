@@ -235,8 +235,12 @@ function main_gui.create(player, player_table)
             {template = "mock_frame_tab", caption = {"ltnm-gui.history"}, save_as = "tabbed_pane.tabs.history"},
             {template = "mock_frame_tab", caption = {"ltnm-gui.alerts"}, save_as = "tabbed_pane.tabs.alerts"},
           }},
-          {type = "frame", style = "ltnm_titlebar_right_frame", children = {
-            {type = "empty-widget", style = "ltnm_titlebar_drag_handle", save_as = "titlebar.drag_handle"},
+          {type = "frame", style = "ltnm_titlebar_right_frame", save_as = "titlebar.frame", children = {
+            {
+              type = "empty-widget",
+              style = "ltnm_titlebar_drag_handle",
+              ignored_by_interaction = true
+            },
             {
               template = "frame_action_button",
               sprite = "utility/search_white",
@@ -343,7 +347,7 @@ function main_gui.create(player, player_table)
     gui_data.window.frame.force_auto_center()
   end
 
-  gui_data.titlebar.drag_handle.drag_target = gui_data.window.frame
+  gui_data.titlebar.frame.drag_target = gui_data.window.frame
   gui_data.window.frame.visible = false
 
   player_table.gui.main = gui_data
