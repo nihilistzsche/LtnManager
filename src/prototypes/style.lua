@@ -442,18 +442,6 @@ styles.ltnm_material_icon = {
   left_margin = 2
 }
 
-styles.ltnm_status_icon = {
-  type = "image_style",
-  stretch_image_to_widget_size = true,
-  size = 14
-}
-
-styles.ltnm_station_status_icon = {
-  type = "image_style",
-  parent = "ltnm_status_icon",
-  left_margin = 2
-}
-
 -- -----------------------------------------------------------------------------
 -- LABEL STYLES
 

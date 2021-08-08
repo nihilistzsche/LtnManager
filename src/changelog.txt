@@ -2,6 +2,10 @@
 Version: 0.3.11
 Date: ????
   Changes:
+    - Removed the "ALPHA" label from the mod, since it is effectively complete
+    - Updated to flib 0.8.0 to fix a crash
+    - Updated status indicators to use the vanilla sprites
+    - Updated various GUI styles to modern standards
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.10
 Date: 2020-11-26

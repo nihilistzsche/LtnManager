@@ -29,8 +29,9 @@ gui.add_templates{
     }
   ),
   status_indicator = function(name, color, value)
-    return {type = "flow", style_mods = {vertical_align = "center"}, children = {
-      {type = "sprite", style = "ltnm_status_icon", sprite = "ltnm_indicator_"..color, save_as = name.."_circle"},
+    local actual_color = string.gsub(color, "signal%-", "")
+    return {type = "flow", style = "flib_indicator_flow", children = {
+      {type = "sprite", style = "flib_indicator", sprite = "flib_indicator_"..actual_color, save_as = name.."_circle"},
       {type = "label", style = "ltnm_depot_button_label", caption = value, save_as = name.."_label"}
     }}
   end,
