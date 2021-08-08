@@ -77,6 +77,7 @@ gui.add_handlers{
           local window_data = player_table.gui.main.window
           if player_table.settings.keep_gui_open then
             e.element.style = "frame_action_button"
+            e.element.sprite = "ltnm_pin_white"
             player_table.settings.keep_gui_open = false
             window_data.frame.force_auto_center()
             if player_table.flags.search_open then
@@ -86,7 +87,8 @@ gui.add_handlers{
               player.opened = window_data.frame
             end
           else
-            e.element.style = "ltnm_active_frame_action_button"
+            e.element.style = "flib_selected_frame_action_button"
+            e.element.sprite = "ltnm_pin_black"
             player_table.settings.keep_gui_open = true
             window_data.frame.auto_center = false
             player.opened = nil
@@ -100,9 +102,11 @@ gui.add_handlers{
             if settings.auto_refresh then
               player_data.set_setting(e.player_index, "auto-refresh", false)
               e.element.style = "frame_action_button"
+              e.element.sprite = "ltnm_refresh_white"
             else
               player_data.set_setting(e.player_index, "auto-refresh", true)
-              e.element.style = "ltnm_active_frame_action_button"
+              e.element.style = "flib_selected_frame_action_button"
+              e.element.sprite = "ltnm_refresh_black"
             end
           else
             main_gui.update_active_tab(game.get_player(e.player_index), global.players[e.player_index])
@@ -321,16 +325,20 @@ function main_gui.create(player, player_table)
 
   -- auto-refresh
   if player_table.settings.auto_refresh then
-    gui_data.titlebar.refresh_button.style = "ltnm_active_frame_action_button"
+    gui_data.titlebar.refresh_button.style = "flib_selected_frame_action_button"
+    gui_data.titlebar.refresh_button.sprite = "ltnm_refresh_black"
   else
     gui_data.titlebar.refresh_button.style = "frame_action_button"
+    gui_data.titlebar.refresh_button.sprite = "ltnm_refresh_white"
   end
 
   -- pinned
   if player_table.settings.keep_gui_open then
-    gui_data.titlebar.pin_button.style = "ltnm_active_frame_action_button"
+    gui_data.titlebar.pin_button.style = "flib_selected_frame_action_button"
+    gui_data.titlebar.pin_button.sprite = "ltnm_pin_black"
   else
     gui_data.titlebar.pin_button.style = "frame_action_button"
+    gui_data.titlebar.pin_button.sprite = "ltnm_pin_white"
     -- center window
     gui_data.window.frame.force_auto_center()
   end
@@ -474,7 +482,8 @@ end
 function main_gui.open_search(player, player_table, gui_data, skip_update)
   local selected_tab = gui_data.tabbed_pane.selected
 
-  gui_data.titlebar.search_button.style = "ltnm_active_frame_action_button"
+  gui_data.titlebar.search_button.style = "flib_selected_frame_action_button"
+  gui_data.titlebar.search_button.sprite = "utility/search_black"
 
   -- set initial state
   tabs[selected_tab].set_search_initial_state(player, player_table, gui_data)
@@ -521,6 +530,7 @@ function main_gui.close_search(player, player_table, gui_data, skip_update)
     end
 
     gui_data.titlebar.search_button.style = "frame_action_button"
+    gui_data.titlebar.search_button.sprite = "utility/search_white"
 
     if not skip_update then
       main_gui.update_active_tab(player, player_table)
