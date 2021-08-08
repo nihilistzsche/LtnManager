@@ -1,6 +1,6 @@
 local alerts_tab = {}
 
-local gui = require("__flib__.gui")
+local gui = require("lib.gui")
 local util = require("scripts.util")
 
 local string_find = string.find

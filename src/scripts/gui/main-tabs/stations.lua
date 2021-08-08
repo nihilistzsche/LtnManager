@@ -1,6 +1,6 @@
 local stations_tab = {}
 
-local gui = require("__flib__.gui")
+local gui = require("lib.gui")
 local util = require("scripts.util")
 
 local constants = require("constants")

@@ -1,6 +1,6 @@
 local main_gui = {}
 
-local gui = require("__flib__.gui")
+local gui = require("lib.gui")
 
 local constants = require("constants")
 local player_data = require("scripts.player-data")

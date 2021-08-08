@@ -1,5 +1,5 @@
 local event = require("__flib__.event")
-local gui = require("__flib__.gui")
+local gui = require("lib.gui")
 local migration = require("__flib__.migration")
 local translation = require("__flib__.translation")
 

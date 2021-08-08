@@ -1,4 +1,4 @@
-local gui = require("__flib__.gui")
+local gui = require("lib.gui")
 local translation = require("__flib__.translation")
 
 return {
