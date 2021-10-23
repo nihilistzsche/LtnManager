@@ -99,7 +99,7 @@ end)
 
 -- SHORTCUT
 
-event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e) --- @type CustomInputEvent|on_lua_shortcut
+event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
   if e.input_name or (e.prototype_name == "ltnm-toggle-gui") then
     local player = game.get_player(e.player_index)
     local player_table = global.players[e.player_index]
