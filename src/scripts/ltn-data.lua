@@ -448,7 +448,7 @@ local function generate_train_statuses(working_data, iterations_per_tick)
     function(_, key)
       return per_player_next(players, trains, key, function(player, train)
         return {
-          translations = players[player].translations.gui,
+          translations = players[player].dictionaries.gui,
           train = trains[train]
         }
       end)
@@ -536,7 +536,7 @@ local function generate_station_search_strings(working_data)
         return {
           station = stations[station],
           player_index = player,
-          translations = players[player].translations,
+          translations = players[player].dictionaries,
         }
       end)
     end
@@ -719,7 +719,7 @@ local function generate_history_search_strings(working_data)
         return {
           history = history[history_index],
           player_index = player,
-          translations = players[player].translations.materials,
+          translations = players[player].dictionaries.materials,
         }
       end)
     end

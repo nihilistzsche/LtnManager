@@ -1,7 +1,7 @@
 local event = require("__flib__.event")
-local gui = require("__flib__.gui-beta")
+local dictionary = require("__flib__.dictionary")
+local gui = require("__flib__.gui")
 local migration = require("__flib__.migration")
-local translation = require("__flib__.translation")
 
 local global_data = require("scripts.global-data")
 local ltn_data = require("scripts.ltn-data")
@@ -31,9 +31,11 @@ commands.add_command("LtnManager", {"ltnm-message.command-help"},
 -- BOOTSTRAP
 
 event.on_init(function()
-  translation.init()
+  dictionary.init()
 
   global_data.init()
+  global_data.build_dictionaries()
+
   ltn_data.init()
   ltn_data.connect()
 
@@ -41,24 +43,21 @@ event.on_init(function()
     player_data.init(player, i)
     player_data.refresh(player, global.players[i])
   end
-
 end)
 
 event.on_load(function()
+  dictionary.load()
   ltn_data.connect()
 end)
 
 event.on_configuration_changed(function(e)
   if migration.on_config_changed(e, migrations) then
-    -- migrate flib modules
-    translation.init()
-    -- update translation data
+    dictionary.init()
+
     global_data.build_translations()
-    -- reset LTN data
     ltn_data.init()
-    -- refresh all player information
+
     for i, player in pairs(game.players) do
-      -- refresh data
       player_data.refresh(player, global.players[i])
     end
   end
@@ -88,23 +87,19 @@ event.on_player_removed(function(e)
 end)
 
 event.on_player_joined_game(function(e)
-  local player_table = global.players[e.player_index]
-  if player_table.flags.translate_on_join then
-    player_table.flags.translate_on_join = false
-    player_data.start_translations(e.player_index)
+  local player = game.get_player(e.player_index)
+  if player.connected then
+    dictionary.translate(player)
   end
 end)
 
 event.on_player_left_game(function(e)
-  if translation.is_translating(e.player_index) then
-    translation.cancel(e.player_index)
-    global.players[e.player_index].flags.translate_on_join = true
-  end
+  dictionary.cancel_translation(e.player_index)
 end)
 
 -- SHORTCUT
 
-event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
+event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e) --- @type CustomInputEvent|on_lua_shortcut
   if e.input_name or (e.prototype_name == "ltnm-toggle-gui") then
     local player = game.get_player(e.player_index)
     local player_table = global.players[e.player_index]
@@ -172,27 +167,27 @@ event.on_tick(function(e)
     end
   end
 
-  if translation.translating_players_count() > 0 then
-    translation.iterate_batch(e)
-  end
+  dictionary.check_skipped()
 end)
 
 -- TRANSLATIONS
 
 event.on_string_translated(function(e)
-  local names, finished = translation.process_result(e)
-  local player_table = global.players[e.player_index]
-  if names then
-    local translations = player_table.translations
-    for dictionary_name, internal_names in pairs(names) do
-      local dictionary = translations[dictionary_name]
-      for i = 1, #internal_names do
-        dictionary[internal_names[i]] = e.translated and e.result or internal_names[i]
+  local language_data = dictionary.process_translation(e)
+  if language_data then
+    for _, player_index in pairs(language_data.players) do
+      local player_table = global.players[player_index]
+      -- If the player already has a language, replace it and rebuild the GUI
+      if player_table.dictionaries and (player_table.language or "") ~= language_data.language then
+        player_table.language = language_data.language
+        player_table.dictionaries = language_data.dictionaries
+        -- TODO: Refresh GUI
+      elseif not player_table.flags.can_open_gui then
+        player_table.language = language_data.language
+        player_table.dictionaries = language_data.dictionaries
+        -- Enable opening the GUI on the next LTN update cycle
+        player_table.flags.translations_finished = true
       end
     end
-  end
-  if finished then
-    -- enable opening the GUI on the next LTN update cycle
-    player_table.flags.translations_finished = true
   end
 end)
