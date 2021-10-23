@@ -170,7 +170,7 @@ styles.ltnm_small_slot_table_frame = {
   }
 }
 
-styles.ltnm_table_row_frame = {
+styles.ltnm_table_row_frame_even = {
   type = "frame_style",
   parent = "statistics_table_item_frame",
   top_padding = 2,
@@ -182,9 +182,19 @@ styles.ltnm_table_row_frame = {
     type = "horizontal_flow_style",
     vertical_align = "center",
     horizontal_spacing = 10,
-  }
+  },
+  graphical_set = {
+    base = {
+      center = {position = {472, 25}, size = {1, 1}}
+    },
+  },
 }
 
+styles.ltnm_table_row_frame_odd = {
+  type = "frame_style",
+  parent = "ltnm_table_row_frame_even",
+  graphical_set = {},
+}
 styles.ltnm_table_toolbar_frame = {
   type = "frame_style",
   parent = "subheader_frame",

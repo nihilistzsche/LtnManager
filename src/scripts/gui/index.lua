@@ -1,6 +1,7 @@
 local gui = require("__flib__.gui")
 
-local actions = require("scripts.gui.actions")
+local actions = require("actions")
+local templates = require("templates")
 
 -- Object methods
 
@@ -78,20 +79,6 @@ end
 
 local index = {}
 
-local function frame_action_button(sprite, tooltip, ref, action)
-  return {
-    type = "sprite-button",
-    style = "frame_action_button",
-    sprite = sprite.."_white",
-    hovered_sprite = sprite.."_black",
-    clicked_sprite = sprite.."_black",
-    mouse_button_filter = {"left"},
-    tooltip = tooltip,
-    ref = ref,
-    actions = {on_click = action},
-  }
-end
-
 function index.build(player, player_table)
   local refs = gui.build(player.gui.screen,{
     {
@@ -111,19 +98,19 @@ function index.build(player, player_table)
         },
         {type = "label", style = "frame_title", caption = {"mod-name.LtnManager"}, ignored_by_interaction = true},
         {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
-        frame_action_button(
+        templates.frame_action_button(
           "ltnm_pin",
           {"gui.ltnm-keep-open"},
           {"titlebar", "pin_button"},
           {gui = "main", action = "toggle_pinned"}
         ),
-        frame_action_button(
+        templates.frame_action_button(
           "ltnm_refresh",
           {"gui.ltnm-refresh-tooltip"},
           {"titlebar", "refresh_button"},
           {gui = "main", transform = "handle_refresh_click"}
         ),
-        frame_action_button(
+        templates.frame_action_button(
           "utility/close",
           {"gui.close-instruction"},
           nil,
@@ -165,7 +152,41 @@ function index.build(player, player_table)
               style = "deep_frame_in_shallow_frame",
               style_mods = {size = {800, 500}},
               direction = "vertical",
-              -- {type = "frame", style = "ltnm_toolbar_frame",
+              {type = "frame", style = "ltnm_table_toolbar_frame",
+                templates.sort_checkbox(
+                  {"gui.ltnm-depot"},
+                  false,
+                  {"trains", "toolbar", "depot_checkbox"},
+                  {gui = "main", tab = "trains", action = "toggle_sort", sort = "depot"}
+                ),
+                templates.sort_checkbox(
+                  {"gui.ltnm-composition"},
+                  false,
+                  {"trains", "toolbar", "composition_checkbox"},
+                  {gui = "main", tab = "trains", action = "toggle_sort", sort = "composition"}
+                ),
+                templates.sort_checkbox(
+                  {"gui.ltnm-status"},
+                  false,
+                  {"trains", "toolbar", "status_checkbox"},
+                  {gui = "main", tab = "trains", action = "toggle_sort", sort = "status"}
+                ),
+                templates.sort_checkbox(
+                  {"gui.ltnm-shipment"},
+                  false,
+                  {"trains", "toolbar", "shipment_checkbox"},
+                  {gui = "main", tab = "trains", action = "toggle_sort", sort = "shipment"}
+                ),
+                {type = "empty-widget", style = "flib_horizontal_pusher"},
+              },
+              {type = "frame", style = "ltnm_table_row_frame_even",
+                {type = "frame", style = "slot_button_deep_frame", {type = "sprite-button", style = "flib_standalone_slot_button_default"}},
+                {type = "empty-widget", style = "flib_horizontal_pusher"},
+              },
+              {type = "frame", style = "ltnm_table_row_frame_odd",
+                {type = "frame", style = "slot_button_deep_frame", {type = "sprite-button", style = "flib_standalone_slot_button_default"}},
+                {type = "empty-widget", style = "flib_horizontal_pusher"},
+              },
             },
           },
         }
