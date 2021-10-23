@@ -57,6 +57,10 @@ function Index:dispatch(msg, e)
     else
       msg.refresh = true
     end
+  elseif msg.transform == "handle_titlebar_click" then
+    if e.button == defines.mouse_button_type.middle then
+      msg.action = "recenter"
+    end
   end
 
   -- Dispatch the associated action
@@ -102,6 +106,9 @@ function index.build(player, player_table)
         type = "flow",
         style = "flib_titlebar_flow",
         ref = {"titlebar", "flow"},
+        actions = {
+          on_click = {gui = "main", transform = "handle_titlebar_click"},
+        },
         {type = "label", style = "frame_title", caption = {"mod-name.LtnManager"}, ignored_by_interaction = true},
         {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
         frame_action_button(
@@ -151,7 +158,17 @@ function index.build(player, player_table)
           }
           -- TODO: maybe surface dropdown?
         },
-        {type = "tabbed-pane", style = "ltnm_tabbed_pane"}
+        {type = "tabbed-pane", style = "ltnm_tabbed_pane",
+          {tab = {type = "tab", caption = {"gui.ltnm-trains"}}, content =
+            {
+              type = "frame",
+              style = "deep_frame_in_shallow_frame",
+              style_mods = {size = {800, 500}},
+              direction = "vertical",
+              -- {type = "frame", style = "ltnm_toolbar_frame",
+            },
+          },
+        }
       }
     }
   })

@@ -14,6 +14,10 @@ function actions.close(self)
   self:close()
 end
 
+function actions.recenter(self)
+  self.refs.window.force_auto_center()
+end
+
 function actions.toggle_auto_refresh(self)
   self.state.auto_refresh = not self.state.auto_refresh
   toggle_fab(self.refs.titlebar.refresh_button, "ltnm_refresh", self.state.auto_refresh)
