@@ -5,7 +5,7 @@
       "type": "factoriomod",
       "request": "launch",
       "name": "Debug",
-      "factorioPath": "${env:factorioTestbench1}",
+      "factorioPath": "/home/rai/dev/factorio/1/bin/x64/factorio",
       "hookMode": "debug",
       "hookControl": ["LtnManager", "level", "Sandbox"],
       "hookData": false,
@@ -16,7 +16,7 @@
       "type": "factoriomod",
       "request": "launch",
       "name": "Profile",
-      "factorioPath": "${env:factorioTestbench1}",
+      "factorioPath": "/home/rai/dev/factorio/1/bin/x64/factorio",
       "hookMode": "profile",
       "hookControl": ["LtnManager", "level", "Sandbox"],
       "factorioArgs": ["--load-scenario", "LTNM"]

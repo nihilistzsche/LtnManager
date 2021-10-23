@@ -8,6 +8,32 @@ Date: ????
     - In most places, the GUI will now update its contents instead of destroying and rebuilding them
     - Search is now universal across all tabs
 ---------------------------------------------------------------------------------------------------
+Version: 0.3.11
+Date: 2021-08-08
+  Changes:
+    - Removed the "ALPHA" label from the mod, since it is effectively complete
+    - Updated to flib 0.8.0 to fix a crash
+    - Updated status indicators to use the vanilla sprites
+    - Updated various GUI styles to modern standards
+---------------------------------------------------------------------------------------------------
+Version: 0.3.10
+Date: 2020-11-26
+  Changes:
+    - Updated to Factorio 1.1
+---------------------------------------------------------------------------------------------------
+Version: 0.3.9
+Date: 2020-10-29
+  Bugfixes:
+    - Fixed a crash when a player would be removed between LTN data iteration and GUI updating
+---------------------------------------------------------------------------------------------------
+Version: 0.3.8
+Date: 2020-10-22
+  Bugfixes:
+    - Fixed a crash related to LTN data desyncing
+    - Fixed a crash when a player's translations would finish in the middle of LTN data iteration
+    - Fixed that clicking a requester station on the inventory screen would open the shipment's provider station instead
+    - Fixed the clear all alerts button clearing all alerts for the rest of time
+---------------------------------------------------------------------------------------------------
 Version: 0.3.7
 Date: 2020-10-02
   Bugfixes:

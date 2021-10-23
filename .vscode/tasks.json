@@ -3,9 +3,9 @@
   "tasks": [
     {
       "type": "factorio",
-      "label": "Adjust mods",
+      "label": "Set minimal mods",
       "command": "adjustMods",
-      "modsPath": "c:/Files/Development/Factorio/Testbenches/1/mods",
+      "modsPath": "/home/rai/dev/factorio/linked/mods",
       "adjustMods": {
         "EditorExtensions": true,
         "flib": true,
