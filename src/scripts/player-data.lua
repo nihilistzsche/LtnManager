@@ -18,9 +18,11 @@ function player_data.init(player, index)
 end
 
 function player_data.refresh(player, player_table)
-  -- TODO: destroy GUIs
+  local Gui = player_table.guis.main
+  if Gui then
+    Gui:destroy()
+  end
 
-  -- set flags
   player_table.flags.can_open_gui = false
   player_table.flags.translations_finished = false
 

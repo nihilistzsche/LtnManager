@@ -8,7 +8,7 @@ local ltn_data = require("scripts.ltn-data")
 local migrations = require("scripts.migrations")
 local player_data = require("scripts.player-data")
 
-local main_gui = require("scripts.gui.main.base")
+local main_gui = require("scripts.gui.index")
 
 -- -----------------------------------------------------------------------------
 -- COMMANDS
@@ -69,7 +69,10 @@ gui.hook_events(function(e)
   local msg = gui.read_action(e)
   if msg then
     if msg.gui == "main" then
-      main_gui.handle_action(e, msg)
+      local Gui = global.players[e.player_index].guis.main
+      if Gui and Gui.refs.window.valid then
+        Gui:dispatch(msg, e)
+      end
     end
   end
 end)
@@ -104,15 +107,13 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
     local player = game.get_player(e.player_index)
     local player_table = global.players[e.player_index]
     local flags = player_table.flags
+    local Gui = main_gui.get(e.player_index)
     if flags.can_open_gui then
-      main_gui.toggle(player, player_table)
+      Gui:toggle()
     else
-      -- close GUI if it is open (just in case)
-      local gui_data = player_table.guis.main
-      if gui_data and gui_data.state.visible == true then
-        main_gui.close(player, player_table)
+      if Gui.state.visible then
+        Gui:close()
       end
-      -- print warning message
       if flags.translations_finished then
         player.print{"ltnm-message.ltn-no-data"}
       else
@@ -146,18 +147,17 @@ event.on_tick(function(e)
     local player = game.get_player(player_index)
     local player_table = global.players[player_index]
     local player_flags = player_table.flags
-    if player_flags.translations_finished and not player_flags.can_open_gui then
-      main_gui.build(player, player_table)
-    elseif
-      player_table.flags.can_open_gui
-      -- TODO:
-      -- and player_table.gui.main.state.base.visible
-      -- and player_table.gui.main.state.base.auto_refresh
-    then
-      -- TODO: update GUI LTN data
+    if player_flags.translations_finished then
+      if player_flags.can_open_gui then
+        local Gui = main_gui.get(player_index)
+        if Gui.state.visible and Gui.state.auto_refresh then
+          -- TODO: Update GUI
+        end
+      else
+        main_gui.build(player, player_table)
+      end
     end
 
-    -- get and save next index, or stop iteration
     local next_index = next(global.players, global.next_update_index)
     if next_index then
       global.next_update_index = next_index
