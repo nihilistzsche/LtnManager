@@ -196,10 +196,12 @@ function index.build(player, player_table)
     state = {
       active_tab = "trains",
       closing = false,
+      do_update = false,
       network_id = -1,
       surface = false,
       pinned = false,
       search_query = "",
+      visible = false,
     },
   }
   setmetatable(Gui, {__index = Index})
