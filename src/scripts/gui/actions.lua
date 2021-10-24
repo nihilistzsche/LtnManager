@@ -73,4 +73,26 @@ function actions.open_station_gui(self, msg)
   self.player.opened = station_data.entity
 end
 
+function actions.toggle_sort(self, msg, e)
+  local tab = msg.tab
+  local column = msg.column
+
+  local sorts = self.state.sorts[tab]
+  local active_column = sorts._active
+  if active_column == column then
+    sorts[column] = e.element.state
+  else
+    sorts._active = column
+    e.element.state = sorts[column]
+
+    local old_checkbox = self.refs[tab].toolbar[active_column.."_checkbox"]
+    old_checkbox.style = "ltnm_sort_checkbox"
+    old_checkbox.style.width = self.widths[tab][active_column]
+    e.element.style = "ltnm_selected_sort_checkbox"
+    e.element.style.width = self.widths[tab][column]
+  end
+
+  self:schedule_update()
+end
+
 return actions

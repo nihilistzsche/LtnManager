@@ -221,11 +221,21 @@ function index.build(player, player_table)
       do_update = false,
       ltn_data = global.data,
       network_id = -1,
+      sorts = {
+        trains = {
+          _active = "status",
+          status = false,
+          composition = false,
+          depot = false,
+          shipment = false,
+        }
+      },
       surface = false,
       pinned = false,
       search_query = "",
       visible = false,
     },
+    widths = widths,
   }
   setmetatable(Gui, {__index = Index})
 
