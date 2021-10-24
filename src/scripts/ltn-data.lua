@@ -436,7 +436,7 @@ end
 
 local function generate_train_statuses(working_data, iterations_per_tick)
   local players = global.players
-  local trains  = working_data.trains
+  local trains = working_data.trains
 
   return table.for_n_of(
     {},
@@ -457,47 +457,66 @@ local function generate_train_statuses(working_data, iterations_per_tick)
   )
 end
 
-local function sort_depot_trains_by_composition(working_data)
-  local trains = working_data.trains
-  return table.for_n_of(working_data.depots, working_data.key, 1, function(depot)
-    table.sort(depot.sorted_trains.composition, function(id_1, id_2)
-      return trains[id_1].composition < trains[id_2].composition
-    end)
-  end)
+local function sort_trains_by_status(working_data)
+  -- local players = global.players
+  -- local trains = working_data.trains
+
+  -- local train_ids = {}
+  -- for train_id in pairs(working_data.trains) do
+  --   table.insert(train_ids, train_id)
+  -- end
+
+  -- return table.for_n_of(
+  --   players,
+  --   working_data.key,
+  --   1,
+  --   function(_, player_index)
+  --     local train_ids = table.array_copy(train_ids)
+
+  --     -- TODO: This is bad
+  --     table.sort(train_ids, function(id_1, id_2)
+  --       return trains[id_1].status[player_index].string < trains[id_2].status[player_index].string
+  --     end)
+
+  --     working_data.sorted_trains.status[player_index] = train_ids
+  --   end
+  -- )
 end
 
-local function sort_depot_trains_by_status(working_data)
-  local players = global.players
-  local depots = working_data.depots
+local function sort_trains_by_composition(working_data, iterations_per_tick)
   local trains = working_data.trains
-
-  return table.for_n_of(
-    {},
+  return table.partial_sort(
+    working_data.sorted_trains.composition,
     working_data.key,
-    1,
-    function(depot_data, key)
-      local train_ids = table.array_copy(depot_data.train_ids)
-      local player_index = key.player
-
-      table.sort(train_ids, function(id_1, id_2)
-        return trains[id_1].status[player_index].string < trains[id_2].status[player_index].string
-      end)
-
-      depot_data.sorted_trains.status[player_index] = train_ids
-    end,
-    function(_, key)
-      return per_player_next(players, depots, key, function(_, depot) return depots[depot] end)
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
+      return trains[id_1].composition < trains[id_2].composition
     end
   )
 end
 
-local function sort_depot_trains_by_shipment(working_data)
+local function sort_trains_by_depot(working_data, iterations_per_tick)
   local trains = working_data.trains
-  return table.for_n_of(working_data.depots, working_data.key, 1, function(depot)
-    table.sort(depot.sorted_trains.shipment, function(id_1, id_2)
+  return table.partial_sort(
+    working_data.sorted_trains.depot,
+    working_data.key,
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
+      return trains[id_1].depot < trains[id_2].depot
+    end
+  )
+end
+
+local function sort_trains_by_shipment(working_data, iterations_per_tick)
+  local trains = working_data.trains
+  return table.partial_sort(
+    working_data.sorted_trains.shipment,
+    working_data.key,
+    math.ceil(iterations_per_tick / 2),
+    function(id_1, id_2)
       return trains[id_1].shipment_count < trains[id_2].shipment_count
-    end)
-  end)
+    end
+  )
 end
 
 local function generate_train_search_strings(working_data)
@@ -921,9 +940,10 @@ function ltn_data.iterate()
     iterate_trains,
     iterate_in_transit,
     generate_train_statuses,
-    sort_depot_trains_by_composition,
-    sort_depot_trains_by_status,
-    sort_depot_trains_by_shipment,
+    sort_trains_by_status,
+    sort_trains_by_composition,
+    sort_trains_by_depot,
+    sort_trains_by_shipment,
     generate_train_search_strings,
     generate_station_search_strings,
     sort_stations_by_name,
@@ -1012,6 +1032,12 @@ function ltn_data.on_dispatcher_updated(e)
   -- lookup tables
   working_data.surfaces = {}
   -- sorting tables
+  working_data.sorted_trains = {
+    status ={},
+    composition = {},
+    depot = {},
+    shipment = {},
+  }
   working_data.sorted_stations = {
     name = {},
     status = {},

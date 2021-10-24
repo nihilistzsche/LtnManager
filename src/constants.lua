@@ -35,7 +35,7 @@ constants.gui = {
       status = 250,
       composition = 120,
       depot = 100,
-      contents = 36 * 4,
+      shipment = 36 * 4,
     },
     -- stations_list = {
     --   name = 232,

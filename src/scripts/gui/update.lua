@@ -18,6 +18,8 @@ return function(self)
     local i = 0
     local scroll_pane = self.refs.trains.scroll_pane
     local children = scroll_pane.children
+
+    local sorted_trains = state.ltn_data.sorted_trains
     for train_id, train_data in pairs(ltn_trains) do
       if train_data.train.valid and train_data.main_locomotive.valid then
         if

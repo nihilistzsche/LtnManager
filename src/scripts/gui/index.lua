@@ -195,7 +195,7 @@ function index.build(player, player_table)
                 templates.sort_checkbox(
                   widths,
                   "trains",
-                  "contents",
+                  "shipment",
                   false
                 ),
                 {type = "empty-widget", style = "flib_horizontal_pusher"},
