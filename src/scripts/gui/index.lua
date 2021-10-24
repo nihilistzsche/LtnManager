@@ -180,6 +180,24 @@ function index.build(player, player_table)
                   "status",
                   false
                 ),
+                templates.sort_checkbox(
+                  widths,
+                  "trains",
+                  "composition",
+                  false
+                ),
+                templates.sort_checkbox(
+                  widths,
+                  "trains",
+                  "depot",
+                  false
+                ),
+                templates.sort_checkbox(
+                  widths,
+                  "trains",
+                  "contents",
+                  false
+                ),
                 {type = "empty-widget", style = "flib_horizontal_pusher"},
               },
               {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"trains", "scroll_pane"}},
