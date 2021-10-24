@@ -378,6 +378,7 @@ local function iterate_trains(working_data, iterations_per_tick)
     train_data.depot = depot
     train_data.composition = train_util.get_composition_string(train)
     train_data.main_locomotive = train_util.get_main_locomotive(train)
+    train_data.search_strings = {}
     train_data.shipment_count = 0
     train_data.status = {}
     trains[train_id] = train_data
@@ -497,6 +498,37 @@ local function sort_depot_trains_by_shipment(working_data)
       return trains[id_1].shipment_count < trains[id_2].shipment_count
     end)
   end)
+end
+
+local function generate_train_search_strings(working_data)
+  local players = global.players
+  local trains = working_data.trains
+
+  return table.for_n_of(
+    {},
+    working_data.key,
+    1,
+    function(data)
+      local train_data = data.train
+      local translations = data.translations
+
+      local str = {string.lower(train_data.depot), string.lower(train_data.status[data.player_index].string)}
+      for name in pairs(train_data.contents or {}) do
+        table.insert(str, string.lower(translations[name]))
+      end
+
+      train_data.search_strings[data.player_index] = table.concat(str, " ")
+    end,
+    function(_, key)
+      return per_player_next(players, trains, key, function(player, train)
+        return {
+          train = trains[train],
+          player_index = player,
+          translations = players[player].dictionaries.materials,
+        }
+      end)
+    end
+  )
 end
 
 local function generate_station_search_strings(working_data)
@@ -892,6 +924,7 @@ function ltn_data.iterate()
     sort_depot_trains_by_composition,
     sort_depot_trains_by_status,
     sort_depot_trains_by_shipment,
+    generate_train_search_strings,
     generate_station_search_strings,
     sort_stations_by_name,
     sort_stations_by_status,
