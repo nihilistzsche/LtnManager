@@ -14,7 +14,7 @@ return function(self)
 
   -- TEMPORARY:
   if state.active_tab == "trains" then
-    local ltn_trains = global.data.trains
+    local ltn_trains = state.ltn_data.trains
     local i = 0
     local scroll_pane = self.refs.trains.scroll_pane
     local children = scroll_pane.children
@@ -46,6 +46,10 @@ return function(self)
           end
 
           local status = train_data.status[self.player.index]
+          -- TODO: This is bad
+          if not status then
+            status = {color = constants.colors.red.tbl, string = "ERROR"}
+          end
           local station_id = status.station and train_data[status.station.."_id"] or nil
 
           gui.update(row,

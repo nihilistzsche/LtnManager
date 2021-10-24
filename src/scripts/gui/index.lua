@@ -22,6 +22,9 @@ function Index:destroy()
 end
 
 function Index:open()
+  self.state.ltn_data = global.data
+  self:update() -- TODO: Do we want to do this every time?
+
   self.refs.window.bring_to_front()
   self.refs.window.visible = true
   self.state.visible = true
@@ -60,6 +63,7 @@ function Index:dispatch(msg, e)
     if e.shift then
       msg.action = "toggle_auto_refresh"
     else
+      self.state.ltn_data = global.data
       self.do_update = true
     end
   elseif msg.transform == "handle_titlebar_click" then
@@ -197,6 +201,7 @@ function index.build(player, player_table)
       active_tab = "trains",
       closing = false,
       do_update = false,
+      ltn_data = global.data,
       network_id = -1,
       surface = false,
       pinned = false,

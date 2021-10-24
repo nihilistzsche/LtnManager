@@ -55,7 +55,7 @@ end
 
 function actions.open_train_gui(self, msg)
   local train_id = msg.train_id
-  local train_data = global.data.trains[train_id]
+  local train_data = self.state.ltn_data.trains[train_id]
   if not train_data or not train_data.train.valid then
     util.error_flying_text(self.player, {"message.ltnm-error-train-is-invalid"})
   end
@@ -65,7 +65,7 @@ end
 
 function actions.open_station_gui(self, msg)
   local station_id = msg.station_id
-  local station_data = global.data.stations[station_id]
+  local station_data = self.state.ltn_data.stations[station_id]
   if not station_data or not station_data.entity.valid then
     util.error_flying_text(self.player, {"message.ltnm-error-station-is-invalid"})
   end
