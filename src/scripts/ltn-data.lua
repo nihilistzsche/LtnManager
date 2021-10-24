@@ -199,6 +199,17 @@ end
 -- -----------------------------------------------------------------------------
 -- PROCESSORS
 
+local function get_ready_players(working_data)
+  local ready_players = {}
+  for i, player_table in pairs(global.players) do
+    if player_table.flags.translations_finished then
+      ready_players[i] = player_table
+    end
+  end
+
+  working_data.players = ready_players
+end
+
 local function iterate_stations(working_data, iterations_per_tick)
   local depots = working_data.depots
   local sorted_stations = working_data.sorted_stations
@@ -435,7 +446,7 @@ local function iterate_in_transit(working_data, iterations_per_tick)
 end
 
 local function generate_train_statuses(working_data, iterations_per_tick)
-  local players = global.players
+  local players = working_data.players
   local trains = working_data.trains
 
   return table.for_n_of(
@@ -458,29 +469,29 @@ local function generate_train_statuses(working_data, iterations_per_tick)
 end
 
 local function sort_trains_by_status(working_data)
-  -- local players = global.players
-  -- local trains = working_data.trains
+  local players = working_data.players
+  local trains = working_data.trains
 
-  -- local train_ids = {}
-  -- for train_id in pairs(working_data.trains) do
-  --   table.insert(train_ids, train_id)
-  -- end
+  local train_ids = {}
+  for train_id in pairs(working_data.trains) do
+    table.insert(train_ids, train_id)
+  end
 
-  -- return table.for_n_of(
-  --   players,
-  --   working_data.key,
-  --   1,
-  --   function(_, player_index)
-  --     local train_ids = table.array_copy(train_ids)
+  return table.for_n_of(
+    players,
+    working_data.key,
+    1,
+    function(_, player_index)
+      local train_ids = table.array_copy(train_ids)
 
-  --     -- TODO: This is bad
-  --     table.sort(train_ids, function(id_1, id_2)
-  --       return trains[id_1].status[player_index].string < trains[id_2].status[player_index].string
-  --     end)
+      -- TODO: This is bad
+      table.sort(train_ids, function(id_1, id_2)
+        return trains[id_1].status[player_index].string < trains[id_2].status[player_index].string
+      end)
 
-  --     working_data.sorted_trains.status[player_index] = train_ids
-  --   end
-  -- )
+      working_data.sorted_trains.status[player_index] = train_ids
+    end
+  )
 end
 
 local function sort_trains_by_composition(working_data, iterations_per_tick)
@@ -520,7 +531,7 @@ local function sort_trains_by_shipment(working_data, iterations_per_tick)
 end
 
 local function generate_train_search_strings(working_data)
-  local players = global.players
+  local players = working_data.players
   local trains = working_data.trains
 
   return table.for_n_of(
@@ -551,7 +562,7 @@ local function generate_train_search_strings(working_data)
 end
 
 local function generate_station_search_strings(working_data)
-  local players = global.players
+  local players = working_data.players
   local stations = working_data.stations
 
   local subtables = {
@@ -739,7 +750,7 @@ local function prepare_history_sort(working_data)
 end
 
 local function generate_history_search_strings(working_data)
-  local players = global.players
+  local players = working_data.players
   local history = working_data.history
 
   return table.for_n_of(
@@ -936,6 +947,7 @@ function ltn_data.iterate()
   local iterations_per_tick = settings.global["ltnm-iterations-per-tick"].value
 
   local processors = {
+    get_ready_players,
     iterate_stations,
     iterate_trains,
     iterate_in_transit,
@@ -994,8 +1006,10 @@ function ltn_data.iterate()
 
     -- start updating GUIs
     global.flags.iterating_ltn_data = false
-    global.flags.updating_guis = true
-    global.next_update_index = next(global.players)
+    if table_size(working_data.players) > 0 then
+      global.flags.updating_guis = true
+      global.next_update_index = next(working_data.players)
+    end
   end
 end
 

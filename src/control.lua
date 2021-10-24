@@ -138,6 +138,8 @@ end)
 -- TICK
 
 event.on_tick(function(e)
+  dictionary.check_skipped()
+
   local flags = global.flags
 
   if flags.iterating_ltn_data then
@@ -169,8 +171,6 @@ event.on_tick(function(e)
       flags.updating_guis = false
     end
   end
-
-  dictionary.check_skipped()
 end)
 
 -- TRANSLATIONS
