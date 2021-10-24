@@ -216,7 +216,8 @@ styles.ltnm_table_row_frame_light = {
   },
   graphical_set = {
     base = {
-      center = {position = {76, 8}, size = {1, 1}}
+      center = {position = {76, 8}, size = {1, 1}},
+      -- bottom = {position = {8, 40}, size = {1, 8}},
     },
   },
 }
@@ -224,6 +225,9 @@ styles.ltnm_table_row_frame_light = {
 styles.ltnm_table_row_frame_dark = {
   type = "frame_style",
   parent = "ltnm_table_row_frame_light",
+  -- graphical_set = {
+  --   base = {bottom = {position = {8, 40}, size = {1, 8}}},
+  -- },
   graphical_set = {},
 }
 
