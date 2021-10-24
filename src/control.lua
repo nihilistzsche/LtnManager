@@ -153,7 +153,7 @@ event.on_tick(function(e)
       if player_flags.can_open_gui then
         local Gui = main_gui.get(player_index)
         if Gui and Gui.state.visible and Gui.state.auto_refresh then
-          -- TODO: Update GUI
+          Gui:update()
         end
       else
         main_gui.build(player, player_table)

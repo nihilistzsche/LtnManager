@@ -2,6 +2,14 @@ local gui = require("__flib__.gui-beta")
 
 local util = {}
 
+--- Create a flying text at the player's cursor with an error sound.
+--- @param player LuaPlayer
+--- @param message LocalisedString
+function util.error_flying_text(player, message)
+  player.create_local_flying_text{create_at_cursor = true, text = message}
+  player.play_sound{path = "utility/cannot_build"}
+end
+
 function util.gui_list(parent, iterator, test, build, update, ...)
   local children = parent.children
   local i = 0

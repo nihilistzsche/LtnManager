@@ -4,19 +4,21 @@ local constants = require("constants")
 
 local actions = require("actions")
 local templates = require("templates")
+local update = require("update")
 
 -- Object methods
 
 local Index = {}
 
 Index.actions = actions
+Index.update = update
 
 function Index:destroy()
   self.refs.window.destroy()
   self.player_table.guis.main = nil
 
-  player.set_shortcut_toggled("ltnm-toggle-gui", false)
-  player.set_shortcut_available("ltnm-toggle-gui", false)
+  self.player.set_shortcut_toggled("ltnm-toggle-gui", false)
+  self.player.set_shortcut_available("ltnm-toggle-gui", false)
 end
 
 function Index:open()
@@ -171,7 +173,7 @@ function index.build(player, player_table)
                 templates.sort_checkbox(
                   widths,
                   "trains",
-                  "depot",
+                  "status",
                   false
                 ),
                 {type = "empty-widget", style = "flib_horizontal_pusher"},
@@ -187,31 +189,15 @@ function index.build(player, player_table)
   refs.titlebar.flow.drag_target = refs.window
   refs.window.force_auto_center()
 
-  -- TEMPORARY:
-  local trains_scroll = refs.trains.scroll_pane
-  for i = 1, 20 do
-    local color = i % 2 == 0 and "dark" or "light"
-    gui.add(trains_scroll,
-      {type = "frame", style = "ltnm_table_row_frame_"..color,
-        {type = "frame", style = "ltnm_table_inset_frame_"..color,
-          {type = "minimap", style = "ltnm_train_minimap",
-            {type = "button", style = "ltnm_train_minimap_button"},
-          },
-        },
-        {type = "frame", style = "ltnm_small_slot_table_frame_"..color,
-          {type = "sprite-button", style = "ltnm_small_slot_button_default"},
-        },
-        {type = "empty-widget", style = "flib_horizontal_pusher"},
-      }
-    )
-  end
-
   local Gui = {
     player = player,
     player_table = player_table,
     refs = refs,
     state = {
+      active_tab = "trains",
       closing = false,
+      network_id = -1,
+      surface = false,
       pinned = false,
       search_query = "",
     },

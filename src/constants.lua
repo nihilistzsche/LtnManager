@@ -32,9 +32,7 @@ constants.gui = {
   en = {
     trains = {
       minimap = 90,
-      composition = 240,
-      status = 373,
-      shipment = (36 * 6)
+      status = 250,
     },
     -- stations_list = {
     --   name = 232,
@@ -57,12 +55,12 @@ constants.gui = {
 }
 
 constants.gui_translations = {
-  delivering_to = {"ltnm-gui.delivering-to"},
-  fetching_from = {"ltnm-gui.fetching-from"},
-  loading_at = {"ltnm-gui.loading-at"},
-  parked_at_depot = {"ltnm-gui.parked-at-depot"},
-  returning_to_depot = {"ltnm-gui.returning-to-depot"},
-  unloading_at = {"ltnm-gui.unloading-at"},
+  delivering_to = {"gui.ltnm-delivering-to"},
+  fetching_from = {"gui.ltnm-fetching-from"},
+  loading_at = {"gui.ltnm-loading-at"},
+  parked_at_depot = {"gui.ltnm-parked-at-depot"},
+  returning_to_depot = {"gui.ltnm-returning-to-depot"},
+  unloading_at = {"gui.ltnm-unloading-at"},
 }
 
 constants.ltn_control_signals = {
