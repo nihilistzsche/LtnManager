@@ -39,12 +39,12 @@ end
 
 function actions.update_text_search_query(self)
   self.state.text_search_query = self.refs.toolbar.text_search_field.text
-  self.schedule_refresh()
+  self:schedule_update()
 end
 
 function actions.update_network_id_query(self)
   self.state.network_id_query = tonumber(self.refs.toolbar.network_id_field.text) or -1
-  self.schedule_refresh()
+  self:schedule_update()
 end
 
 return actions

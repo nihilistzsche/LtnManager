@@ -58,7 +58,7 @@ function Index:dispatch(msg, e)
     if e.shift then
       msg.action = "toggle_auto_refresh"
     else
-      msg.refresh = true
+      self.do_update = true
     end
   elseif msg.transform == "handle_titlebar_click" then
     if e.button == defines.mouse_button_type.middle then
@@ -75,6 +75,16 @@ function Index:dispatch(msg, e)
       log("Attempted to call action `"..msg.action.."` for which there is no handler yet.")
     end
   end
+
+  -- Update if necessary
+  if self.do_update then
+    self:update()
+    self.do_update = false
+  end
+end
+
+function Index:schedule_update()
+  self.do_update = true
 end
 
 -- Constructor and utilities
