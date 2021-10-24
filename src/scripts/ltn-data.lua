@@ -328,6 +328,8 @@ local function iterate_trains(working_data, iterations_per_tick)
   local depots = working_data.depots
   local trains = working_data.trains
 
+  local sorted_trains = working_data.sorted_trains
+
   local deliveries = working_data.deliveries
   local available_trains = working_data.available_trains
 
@@ -368,6 +370,11 @@ local function iterate_trains(working_data, iterations_per_tick)
     end
     if train_state == defines.train_state.wait_station and schedule.records[schedule.current].station == depot then
       depot_data.available_trains[#depot_data.available_trains+1] = train_id
+    end
+
+    -- add to sorting tables
+    for _, sort_table in pairs(sorted_trains) do
+      sort_table[#sort_table+1] = train_id
     end
 
     -- construct train contents
@@ -468,21 +475,21 @@ local function generate_train_statuses(working_data, iterations_per_tick)
   )
 end
 
+local function prepare_train_status_sort(working_data)
+  working_data.train_status_sort_src = working_data.sorted_trains.status
+  working_data.sorted_trains.status = {}
+end
+
 local function sort_trains_by_status(working_data)
   local players = working_data.players
   local trains = working_data.trains
-
-  local train_ids = {}
-  for train_id in pairs(working_data.trains) do
-    table.insert(train_ids, train_id)
-  end
 
   return table.for_n_of(
     players,
     working_data.key,
     1,
     function(_, player_index)
-      local train_ids = table.array_copy(train_ids)
+      local train_ids = table.array_copy(working_data.train_status_sort_src)
 
       -- TODO: This is bad
       table.sort(train_ids, function(id_1, id_2)
@@ -952,6 +959,7 @@ function ltn_data.iterate()
     iterate_trains,
     iterate_in_transit,
     generate_train_statuses,
+    prepare_train_status_sort,
     sort_trains_by_status,
     sort_trains_by_composition,
     sort_trains_by_depot,
@@ -993,6 +1001,7 @@ function ltn_data.iterate()
       -- lookup tables
       surfaces = working_data.surfaces,
       -- sorting tables
+      sorted_trains = working_data.sorted_trains,
       sorted_stations = working_data.sorted_stations,
       sorted_history = working_data.sorted_history,
       sorted_alerts = working_data.sorted_alerts,
