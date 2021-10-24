@@ -61,6 +61,8 @@ return function(self)
                   },
                 },
                 {type = "label", style = "ltnm_clickable_bold_label"},
+                {type = "label", style = "bold_label", style_mods = {width = widths.trains.composition}},
+                {type = "label", style = "bold_label", style_mods = {width = widths.trains.depot}},
                 {type = "frame", style = "ltnm_small_slot_table_frame_"..color,
                   {type = "sprite-button", style = "ltnm_small_slot_button_default"},
                 },
@@ -95,6 +97,8 @@ return function(self)
                 style = station_id and "ltnm_clickable_bold_label" or "bold_label",
                 style_mods = {font_color = status.color or constants.colors.white.tbl, width = widths.trains.status},
               },
+              {elem_mods = {caption = train_data.composition}},
+              {elem_mods = {caption = train_data.depot}},
             }
           )
         end

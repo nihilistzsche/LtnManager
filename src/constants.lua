@@ -32,9 +32,9 @@ constants.gui = {
   en = {
     trains = {
       minimap = 90,
-      status = 250,
-      composition = 120,
-      depot = 100,
+      status = 280,
+      composition = 160,
+      depot = 120,
       shipment = 36 * 4,
     },
     -- stations_list = {

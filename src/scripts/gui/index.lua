@@ -170,7 +170,7 @@ function index.build(player, player_table)
             {
               type = "frame",
               style = "deep_frame_in_shallow_frame",
-              style_mods = {size = {900, 600}},
+              style_mods = {height = 600},
               direction = "vertical",
               {type = "frame", style = "ltnm_table_toolbar_frame",
                 {type = "empty-widget", style_mods = {width = widths.trains.minimap}},
