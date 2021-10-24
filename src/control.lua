@@ -108,16 +108,18 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
     local player_table = global.players[e.player_index]
     local flags = player_table.flags
     local Gui = main_gui.get(e.player_index)
-    if flags.can_open_gui then
-      Gui:toggle()
-    else
-      if Gui.state.visible then
-        Gui:close()
-      end
-      if flags.translations_finished then
-        player.print{"ltnm-message.ltn-no-data"}
+    if Gui then
+      if flags.can_open_gui then
+        Gui:toggle()
       else
-        player.print{"ltnm-message.translations-not-finished"}
+        if Gui.state.visible then
+          Gui:close()
+        end
+        if flags.translations_finished then
+          player.print{"ltnm-message.ltn-no-data"}
+        else
+          player.print{"ltnm-message.translations-not-finished"}
+        end
       end
     end
   end
@@ -150,7 +152,7 @@ event.on_tick(function(e)
     if player_flags.translations_finished then
       if player_flags.can_open_gui then
         local Gui = main_gui.get(player_index)
-        if Gui.state.visible and Gui.state.auto_refresh then
+        if Gui and Gui.state.visible and Gui.state.auto_refresh then
           -- TODO: Update GUI
         end
       else

@@ -14,15 +14,23 @@ function templates.frame_action_button(sprite, tooltip, ref, action)
   }
 end
 
-function templates.sort_checkbox(caption, state, ref, action)
+--- Creates a column header with a sort toggle.
+--- @param widths table
+--- @param tab string
+--- @param column string
+--- @param state boolean
+--- @param tooltip string|nil
+function templates.sort_checkbox(widths, tab, column, state, tooltip)
   return {
     type = "checkbox",
     style = "ltnm_sort_checkbox",
-    caption = caption,
+    style_mods = {width = widths[tab][column]},
+    caption = {"gui.ltnm-"..column},
+    tooltip = tooltip,
     state = state,
-    ref = ref,
+    ref = {tab, "toolbar", column.."_checkbox"},
     actions = {
-      on_checked_state_changed = action,
+      on_checked_state_changed = {gui = "main", tab = tab, action = "toggle_sort", column = column},
     }
   }
 end

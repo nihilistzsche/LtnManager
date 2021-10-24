@@ -4,7 +4,7 @@ local util = require("prototypes.util")
 
 local styles = data.raw["gui-style"]["default"]
 
-local depot_button_height = 89
+-- local depot_button_height = 89
 
 -- BUTTON STYLES
 
@@ -22,24 +22,24 @@ for _, color in ipairs{"default", "red", "green", "blue"} do
   }
 end
 
-styles.ltnm_depot_button = {
-  type = "button_style",
-  parent = "button",
-  width = 206,
-  height = 89,
-  padding = 4,
-  top_padding = 1,
-  hovered_font_color = button_hovered_font_color,
-  hovered_graphical_set = {
-    base = {position = {34, 17}, corner_size = 8},
-    shadow = default_dirt,
-  },
-  disabled_font_color = button_hovered_font_color,
-  disabled_graphical_set = {
-    base = {position = {225, 17}, corner_size = 8},
-    shadow = default_dirt
-  }
-}
+-- styles.ltnm_depot_button = {
+--   type = "button_style",
+--   parent = "button",
+--   width = 206,
+--   height = 89,
+--   padding = 4,
+--   top_padding = 1,
+--   hovered_font_color = button_hovered_font_color,
+--   hovered_graphical_set = {
+--     base = {position = {34, 17}, corner_size = 8},
+--     shadow = default_dirt,
+--   },
+--   disabled_font_color = button_hovered_font_color,
+--   disabled_graphical_set = {
+--     base = {position = {225, 17}, corner_size = 8},
+--     shadow = default_dirt
+--   }
+-- }
 
 styles.ltnm_train_minimap_button = {
 	type = "button_style",
@@ -125,37 +125,30 @@ styles.ltnm_selected_sort_checkbox = {
 
 -- EMPTY WIDGET STYLES
 
-styles.ltnm_table_header_spacer = {
-  type = "empty_widget_style",
-  width = 12
-}
+-- styles.ltnm_table_header_spacer = {
+--   type = "empty_widget_style",
+--   width = 12
+-- }
 
 -- FLOW STYLES
 
-styles.ltnm_tab_horizontal_flow = {
-  type = "horizontal_flow_style",
-  horizontal_spacing = 12,
-}
+-- styles.ltnm_depot_button_inner_flow = {
+--   type = "vertical_flow_style",
+--   vertical_spacing = 0
+-- }
 
-styles.ltnm_depot_button_inner_flow = {
-  type = "vertical_flow_style",
-  vertical_spacing = 0
-}
-
-styles.ltnm_train_status_flow = {
-  type = "vertical_flow_style",
-  vertical_spacing = 0,
-  vertical_align = "center",
-}
+-- styles.ltnm_train_status_flow = {
+--   type = "vertical_flow_style",
+--   vertical_spacing = 0,
+--   vertical_align = "center",
+-- }
 
 -- FRAME STYLES
 
-styles.ltnm_small_slot_table_frame = {
+styles.ltnm_small_slot_table_frame_light = {
   type = "frame_style",
-  parent = "deep_frame_in_shallow_frame",
+  parent = "ltnm_table_inset_frame_light",
   minimal_height = 36,
-  -- top_margin = 2,
-  bottom_margin = 4,
   background_graphical_set = {
     base = {
       position = {282, 17},
@@ -170,13 +163,51 @@ styles.ltnm_small_slot_table_frame = {
   }
 }
 
-styles.ltnm_table_row_frame_even = {
+styles.ltnm_small_slot_table_frame_dark = {
+  type = "frame_style",
+  parent = "ltnm_table_inset_frame_dark",
+  minimal_height = 36,
+  background_graphical_set = {
+    base = {
+      position = {282, 17},
+      corner_size = 8,
+      overall_tiling_horizontal_padding = 4,
+      overall_tiling_horizontal_size = 28,
+      overall_tiling_horizontal_spacing = 8,
+      overall_tiling_vertical_padding = 4,
+      overall_tiling_vertical_size = 28,
+      overall_tiling_vertical_spacing = 8
+    }
+  }
+}
+
+styles.ltnm_table_inset_frame_light = {
+  type = "frame_style",
+  parent = "deep_frame_in_shallow_frame",
+}
+
+styles.ltnm_table_inset_frame_dark = {
+  type = "frame_style",
+  parent = "deep_frame_in_shallow_frame",
+  graphical_set = {
+    base =
+    {
+      position = {51, 0},
+      corner_size = 8,
+      center = {position = {42, 8}, size = {1, 1}},
+      draw_type = "outer"
+    },
+    shadow = default_inner_shadow,
+  },
+}
+
+styles.ltnm_table_row_frame_light = {
   type = "frame_style",
   parent = "statistics_table_item_frame",
-  top_padding = 2,
-  bottom_padding = 2,
-  left_padding = 10,
-  right_padding = 7,
+  top_padding = 8,
+  bottom_padding = 8,
+  left_padding = 8,
+  right_padding = 8,
   minimal_height = 52,
   horizontal_flow_style = {
     type = "horizontal_flow_style",
@@ -185,21 +216,22 @@ styles.ltnm_table_row_frame_even = {
   },
   graphical_set = {
     base = {
-      center = {position = {472, 25}, size = {1, 1}}
+      center = {position = {76, 8}, size = {1, 1}}
     },
   },
 }
 
-styles.ltnm_table_row_frame_odd = {
+styles.ltnm_table_row_frame_dark = {
   type = "frame_style",
-  parent = "ltnm_table_row_frame_even",
+  parent = "ltnm_table_row_frame_light",
   graphical_set = {},
 }
+
 styles.ltnm_table_toolbar_frame = {
   type = "frame_style",
   parent = "subheader_frame",
-  left_padding = 14,
-  right_padding = 23,
+  left_padding = 10,
+  right_padding = 6,
   horizontal_flow_style = {
     type = "horizontal_flow_style",
     horizontal_spacing = 10,
@@ -207,21 +239,19 @@ styles.ltnm_table_toolbar_frame = {
   }
 }
 
-styles.status_image.stretch_image_to_widget_size = true
-
 -- LABEL STYLES
 
-styles.ltnm_black_label = {
-  type = "label_style",
-  parent = "label",
-  font_color = button_default_font_color
-}
+-- styles.ltnm_black_label = {
+--   type = "label_style",
+--   parent = "label",
+--   font_color = button_default_font_color
+-- }
 
-styles.ltnm_bold_black_label = {
-  type = "label_style",
-  parent = "bold_label",
-  font_color = button_default_bold_font_color
-}
+-- styles.ltnm_bold_black_label = {
+--   type = "label_style",
+--   parent = "bold_label",
+--   font_color = button_default_bold_font_color
+-- }
 
 local hovered_label_color = {
   r = 0.5 * (1 + default_orange_color.r),
@@ -254,12 +284,12 @@ styles.ltnm_bold_red_label = {
   font_color = constants.colors.red.tbl
 }
 
-styles.ltnm_semibold_black_label = {
-  type = "label_style",
-  parent = "bold_label",
-  font = "default-semibold",
-  font_color = button_default_font_color
-}
+-- styles.ltnm_semibold_black_label = {
+--   type = "label_style",
+--   parent = "bold_label",
+--   font = "default-semibold",
+--   font_color = button_default_font_color
+-- }
 
 -- MINIMAP STYLES
 
@@ -270,90 +300,99 @@ styles.ltnm_train_minimap = {
 
 -- SCROLL PANE STYLES
 
-styles.ltnm_depot_select_scroll_pane = {
-  type = "scroll_pane_style",
-  parent = "flib_naked_scroll_pane_no_padding",
-  width = 206,
-  height = (depot_button_height * 8),
-  background_graphical_set = {
-    position = {282, 17},
-    corner_size = 8,
-    overall_tiling_horizontal_padding = 6,
-    overall_tiling_vertical_padding = 6,
-    overall_tiling_vertical_size = depot_button_height - 12,
-    overall_tiling_vertical_spacing = 12
-  },
-  vertical_flow_style = {
-    type = "vertical_flow_style",
-    vertical_spacing = 0
-  }
-}
-
-styles.ltnm_slot_table_scroll_pane = {
-  type = "scroll_pane_style",
-  parent = "flib_naked_scroll_pane",
-  padding = 0,
-  margin = 0,
-  extra_padding_when_activated = 0,
-  horizontally_squashable = "off",
-  background_graphical_set = {
-    base = {
-      position = {282, 17},
-      corner_size = 8,
-      overall_tiling_horizontal_padding = 4,
-      overall_tiling_horizontal_size = 32,
-      overall_tiling_horizontal_spacing = 8,
-      overall_tiling_vertical_padding = 4,
-      overall_tiling_vertical_size = 32,
-      overall_tiling_vertical_spacing = 8
-    }
-  }
-}
-
-styles.ltnm_small_slot_table_scroll_pane = {
-  type = "scroll_pane_style",
-  parent = "flib_naked_scroll_pane",
-  padding = 0,
-  margin = 0,
-  extra_padding_when_activated = 0,
-  minimal_height = 36,
-  dont_force_clipping_rect_for_contents = false,
-  background_graphical_set = {
-    base = {
-      position = {282, 17},
-      corner_size = 8,
-      overall_tiling_horizontal_padding = 4,
-      overall_tiling_horizontal_size = 28,
-      overall_tiling_horizontal_spacing = 8,
-      overall_tiling_vertical_padding = 4,
-      overall_tiling_vertical_size = 28,
-      overall_tiling_vertical_spacing = 8
-    }
-  }
-}
-
 styles.ltnm_table_scroll_pane = {
   type = "scroll_pane_style",
-  extra_padding_when_activated = 0,
-  padding = 0,
-  horizontally_stretchable = "on",
-  vertically_stretchable = "on",
-  graphical_set = {
-    shadow = default_inner_shadow
-  },
-  background_graphical_set = {
-    position = {282, 17},
-    corner_size = 8,
-    overall_tiling_horizontal_padding = 6,
-    overall_tiling_vertical_padding = 6,
-    overall_tiling_vertical_size = 40,
-    overall_tiling_vertical_spacing = 12
-  },
+  parent = "flib_naked_scroll_pane_no_padding",
   vertical_flow_style = {
     type = "vertical_flow_style",
-    vertical_spacing = 0
+    vertical_spacing = 0,
   }
 }
+
+-- styles.ltnm_depot_select_scroll_pane = {
+--   type = "scroll_pane_style",
+--   parent = "flib_naked_scroll_pane_no_padding",
+--   width = 206,
+--   height = (depot_button_height * 8),
+--   background_graphical_set = {
+--     position = {282, 17},
+--     corner_size = 8,
+--     overall_tiling_horizontal_padding = 6,
+--     overall_tiling_vertical_padding = 6,
+--     overall_tiling_vertical_size = depot_button_height - 12,
+--     overall_tiling_vertical_spacing = 12
+--   },
+--   vertical_flow_style = {
+--     type = "vertical_flow_style",
+--     vertical_spacing = 0
+--   }
+-- }
+
+-- styles.ltnm_slot_table_scroll_pane = {
+--   type = "scroll_pane_style",
+--   parent = "flib_naked_scroll_pane",
+--   padding = 0,
+--   margin = 0,
+--   extra_padding_when_activated = 0,
+--   horizontally_squashable = "off",
+--   background_graphical_set = {
+--     base = {
+--       position = {282, 17},
+--       corner_size = 8,
+--       overall_tiling_horizontal_padding = 4,
+--       overall_tiling_horizontal_size = 32,
+--       overall_tiling_horizontal_spacing = 8,
+--       overall_tiling_vertical_padding = 4,
+--       overall_tiling_vertical_size = 32,
+--       overall_tiling_vertical_spacing = 8
+--     }
+--   }
+-- }
+
+-- styles.ltnm_small_slot_table_scroll_pane = {
+--   type = "scroll_pane_style",
+--   parent = "flib_naked_scroll_pane",
+--   padding = 0,
+--   margin = 0,
+--   extra_padding_when_activated = 0,
+--   minimal_height = 36,
+--   dont_force_clipping_rect_for_contents = false,
+--   background_graphical_set = {
+--     base = {
+--       position = {282, 17},
+--       corner_size = 8,
+--       overall_tiling_horizontal_padding = 4,
+--       overall_tiling_horizontal_size = 28,
+--       overall_tiling_horizontal_spacing = 8,
+--       overall_tiling_vertical_padding = 4,
+--       overall_tiling_vertical_size = 28,
+--       overall_tiling_vertical_spacing = 8
+--     }
+--   }
+-- }
+
+-- styles.ltnm_table_scroll_pane = {
+--   type = "scroll_pane_style",
+--   extra_padding_when_activated = 0,
+--   padding = 0,
+--   horizontally_stretchable = "on",
+--   vertically_stretchable = "on",
+--   graphical_set = {
+--     shadow = default_inner_shadow
+--   },
+--   background_graphical_set = {
+--     position = {282, 17},
+--     corner_size = 8,
+--     overall_tiling_horizontal_padding = 6,
+--     overall_tiling_vertical_padding = 6,
+--     overall_tiling_vertical_size = 40,
+--     overall_tiling_vertical_spacing = 12
+--   },
+--   vertical_flow_style = {
+--     type = "vertical_flow_style",
+--     vertical_spacing = 0
+--   }
+-- }
 
 -- TABBED PANE STYLES
 

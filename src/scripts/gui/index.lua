@@ -1,5 +1,7 @@
 local gui = require("__flib__.gui")
 
+local constants = require("constants")
+
 local actions = require("actions")
 local templates = require("templates")
 
@@ -80,6 +82,8 @@ end
 local index = {}
 
 function index.build(player, player_table)
+  local widths = constants.gui[player_table.language] or constants.gui["en"]
+
   local refs = gui.build(player.gui.screen,{
     {
       type = "frame",
@@ -150,43 +154,19 @@ function index.build(player, player_table)
             {
               type = "frame",
               style = "deep_frame_in_shallow_frame",
-              style_mods = {size = {800, 500}},
+              style_mods = {size = {900, 600}},
               direction = "vertical",
               {type = "frame", style = "ltnm_table_toolbar_frame",
+                {type = "empty-widget", style_mods = {width = widths.trains.minimap}},
                 templates.sort_checkbox(
-                  {"gui.ltnm-depot"},
-                  false,
-                  {"trains", "toolbar", "depot_checkbox"},
-                  {gui = "main", tab = "trains", action = "toggle_sort", sort = "depot"}
-                ),
-                templates.sort_checkbox(
-                  {"gui.ltnm-composition"},
-                  false,
-                  {"trains", "toolbar", "composition_checkbox"},
-                  {gui = "main", tab = "trains", action = "toggle_sort", sort = "composition"}
-                ),
-                templates.sort_checkbox(
-                  {"gui.ltnm-status"},
-                  false,
-                  {"trains", "toolbar", "status_checkbox"},
-                  {gui = "main", tab = "trains", action = "toggle_sort", sort = "status"}
-                ),
-                templates.sort_checkbox(
-                  {"gui.ltnm-shipment"},
-                  false,
-                  {"trains", "toolbar", "shipment_checkbox"},
-                  {gui = "main", tab = "trains", action = "toggle_sort", sort = "shipment"}
+                  widths,
+                  "trains",
+                  "depot",
+                  false
                 ),
                 {type = "empty-widget", style = "flib_horizontal_pusher"},
               },
-              {type = "frame", style = "ltnm_table_row_frame_even",
-                {type = "frame", style = "slot_button_deep_frame", {type = "sprite-button", style = "flib_standalone_slot_button_default"}},
-                {type = "empty-widget", style = "flib_horizontal_pusher"},
-              },
-              {type = "frame", style = "ltnm_table_row_frame_odd",
-                {type = "frame", style = "slot_button_deep_frame", {type = "sprite-button", style = "flib_standalone_slot_button_default"}},
-                {type = "empty-widget", style = "flib_horizontal_pusher"},
-              },
+              {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"trains", "scroll_pane"}},
             },
           },
         }
@@ -196,6 +176,25 @@ function index.build(player, player_table)
 
   refs.titlebar.flow.drag_target = refs.window
   refs.window.force_auto_center()
+
+  -- TEMPORARY:
+  local trains_scroll = refs.trains.scroll_pane
+  for i = 1, 20 do
+    local color = i % 2 == 0 and "dark" or "light"
+    gui.add(trains_scroll,
+      {type = "frame", style = "ltnm_table_row_frame_"..color,
+        {type = "frame", style = "ltnm_table_inset_frame_"..color,
+          {type = "minimap", style = "ltnm_train_minimap",
+            {type = "button", style = "ltnm_train_minimap_button"},
+          },
+        },
+        {type = "frame", style = "ltnm_small_slot_table_frame_"..color,
+          {type = "sprite-button", style = "ltnm_small_slot_button_default"},
+        },
+        {type = "empty-widget", style = "flib_horizontal_pusher"},
+      }
+    )
+  end
 
   local Gui = {
     player = player,

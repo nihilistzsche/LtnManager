@@ -30,28 +30,29 @@ constants.colors = {
 -- dictionary locale identifier -> dictionary of hardcoded GUI sizes
 constants.gui = {
   en = {
-    trains_list = {
+    trains = {
+      minimap = 90,
       composition = 240,
       status = 373,
       shipment = (36 * 6)
     },
-    stations_list = {
-      name = 232,
-      status = 53,
-      network_id = 84,
-      provided_requested = (36 * 6),
-      shipments = (36 * 5),
-      control_signals = (36 * 7)
-    },
-    history = {
-      depot = 160,
-      train_id = 60,
-      network_id = 84,
-      route = 351,
-      runtime = 68,
-      finished = 68,
-      shipment = (36 * 6)
-    }
+    -- stations_list = {
+    --   name = 232,
+    --   status = 53,
+    --   network_id = 84,
+    --   provided_requested = (36 * 6),
+    --   shipments = (36 * 5),
+    --   control_signals = (36 * 7)
+    -- },
+    -- history = {
+    --   depot = 160,
+    --   train_id = 60,
+    --   network_id = 84,
+    --   route = 351,
+    --   runtime = 68,
+    --   finished = 68,
+    --   shipment = (36 * 6)
+    -- }
   }
 }
 

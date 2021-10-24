@@ -11,6 +11,7 @@ function player_data.init(player, index)
       translations_finished = false
     },
     guis = {},
+    language = nil,
     last_update = game.tick,
   }
   player.set_shortcut_available("ltnm-toggle-gui", false)
