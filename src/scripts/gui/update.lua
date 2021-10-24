@@ -15,21 +15,43 @@ return function(self)
   -- TEMPORARY:
   if state.active_tab == "trains" then
     local ltn_trains = state.ltn_data.trains
-    local i = 0
     local scroll_pane = self.refs.trains.scroll_pane
     local children = scroll_pane.children
 
-    local sorted_trains = state.ltn_data.sorted_trains
-    for train_id, train_data in pairs(ltn_trains) do
+    local sorts = state.sorts[state.active_tab]
+    local active_sort = sorts._active
+    local sorted_trains = state.ltn_data.sorted_trains[active_sort]
+    if active_sort == "status" then
+      sorted_trains = sorted_trains[self.player.index]
+    end
+
+    local j = 0
+
+    -- False = ascending (arrow down), True = descending (arrow up)
+    local start, finish, step
+    if sorts[active_sort] then
+      start = #sorted_trains
+      finish = 1
+      step = -1
+    else
+      start = 1
+      finish = #sorted_trains
+      step = 1
+    end
+
+    for i = start, finish, step do
+      local train_id = sorted_trains[i]
+      local train_data = ltn_trains[train_id]
+
       if train_data.train.valid and train_data.main_locomotive.valid then
         if
           (not search_surface or (train_data.main_locomotive.surface.index == search_surface))
           and bit32.btest(train_data.network_id, search_network_id)
           and (#search_query == 0 or string.find(train_data.search_strings[self.player.index], search_query))
         then
-          i = i + 1
-          local row = children[i]
-          local color = i % 2 == 0 and "dark" or "light"
+          j = j + 1
+          local row = children[j]
+          local color = j % 2 == 0 and "dark" or "light"
           if not row then
             row = gui.add(scroll_pane,
               {type = "frame", style = "ltnm_table_row_frame_"..color,
@@ -79,8 +101,8 @@ return function(self)
       end
     end
 
-    for j = i + 1, #children do
-      children[j].destroy()
+    for k = j + 1, #children do
+      children[k].destroy()
     end
   end
 end
