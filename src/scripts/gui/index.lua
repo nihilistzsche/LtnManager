@@ -148,8 +148,8 @@ function index.build(player, player_table)
             clear_and_focus_on_right_click = true,
             ref = {"toolbar", "text_search_field"},
             actions = {
-              on_text_changed = {gui = "main", action = "update_text_search_query"}
-            }
+              on_text_changed = {gui = "main", action = "update_text_search_query"},
+            },
           },
           {type = "empty-widget", style = "flib_horizontal_pusher"},
           {type = "label", style = "caption_label", caption = {"gui.ltnm-network-id-label"}},
@@ -162,8 +162,8 @@ function index.build(player, player_table)
             text = "-1",
             ref = {"toolbar", "network_id_field"},
             actions = {
-              on_text_changed = {gui = "main", action = "update_network_id_query"}
-            }
+              on_text_changed = {gui = "main", action = "update_network_id_query"},
+            },
           }
           -- TODO: maybe surface dropdown?
         },
@@ -194,7 +194,7 @@ function index.build(player, player_table)
           composition = false,
           depot = false,
           shipment = false,
-        }
+        },
       },
       surface = false,
       pinned = false,

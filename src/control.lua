@@ -2,6 +2,7 @@ local event = require("__flib__.event")
 local dictionary = require("__flib__.dictionary")
 local gui = require("__flib__.gui")
 local migration = require("__flib__.migration")
+local on_tick_n = require("__flib__.on-tick-n")
 
 local global_data = require("scripts.global-data")
 local ltn_data = require("scripts.ltn-data")
@@ -32,6 +33,7 @@ commands.add_command("LtnManager", {"ltnm-message.command-help"},
 
 event.on_init(function()
   dictionary.init()
+  on_tick_n.init()
 
   global_data.init()
   global_data.build_dictionaries()
@@ -65,15 +67,19 @@ end)
 
 -- GUI
 
+local function handle_gui_event(msg, e)
+  if msg.gui == "main" then
+    local Gui = global.players[e.player_index].guis.main
+    if Gui and Gui.refs.window.valid then
+      Gui:dispatch(msg, e)
+    end
+  end
+end
+
 gui.hook_events(function(e)
   local msg = gui.read_action(e)
   if msg then
-    if msg.gui == "main" then
-      local Gui = global.players[e.player_index].guis.main
-      if Gui and Gui.refs.window.valid then
-        Gui:dispatch(msg, e)
-      end
-    end
+    handle_gui_event(msg, e)
   end
 end)
 
@@ -139,6 +145,15 @@ end)
 
 event.on_tick(function(e)
   dictionary.check_skipped()
+
+  local tasks = on_tick_n.retrieve(e.tick)
+  if tasks then
+    for _, task in pairs(tasks) do
+      if task.gui then
+        handle_gui_event(task, {player_index = task.player_index})
+      end
+    end
+  end
 
   local flags = global.flags
 

@@ -1,4 +1,5 @@
 local train_util = require("__flib__.train")
+local on_tick_n = require("__flib__.on-tick-n")
 
 local util = require("scripts.util")
 
@@ -41,11 +42,24 @@ function actions.toggle_pinned(self)
   end
 end
 
--- TODO: Rate-limit these
+function actions.update_text_search_query(self, _, e)
+  local text = e.element.text
 
-function actions.update_text_search_query(self)
-  self.state.search_query = self.refs.toolbar.text_search_field.text
-  self:schedule_update()
+  -- TODO: Sanitization and other stuffs
+  self.state.search_query = text
+
+  if self.state.search_job then
+    on_tick_n.remove(self.state.search_job)
+  end
+
+  if #text == 0 then
+    self:schedule_update()
+  else
+    self.state.search_job = on_tick_n.add(
+      game.tick + 30,
+      {gui = "main", action = "update", player_index = self.player.index}
+    )
+  end
 end
 
 function actions.update_network_id_query(self)
@@ -92,6 +106,10 @@ function actions.toggle_sort(self, msg, e)
     e.element.style.width = self.widths[tab][column]
   end
 
+  self:schedule_update()
+end
+
+function actions.update(self)
   self:schedule_update()
 end
 
