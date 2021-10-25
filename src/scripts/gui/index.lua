@@ -6,6 +6,8 @@ local actions = require("actions")
 local templates = require("templates")
 local update = require("update")
 
+local trains_tab = require("trains")
+
 -- Object methods
 
 local Index = {}
@@ -166,43 +168,7 @@ function index.build(player, player_table)
           -- TODO: maybe surface dropdown?
         },
         {type = "tabbed-pane", style = "ltnm_tabbed_pane",
-          {tab = {type = "tab", caption = {"gui.ltnm-trains"}}, content =
-            {
-              type = "frame",
-              style = "deep_frame_in_shallow_frame",
-              style_mods = {height = 600},
-              direction = "vertical",
-              {type = "frame", style = "ltnm_table_toolbar_frame",
-                {type = "empty-widget", style_mods = {width = widths.trains.minimap}},
-                templates.sort_checkbox(
-                  widths,
-                  "trains",
-                  "status",
-                  false
-                ),
-                templates.sort_checkbox(
-                  widths,
-                  "trains",
-                  "composition",
-                  false
-                ),
-                templates.sort_checkbox(
-                  widths,
-                  "trains",
-                  "depot",
-                  false
-                ),
-                templates.sort_checkbox(
-                  widths,
-                  "trains",
-                  "shipment",
-                  false
-                ),
-                {type = "empty-widget", style = "flib_horizontal_pusher"},
-              },
-              {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"trains", "scroll_pane"}},
-            },
-          },
+          trains_tab.build(widths)
         }
       }
     }
