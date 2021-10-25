@@ -126,7 +126,7 @@ function trains_tab.update(self)
         local station_id = status.station and train_data[status.station.."_id"] or nil
 
         gui.update(row,
-          {style = "ltnm_table_row_frame_"..color,
+          {
             {
               {elem_mods = {entity = train_data.main_locomotive},
                 {actions = {
