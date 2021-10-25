@@ -67,7 +67,7 @@ function trains_tab.update(self)
     sorted_trains = sorted_trains[self.player.index]
   end
 
-  local j = 0
+  local table_index = 0
 
   -- False = ascending (arrow down), True = descending (arrow up)
   local start, finish, step
@@ -81,8 +81,8 @@ function trains_tab.update(self)
     step = 1
   end
 
-  for i = start, finish, step do
-    local train_id = sorted_trains[i]
+  for sorted_index = start, finish, step do
+    local train_id = sorted_trains[sorted_index]
     local train_data = ltn_trains[train_id]
 
     if train_data.train.valid and train_data.main_locomotive.valid then
@@ -91,9 +91,9 @@ function trains_tab.update(self)
         and bit32.btest(train_data.network_id, search_network_id)
         and (#search_query == 0 or string.find(train_data.search_strings[self.player.index], search_query))
       then
-        j = j + 1
-        local row = children[j]
-        local color = j % 2 == 0 and "dark" or "light"
+        table_index = table_index + 1
+        local row = children[table_index]
+        local color = table_index % 2 == 0 and "dark" or "light"
         if not row then
           row = gui.add(scroll_pane,
             {type = "frame", style = "ltnm_table_row_frame_"..color,
@@ -151,10 +151,10 @@ function trains_tab.update(self)
         local table = row.shipment_frame.shipment_table
         local table_children = table.children
 
-        local k = 0
+        local shipment_index = 0
         for name, count in pairs(train_data.shipment or {}) do
-          k = k + 1
-          local button = table_children[k]
+          shipment_index = shipment_index + 1
+          local button = table_children[shipment_index]
           if not button then
             local sprite = string.gsub(name, ",", "/")
             button = gui.add(table, {
@@ -172,15 +172,15 @@ function trains_tab.update(self)
           end
         end
 
-        for l = k + 1, #table_children do
-          table_children[l].destroy()
+        for child_index = shipment_index + 1, #table_children do
+          table_children[child_index].destroy()
         end
       end
     end
   end
 
-  for k = j + 1, #children do
-    children[k].destroy()
+  for child_index = table_index + 1, #children do
+    children[child_index].destroy()
   end
 end
 
