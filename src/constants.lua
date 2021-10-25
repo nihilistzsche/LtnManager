@@ -61,6 +61,7 @@ constants.gui_translations = {
   delivering_to = {"gui.ltnm-delivering-to"},
   fetching_from = {"gui.ltnm-fetching-from"},
   loading_at = {"gui.ltnm-loading-at"},
+  not_available = {"gui.ltnm-not-available"},
   parked_at_depot = {"gui.ltnm-parked-at-depot"},
   returning_to_depot = {"gui.ltnm-returning-to-depot"},
   unloading_at = {"gui.ltnm-unloading-at"},
