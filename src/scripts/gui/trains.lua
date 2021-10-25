@@ -9,48 +9,58 @@ local templates = require("templates")
 local trains_tab = {}
 
 function trains_tab.build(widths)
-  return
-    {tab = {type = "tab", caption = {"gui.ltnm-trains"}}, content =
-      {
-        type = "frame",
-        style = "deep_frame_in_shallow_frame",
-        style_mods = {height = 600},
-        direction = "vertical",
-        {type = "frame", style = "ltnm_table_toolbar_frame",
-          {type = "empty-widget", style_mods = {width = widths.trains.minimap}},
-          templates.sort_checkbox(
-            widths,
-            "trains",
-            "status",
-            true
-          ),
-          templates.sort_checkbox(
-            widths,
-            "trains",
-            "composition",
-            false
-          ),
-          templates.sort_checkbox(
-            widths,
-            "trains",
-            "depot",
-            false
-          ),
-          templates.sort_checkbox(
-            widths,
-            "trains",
-            "shipment",
-            false
-          ),
-          {type = "empty-widget", style = "flib_horizontal_pusher"},
-        },
-        {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"trains", "scroll_pane"}},
+  return {
+    tab = {type = "tab", caption = {"gui.ltnm-trains"}, ref = {"trains", "tab"}},
+    content = {
+      type = "frame",
+      style = "deep_frame_in_shallow_frame",
+      style_mods = {height = 600},
+      direction = "vertical",
+      ref = {"trains", "content_frame"},
+      {type = "frame", style = "ltnm_table_toolbar_frame",
+        {type = "empty-widget", style_mods = {width = widths.trains.minimap}},
+        templates.sort_checkbox(
+          widths,
+          "trains",
+          "status",
+          true
+        ),
+        templates.sort_checkbox(
+          widths,
+          "trains",
+          "composition",
+          false
+        ),
+        templates.sort_checkbox(
+          widths,
+          "trains",
+          "depot",
+          false
+        ),
+        templates.sort_checkbox(
+          widths,
+          "trains",
+          "shipment",
+          false
+        ),
+        {type = "empty-widget", style = "flib_horizontal_pusher"},
       },
-    }
+      {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"trains", "scroll_pane"}},
+      {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"trains", "warning_flow"},
+        {
+          type = "label",
+          style = "bold_label",
+          caption = {"gui.ltnm-no-trains"},
+          ref = {"trains", "warning_label"}
+        },
+      }
+    },
+  }
 end
 
 function trains_tab.update(self)
   local state = self.state
+  local refs = self.refs.trains
   local widths = self.widths
 
   local search_query = state.search_query
@@ -58,7 +68,7 @@ function trains_tab.update(self)
   local search_surface = state.surface
 
   local ltn_trains = state.ltn_data.trains
-  local scroll_pane = self.refs.trains.scroll_pane
+  local scroll_pane = refs.scroll_pane
   local children = scroll_pane.children
 
   local sorts = state.sorts[state.active_tab]
@@ -69,6 +79,8 @@ function trains_tab.update(self)
   end
 
   local table_index = 0
+
+  refs.tab.badge_text = misc.delineate_number(#sorted_trains)
 
   -- False = ascending (arrow down), True = descending (arrow up)
   local start, finish, step
@@ -90,7 +102,8 @@ function trains_tab.update(self)
       if
         (not search_surface or (train_data.main_locomotive.surface.index == search_surface))
         and bit32.btest(train_data.network_id, search_network_id)
-        and (#search_query == 0 or string.find(train_data.search_strings[self.player.index], search_query))
+        and
+          #search_query == 0 or string.find(train_data.search_strings[self.player.index], string.lower(search_query))
       then
         table_index = table_index + 1
         local row = children[table_index]
@@ -156,6 +169,18 @@ function trains_tab.update(self)
 
   for child_index = table_index + 1, #children do
     children[child_index].destroy()
+  end
+
+  if table_index == 0 then
+    refs.warning_flow.visible = true
+    scroll_pane.visible = false
+    refs.content_frame.style = "ltnm_warning_frame_in_shallow_frame"
+    refs.content_frame.style.height = 600
+  else
+    refs.warning_flow.visible = false
+    scroll_pane.visible = true
+    refs.content_frame.style = "deep_frame_in_shallow_frame"
+    refs.content_frame.style.height = 600
   end
 end
 
