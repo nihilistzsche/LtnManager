@@ -1,4 +1,5 @@
-local gui = require("__flib__.gui-beta")
+local gui = require("__flib__.gui")
+local misc = require("__flib__.misc")
 
 local util = {}
 
@@ -14,7 +15,6 @@ function util.gui_list(parent, iterator, test, build, update, ...)
   local children = parent.children
   local i = 0
 
-  -- create or update items
   for k, v in table.unpack(iterator) do
     local passed = test(v, k, i, ...)
     if passed then
@@ -28,9 +28,41 @@ function util.gui_list(parent, iterator, test, build, update, ...)
     end
   end
 
-  -- destroy extraneous items
   for j = i + 1, #children do
     children[j].destroy()
+  end
+end
+
+--- Updates a slot table based on the current items.
+--- @param table LuaGuiElement
+--- @param source table
+--- @param dictionaries table
+function util.slot_table_update(table, source, dictionaries)
+  local children = table.children
+
+  local i = 0
+  for name, count in pairs(source or {}) do
+    i = i + 1
+    local button = children[i]
+    if not button then
+      local sprite = string.gsub(name, ",", "/")
+      button = gui.add(table, {
+          type = "sprite-button",
+          style = "ltnm_small_slot_button_default",
+          sprite = sprite,
+          tooltip = "[img="
+            ..sprite
+            .."]  [font=default-semibold]"
+            ..dictionaries.materials[name]
+            .."[/font]\n"
+            ..misc.delineate_number(count),
+          number = count,
+      })
+    end
+  end
+
+  for i = i + 1, #children do
+    children[i].destroy()
   end
 end
 

@@ -2,6 +2,7 @@ local gui = require("__flib__.gui")
 local misc = require("__flib__.misc")
 
 local constants = require("constants")
+local util = require("scripts.util")
 
 local templates = require("templates")
 
@@ -148,33 +149,7 @@ function trains_tab.update(self)
           }
         )
 
-        local table = row.shipment_frame.shipment_table
-        local table_children = table.children
-
-        local shipment_index = 0
-        for name, count in pairs(train_data.shipment or {}) do
-          shipment_index = shipment_index + 1
-          local button = table_children[shipment_index]
-          if not button then
-            local sprite = string.gsub(name, ",", "/")
-            button = gui.add(table, {
-                type = "sprite-button",
-                style = "ltnm_small_slot_button_default",
-                sprite = sprite,
-                tooltip = "[img="
-                  ..sprite
-                  .."]  [font=default-semibold]"
-                  ..self.player_table.dictionaries.materials[name]
-                  .."[/font]\n"
-                  ..misc.delineate_number(count),
-                number = count,
-            })
-          end
-        end
-
-        for child_index = shipment_index + 1, #table_children do
-          table_children[child_index].destroy()
-        end
+        util.slot_table_update(row.shipment_frame.shipment_table, train_data.shipment, self.player_table.dictionaries)
       end
     end
   end
