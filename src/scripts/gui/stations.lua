@@ -95,8 +95,6 @@ function stations_tab.update(self)
 
   local table_index = 0
 
-  refs.tab.badge_text = misc.delineate_number(#sorted_stations)
-
   -- False = ascending (arrow down), True = descending (arrow up)
   local start, finish, step
   if sorts[active_sort] then

@@ -1,4 +1,5 @@
 local gui = require("__flib__.gui")
+local misc = require("__flib__.misc")
 
 local constants = require("constants")
 
@@ -96,8 +97,14 @@ end
 
 function Index:update()
   local state = self.state
+  local refs = self.refs
+
+  local ltn_data = self.state.ltn_data
 
   -- TODO: Update surfaces dropdown
+
+  refs.trains.tab.badge_text = misc.delineate_number(#ltn_data.sorted_trains.composition)
+  refs.stations.tab.badge_text = misc.delineate_number(#ltn_data.sorted_stations.name)
 
   if state.active_tab == "trains" then
     trains_tab.update(self)
