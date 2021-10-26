@@ -56,7 +56,7 @@ event.on_configuration_changed(function(e)
   if migration.on_config_changed(e, migrations) then
     dictionary.init()
 
-    global_data.build_translations()
+    global_data.build_dictionaries()
     ltn_data.init()
 
     for i, player in pairs(game.players) do
