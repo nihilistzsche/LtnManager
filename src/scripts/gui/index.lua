@@ -4,7 +4,6 @@ local constants = require("constants")
 
 local actions = require("actions")
 local templates = require("templates")
-local update = require("update")
 
 local trains_tab = require("trains")
 local stations_tab = require("stations")
@@ -14,7 +13,6 @@ local stations_tab = require("stations")
 local Index = {}
 
 Index.actions = actions
-Index.update = update
 
 function Index:destroy()
   self.refs.window.destroy()
@@ -94,6 +92,18 @@ end
 
 function Index:schedule_update()
   self.do_update = true
+end
+
+function Index:update()
+  local state = self.state
+
+  -- TODO: Update surfaces dropdown
+
+  if state.active_tab == "trains" then
+    trains_tab.update(self)
+  elseif state.active_tab == "stations" then
+    stations_tab.update(self)
+  end
 end
 
 -- Constructor and utilities
@@ -214,6 +224,7 @@ function index.build(player, player_table)
     },
     widths = widths,
   }
+  -- TODO: Restore metatables on load
   setmetatable(Gui, {__index = Index})
 
   player_table.guis.main = Gui
