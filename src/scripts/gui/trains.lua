@@ -54,7 +54,7 @@ function trains_tab.build(widths)
       {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"trains", "warning_flow"},
         {
           type = "label",
-          style = "bold_label",
+          style = "ltnm_semibold_label",
           caption = {"gui.ltnm-no-trains"},
           ref = {"trains", "warning_label"}
         },
@@ -121,9 +121,9 @@ function trains_tab.update(self)
                   {type = "button", style = "ltnm_train_minimap_button", tooltip = {"gui.ltnm-open-train-gui"}},
                 },
               },
-              {type = "label", style = "ltnm_clickable_bold_label"},
-              {type = "label", style = "bold_label", style_mods = {width = widths.trains.composition}},
-              {type = "label", style = "bold_label", style_mods = {width = widths.trains.depot}},
+              {type = "label", style = "ltnm_clickable_semibold_label"},
+              {type = "label", style_mods = {width = widths.trains.composition}},
+              {type = "label", style_mods = {width = widths.trains.depot}},
               {
                 type = "frame",
                 name = "shipment_frame",
@@ -159,7 +159,7 @@ function trains_tab.update(self)
                   or false,
               },
               elem_mods = {caption = status.string, tooltip = station_id and {"gui.ltnm-open-station-gui"} or ""},
-              style = station_id and "ltnm_clickable_bold_label" or "bold_label",
+              style = station_id and "ltnm_clickable_semibold_label" or "ltnm_semibold_label",
               style_mods = {font_color = status.color or constants.colors.white.tbl, width = widths.trains.status},
             },
             {elem_mods = {caption = train_data.composition}},

@@ -59,7 +59,7 @@ styles.ltnm_train_minimap_button = {
 styles.ltnm_sort_checkbox = {
   type = "checkbox_style",
   font = "default-bold",
-  font_color = bold_font_color,
+  -- font_color = bold_font_color,
   padding = 0,
   default_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-down-white.png",
@@ -294,16 +294,21 @@ local hovered_label_color = {
   b = 0.5 * (1 + default_orange_color.b)
 }
 
-styles.ltnm_clickable_bold_label = {
+styles.ltnm_semibold_label = {
   type = "label_style",
-  parent = "bold_label",
+  font = "default-semibold",
+}
+
+styles.ltnm_clickable_semibold_label = {
+  type = "label_style",
+  parent = "ltnm_semibold_label",
   hovered_font_color = hovered_label_color,
-  disabled_font_color = hovered_label_color
+  disabled_font_color = hovered_label_color,
 }
 
 styles.ltnm_clickable_label = {
   type = "label_style",
-  parent = "ltnm_clickable_bold_label",
+  parent = "ltnm_clickable_semibold_label",
   font = "default"
 }
 

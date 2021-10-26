@@ -63,7 +63,7 @@ function stations_tab.build(widths)
       {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"stations", "warning_flow"},
         {
           type = "label",
-          style = "bold_label",
+          style = "ltnm_semibold_label",
           caption = {"gui.ltnm-no-stations"},
           ref = {"stations", "warning_label"}
         },
@@ -124,7 +124,7 @@ function stations_tab.update(self)
             {type = "frame", style = "ltnm_table_row_frame_"..color,
               {
                 type = "label",
-                style = "ltnm_clickable_bold_label",
+                style = "ltnm_clickable_semibold_label",
                 style_mods = {width = widths.name},
                 tooltip = {"gui.ltnm-open-station-gui"},
               },
