@@ -56,7 +56,7 @@ function util.slot_table_update(table, sources)
         i = i + 1
         local button = children[i]
         if not button then
-          button = gui.add(table, {type = "sprite-button"})
+          button = gui.add(table, {type = "sprite-button", enabled = false})
         end
         local sprite
         if source_data.type then
