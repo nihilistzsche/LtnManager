@@ -124,7 +124,12 @@ function stations_tab.update(self)
         if not row then
           row = gui.add(scroll_pane,
             {type = "frame", style = "ltnm_table_row_frame_"..color,
-              {type = "label", style = "ltnm_clickable_bold_label", style_mods = {width = widths.name}},
+              {
+                type = "label",
+                style = "ltnm_clickable_bold_label",
+                style_mods = {width = widths.name},
+                tooltip = {"gui.ltnm-open-station-gui"},
+              },
               templates.status_indicator(widths.status),
               {type = "label", style_mods = {width = widths.network_id, horizontal_align = "center"}},
               templates.small_slot_table(widths, color, "provided_requested"),
@@ -136,7 +141,12 @@ function stations_tab.update(self)
 
         gui.update(row,
           {
-            {elem_mods = {caption = station_data.name}},
+            {
+              elem_mods = {caption = station_data.name},
+              actions = {
+                on_click = {gui = "main", action = "open_station_gui", station_id = station_id},
+              },
+            },
             {
               {elem_mods = {sprite = "flib_indicator_"..station_data.status.color}},
               {elem_mods = {caption = station_data.status.count}},
