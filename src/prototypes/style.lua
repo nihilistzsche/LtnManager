@@ -155,6 +155,12 @@ styles.ltnm_warning_flow = {
 
 -- FRAME STYLES
 
+styles.ltnm_main_content_frame = {
+  type = "frame_style",
+  parent = "deep_frame_in_shallow_frame",
+  height = constants.gui_content_frame_height,
+}
+
 styles.ltnm_small_slot_table_frame_light = {
   type = "frame_style",
   parent = "ltnm_table_inset_frame_light",
@@ -254,9 +260,10 @@ styles.ltnm_table_toolbar_frame = {
   }
 }
 
-styles.ltnm_warning_frame_in_shallow_frame = {
+styles.ltnm_main_warning_frame = {
   type = "frame_style",
   parent = "deep_frame_in_shallow_frame",
+  height = constants.gui_content_frame_height,
   graphical_set = {
     base = {
       position = {85, 0}, corner_size = 8,
@@ -356,26 +363,23 @@ styles.ltnm_table_scroll_pane = {
 --   }
 -- }
 
--- styles.ltnm_slot_table_scroll_pane = {
---   type = "scroll_pane_style",
---   parent = "flib_naked_scroll_pane",
---   padding = 0,
---   margin = 0,
---   extra_padding_when_activated = 0,
---   horizontally_squashable = "off",
---   background_graphical_set = {
---     base = {
---       position = {282, 17},
---       corner_size = 8,
---       overall_tiling_horizontal_padding = 4,
---       overall_tiling_horizontal_size = 32,
---       overall_tiling_horizontal_spacing = 8,
---       overall_tiling_vertical_padding = 4,
---       overall_tiling_vertical_size = 32,
---       overall_tiling_vertical_spacing = 8
---     }
---   }
--- }
+styles.ltnm_slot_table_scroll_pane = {
+  type = "scroll_pane_style",
+  parent = "flib_naked_scroll_pane_no_padding",
+  horizontally_squashable = "off",
+  background_graphical_set = {
+    base = {
+      position = {282, 17},
+      corner_size = 8,
+      overall_tiling_horizontal_padding = 4,
+      overall_tiling_horizontal_size = 32,
+      overall_tiling_horizontal_spacing = 8,
+      overall_tiling_vertical_padding = 4,
+      overall_tiling_vertical_size = 32,
+      overall_tiling_vertical_spacing = 8
+    }
+  }
+}
 
 -- styles.ltnm_small_slot_table_scroll_pane = {
 --   type = "scroll_pane_style",

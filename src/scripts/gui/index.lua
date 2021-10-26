@@ -8,6 +8,7 @@ local templates = require("templates")
 
 local trains_tab = require("trains")
 local stations_tab = require("stations")
+local inventory_tab = require("inventory")
 
 -- Object methods
 
@@ -110,6 +111,8 @@ function Index:update()
     trains_tab.update(self)
   elseif state.active_tab == "stations" then
     stations_tab.update(self)
+  elseif state.active_tab == "inventory" then
+    inventory_tab.update(self)
   end
 end
 
@@ -188,6 +191,7 @@ function index.build(player, player_table)
         {type = "tabbed-pane", style = "ltnm_tabbed_pane",
           trains_tab.build(widths),
           stations_tab.build(widths),
+          inventory_tab.build(),
         }
       }
     }
@@ -224,7 +228,7 @@ function index.build(player, player_table)
           control_signals = false,
         },
       },
-      surface = false,
+      surface = -1,
       pinned = false,
       search_query = "",
       visible = false,

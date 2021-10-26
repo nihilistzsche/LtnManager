@@ -1,5 +1,4 @@
 local gui = require("__flib__.gui")
-local misc = require("__flib__.misc")
 
 local util = require("scripts.util")
 
@@ -19,8 +18,7 @@ function stations_tab.build(widths)
     },
     content = {
       type = "frame",
-      style = "deep_frame_in_shallow_frame",
-      style_mods = {height = 750},
+      style = "ltnm_main_content_frame",
       direction = "vertical",
       ref = {"stations", "content_frame"},
       {type = "frame", style = "ltnm_table_toolbar_frame",
@@ -113,7 +111,7 @@ function stations_tab.update(self)
 
     if station_data.entity.valid then
       if
-        (not search_surface or (station_data.entity.surface.index == search_surface))
+        (search_surface == -1 or (station_data.entity.surface.index == search_surface))
         and bit32.btest(station_data.network_id, search_network_id)
         and
           #search_query == 0 or string.find(station_data.search_strings[self.player.index], string.lower(search_query))
@@ -191,13 +189,11 @@ function stations_tab.update(self)
   if table_index == 0 then
     refs.warning_flow.visible = true
     scroll_pane.visible = false
-    refs.content_frame.style = "ltnm_warning_frame_in_shallow_frame"
-    refs.content_frame.style.height = 750
+    refs.content_frame.style = "ltnm_main_warning_frame"
   else
     refs.warning_flow.visible = false
     scroll_pane.visible = true
-    refs.content_frame.style = "deep_frame_in_shallow_frame"
-    refs.content_frame.style.height = 750
+    refs.content_frame.style = "ltnm_main_content_frame"
   end
 end
 

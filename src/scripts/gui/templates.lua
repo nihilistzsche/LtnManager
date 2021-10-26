@@ -1,5 +1,12 @@
+local constants = require("constants")
+
 local templates = {}
 
+--- Creates a frame action button, automatically accounting for inverted sprites.
+--- @param sprite string|nil
+--- @param tooltip string|nil
+--- @param ref string[]|nil
+--- @param action table|nil
 function templates.frame_action_button(sprite, tooltip, ref, action)
   return {
     type = "sprite-button",
@@ -14,6 +21,35 @@ function templates.frame_action_button(sprite, tooltip, ref, action)
   }
 end
 
+--- Creates a full-sized scrollable slot table for the inventory tab.
+--- @param name string
+--- @param columns uint
+function templates.inventory_slot_table(name, columns)
+  return
+    {type = "flow", direction = "vertical",
+      {type = "label", style = "bold_label", caption = {"gui.ltnm-"..string.gsub(name, "_", "-")}},
+      {
+        type = "frame",
+        style = "deep_frame_in_shallow_frame",
+        style_mods = {height = constants.gui_inventory_table_height},
+        ref = {"inventory", name, "frame"},
+        {
+          type = "scroll-pane",
+          style = "ltnm_slot_table_scroll_pane",
+          style_mods = {width = 40 * columns + 12, minimal_height = constants.gui_inventory_table_height},
+          vertical_scroll_policy = "auto-and-reserve-space",
+          -- vertical_scroll_policy = "always",
+          ref = {"inventory", name, "scroll_pane"},
+          {type = "table", style = "slot_table", column_count = columns, ref = {"inventory", name, "table"}},
+        },
+      },
+    }
+end
+
+--- Creates a small non-scrollable slot table.
+--- @param widths table
+--- @param color string
+--- @param name string
 function templates.small_slot_table(widths, color, name)
   return {
     type = "frame",
