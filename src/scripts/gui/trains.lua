@@ -10,11 +10,18 @@ local trains_tab = {}
 
 function trains_tab.build(widths)
   return {
-    tab = {type = "tab", caption = {"gui.ltnm-trains"}, ref = {"trains", "tab"}},
+    tab = {
+      type = "tab",
+      caption = {"gui.ltnm-trains"},
+      ref = {"trains", "tab"},
+      actions = {
+        on_click = {gui = "main", action = "change_tab", tab = "trains"},
+      },
+    },
     content = {
       type = "frame",
       style = "deep_frame_in_shallow_frame",
-      style_mods = {height = 600},
+      style_mods = {height = 750},
       direction = "vertical",
       ref = {"trains", "content_frame"},
       {type = "frame", style = "ltnm_table_toolbar_frame",
@@ -59,6 +66,8 @@ function trains_tab.build(widths)
 end
 
 function trains_tab.update(self)
+  local dictionaries = self.player_table.dictionaries
+
   local state = self.state
   local refs = self.refs.trains
   local widths = self.widths
@@ -162,7 +171,10 @@ function trains_tab.update(self)
           }
         )
 
-        util.slot_table_update(row.shipment_frame.shipment_table, train_data.shipment, self.player_table.dictionaries)
+        util.slot_table_update(
+          row.shipment_frame.shipment_table,
+          {{color = "default", entries = train_data.shipment, translations = dictionaries.materials}}
+        )
       end
     end
   end
@@ -175,12 +187,12 @@ function trains_tab.update(self)
     refs.warning_flow.visible = true
     scroll_pane.visible = false
     refs.content_frame.style = "ltnm_warning_frame_in_shallow_frame"
-    refs.content_frame.style.height = 600
+    refs.content_frame.style.height = 750
   else
     refs.warning_flow.visible = false
     scroll_pane.visible = true
     refs.content_frame.style = "deep_frame_in_shallow_frame"
-    refs.content_frame.style.height = 600
+    refs.content_frame.style.height = 750
   end
 end
 

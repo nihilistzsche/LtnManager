@@ -223,6 +223,7 @@ styles.ltnm_table_row_frame_light = {
     type = "horizontal_flow_style",
     vertical_align = "center",
     horizontal_spacing = 10,
+    horizontally_stretchable = "on",
   },
   graphical_set = {
     base = {
@@ -245,7 +246,7 @@ styles.ltnm_table_toolbar_frame = {
   type = "frame_style",
   parent = "subheader_frame",
   left_padding = 9,
-  right_padding = 7,
+  right_padding = 7 + 12, -- For scrollbar
   horizontal_flow_style = {
     type = "horizontal_flow_style",
     horizontal_spacing = 10,

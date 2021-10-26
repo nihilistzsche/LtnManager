@@ -37,14 +37,17 @@ constants.gui = {
       depot = 120,
       shipment = 36 * 4,
     },
-    -- stations_list = {
-    --   name = 232,
-    --   status = 53,
-    --   network_id = 84,
-    --   provided_requested = (36 * 6),
-    --   shipments = (36 * 5),
-    --   control_signals = (36 * 7)
-    -- },
+    stations = {
+      name = 232,
+      status = 53,
+      network_id = 84,
+      provided_requested = 36 * 6,
+      provided_requested_columns = 6,
+      shipments = 36 * 5,
+      shipments_columns = 5,
+      control_signals = 36 * 7,
+      control_signals_columns = 7,
+    },
     -- history = {
     --   depot = 160,
     --   train_id = 60,

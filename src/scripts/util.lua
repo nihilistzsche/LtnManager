@@ -33,31 +33,47 @@ function util.gui_list(parent, iterator, test, build, update, ...)
   end
 end
 
---- Updates a slot table based on the current items.
+--- A dataset to put into a slot table.
+---
+--- If `type` is provided, it will be used for the sprite definition. If not provided, the type will be derived from the
+--- name of each material.
+--- @class SlotTableDef
+--- @field color string
+--- @field entries table<string, number>
+--- @field translations table
+--- @field type string|nil
+
+--- Updates a slot table based on the passed criteria.
 --- @param table LuaGuiElement
---- @param source table
---- @param dictionaries table
-function util.slot_table_update(table, source, dictionaries)
+--- @param sources SlotTableDef[]
+function util.slot_table_update(table, sources)
   local children = table.children
 
   local i = 0
-  for name, count in pairs(source or {}) do
-    i = i + 1
-    local button = children[i]
-    if not button then
-      local sprite = string.gsub(name, ",", "/")
-      button = gui.add(table, {
-          type = "sprite-button",
-          style = "ltnm_small_slot_button_default",
-          sprite = sprite,
-          tooltip = "[img="
-            ..sprite
-            .."]  [font=default-semibold]"
-            ..dictionaries.materials[name]
-            .."[/font]\n"
-            ..misc.delineate_number(count),
-          number = count,
-      })
+  for _, source_data in pairs(sources) do
+    if source_data.entries then
+      for name, count in pairs(source_data.entries) do
+        i = i + 1
+        local button = children[i]
+        if not button then
+          button = gui.add(table, {type = "sprite-button"})
+        end
+        local sprite
+        if source_data.type then
+          sprite = source_data.type.."/"..name
+        else
+          sprite = string.gsub(name, ",", "/")
+        end
+        button.style = "ltnm_small_slot_button_"..source_data.color
+        button.sprite = sprite
+        button.tooltip = "[img="
+          ..sprite
+          .."]  [font=default-semibold]"
+          ..source_data.translations[name]
+          .."[/font]\n"
+          ..misc.delineate_number(count)
+        button.number = count
+      end
     end
   end
 

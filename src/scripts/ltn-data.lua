@@ -248,19 +248,17 @@ local function iterate_stations(working_data, iterations_per_tick)
     local provided_requested_count = 0
     for mode, count_multiplier in pairs{provided = 1, requested = -1} do
       local materials = working_data[mode.."_by_stop"][station_id]
-      if materials then
-        local materials_copy = {}
-        for name, count in pairs(materials) do
-          -- copy
-          materials_copy[name] = count
-          -- update total count
-          provided_requested_count = provided_requested_count + (count * count_multiplier)
-          -- add to global inventory
-          add_to_inventory(inventory[mode], surface_index, network_id, name, count)
-        end
-        -- add to station
-        station_data[mode] = materials_copy
+      local materials_copy = {}
+      for name, count in pairs(materials or {}) do
+        -- copy
+        materials_copy[name] = count
+        -- update total count
+        provided_requested_count = provided_requested_count + (count * count_multiplier)
+        -- add to global inventory
+        add_to_inventory(inventory[mode], surface_index, network_id, name, count)
       end
+      -- add to station
+      station_data[mode] = materials_copy
     end
     station_data.provided_requested_count = provided_requested_count
 

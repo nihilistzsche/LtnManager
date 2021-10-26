@@ -7,6 +7,7 @@ local templates = require("templates")
 local update = require("update")
 
 local trains_tab = require("trains")
+local stations_tab = require("stations")
 
 -- Object methods
 
@@ -168,7 +169,8 @@ function index.build(player, player_table)
           -- TODO: maybe surface dropdown?
         },
         {type = "tabbed-pane", style = "ltnm_tabbed_pane",
-          trains_tab.build(widths)
+          trains_tab.build(widths),
+          stations_tab.build(widths),
         }
       }
     }
@@ -189,11 +191,20 @@ function index.build(player, player_table)
       network_id = -1,
       sorts = {
         trains = {
-          _active = "status",
+          _active = "composition",
           status = false,
           composition = false,
           depot = false,
           shipment = false,
+        },
+        stations = {
+          _active = "name",
+          name = false,
+          status = false,
+          network_id = false,
+          provided_requested = false,
+          shipments = false,
+          control_signals = false,
         },
       },
       surface = false,

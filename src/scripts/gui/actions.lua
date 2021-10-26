@@ -113,4 +113,9 @@ function actions.update(self)
   self:schedule_update()
 end
 
+function actions.change_tab(self, msg)
+  self.state.active_tab = msg.tab
+  self:schedule_update()
+end
+
 return actions
