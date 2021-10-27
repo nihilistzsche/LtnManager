@@ -136,4 +136,10 @@ function actions.delete_alert(self, msg)
   self:schedule_update()
 end
 
+function actions.delete_all_alerts(self)
+  global.flags.deleted_all_alerts = true
+  self:schedule_update()
+end
+
+
 return actions
