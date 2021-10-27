@@ -182,7 +182,7 @@ function alerts_tab.update(self)
           {
             elem_mods = {caption = alerts_entry.train_id},
             actions = {
-              on_click = {gui = "main", action = "open_train_gui", alert_id = alerts_entry.train_id},
+              on_click = {gui = "main", action = "open_train_gui", train_id = alerts_entry.train_id},
             },
           },
           {

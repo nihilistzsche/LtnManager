@@ -177,7 +177,7 @@ function history_tab.update(self)
           {
             elem_mods = {caption = history_entry.train_id},
             actions = {
-              on_click = {gui = "main", action = "open_train_gui", history_id = history_entry.train_id},
+              on_click = {gui = "main", action = "open_train_gui", train_id = history_entry.train_id},
             },
           },
           {
