@@ -68,7 +68,6 @@ function history_tab.build(widths)
           "shipment",
           false
         ),
-        {type = "empty-widget", style = "flib_horizontal_pusher"},
         {
           type = "sprite-button",
           style = "tool_button_red",

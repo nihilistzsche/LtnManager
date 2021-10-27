@@ -51,12 +51,11 @@ function alerts_tab.build(widths)
           false
         ),
         templates.sort_checkbox(
-          widths,
+          nil,
           "alerts",
           "type",
           false
         ),
-        {type = "empty-widget", style = "flib_horizontal_pusher"},
         {
           type = "sprite-button",
           style = "tool_button_red",
