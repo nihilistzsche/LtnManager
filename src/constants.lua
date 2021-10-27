@@ -52,6 +52,12 @@ constants.gui = {
       control_signals = 36 * 7,
       control_signals_columns = 7,
     },
+    depots = {
+      name = 200,
+      network_id = 84,
+      status = 200,
+      trains = 200,
+    },
     history = {
       train_id = 60,
       route = 351,

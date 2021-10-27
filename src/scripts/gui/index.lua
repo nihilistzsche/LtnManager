@@ -9,6 +9,7 @@ local actions = require("actions")
 local templates = require("templates")
 
 local trains_tab = require("trains")
+local depots_tab = require("depots")
 local stations_tab = require("stations")
 local inventory_tab = require("inventory")
 local history_tab = require("history")
@@ -125,6 +126,8 @@ function Index:update()
 
   if state.active_tab == "trains" then
     trains_tab.update(self)
+  elseif state.active_tab == "depots" then
+    depots_tab.update(self)
   elseif state.active_tab == "stations" then
     stations_tab.update(self)
   elseif state.active_tab == "inventory" then
@@ -216,13 +219,23 @@ function index.build(player, player_table)
         },
         {type = "tabbed-pane", style = "ltnm_tabbed_pane",
           trains_tab.build(widths),
+          depots_tab.build(widths),
           stations_tab.build(widths),
           inventory_tab.build(),
           history_tab.build(widths),
           alerts_tab.build(widths),
         }
-      }
-    }
+      },
+      {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"depots", "scroll_pane"}},
+      {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"depots", "warning_flow"},
+        {
+          type = "label",
+          style = "ltnm_semibold_label",
+          caption = {"gui.ltnm-no-depots"},
+          ref = {"depots", "warning_label"},
+        },
+      },
+    },
   })
 
   refs.titlebar.flow.drag_target = refs.window
@@ -245,6 +258,13 @@ function index.build(player, player_table)
           composition = false,
           depot = false,
           shipment = false,
+        },
+        depots = {
+          _active = "name",
+          name = false,
+          network_id = false,
+          status = false,
+          trains = false,
         },
         stations = {
           _active = "name",

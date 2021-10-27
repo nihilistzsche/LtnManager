@@ -298,13 +298,9 @@ local function iterate_stations(working_data, iterations_per_tick)
           num_trains = #station_trains,
           stations = {station_id},
           statuses = {[status.color] = status.count},
+          search_string = {},
           surfaces = {[surface_index] = true},
           train_ids = {},
-          sorted_trains = {
-            composition = {},
-            status = {},
-            shipment = {}
-          }
         }
       end
     else
@@ -359,13 +355,13 @@ local function iterate_trains(working_data, iterations_per_tick)
     if not depot_data then return nil, true end
 
     -- add to depot trains lists
-    local train_ids = depot_data.train_ids
-    train_ids[#train_ids+1] = train_id
-    for name, sort_table in pairs(depot_data.sorted_trains) do
-      if name ~= "status" then
-        sort_table[#sort_table+1] = train_id
-      end
-    end
+    -- local train_ids = depot_data.train_ids
+    -- train_ids[#train_ids+1] = train_id
+    -- for name, sort_table in pairs(depot_data.sorted_trains) do
+    --   if name ~= "status" then
+    --     sort_table[#sort_table+1] = train_id
+    --   end
+    -- end
     if train_state == defines.train_state.wait_station and schedule.records[schedule.current].station == depot then
       depot_data.available_trains[#depot_data.available_trains+1] = train_id
     end
@@ -449,6 +445,34 @@ local function iterate_in_transit(working_data, iterations_per_tick)
       end
     end
   )
+end
+
+local function generate_depot_strings(working_data, iterations_per_tick)
+  local depots = working_data.depots
+  local players = working_data.players
+
+  return table.for_n_of(
+    {},
+    working_data.key,
+    iterations_per_tick,
+    function(depot_data, depot_name)
+      local search_string = {}
+
+    end,
+    function(_, key)
+      return per_player_next(players, depots, key, function(player, depot)
+        return {
+          translations = players[player].dictionaries.gui,
+          depot = depots[depot]
+        }
+      end)
+    end
+  )
+  end
+end
+
+local function sort_depots(working_data, iterations_per_tick)
+
 end
 
 local function generate_train_statuses(working_data, iterations_per_tick)
