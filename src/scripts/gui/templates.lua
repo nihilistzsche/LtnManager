@@ -66,14 +66,17 @@ end
 --- @param column string
 --- @param selected boolean
 --- @param tooltip string|nil
-function templates.sort_checkbox(widths, tab, column, selected, tooltip)
+function templates.sort_checkbox(widths, tab, column, selected, tooltip, state)
+  if state == nil then
+    state = false
+  end
   return {
     type = "checkbox",
     style = selected and "ltnm_selected_sort_checkbox" or "ltnm_sort_checkbox",
     style_mods = {width = widths[tab][column]},
     caption = {"gui.ltnm-"..string.gsub(column, "_", "-")},
     tooltip = tooltip,
-    state = false,
+    state = state,
     ref = {tab, "toolbar", column.."_checkbox"},
     actions = {
       on_checked_state_changed = {gui = "main", tab = tab, action = "toggle_sort", column = column},
