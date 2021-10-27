@@ -131,4 +131,9 @@ function actions.change_surface(self, _, e)
   end
 end
 
+function actions.delete_alert(self, msg)
+  global.active_data.alerts_to_delete[msg.alert_id] = true
+  self:schedule_update()
+end
+
 return actions

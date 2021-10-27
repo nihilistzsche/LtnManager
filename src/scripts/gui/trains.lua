@@ -104,7 +104,7 @@ function trains_tab.update(self)
 
     if train_data.train.valid and train_data.main_locomotive.valid then
       if
-        (search_surface == -1 or (train_data.main_locomotive.surface.index == search_surface))
+        (search_surface == -1 or (train_data.surface_index == search_surface))
         and bit32.btest(train_data.network_id, search_network_id)
         and (
           #search_query == 0 or string.find(train_data.search_strings[self.player.index], string.lower(search_query))

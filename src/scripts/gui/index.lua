@@ -12,6 +12,7 @@ local trains_tab = require("trains")
 local stations_tab = require("stations")
 local inventory_tab = require("inventory")
 local history_tab = require("history")
+local alerts_tab = require("alerts")
 
 -- Object methods
 
@@ -120,6 +121,7 @@ function Index:update()
   refs.trains.tab.badge_text = misc.delineate_number(#ltn_data.sorted_trains.composition)
   refs.stations.tab.badge_text = misc.delineate_number(#ltn_data.sorted_stations.name)
   refs.history.tab.badge_text = misc.delineate_number(queue.length(ltn_data.history))
+  refs.alerts.tab.badge_text = misc.delineate_number(queue.length(ltn_data.alerts))
 
   if state.active_tab == "trains" then
     trains_tab.update(self)
@@ -129,6 +131,8 @@ function Index:update()
     inventory_tab.update(self)
   elseif state.active_tab == "history" then
     history_tab.update(self)
+  elseif state.active_tab == "alerts" then
+    alerts_tab.update(self)
   end
 end
 
@@ -215,6 +219,7 @@ function index.build(player, player_table)
           stations_tab.build(widths),
           inventory_tab.build(),
           history_tab.build(widths),
+          alerts_tab.build(widths),
         }
       }
     }
@@ -259,6 +264,15 @@ function index.build(player, player_table)
           runtime = false,
           finished = true,
           shipment = false,
+        },
+        alerts = {
+          _active = "time",
+          time = true,
+          train_id = false,
+          route = false,
+          network_id = false,
+          type = false,
+          contents = false,
         },
       },
       surface = -1,

@@ -396,6 +396,7 @@ local function iterate_trains(working_data, iterations_per_tick)
     train_data.main_locomotive = train_util.get_main_locomotive(train)
     train_data.search_strings = {}
     train_data.shipment_count = 0
+    train_data.surface_index = train_data.main_locomotive.surface.index
     train_data.status = {}
     trains[train_id] = train_data
     for key, value in pairs(
@@ -854,6 +855,7 @@ local function update_alerts(working_data)
       -- there's nothing we can do, so skip this one
       if not train or not train.to then goto continue end
     end
+    alert_data.search_strings = {}
     alert_data.train = {
       depot = train.depot,
       from = train.from,
@@ -863,7 +865,8 @@ local function update_alerts(working_data)
       pickup_done = train.pickupDone or false,
       to = train.to,
       to_id = train.to_id,
-      route = train.from.." -> "..train.to
+      route = train.from.." -> "..train.to,
+      surface_index = train.surface_index,
     }
     -- save to alerts table
     queue.push_right(active_alerts, alert_data)
@@ -876,6 +879,49 @@ local function update_alerts(working_data)
   active_data.alerts_to_add = {}
 end
 
+local function generate_alerts_search_strings(working_data)
+  local players = working_data.players
+  local alerts = working_data.alerts
+
+  return table.for_n_of(
+    {},
+    working_data.key,
+    1,
+    function(data, key)
+      if key.obj == "first" or key.obj == "last" then return end
+
+      local alert_data = data.alert
+      local translations = data.translations
+
+      -- TODO: Search alert types
+      local str = {
+        alert_data.time,
+        alert_data.train_id,
+        string.lower(alert_data.train.from),
+        string.lower(alert_data.train.to),
+        alert_data.train.network_id,
+      }
+      local str_i = 5
+      for _, source in pairs{alert_data.planned_shipment or {}, alert_data.actual_shipment} do
+        for name in pairs(source) do
+          str_i = str_i + 1
+          str[str_i] = string.lower(translations[name])
+        end
+      end
+
+      alert_data.search_strings[data.player_index] = table.concat(str, " ")
+    end,
+    function(_, key)
+      return per_player_next(players, alerts, key, function(player, alerts_index)
+        return {
+          alert = alerts[alerts_index],
+          player_index = player,
+          translations = players[player].dictionaries.materials,
+        }
+      end)
+    end
+  )
+end
 local function prepare_alerts_sort(working_data)
   local active_alerts = global.active_data.alerts
   -- copy to working data
@@ -927,7 +973,7 @@ end
 
 local function process_surfaces(working_data)
   local surface_data = {
-    items = {{"ltnm-gui.all-paren"}},
+    items = {{"gui.ltnm-all-paren"}},
     selected_to_index = {-1}
   }
   local i = 1
@@ -976,6 +1022,7 @@ function ltn_data.iterate()
     generate_history_search_strings,
     sort_history,
     update_alerts,
+    generate_alerts_search_strings,
     prepare_alerts_sort,
     sort_alerts,
     process_surfaces
@@ -1066,7 +1113,7 @@ function ltn_data.on_dispatcher_updated(e)
     network_id = {},
     provided_requested = {},
     shipments = {},
-    control_signals = {}
+    control_signals = {},
   }
   working_data.sorted_history = {
     depot = {},
@@ -1075,12 +1122,14 @@ function ltn_data.on_dispatcher_updated(e)
     route = {},
     finished = {},
     runtime = {},
-    shipment = {}
+    shipment = {},
   }
   working_data.sorted_alerts = {
-    route = {},
     time = {},
-    type = {}
+    train_id = {},
+    route = {},
+    network_id = {},
+    type = {},
   }
   -- iteration data
   working_data.step = 1

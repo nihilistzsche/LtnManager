@@ -116,8 +116,8 @@ function history_tab.update(self)
   end
 
   for sorted_index = start, finish, step do
-    local train_id = sorted_history[sorted_index]
-    local history_entry = ltn_history[train_id]
+    local history_id = sorted_history[sorted_index]
+    local history_entry = ltn_history[history_id]
 
     if
       (search_surface == -1 or (history_entry.surface_index == search_surface))
@@ -177,7 +177,7 @@ function history_tab.update(self)
           {
             elem_mods = {caption = history_entry.train_id},
             actions = {
-              on_click = {gui = "main", action = "open_train_gui", train_id = history_entry.train_id},
+              on_click = {gui = "main", action = "open_train_gui", history_id = history_entry.train_id},
             },
           },
           {
@@ -221,7 +221,6 @@ function history_tab.update(self)
     scroll_pane.visible = true
     refs.content_frame.style = "ltnm_main_content_frame"
   end
-
 end
 
 return history_tab

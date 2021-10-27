@@ -60,7 +60,15 @@ constants.gui = {
       runtime = 68,
       finished = 68,
       shipment = (36 * 6)
-    }
+    },
+    alerts = {
+      time = 68,
+      train_id = 60,
+      route = 338,
+      network_id = 84,
+      type = 230,
+      contents = 36 * 6,
+    },
   }
 }
 
