@@ -264,6 +264,7 @@ styles.ltnm_table_toolbar_frame = {
   parent = "subheader_frame",
   left_padding = 9,
   right_padding = 7 + 12, -- For scrollbar
+  horizontally_stretchable = "on", -- FIXME: This causes the GUI to jump when the scrollbar appears
   horizontal_flow_style = {
     type = "horizontal_flow_style",
     horizontal_spacing = 10,
