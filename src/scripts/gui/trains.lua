@@ -48,7 +48,6 @@ function trains_tab.build(widths)
           "shipment",
           false
         ),
-        {type = "empty-widget", style = "flib_horizontal_pusher"},
       },
       {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"trains", "scroll_pane"}},
       {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"trains", "warning_flow"},
@@ -56,9 +55,9 @@ function trains_tab.build(widths)
           type = "label",
           style = "ltnm_semibold_label",
           caption = {"gui.ltnm-no-trains"},
-          ref = {"trains", "warning_label"}
+          ref = {"trains", "warning_label"},
         },
-      }
+      },
     },
   }
 end
