@@ -28,13 +28,13 @@ function trains_tab.build(widths)
           widths,
           "trains",
           "status",
-          true
+          false
         ),
         templates.sort_checkbox(
           widths,
           "trains",
           "composition",
-          false
+          true
         ),
         templates.sort_checkbox(
           widths,
