@@ -161,6 +161,17 @@ styles.ltnm_main_content_frame = {
   height = constants.gui_content_frame_height,
 }
 
+styles.ltnm_main_toolbar_frame = {
+  type = "frame_style",
+  parent = "subheader_frame",
+  bottom_margin = 12,
+  horizontal_flow_style = {
+    type = "horizontal_flow_style",
+    horizontal_spacing = 12,
+    vertical_align = "center",
+  },
+}
+
 styles.ltnm_small_slot_table_frame_light = {
   type = "frame_style",
   parent = "ltnm_table_inset_frame_light",

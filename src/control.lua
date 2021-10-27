@@ -199,7 +199,7 @@ event.on_string_translated(function(e)
       if player_table.dictionaries and (player_table.language or "") ~= language_data.language then
         player_table.language = language_data.language
         player_table.dictionaries = language_data.dictionaries
-        -- TODO: Refresh GUI
+        -- TODO: Rebuild GUI
       elseif not player_table.flags.can_open_gui then
         player_table.language = language_data.language
         player_table.dictionaries = language_data.dictionaries

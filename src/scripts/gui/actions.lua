@@ -70,8 +70,10 @@ end
 function actions.open_train_gui(self, msg)
   local train_id = msg.train_id
   local train_data = self.state.ltn_data.trains[train_id]
+
   if not train_data or not train_data.train.valid then
     util.error_flying_text(self.player, {"message.ltnm-error-train-is-invalid"})
+    return
   end
 
   train_util.open_gui(self.player.index, train_data.train)
@@ -80,8 +82,10 @@ end
 function actions.open_station_gui(self, msg)
   local station_id = msg.station_id
   local station_data = self.state.ltn_data.stations[station_id]
+
   if not station_data or not station_data.entity.valid then
     util.error_flying_text(self.player, {"message.ltnm-error-station-is-invalid"})
+    return
   end
 
   self.player.opened = station_data.entity
@@ -116,6 +120,15 @@ end
 function actions.change_tab(self, msg)
   self.state.active_tab = msg.tab
   self:schedule_update()
+end
+
+function actions.change_surface(self, _, e)
+  local selected_index = e.element.selected_index
+  local selected_surface_index = self.state.ltn_data.surfaces.selected_to_index[selected_index]
+  if selected_surface_index then
+    self.state.surface = selected_surface_index
+    self:schedule_update()
+  end
 end
 
 return actions

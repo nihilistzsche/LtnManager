@@ -111,10 +111,11 @@ function stations_tab.update(self)
 
     if station_data.entity.valid then
       if
-        (search_surface == -1 or (station_data.entity.surface.index == search_surface))
+        (search_surface == -1 or station_data.entity.surface.index == search_surface)
         and bit32.btest(station_data.network_id, search_network_id)
-        and
+        and (
           #search_query == 0 or string.find(station_data.search_strings[self.player.index], string.lower(search_query))
+        )
       then
         table_index = table_index + 1
         local row = children[table_index]

@@ -1,5 +1,6 @@
 local gui = require("__flib__.gui")
 local misc = require("__flib__.misc")
+local table = require("__flib__.table")
 
 local constants = require("constants")
 
@@ -102,7 +103,17 @@ function Index:update()
 
   local ltn_data = self.state.ltn_data
 
-  -- TODO: Update surfaces dropdown
+  -- Surface dropdown
+  local surface_dropdown = refs.toolbar.surface_dropdown
+  surface_dropdown.items = ltn_data.surfaces.items
+  -- Validate that the selected index still exist
+  local selected_index = table.find(ltn_data.surfaces.selected_to_index, state.surface)
+  -- If the surface was invalidated since last update, reset to all
+  if not selected_index then
+    selected_index = 1
+    state.surface = -1
+  end
+  surface_dropdown.selected_index = selected_index
 
   refs.trains.tab.badge_text = misc.delineate_number(#ltn_data.sorted_trains.composition)
   refs.stations.tab.badge_text = misc.delineate_number(#ltn_data.sorted_stations.name)
@@ -161,11 +172,10 @@ function index.build(player, player_table)
         ),
       },
       {type = "frame", style = "inside_deep_frame", direction = "vertical",
-        {type = "frame", style = "subheader_frame", style_mods = {bottom_margin = 12},
+        {type = "frame", style = "ltnm_main_toolbar_frame",
           {type = "label", style = "subheader_caption_label", caption = {"gui.ltnm-search-label"}},
           {
             type = "textfield",
-            style_mods = {left_margin = 8},
             clear_and_focus_on_right_click = true,
             ref = {"toolbar", "text_search_field"},
             actions = {
@@ -176,7 +186,7 @@ function index.build(player, player_table)
           {type = "label", style = "caption_label", caption = {"gui.ltnm-network-id-label"}},
           {
             type = "textfield",
-            style_mods = {left_margin = 8, width = 120},
+            style_mods = {width = 120},
             numeric = true,
             allow_negative = true,
             clear_and_focus_on_right_click = true,
@@ -185,8 +195,15 @@ function index.build(player, player_table)
             actions = {
               on_text_changed = {gui = "main", action = "update_network_id_query"},
             },
-          }
-          -- TODO: maybe surface dropdown?
+          },
+          {type = "label", style = "caption_label", caption = {"gui.ltnm-surface-label"}},
+          {
+            type = "drop-down",
+            ref = {"toolbar", "surface_dropdown"},
+            actions = {
+              on_selection_state_changed = {gui = "main", action = "change_surface"},
+            },
+          },
         },
         {type = "tabbed-pane", style = "ltnm_tabbed_pane",
           trains_tab.build(widths),
@@ -229,6 +246,7 @@ function index.build(player, player_table)
         },
       },
       surface = -1,
+      surface_dd_index = 1,
       pinned = false,
       search_query = "",
       visible = false,

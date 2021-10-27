@@ -107,8 +107,9 @@ function trains_tab.update(self)
       if
         (search_surface == -1 or (train_data.main_locomotive.surface.index == search_surface))
         and bit32.btest(train_data.network_id, search_network_id)
-        and
+        and (
           #search_query == 0 or string.find(train_data.search_strings[self.player.index], string.lower(search_query))
+        )
       then
         table_index = table_index + 1
         local row = children[table_index]
