@@ -131,6 +131,11 @@ function actions.change_surface(self, _, e)
   end
 end
 
+function actions.clear_history(self)
+  global.flags.deleted_history = true
+  self:schedule_update()
+end
+
 function actions.delete_alert(self, msg)
   global.active_data.alerts_to_delete[msg.alert_id] = true
   self:schedule_update()
@@ -140,6 +145,5 @@ function actions.delete_all_alerts(self)
   global.flags.deleted_all_alerts = true
   self:schedule_update()
 end
-
 
 return actions

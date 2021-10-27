@@ -73,7 +73,7 @@ function templates.sort_checkbox(widths, tab, column, selected, tooltip, state)
   return {
     type = "checkbox",
     style = selected and "ltnm_selected_sort_checkbox" or "ltnm_sort_checkbox",
-    style_mods = {width = widths[tab][column]},
+    style_mods = {width = widths and widths[tab][column] or nil},
     caption = {"gui.ltnm-"..string.gsub(column, "_", "-")},
     tooltip = tooltip,
     state = state,

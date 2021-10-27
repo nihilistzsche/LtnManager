@@ -23,7 +23,7 @@ function history_tab.build(widths)
       style = "ltnm_main_content_frame",
       direction = "vertical",
       ref = {"history", "content_frame"},
-      {type = "frame", style = "ltnm_table_toolbar_frame",
+      {type = "frame", style = "ltnm_table_toolbar_frame", style_mods = {right_padding = 4},
         templates.sort_checkbox(
           widths,
           "history",
@@ -63,11 +63,21 @@ function history_tab.build(widths)
           true
         ),
         templates.sort_checkbox(
-          widths,
+          nil,
           "history",
           "shipment",
           false
         ),
+        {type = "empty-widget", style = "flib_horizontal_pusher"},
+        {
+          type = "sprite-button",
+          style = "tool_button_red",
+          sprite = "utility/trash",
+          tooltip = {"gui.ltnm-clear-history"},
+          actions = {
+            on_click = {gui = "main", action = "clear_history"},
+          },
+        },
       },
       {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"history", "scroll_pane"}},
       {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"history", "warning_flow"},
@@ -115,96 +125,96 @@ function history_tab.update(self)
     step = 1
   end
 
-  for sorted_index = start, finish, step do
-    local history_id = sorted_history[sorted_index]
-    local history_entry = ltn_history[history_id]
+  if not global.flags.deleted_history then
+    for sorted_index = start, finish, step do
+      local history_id = sorted_history[sorted_index]
+      local history_entry = ltn_history[history_id]
 
-    if
-      (search_surface == -1 or (history_entry.surface_index == search_surface))
-      and bit32.btest(history_entry.network_id, search_network_id)
-      and (
-        #search_query == 0 or string.find(history_entry.search_strings[self.player.index], string.lower(search_query))
-      )
-    then
-      table_index = table_index + 1
-      local row = children[table_index]
-      local color = table_index % 2 == 0 and "dark" or "light"
-      if not row then
-        row = gui.add(scroll_pane,
-          {type = "frame", style = "ltnm_table_row_frame_"..color,
-            {
-              type = "label",
-              style = "ltnm_clickable_semibold_label",
-              style_mods = {width = widths.history.train_id, horizontal_align = "center"},
-              tooltip = {"gui.ltnm-open-train-gui"},
-            },
-            {
-              type = "flow",
-              style_mods = {vertical_spacing = 0},
-              direction = "vertical",
+      if
+        (search_surface == -1 or (history_entry.surface_index == search_surface))
+        and bit32.btest(history_entry.network_id, search_network_id)
+        and (
+          #search_query == 0 or string.find(history_entry.search_strings[self.player.index], string.lower(search_query))
+        )
+      then
+        table_index = table_index + 1
+        local row = children[table_index]
+        local color = table_index % 2 == 0 and "dark" or "light"
+        if not row then
+          row = gui.add(scroll_pane,
+            {type = "frame", style = "ltnm_table_row_frame_"..color,
               {
                 type = "label",
                 style = "ltnm_clickable_semibold_label",
-                style_mods = {width = widths.history.route},
-                tooltip = {"gui.ltnm-open-station-gui"},
+                style_mods = {width = widths.history.train_id, horizontal_align = "center"},
+                tooltip = {"gui.ltnm-open-train-gui"},
               },
               {
-                type = "label",
-                style = "ltnm_clickable_semibold_label",
-                style_mods = {width = widths.history.route},
-                tooltip = {"gui.ltnm-open-station-gui"},
+                type = "flow",
+                style_mods = {vertical_spacing = 0},
+                direction = "vertical",
+                {
+                  type = "label",
+                  style = "ltnm_clickable_semibold_label",
+                  style_mods = {width = widths.history.route},
+                  tooltip = {"gui.ltnm-open-station-gui"},
+                },
+                {
+                  type = "label",
+                  style = "ltnm_clickable_semibold_label",
+                  style_mods = {width = widths.history.route},
+                  tooltip = {"gui.ltnm-open-station-gui"},
+                },
+              },
+              {type = "label", style_mods = {width = widths.history.depot}},
+              {type = "label", style_mods = {width = widths.history.network_id, horizontal_align = "center"}},
+              {type = "label", style_mods = {width = widths.history.finished, horizontal_align = "center"}},
+              {type = "label", style_mods = {width = widths.history.runtime, horizontal_align = "center"}},
+              {
+                type = "frame",
+                name = "shipment_frame",
+                style = "ltnm_small_slot_table_frame_"..color,
+                style_mods = {width = widths.history.shipment},
+                {type = "table", name = "shipment_table", style = "slot_table", column_count = 4},
+              },
+            }
+          )
+        end
+
+        gui.update(row,
+          {
+            {
+              elem_mods = {caption = history_entry.train_id},
+              actions = {
+                on_click = {gui = "main", action = "open_train_gui", train_id = history_entry.train_id},
               },
             },
-            {type = "label", style_mods = {width = widths.history.depot}},
-            {type = "label", style_mods = {width = widths.history.network_id, horizontal_align = "center"}},
-            {type = "label", style_mods = {width = widths.history.finished, horizontal_align = "center"}},
-            {type = "label", style_mods = {width = widths.history.runtime, horizontal_align = "center"}},
             {
-              type = "frame",
-              name = "shipment_frame",
-              style = "ltnm_small_slot_table_frame_"..color,
-              style_mods = {width = widths.history.shipment},
-              {type = "table", name = "shipment_table", style = "slot_table", column_count = 4},
+              {
+                elem_mods = {caption = history_entry.from},
+                actions = {
+                  on_click = {gui = "main", action = "open_station_gui", station_id = history_entry.from_id},
+                },
+              },
+              {
+                elem_mods = {caption = "[color="..constants.colors.caption.str.."]->[/color]  "..history_entry.to},
+                actions = {
+                  on_click = {gui = "main", action = "open_station_gui", station_id = history_entry.to_id},
+                },
+              },
             },
+            {elem_mods = {caption = history_entry.depot}},
+            {elem_mods = {caption = history_entry.network_id}},
+            {elem_mods = {caption = misc.ticks_to_timestring(history_entry.runtime)}},
+            {elem_mods = {caption = misc.ticks_to_timestring(history_entry.finished)}},
           }
         )
+
+        util.slot_table_update(
+          row.shipment_frame.shipment_table,
+          {{color = "default", entries = history_entry.shipment, translations = dictionaries.materials}}
+        )
       end
-
-      -- local station_id = status.station and history_entry[status.station.."_id"] or nil
-
-      gui.update(row,
-        {
-          {
-            elem_mods = {caption = history_entry.train_id},
-            actions = {
-              on_click = {gui = "main", action = "open_train_gui", train_id = history_entry.train_id},
-            },
-          },
-          {
-            {
-              elem_mods = {caption = history_entry.from},
-              actions = {
-                on_click = {gui = "main", action = "open_station_gui", station_id = history_entry.from_id},
-              },
-            },
-            {
-              elem_mods = {caption = "[color="..constants.colors.caption.str.."]->[/color]  "..history_entry.to},
-              actions = {
-                on_click = {gui = "main", action = "open_station_gui", station_id = history_entry.to_id},
-              },
-            },
-          },
-          {elem_mods = {caption = history_entry.depot}},
-          {elem_mods = {caption = history_entry.network_id}},
-          {elem_mods = {caption = misc.ticks_to_timestring(history_entry.runtime)}},
-          {elem_mods = {caption = misc.ticks_to_timestring(history_entry.finished)}},
-        }
-      )
-
-      util.slot_table_update(
-        row.shipment_frame.shipment_table,
-        {{color = "default", entries = history_entry.shipment, translations = dictionaries.materials}}
-      )
     end
   end
 
