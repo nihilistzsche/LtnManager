@@ -73,6 +73,7 @@ function history_tab.build(widths)
           style = "tool_button_red",
           sprite = "utility/trash",
           tooltip = {"gui.ltnm-clear-history"},
+          ref = {"history", "clear_button"},
           actions = {
             on_click = {gui = "main", action = "clear_history"},
           },
@@ -225,10 +226,12 @@ function history_tab.update(self)
     refs.warning_flow.visible = true
     scroll_pane.visible = false
     refs.content_frame.style = "ltnm_main_warning_frame"
+    refs.clear_button.enabled = false
   else
     refs.warning_flow.visible = false
     scroll_pane.visible = true
     refs.content_frame.style = "ltnm_main_content_frame"
+    refs.clear_button.enabled = true
   end
 end
 

@@ -61,6 +61,7 @@ function alerts_tab.build(widths)
           style = "tool_button_red",
           sprite = "utility/trash",
           tooltip = {"gui.ltnm-delete-all-alerts"},
+          ref = {"alerts", "delete_all_button"},
           actions = {
             on_click = {gui = "main", action = "delete_all_alerts"},
           },
@@ -234,10 +235,12 @@ function alerts_tab.update(self)
     refs.warning_flow.visible = true
     scroll_pane.visible = false
     refs.content_frame.style = "ltnm_main_warning_frame"
+    refs.delete_all_button.enabled = false
   else
     refs.warning_flow.visible = false
     scroll_pane.visible = true
     refs.content_frame.style = "ltnm_main_content_frame"
+    refs.delete_all_button.enabled = true
   end
 end
 
