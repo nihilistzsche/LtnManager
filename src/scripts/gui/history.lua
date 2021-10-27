@@ -135,12 +135,25 @@ function history_tab.update(self)
             {
               type = "label",
               style = "ltnm_clickable_semibold_label",
-              style_mods = {width = widths.history.train_id, horizontal_align = "center"}
+              style_mods = {width = widths.history.train_id, horizontal_align = "center"},
+              tooltip = {"gui.ltnm-open-train-gui"},
             },
             {
-              type = "label",
-              style = "ltnm_clickable_semibold_label",
-              style_mods = {width = widths.history.route}
+              type = "flow",
+              style_mods = {vertical_spacing = 0},
+              direction = "vertical",
+              {
+                type = "label",
+                style = "ltnm_clickable_semibold_label",
+                style_mods = {width = widths.history.route},
+                tooltip = {"gui.ltnm-open-station-gui"},
+              },
+              {
+                type = "label",
+                style = "ltnm_clickable_semibold_label",
+                style_mods = {width = widths.history.route},
+                tooltip = {"gui.ltnm-open-station-gui"},
+              },
             },
             {type = "label", style_mods = {width = widths.history.depot}},
             {type = "label", style_mods = {width = widths.history.network_id, horizontal_align = "center"}},
@@ -153,7 +166,6 @@ function history_tab.update(self)
               style_mods = {width = widths.history.shipment},
               {type = "table", name = "shipment_table", style = "slot_table", column_count = 4},
             },
-            -- {type = "empty-widget", style = "flib_horizontal_pusher"},
           }
         )
       end
@@ -169,12 +181,18 @@ function history_tab.update(self)
             },
           },
           {
-            elem_mods = {caption = history_entry.route},
-            -- actions = {
-            --   on_click = station_id
-            --     and {gui = "main", action = "open_station_gui", station_id = station_id}
-            --     or false,
-            -- },
+            {
+              elem_mods = {caption = history_entry.from},
+              actions = {
+                on_click = {gui = "main", action = "open_station_gui", station_id = history_entry.from_id},
+              },
+            },
+            {
+              elem_mods = {caption = "[color="..constants.colors.caption.str.."]->[/color]  "..history_entry.to},
+              actions = {
+                on_click = {gui = "main", action = "open_station_gui", station_id = history_entry.to_id},
+              },
+            },
           },
           {elem_mods = {caption = history_entry.depot}},
           {elem_mods = {caption = history_entry.network_id}},

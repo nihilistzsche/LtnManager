@@ -1,6 +1,10 @@
 local constants = {}
 
 constants.colors = {
+  caption = {
+    str = "255, 230, 192",
+    tbl = {255, 230, 192},
+  },
   green = {
     str = "69, 255, 69",
     tbl = {69, 255, 69}
