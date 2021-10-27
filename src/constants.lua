@@ -48,15 +48,15 @@ constants.gui = {
       control_signals = 36 * 7,
       control_signals_columns = 7,
     },
-    -- history = {
-    --   depot = 160,
-    --   train_id = 60,
-    --   network_id = 84,
-    --   route = 351,
-    --   runtime = 68,
-    --   finished = 68,
-    --   shipment = (36 * 6)
-    -- }
+    history = {
+      train_id = 60,
+      route = 351,
+      depot = 160,
+      network_id = 84,
+      runtime = 68,
+      finished = 68,
+      shipment = (36 * 6)
+    }
   }
 }
 
