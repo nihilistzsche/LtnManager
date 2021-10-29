@@ -298,10 +298,11 @@ local function iterate_stations(working_data, iterations_per_tick)
           num_trains = #station_trains,
           stations = {station_id},
           statuses = {[status.color] = status.count},
-          search_string = {},
           surfaces = {[surface_index] = true},
-          train_ids = {},
         }
+        for _, tbl in pairs(working_data.sorted_depots) do
+          table.insert(tbl, station_name)
+        end
       end
     else
       -- add to sorting tables
@@ -354,14 +355,7 @@ local function iterate_trains(working_data, iterations_per_tick)
     -- not every train will be LTN-controlled
     if not depot_data then return nil, true end
 
-    -- add to depot trains lists
-    -- local train_ids = depot_data.train_ids
-    -- train_ids[#train_ids+1] = train_id
-    -- for name, sort_table in pairs(depot_data.sorted_trains) do
-    --   if name ~= "status" then
-    --     sort_table[#sort_table+1] = train_id
-    --   end
-    -- end
+    -- add to depot available trains list
     if train_state == defines.train_state.wait_station and schedule.records[schedule.current].station == depot then
       depot_data.available_trains[#depot_data.available_trains+1] = train_id
     end
@@ -448,32 +442,68 @@ local function iterate_in_transit(working_data, iterations_per_tick)
 end
 
 local function generate_depot_strings(working_data, iterations_per_tick)
-  local depots = working_data.depots
-  local players = working_data.players
-
   return table.for_n_of(
-    {},
+    working_data.depots,
     working_data.key,
     iterations_per_tick,
     function(depot_data, depot_name)
-      local search_string = {}
-
-    end,
-    function(_, key)
-      return per_player_next(players, depots, key, function(player, depot)
-        return {
-          translations = players[player].dictionaries.gui,
-          depot = depots[depot]
-        }
+      depot_data.statuses_string = table.reduce(depot_data.statuses, function(output, count, color)
+        return output.." "..color.." "..count
       end)
+      depot_data.trains_string = #depot_data.available_trains .. " / " .. depot_data.num_trains
+      depot_data.statuses_count = table.reduce(depot_data.statuses, function(sum, count) return sum + count end)
+      depot_data.search_string = table.concat({
+        depot_name,
+        depot_data.statuses_string,
+        depot_data.trains_string,
+      }, " ")
     end
   )
-  end
 end
 
-local function sort_depots(working_data, iterations_per_tick)
-
+local function sort_depots_by_name(working_data, iterations_per_tick)
+  return table.partial_sort(working_data.sorted_depots.name, working_data.key, iterations_per_tick)
 end
+
+local function sort_depots_by_network_id(working_data, iterations_per_tick)
+  local depots = working_data.depots
+
+  return table.partial_sort(
+    working_data.sorted_depots.name,
+    working_data.key,
+    iterations_per_tick,
+    function(depot_1, depot_2)
+      return depots[depot_1].network_id < depots[depot_2].network_id
+    end
+  )
+end
+
+local function sort_depots_by_statuses(working_data, iterations_per_tick)
+  local depots = working_data.depots
+
+  return table.partial_sort(
+    working_data.sorted_depots.name,
+    working_data.key,
+    iterations_per_tick,
+    function(depot_1, depot_2)
+      return depots[depot_1].statuses_count < depots[depot_2].statuses_count
+    end
+  )
+end
+
+local function sort_depots_by_available_trains(working_data, iterations_per_tick)
+  local depots = working_data.depots
+
+  return table.partial_sort(
+    working_data.sorted_depots.name,
+    working_data.key,
+    iterations_per_tick,
+    function(depot_1, depot_2)
+      return #depots[depot_1].available_trains < #depots[depot_2].available_trains
+    end
+  )
+end
+
 
 local function generate_train_statuses(working_data, iterations_per_tick)
   local players = working_data.players
@@ -1027,6 +1057,11 @@ function ltn_data.iterate()
     iterate_stations,
     iterate_trains,
     iterate_in_transit,
+    generate_depot_strings,
+    sort_depots_by_name,
+    sort_depots_by_network_id,
+    sort_depots_by_statuses,
+    sort_depots_by_available_trains,
     generate_train_statuses,
     prepare_train_status_sort,
     sort_trains_by_status,
@@ -1072,6 +1107,7 @@ function ltn_data.iterate()
       surfaces = working_data.surfaces,
       -- sorting tables
       sorted_trains = working_data.sorted_trains,
+      sorted_depots = working_data.sorted_depots,
       sorted_stations = working_data.sorted_stations,
       sorted_history = working_data.sorted_history,
       sorted_alerts = working_data.sorted_alerts,
@@ -1130,6 +1166,12 @@ function ltn_data.on_dispatcher_updated(e)
     composition = {},
     depot = {},
     shipment = {},
+  }
+  working_data.sorted_depots = {
+    name = {},
+    network_id = {},
+    status = {},
+    trains = {},
   }
   working_data.sorted_stations = {
     name = {},

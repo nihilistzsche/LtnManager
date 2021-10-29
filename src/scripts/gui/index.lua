@@ -120,6 +120,7 @@ function Index:update()
   surface_dropdown.selected_index = selected_index
 
   refs.trains.tab.badge_text = misc.delineate_number(#ltn_data.sorted_trains.composition)
+  refs.depots.tab.badge_text = misc.delineate_number(#ltn_data.sorted_depots.name)
   refs.stations.tab.badge_text = misc.delineate_number(#ltn_data.sorted_stations.name)
   refs.history.tab.badge_text = misc.delineate_number(queue.length(ltn_data.history))
   refs.alerts.tab.badge_text = misc.delineate_number(queue.length(ltn_data.alerts))
@@ -225,15 +226,6 @@ function index.build(player, player_table)
           history_tab.build(widths),
           alerts_tab.build(widths),
         }
-      },
-      {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"depots", "scroll_pane"}},
-      {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"depots", "warning_flow"},
-        {
-          type = "label",
-          style = "ltnm_semibold_label",
-          caption = {"gui.ltnm-no-depots"},
-          ref = {"depots", "warning_label"},
-        },
       },
     },
   })

@@ -36,23 +36,31 @@ function depots_tab.build(widths)
           widths,
           "depots",
           "network_id",
-          true
+          false
         ),
         templates.sort_checkbox(
           widths,
           "depots",
           "status",
-          true
+          false
         ),
         templates.sort_checkbox(
           widths,
           "depots",
           "trains",
-          true
+          false
         ),
-
-      }
-    }
+      },
+      {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"depots", "scroll_pane"}},
+      {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"depots", "warning_flow"},
+        {
+          type = "label",
+          style = "ltnm_semibold_label",
+          caption = {"gui.ltnm-no-depots"},
+          ref = {"depots", "warning_label"},
+        },
+      },
+    },
   }
 end
 
@@ -96,10 +104,9 @@ function depots_tab.update(self)
     if
       (search_surface == -1 or depot_data.surfaces[search_surface])
       and bit32.btest(depot_data.network_id, search_network_id)
-      -- TODO: Search
-      -- and (
-      --   #search_query == 0 or string.find(depot_data.search_strings[self.player.index], string.lower(search_query))
-      -- )
+      and (
+        #search_query == 0 or string.find(depot_data.search_string, string.lower(search_query))
+      )
     then
       table_index = table_index + 1
       local row = children[table_index]
@@ -108,8 +115,9 @@ function depots_tab.update(self)
         row = gui.add(scroll_pane,
           {type = "frame", style = "ltnm_table_row_frame_"..color,
             {type = "label", style_mods = {width = widths.name}},
-            templates.status_indicator(widths.status),
             {type = "label", style_mods = {width = widths.network_id, horizontal_align = "center"}},
+            {type = "flow", name = "statuses_flow", style_mods = {width = widths.status}},
+            {type = "label", style_mods = {width = widths.trains}},
           }
         )
       end
@@ -117,13 +125,29 @@ function depots_tab.update(self)
       gui.update(row,
         {
           {elem_mods = {caption = depot_name}},
-          {
-            {elem_mods = {sprite = "flib_indicator_"..depot_data.status.color}},
-            {elem_mods = {caption = depot_data.status.count}},
-          },
           {elem_mods = {caption = depot_data.network_id}},
+          {},
+          {elem_mods = {caption = depot_data.trains_string}},
         }
       )
+
+      local statuses_flow = row.statuses_flow
+      local statuses_children = statuses_flow.children
+      local status_index = 0
+      for color, count in pairs(depot_data.statuses) do
+        status_index = status_index + 1
+        local status_flow = statuses_children[status_index]
+        if not status_flow then
+          status_flow = gui.add(statuses_flow, templates.status_indicator())
+        end
+        gui.update(status_flow, {
+          {elem_mods = {sprite = "flib_indicator_"..color}},
+          {elem_mods = {caption = count}},
+        })
+      end
+      for child_index = status_index + 1, #statuses_children do
+        statuses_children[child_index].destroy()
+      end
     end
   end
 
@@ -140,7 +164,6 @@ function depots_tab.update(self)
     scroll_pane.visible = true
     refs.content_frame.style = "ltnm_main_content_frame"
   end
-
 end
 
 return depots_tab
