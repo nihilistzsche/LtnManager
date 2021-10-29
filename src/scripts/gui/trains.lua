@@ -129,9 +129,13 @@ function trains_tab.update(self)
                 name = "shipment_frame",
                 style = "ltnm_small_slot_table_frame_"..color,
                 style_mods = {width = widths.trains.shipment},
-                {type = "table", name = "shipment_table", style = "slot_table", column_count = 4},
+                {
+                  type = "table",
+                  name = "shipment_table",
+                  style = "slot_table",
+                  column_count = widths.trains.shipment_columns
+                },
               },
-              {type = "empty-widget", style = "flib_horizontal_pusher"},
             }
           )
         end
