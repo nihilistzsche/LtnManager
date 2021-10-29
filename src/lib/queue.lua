@@ -4,7 +4,7 @@
 local queue = {}
 
 function queue.new()
-  return {first = 0, last = -1}
+  return { first = 0, last = -1 }
 end
 
 function queue.push_left(tbl, value)
@@ -21,18 +21,22 @@ end
 
 function queue.pop_left(tbl)
   local first = tbl.first
-  if first > tbl.last then error("list is empty") end
+  if first > tbl.last then
+    error("list is empty")
+  end
   local value = tbl[first]
-  tbl[first] = nil        -- to allow garbage collection
+  tbl[first] = nil -- to allow garbage collection
   tbl.first = first + 1
   return value
 end
 
 function queue.pop_right(tbl)
   local last = tbl.last
-  if tbl.first > last then error("list is empty") end
+  if tbl.first > last then
+    error("list is empty")
+  end
   local value = tbl[last]
-  tbl[last] = nil         -- to allow garbage collection
+  tbl[last] = nil -- to allow garbage collection
   tbl.last = last - 1
   return value
 end

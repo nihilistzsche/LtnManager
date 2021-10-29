@@ -3,32 +3,32 @@ local constants = {}
 constants.colors = {
   caption = {
     str = "255, 230, 192",
-    tbl = {255, 230, 192},
+    tbl = { 255, 230, 192 },
   },
   green = {
     str = "69, 255, 69",
-    tbl = {69, 255, 69}
+    tbl = { 69, 255, 69 },
   },
   info = {
     str = "128, 206, 240",
-    tbl = {128, 206, 240}
+    tbl = { 128, 206, 240 },
   },
   red = {
     str = "255, 69, 69",
-    tbl = {255, 69, 69}
+    tbl = { 255, 69, 69 },
   },
   station_circle = {
     str = "255, 50, 50, 190",
-    tbl = {255, 50, 50, 190}
+    tbl = { 255, 50, 50, 190 },
   },
   yellow = {
     str = "255, 240, 69",
-    tbl = {255, 240, 69}
+    tbl = { 255, 240, 69 },
   },
   white = {
     str = "255, 255, 255",
-    tbl = {255, 255, 255}
-  }
+    tbl = { 255, 255, 255 },
+  },
 }
 
 -- dictionary locale identifier -> dictionary of hardcoded GUI sizes
@@ -66,7 +66,7 @@ constants.gui = {
       network_id = 84,
       runtime = 68,
       finished = 68,
-      shipment = (36 * 6)
+      shipment = (36 * 6),
     },
     alerts = {
       time = 68,
@@ -76,20 +76,20 @@ constants.gui = {
       type = 230,
       contents = 36 * 6,
     },
-  }
+  },
 }
 
 constants.gui_content_frame_height = 744
 constants.gui_inventory_table_height = 40 * 18
 
 constants.gui_translations = {
-  delivering_to = {"gui.ltnm-delivering-to"},
-  fetching_from = {"gui.ltnm-fetching-from"},
-  loading_at = {"gui.ltnm-loading-at"},
-  not_available = {"gui.ltnm-not-available"},
-  parked_at_depot = {"gui.ltnm-parked-at-depot"},
-  returning_to_depot = {"gui.ltnm-returning-to-depot"},
-  unloading_at = {"gui.ltnm-unloading-at"},
+  delivering_to = { "gui.ltnm-delivering-to" },
+  fetching_from = { "gui.ltnm-fetching-from" },
+  loading_at = { "gui.ltnm-loading-at" },
+  not_available = { "gui.ltnm-not-available" },
+  parked_at_depot = { "gui.ltnm-parked-at-depot" },
+  returning_to_depot = { "gui.ltnm-returning-to-depot" },
+  unloading_at = { "gui.ltnm-unloading-at" },
 }
 
 constants.ltn_control_signals = {
@@ -107,7 +107,7 @@ constants.ltn_control_signals = {
   ["ltn-requester-threshold"] = true,
   ["ltn-requester-stack-threshold"] = true,
   ["ltn-requester-priority"] = true,
-  ["ltn-disable-warnings"] = true
+  ["ltn-disable-warnings"] = true,
 }
 
 constants.ltn_event_names = {
@@ -120,7 +120,7 @@ constants.ltn_event_names = {
   on_provider_missing_cargo = true,
   on_provider_unscheduled_cargo = true,
   on_requester_remaining_cargo = true,
-  on_requester_unscheduled_cargo = true
+  on_requester_unscheduled_cargo = true,
 }
 
 return constants

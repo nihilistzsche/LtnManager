@@ -14,15 +14,13 @@ local main_gui = require("scripts.gui.index")
 -- -----------------------------------------------------------------------------
 -- COMMANDS
 
-commands.add_command("LtnManager", {"ltnm-message.command-help"},
-  function(e)
-    if e.parameter == "refresh-player-data" then
-      local player = game.get_player(e.player_index)
-      local player_table = global.players[e.player_index]
-      player_data.refresh(player, player_table)
-    end
+commands.add_command("LtnManager", { "ltnm-message.command-help" }, function(e)
+  if e.parameter == "refresh-player-data" then
+    local player = game.get_player(e.player_index)
+    local player_table = global.players[e.player_index]
+    player_data.refresh(player, player_table)
   end
-)
+end)
 
 -- -----------------------------------------------------------------------------
 -- EVENT HANDLERS
@@ -108,7 +106,7 @@ end)
 
 -- SHORTCUT
 
-event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
+event.register({ defines.events.on_lua_shortcut, "ltnm-toggle-gui" }, function(e)
   if e.input_name or (e.prototype_name == "ltnm-toggle-gui") then
     local player = game.get_player(e.player_index)
     local player_table = global.players[e.player_index]
@@ -122,9 +120,9 @@ event.register({defines.events.on_lua_shortcut, "ltnm-toggle-gui"}, function(e)
           Gui:close()
         end
         if flags.translations_finished then
-          player.print{"ltnm-message.ltn-no-data"}
+          player.print({ "ltnm-message.ltn-no-data" })
         else
-          player.print{"ltnm-message.translations-not-finished"}
+          player.print({ "ltnm-message.translations-not-finished" })
         end
       end
     end
@@ -150,7 +148,7 @@ event.on_tick(function(e)
   if tasks then
     for _, task in pairs(tasks) do
       if task.gui then
-        handle_gui_event(task, {player_index = task.player_index})
+        handle_gui_event(task, { player_index = task.player_index })
       end
     end
   end

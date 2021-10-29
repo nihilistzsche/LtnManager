@@ -45,7 +45,9 @@ function Index:open()
 end
 
 function Index:close()
-  if self.state.pinning then return end
+  if self.state.pinning then
+    return
+  end
 
   self.refs.window.visible = false
   self.state.visible = false
@@ -86,7 +88,7 @@ function Index:dispatch(msg, e)
     if func then
       func(self, msg, e)
     else
-      log("Attempted to call action `"..msg.action.."` for which there is no handler yet.")
+      log("Attempted to call action `" .. msg.action .. "` for which there is no handler yet.")
     end
   end
 
@@ -147,85 +149,92 @@ local index = {}
 function index.build(player, player_table)
   local widths = constants.gui[player_table.language] or constants.gui["en"]
 
-  local refs = gui.build(player.gui.screen,{
+  local refs = gui.build(player.gui.screen, {
     {
       type = "frame",
       direction = "vertical",
       visible = false,
-      ref = {"window"},
+      ref = { "window" },
       actions = {
-        on_closed = {gui = "main", action = "close"},
+        on_closed = { gui = "main", action = "close" },
       },
       {
         type = "flow",
         style = "flib_titlebar_flow",
-        ref = {"titlebar", "flow"},
+        ref = { "titlebar", "flow" },
         actions = {
-          on_click = {gui = "main", transform = "handle_titlebar_click"},
+          on_click = { gui = "main", transform = "handle_titlebar_click" },
         },
-        {type = "label", style = "frame_title", caption = {"mod-name.LtnManager"}, ignored_by_interaction = true},
-        {type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true},
+        { type = "label", style = "frame_title", caption = { "mod-name.LtnManager" }, ignored_by_interaction = true },
+        { type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true },
         templates.frame_action_button(
           "ltnm_pin",
-          {"gui.ltnm-keep-open"},
-          {"titlebar", "pin_button"},
-          {gui = "main", action = "toggle_pinned"}
+          { "gui.ltnm-keep-open" },
+          { "titlebar", "pin_button" },
+          { gui = "main", action = "toggle_pinned" }
         ),
         templates.frame_action_button(
           "ltnm_refresh",
-          {"gui.ltnm-refresh-tooltip"},
-          {"titlebar", "refresh_button"},
-          {gui = "main", transform = "handle_refresh_click"}
+          { "gui.ltnm-refresh-tooltip" },
+          { "titlebar", "refresh_button" },
+          { gui = "main", transform = "handle_refresh_click" }
         ),
         templates.frame_action_button(
           "utility/close",
-          {"gui.close-instruction"},
+          { "gui.close-instruction" },
           nil,
-          {gui = "main", action = "close"}
+          { gui = "main", action = "close" }
         ),
       },
-      {type = "frame", style = "inside_deep_frame", direction = "vertical",
-        {type = "frame", style = "ltnm_main_toolbar_frame",
-          {type = "label", style = "subheader_caption_label", caption = {"gui.ltnm-search-label"}},
+      {
+        type = "frame",
+        style = "inside_deep_frame",
+        direction = "vertical",
+        {
+          type = "frame",
+          style = "ltnm_main_toolbar_frame",
+          { type = "label", style = "subheader_caption_label", caption = { "gui.ltnm-search-label" } },
           {
             type = "textfield",
             clear_and_focus_on_right_click = true,
-            ref = {"toolbar", "text_search_field"},
+            ref = { "toolbar", "text_search_field" },
             actions = {
-              on_text_changed = {gui = "main", action = "update_text_search_query"},
+              on_text_changed = { gui = "main", action = "update_text_search_query" },
             },
           },
-          {type = "empty-widget", style = "flib_horizontal_pusher"},
-          {type = "label", style = "caption_label", caption = {"gui.ltnm-network-id-label"}},
+          { type = "empty-widget", style = "flib_horizontal_pusher" },
+          { type = "label", style = "caption_label", caption = { "gui.ltnm-network-id-label" } },
           {
             type = "textfield",
-            style_mods = {width = 120},
+            style_mods = { width = 120 },
             numeric = true,
             allow_negative = true,
             clear_and_focus_on_right_click = true,
             text = "-1",
-            ref = {"toolbar", "network_id_field"},
+            ref = { "toolbar", "network_id_field" },
             actions = {
-              on_text_changed = {gui = "main", action = "update_network_id_query"},
+              on_text_changed = { gui = "main", action = "update_network_id_query" },
             },
           },
-          {type = "label", style = "caption_label", caption = {"gui.ltnm-surface-label"}},
+          { type = "label", style = "caption_label", caption = { "gui.ltnm-surface-label" } },
           {
             type = "drop-down",
-            ref = {"toolbar", "surface_dropdown"},
+            ref = { "toolbar", "surface_dropdown" },
             actions = {
-              on_selection_state_changed = {gui = "main", action = "change_surface"},
+              on_selection_state_changed = { gui = "main", action = "change_surface" },
             },
           },
         },
-        {type = "tabbed-pane", style = "ltnm_tabbed_pane",
+        {
+          type = "tabbed-pane",
+          style = "ltnm_tabbed_pane",
           trains_tab.build(widths),
           depots_tab.build(widths),
           stations_tab.build(widths),
           inventory_tab.build(),
           history_tab.build(widths),
           alerts_tab.build(widths),
-        }
+        },
       },
     },
   })
@@ -295,7 +304,7 @@ function index.build(player, player_table)
     widths = widths,
   }
   -- TODO: Restore metatables on load
-  setmetatable(Gui, {__index = Index})
+  setmetatable(Gui, { __index = Index })
 
   player_table.guis.main = Gui
 
@@ -306,7 +315,7 @@ end
 function index.get(player_index)
   local Gui = global.players[player_index].guis.main
   if Gui and Gui.refs.window.valid then
-    return setmetatable(Gui, {__index = Index})
+    return setmetatable(Gui, { __index = Index })
   end
 end
 

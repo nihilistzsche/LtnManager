@@ -8,7 +8,7 @@ end
 
 util.paths = {
   nav_icons = "__LtnManager__/graphics/gui/frame-action-icons.png",
-  shortcut_icons = "__LtnManager__/graphics/shortcut/ltn-manager-shortcut.png"
+  shortcut_icons = "__LtnManager__/graphics/shortcut/ltn-manager-shortcut.png",
 }
 
 util.empty_checkmark = {
@@ -17,7 +17,7 @@ util.empty_checkmark = {
   width = 1,
   height = 1,
   frame_count = 1,
-  scale = 8
+  scale = 8,
 }
 
 return util

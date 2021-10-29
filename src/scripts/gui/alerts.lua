@@ -12,68 +12,48 @@ function alerts_tab.build(widths)
   return {
     tab = {
       type = "tab",
-      caption = {"gui.ltnm-alerts"},
-      ref = {"alerts", "tab"},
+      caption = { "gui.ltnm-alerts" },
+      ref = { "alerts", "tab" },
       actions = {
-        on_click = {gui = "main", action = "change_tab", tab = "alerts"},
+        on_click = { gui = "main", action = "change_tab", tab = "alerts" },
       },
     },
     content = {
       type = "frame",
       style = "ltnm_main_content_frame",
       direction = "vertical",
-      ref = {"alerts", "content_frame"},
-      {type = "frame", style = "ltnm_table_toolbar_frame", style_mods = {right_padding = 4},
-        templates.sort_checkbox(
-          widths,
-          "alerts",
-          "time",
-          true,
-          nil,
-          true
-        ),
-        templates.sort_checkbox(
-          widths,
-          "alerts",
-          "train_id",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "alerts",
-          "route",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "alerts",
-          "network_id",
-          false
-        ),
-        templates.sort_checkbox(
-          nil,
-          "alerts",
-          "type",
-          false
-        ),
+      ref = { "alerts", "content_frame" },
+      {
+        type = "frame",
+        style = "ltnm_table_toolbar_frame",
+        style_mods = { right_padding = 4 },
+        templates.sort_checkbox(widths, "alerts", "time", true, nil, true),
+        templates.sort_checkbox(widths, "alerts", "train_id", false),
+        templates.sort_checkbox(widths, "alerts", "route", false),
+        templates.sort_checkbox(widths, "alerts", "network_id", false),
+        templates.sort_checkbox(nil, "alerts", "type", false),
         {
           type = "sprite-button",
           style = "tool_button_red",
           sprite = "utility/trash",
-          tooltip = {"gui.ltnm-delete-all-alerts"},
-          ref = {"alerts", "delete_all_button"},
+          tooltip = { "gui.ltnm-delete-all-alerts" },
+          ref = { "alerts", "delete_all_button" },
           actions = {
-            on_click = {gui = "main", action = "delete_all_alerts"},
+            on_click = { gui = "main", action = "delete_all_alerts" },
           },
         },
       },
-      {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"alerts", "scroll_pane"}},
-      {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"alerts", "warning_flow"},
+      { type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = { "alerts", "scroll_pane" } },
+      {
+        type = "flow",
+        style = "ltnm_warning_flow",
+        visible = false,
+        ref = { "alerts", "warning_flow" },
         {
           type = "label",
           style = "ltnm_semibold_label",
-          caption = {"gui.ltnm-no-alerts"},
-          ref = {"alerts", "warning_label"},
+          caption = { "gui.ltnm-no-alerts" },
+          ref = { "alerts", "warning_label" },
         },
       },
     },
@@ -123,106 +103,108 @@ function alerts_tab.update(self)
       if
         (search_surface == -1 or (alerts_entry.train.surface_index == search_surface))
         and bit32.btest(alerts_entry.train.network_id, search_network_id)
-        and (
-          #search_query == 0 or string.find(alerts_entry.search_strings[self.player.index], string.lower(search_query))
-        )
+        and (#search_query == 0 or string.find(
+          alerts_entry.search_strings[self.player.index],
+          string.lower(search_query)
+        ))
         and not alerts_to_delete[alert_id]
       then
         table_index = table_index + 1
         local row = children[table_index]
         local color = table_index % 2 == 0 and "dark" or "light"
         if not row then
-          row = gui.add(scroll_pane,
-            {type = "frame", style = "ltnm_table_row_frame_"..color,
-              {type = "label", style_mods = {width = widths.alerts.time}},
+          row = gui.add(
+            scroll_pane,
+            {
+              type = "frame",
+              style = "ltnm_table_row_frame_" .. color,
+              { type = "label", style_mods = { width = widths.alerts.time } },
               {
                 type = "label",
                 style = "ltnm_clickable_semibold_label",
-                style_mods = {width = widths.alerts.train_id, horizontal_align = "center"},
-                tooltip = {"gui.ltnm-open-train-gui"},
+                style_mods = { width = widths.alerts.train_id, horizontal_align = "center" },
+                tooltip = { "gui.ltnm-open-train-gui" },
               },
               {
                 type = "flow",
-                style_mods = {vertical_spacing = 0},
+                style_mods = { vertical_spacing = 0 },
                 direction = "vertical",
                 {
                   type = "label",
                   style = "ltnm_clickable_semibold_label",
-                  style_mods = {width = widths.alerts.route},
-                  tooltip = {"gui.ltnm-open-station-gui"},
+                  style_mods = { width = widths.alerts.route },
+                  tooltip = { "gui.ltnm-open-station-gui" },
                 },
                 {
                   type = "label",
                   style = "ltnm_clickable_semibold_label",
-                  style_mods = {width = widths.alerts.route},
-                  tooltip = {"gui.ltnm-open-station-gui"},
+                  style_mods = { width = widths.alerts.route },
+                  tooltip = { "gui.ltnm-open-station-gui" },
                 },
               },
-              {type = "label", style_mods = {width = widths.alerts.network_id, horizontal_align = "center"}},
-              {type = "label", style_mods = {width = widths.alerts.type}},
+              { type = "label", style_mods = { width = widths.alerts.network_id, horizontal_align = "center" } },
+              { type = "label", style_mods = { width = widths.alerts.type } },
               {
                 type = "frame",
                 name = "contents_frame",
-                style = "ltnm_small_slot_table_frame_"..color,
-                style_mods = {width = widths.alerts.contents},
-                {type = "table", name = "contents_table", style = "slot_table", column_count = 4},
+                style = "ltnm_small_slot_table_frame_" .. color,
+                style_mods = { width = widths.alerts.contents },
+                { type = "table", name = "contents_table", style = "slot_table", column_count = 4 },
               },
               {
                 type = "sprite-button",
                 style = "tool_button_red",
                 sprite = "utility/trash",
-                tooltip = {"gui.ltnm-delete-alert"},
+                tooltip = { "gui.ltnm-delete-alert" },
               },
             }
           )
         end
 
-        gui.update(row,
+        gui.update(row, {
+          { elem_mods = { caption = misc.ticks_to_timestring(alerts_entry.time) } },
           {
-            {elem_mods = {caption = misc.ticks_to_timestring(alerts_entry.time)}},
+            elem_mods = { caption = alerts_entry.train_id },
+            actions = {
+              on_click = { gui = "main", action = "open_train_gui", train_id = alerts_entry.train_id },
+            },
+          },
+          {
             {
-              elem_mods = {caption = alerts_entry.train_id},
+              elem_mods = { caption = alerts_entry.train.from },
               actions = {
-                on_click = {gui = "main", action = "open_train_gui", train_id = alerts_entry.train_id},
+                on_click = { gui = "main", action = "open_station_gui", station_id = alerts_entry.train.from_id },
               },
             },
             {
-              {
-                elem_mods = {caption = alerts_entry.train.from},
-                actions = {
-                  on_click = {gui = "main", action = "open_station_gui", station_id = alerts_entry.train.from_id},
-                },
-              },
-              {
-                elem_mods = {caption = "[color="..constants.colors.caption.str.."]->[/color]  "..alerts_entry.train.to},
-                actions = {
-                  on_click = {gui = "main", action = "open_station_gui", station_id = alerts_entry.train.to_id},
-                },
-              },
-            },
-            {elem_mods = {caption = alerts_entry.train.network_id}},
-            {
-              elem_mods = {
-                caption = {"gui.ltnm-alert-"..string.gsub(alerts_entry.type, "_", "-")},
-                tooltip = {"gui.ltnm-alert-"..string.gsub(alerts_entry.type, "_", "-").."-description"},
-              },
-            },
-            {},
-            {
+              elem_mods = { caption = "[color="
+                .. constants.colors.caption.str
+                .. "]->[/color]  "
+                .. alerts_entry.train.to },
               actions = {
-                on_click = {gui = "main", action = "delete_alert", alert_id = alert_id},
+                on_click = { gui = "main", action = "open_station_gui", station_id = alerts_entry.train.to_id },
               },
             },
-          }
-        )
+          },
+          { elem_mods = { caption = alerts_entry.train.network_id } },
+          {
+            elem_mods = {
+              caption = { "gui.ltnm-alert-" .. string.gsub(alerts_entry.type, "_", "-") },
+              tooltip = { "gui.ltnm-alert-" .. string.gsub(alerts_entry.type, "_", "-") .. "-description" },
+            },
+          },
+          {},
+          {
+            actions = {
+              on_click = { gui = "main", action = "delete_alert", alert_id = alert_id },
+            },
+          },
+        })
 
-        util.slot_table_update(
-          row.contents_frame.contents_table,
-          {
-            {color = "green", entries = alerts_entry.planned_shipment or {}, translations = dictionaries.materials},
-            {color = "red", entries = alerts_entry.actual_shipment or {}, translations = dictionaries.materials},
-          }
-        )
+        util.slot_table_update(row.contents_frame.contents_table, {
+          { color = "green", entries = alerts_entry.planned_shipment or {}, translations = dictionaries.materials },
+          { color = "red", entries = alerts_entry.actual_shipment or {}, translations = dictionaries.materials },
+        })
       end
     end
   end

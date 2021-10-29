@@ -12,52 +12,37 @@ function depots_tab.build(widths)
   return {
     tab = {
       type = "tab",
-      caption = {"gui.ltnm-depots"},
-      ref = {"depots", "tab"},
+      caption = { "gui.ltnm-depots" },
+      ref = { "depots", "tab" },
       actions = {
-        on_click = {gui = "main", action = "change_tab", tab = "depots"},
+        on_click = { gui = "main", action = "change_tab", tab = "depots" },
       },
     },
     content = {
       type = "frame",
       style = "ltnm_main_content_frame",
       direction = "vertical",
-      ref = {"depots", "content_frame"},
-      {type = "frame", style = "ltnm_table_toolbar_frame", style_mods = {right_padding = 4},
-        templates.sort_checkbox(
-          widths,
-          "depots",
-          "name",
-          true,
-          nil,
-          true
-        ),
-        templates.sort_checkbox(
-          widths,
-          "depots",
-          "network_id",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "depots",
-          "status",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "depots",
-          "trains",
-          false
-        ),
+      ref = { "depots", "content_frame" },
+      {
+        type = "frame",
+        style = "ltnm_table_toolbar_frame",
+        style_mods = { right_padding = 4 },
+        templates.sort_checkbox(widths, "depots", "name", true, nil, true),
+        templates.sort_checkbox(widths, "depots", "network_id", false),
+        templates.sort_checkbox(widths, "depots", "status", false),
+        templates.sort_checkbox(widths, "depots", "trains", false),
       },
-      {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"depots", "scroll_pane"}},
-      {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"depots", "warning_flow"},
+      { type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = { "depots", "scroll_pane" } },
+      {
+        type = "flow",
+        style = "ltnm_warning_flow",
+        visible = false,
+        ref = { "depots", "warning_flow" },
         {
           type = "label",
           style = "ltnm_semibold_label",
-          caption = {"gui.ltnm-no-depots"},
-          ref = {"depots", "warning_label"},
+          caption = { "gui.ltnm-no-depots" },
+          ref = { "depots", "warning_label" },
         },
       },
     },
@@ -104,32 +89,31 @@ function depots_tab.update(self)
     if
       (search_surface == -1 or depot_data.surfaces[search_surface])
       and bit32.btest(depot_data.network_id, search_network_id)
-      and (
-        #search_query == 0 or string.find(depot_data.search_string, string.lower(search_query))
-      )
+      and (#search_query == 0 or string.find(depot_data.search_string, string.lower(search_query)))
     then
       table_index = table_index + 1
       local row = children[table_index]
       local color = table_index % 2 == 0 and "dark" or "light"
       if not row then
-        row = gui.add(scroll_pane,
-          {type = "frame", style = "ltnm_table_row_frame_"..color,
-            {type = "label", style_mods = {width = widths.name}},
-            {type = "label", style_mods = {width = widths.network_id, horizontal_align = "center"}},
-            {type = "flow", name = "statuses_flow", style_mods = {width = widths.status}},
-            {type = "label", style_mods = {width = widths.trains}},
+        row = gui.add(
+          scroll_pane,
+          {
+            type = "frame",
+            style = "ltnm_table_row_frame_" .. color,
+            { type = "label", style_mods = { width = widths.name } },
+            { type = "label", style_mods = { width = widths.network_id, horizontal_align = "center" } },
+            { type = "flow", name = "statuses_flow", style_mods = { width = widths.status } },
+            { type = "label", style_mods = { width = widths.trains } },
           }
         )
       end
 
-      gui.update(row,
-        {
-          {elem_mods = {caption = depot_name}},
-          {elem_mods = {caption = depot_data.network_id}},
-          {},
-          {elem_mods = {caption = depot_data.trains_string}},
-        }
-      )
+      gui.update(row, {
+        { elem_mods = { caption = depot_name } },
+        { elem_mods = { caption = depot_data.network_id } },
+        {},
+        { elem_mods = { caption = depot_data.trains_string } },
+      })
 
       local statuses_flow = row.statuses_flow
       local statuses_children = statuses_flow.children
@@ -141,8 +125,8 @@ function depots_tab.update(self)
           status_flow = gui.add(statuses_flow, templates.status_indicator())
         end
         gui.update(status_flow, {
-          {elem_mods = {sprite = "flib_indicator_"..color}},
-          {elem_mods = {caption = count}},
+          { elem_mods = { sprite = "flib_indicator_" .. color } },
+          { elem_mods = { caption = count } },
         })
       end
       for child_index = status_index + 1, #statuses_children do

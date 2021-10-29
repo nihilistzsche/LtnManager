@@ -26,7 +26,7 @@ end
 
 -- adds the given material to the global inventory
 local function add_to_inventory(inventory, surface_index, network_id, name, count)
-  for _, surface in ipairs{-1, surface_index} do
+  for _, surface in ipairs({ -1, surface_index }) do
     local surface_stock = inventory[surface]
     if not surface_stock then
       inventory[surface] = {}
@@ -34,7 +34,7 @@ local function add_to_inventory(inventory, surface_index, network_id, name, coun
     end
     local material_stock = surface_stock[name]
     if not material_stock then
-      surface_stock[name] = {combined_id = 0}
+      surface_stock[name] = { combined_id = 0 }
       material_stock = surface_stock[name]
     end
     material_stock.combined_id = bit32.bor(material_stock.combined_id, network_id)
@@ -57,27 +57,27 @@ local function parse_train_status(train_data, translations)
       return {
         color = constants.colors.white.tbl,
         msg = translations.returning_to_depot,
-        string = translations.returning_to_depot
+        string = translations.returning_to_depot,
       }
     else
       if train_data.pickupDone then
         return {
           station = "to",
-          string = translations.delivering_to.." "..train_data.to,
-          type = translations.delivering_to
+          string = translations.delivering_to .. " " .. train_data.to,
+          type = translations.delivering_to,
         }
       else
         if not train_data.from then
           return {
             color = constants.colors.red.tbl,
             msg = translations.not_available,
-            string = translations.not_available
+            string = translations.not_available,
           }
         else
           return {
             station = "from",
-            string = translations.fetching_from.." "..train_data.from,
-            type = translations.fetching_from
+            string = translations.fetching_from .. " " .. train_data.from,
+            type = translations.fetching_from,
           }
         end
       end
@@ -94,15 +94,15 @@ local function parse_train_status(train_data, translations)
         return {
           color = constants.colors.green.tbl,
           msg = translations.parked_at_depot,
-          string = translations.parked_at_depot
+          string = translations.parked_at_depot,
         }
       end
     else
       if train_data.pickupDone then
         return {
           station = "to",
-          string = translations.unloading_at.." "..train_data.to,
-          type = translations.unloading_at
+          string = translations.unloading_at .. " " .. train_data.to,
+          type = translations.unloading_at,
         }
       else
         local station = train.station
@@ -115,8 +115,8 @@ local function parse_train_status(train_data, translations)
         else
           return {
             station = "from",
-            string = translations.loading_at.." "..train_data.from,
-            type = translations.loading_at
+            string = translations.loading_at .. " " .. train_data.from,
+            type = translations.loading_at,
           }
         end
       end
@@ -125,7 +125,7 @@ local function parse_train_status(train_data, translations)
     return {
       color = constants.colors.red.tbl,
       msg = translations.not_available,
-      string = translations.not_available
+      string = translations.not_available,
     }
   end
 end
@@ -161,9 +161,7 @@ local function per_player_next(players, objects, key, callback)
   end
 
   -- return tables
-  return
-    {player = player, obj = obj},
-    callback(player, obj)
+  return { player = player, obj = obj }, callback(player, obj)
 end
 
 local function add_alert(e)
@@ -176,7 +174,7 @@ local function add_alert(e)
     time = game.tick,
     type = alert_type,
     train_id = train_id,
-    use_working_data = global.flags.iterating_ltn_data or not global.data
+    use_working_data = global.flags.iterating_ltn_data or not global.data,
   }
 
   -- add unique data
@@ -193,7 +191,7 @@ local function add_alert(e)
   end
 
   -- add to temporary table
-  global.active_data.alerts_to_add[#global.active_data.alerts_to_add+1] = alert_data
+  global.active_data.alerts_to_add[#global.active_data.alerts_to_add + 1] = alert_data
 end
 
 -- -----------------------------------------------------------------------------
@@ -219,7 +217,9 @@ local function iterate_stations(working_data, iterations_per_tick)
 
   return table.for_n_of(working_data.stations, working_data.key, iterations_per_tick, function(station_data, station_id)
     -- check station validity
-    if not station_data.entity.valid or not station_data.input.valid or not station_data.output.valid then return end
+    if not station_data.entity.valid or not station_data.input.valid or not station_data.output.valid then
+      return
+    end
 
     local network_id = station_data.network_id
     local station_name = station_data.entity.backer_name
@@ -241,13 +241,13 @@ local function iterate_stations(working_data, iterations_per_tick)
     station_data.status = {
       color = status_color,
       count = lamp_signal.count,
-      sort_key = status_color..lamp_signal.count
+      sort_key = status_color .. lamp_signal.count,
     }
 
     -- process station materials
     local provided_requested_count = 0
-    for mode, count_multiplier in pairs{provided = 1, requested = -1} do
-      local materials = working_data[mode.."_by_stop"][station_id]
+    for mode, count_multiplier in pairs({ provided = 1, requested = -1 }) do
+      local materials = working_data[mode .. "_by_stop"][station_id]
       local materials_copy = {}
       for name, count in pairs(materials or {}) do
         -- copy
@@ -278,7 +278,7 @@ local function iterate_stations(working_data, iterations_per_tick)
     -- add station trains to trains table
     local station_trains = station_data.entity.get_train_stop_trains()
     for _, train in ipairs(station_trains) do
-      trains[train.id] = {train = train}
+      trains[train.id] = { train = train }
     end
 
     local status = station_data.status
@@ -286,7 +286,7 @@ local function iterate_stations(working_data, iterations_per_tick)
       -- add station to depot
       local depot = depots[station_name]
       if depot then
-        depot.stations[#depot.stations+1] = station_id
+        depot.stations[#depot.stations + 1] = station_id
         local statuses = depot.statuses
         statuses[status.color] = (statuses[status.color] or 0) + status.count
         depot.surfaces[surface_index] = true
@@ -296,9 +296,9 @@ local function iterate_stations(working_data, iterations_per_tick)
           force = station_data.entity.force,
           network_id = network_id,
           num_trains = #station_trains,
-          stations = {station_id},
-          statuses = {[status.color] = status.count},
-          surfaces = {[surface_index] = true},
+          stations = { station_id },
+          statuses = { [status.color] = status.count },
+          surfaces = { [surface_index] = true },
         }
         for _, tbl in pairs(working_data.sorted_depots) do
           table.insert(tbl, station_name)
@@ -307,7 +307,7 @@ local function iterate_stations(working_data, iterations_per_tick)
     else
       -- add to sorting tables
       for _, sort_table in pairs(sorted_stations) do
-        sort_table[#sort_table+1] = station_id
+        sort_table[#sort_table + 1] = station_id
       end
     end
 
@@ -347,22 +347,26 @@ local function iterate_trains(working_data, iterations_per_tick)
     local schedule = train.schedule
 
     -- if `schedule` is `nil`, the train was put into manual mode between the previous step and this one
-    if not schedule then return nil, true end
+    if not schedule then
+      return nil, true
+    end
 
     local depot = schedule.records[1].station
     local depot_data = depots[depot]
 
     -- not every train will be LTN-controlled
-    if not depot_data then return nil, true end
+    if not depot_data then
+      return nil, true
+    end
 
     -- add to depot available trains list
     if train_state == defines.train_state.wait_station and schedule.records[schedule.current].station == depot then
-      depot_data.available_trains[#depot_data.available_trains+1] = train_id
+      depot_data.available_trains[#depot_data.available_trains + 1] = train_id
     end
 
     -- add to sorting tables
     for _, sort_table in pairs(sorted_trains) do
-      sort_table[#sort_table+1] = train_id
+      sort_table[#sort_table + 1] = train_id
     end
 
     -- construct train contents
@@ -370,11 +374,11 @@ local function iterate_trains(working_data, iterations_per_tick)
     local has_contents = false
     for name, count in pairs(train.get_contents()) do
       has_contents = true
-      contents["item,"..name] = count
+      contents["item," .. name] = count
     end
     for name, count in pairs(train.get_fluid_contents()) do
       has_contents = true
-      contents["fluid,"..name] = count
+      contents["fluid," .. name] = count
     end
 
     -- construct train data
@@ -389,16 +393,12 @@ local function iterate_trains(working_data, iterations_per_tick)
     train_data.surface_index = train_data.main_locomotive.surface.index
     train_data.status = {}
     trains[train_id] = train_data
-    for key, value in pairs(
-      deliveries[train_id]
-      or available_trains[train_id]
-      or {
-        train = train,
-        network_id = depot_data.network_id,
-        force = depot_data.force,
-        returning_to_depot = true
-      }
-    ) do
+    for key, value in pairs(deliveries[train_id] or available_trains[train_id] or {
+      train = train,
+      network_id = depot_data.network_id,
+      force = depot_data.force,
+      returning_to_depot = true,
+    }) do
       train_data[key] = value
     end
   end)
@@ -421,11 +421,13 @@ local function iterate_in_transit(working_data, iterations_per_tick)
           add_to_inventory(in_transit, surface_index, network_id, name, count)
         end
         -- get shipment sorting value
-        local shipment_count = table.reduce(delivery_data.shipment, function(acc, count) return acc + count end, 0)
+        local shipment_count = table.reduce(delivery_data.shipment, function(acc, count)
+          return acc + count
+        end, 0)
         -- add shipment to station
         local stations = working_data.stations
-        for station_direction, subtable_name in pairs{from = "outbound", to = "inbound"} do
-          local station_data = stations[delivery_data[station_direction.."_id"]]
+        for station_direction, subtable_name in pairs({ from = "outbound", to = "inbound" }) do
+          local station_data = stations[delivery_data[station_direction .. "_id"]]
           if station_data then
             -- add materials
             add_materials(delivery_data.shipment, station_data[subtable_name])
@@ -442,23 +444,20 @@ local function iterate_in_transit(working_data, iterations_per_tick)
 end
 
 local function generate_depot_strings(working_data, iterations_per_tick)
-  return table.for_n_of(
-    working_data.depots,
-    working_data.key,
-    iterations_per_tick,
-    function(depot_data, depot_name)
-      depot_data.statuses_string = table.reduce(depot_data.statuses, function(output, count, color)
-        return output.." "..color.." "..count
-      end)
-      depot_data.trains_string = #depot_data.available_trains .. " / " .. depot_data.num_trains
-      depot_data.statuses_count = table.reduce(depot_data.statuses, function(sum, count) return sum + count end)
-      depot_data.search_string = table.concat({
-        depot_name,
-        depot_data.statuses_string,
-        depot_data.trains_string,
-      }, " ")
-    end
-  )
+  return table.for_n_of(working_data.depots, working_data.key, iterations_per_tick, function(depot_data, depot_name)
+    depot_data.statuses_string = table.reduce(depot_data.statuses, function(output, count, color)
+      return output .. " " .. color .. " " .. count
+    end)
+    depot_data.trains_string = #depot_data.available_trains .. " / " .. depot_data.num_trains
+    depot_data.statuses_count = table.reduce(depot_data.statuses, function(sum, count)
+      return sum + count
+    end)
+    depot_data.search_string = table.concat({
+      depot_name,
+      depot_data.statuses_string,
+      depot_data.trains_string,
+    }, " ")
+  end)
 end
 
 local function sort_depots_by_name(working_data, iterations_per_tick)
@@ -504,28 +503,21 @@ local function sort_depots_by_available_trains(working_data, iterations_per_tick
   )
 end
 
-
 local function generate_train_statuses(working_data, iterations_per_tick)
   local players = working_data.players
   local trains = working_data.trains
 
-  return table.for_n_of(
-    {},
-    working_data.key,
-    iterations_per_tick,
-    function(data, key)
-      local train = trains[key.obj]
-      train.status[key.player] = parse_train_status(train, data.translations)
-    end,
-    function(_, key)
-      return per_player_next(players, trains, key, function(player, train)
-        return {
-          translations = players[player].dictionaries.gui,
-          train = trains[train]
-        }
-      end)
-    end
-  )
+  return table.for_n_of({}, working_data.key, iterations_per_tick, function(data, key)
+    local train = trains[key.obj]
+    train.status[key.player] = parse_train_status(train, data.translations)
+  end, function(_, key)
+    return per_player_next(players, trains, key, function(player, train)
+      return {
+        translations = players[player].dictionaries.gui,
+        train = trains[train],
+      }
+    end)
+  end)
 end
 
 local function prepare_train_status_sort(working_data)
@@ -537,21 +529,16 @@ local function sort_trains_by_status(working_data)
   local players = working_data.players
   local trains = working_data.trains
 
-  return table.for_n_of(
-    players,
-    working_data.key,
-    1,
-    function(_, player_index)
-      local train_ids = table.array_copy(working_data.train_status_sort_src)
+  return table.for_n_of(players, working_data.key, 1, function(_, player_index)
+    local train_ids = table.array_copy(working_data.train_status_sort_src)
 
-      -- TODO: This is bad
-      table.sort(train_ids, function(id_1, id_2)
-        return trains[id_1].status[player_index].string < trains[id_2].status[player_index].string
-      end)
+    -- TODO: This is bad
+    table.sort(train_ids, function(id_1, id_2)
+      return trains[id_1].status[player_index].string < trains[id_2].status[player_index].string
+    end)
 
-      working_data.sorted_trains.status[player_index] = train_ids
-    end
-  )
+    working_data.sorted_trains.status[player_index] = train_ids
+  end)
 end
 
 local function sort_trains_by_composition(working_data, iterations_per_tick)
@@ -594,31 +581,25 @@ local function generate_train_search_strings(working_data)
   local players = working_data.players
   local trains = working_data.trains
 
-  return table.for_n_of(
-    {},
-    working_data.key,
-    1,
-    function(data)
-      local train_data = data.train
-      local translations = data.translations
+  return table.for_n_of({}, working_data.key, 1, function(data)
+    local train_data = data.train
+    local translations = data.translations
 
-      local str = {string.lower(train_data.depot), string.lower(train_data.status[data.player_index].string)}
-      for name in pairs(train_data.contents or {}) do
-        table.insert(str, string.lower(translations[name]))
-      end
-
-      train_data.search_strings[data.player_index] = table.concat(str, " ")
-    end,
-    function(_, key)
-      return per_player_next(players, trains, key, function(player, train)
-        return {
-          train = trains[train],
-          player_index = player,
-          translations = players[player].dictionaries.materials,
-        }
-      end)
+    local str = { string.lower(train_data.depot), string.lower(train_data.status[data.player_index].string) }
+    for name in pairs(train_data.contents or {}) do
+      table.insert(str, string.lower(translations[name]))
     end
-  )
+
+    train_data.search_strings[data.player_index] = table.concat(str, " ")
+  end, function(_, key)
+    return per_player_next(players, trains, key, function(player, train)
+      return {
+        train = trains[train],
+        player_index = player,
+        translations = players[player].dictionaries.materials,
+      }
+    end)
+  end)
 end
 
 local function generate_station_search_strings(working_data)
@@ -630,39 +611,33 @@ local function generate_station_search_strings(working_data)
     requested = "materials",
     inbound = "materials",
     outbound = "materials",
-    control_signals = "virtual_signals"
+    control_signals = "virtual_signals",
   }
 
-  return table.for_n_of(
-    {},
-    working_data.key,
-    1,
-    function(data)
-      local station_data = data.station
-      local translations = data.translations
+  return table.for_n_of({}, working_data.key, 1, function(data)
+    local station_data = data.station
+    local translations = data.translations
 
-      local str = {string.lower(station_data.name)}
-      local str_i = 1
-      for station_table, dictionary_name in pairs(subtables) do
-        local dictionary = translations[dictionary_name]
-        for name in pairs(station_data[station_table] or {}) do
-          str_i = str_i + 1
-          str[str_i] = string.lower(dictionary[name])
-        end
+    local str = { string.lower(station_data.name) }
+    local str_i = 1
+    for station_table, dictionary_name in pairs(subtables) do
+      local dictionary = translations[dictionary_name]
+      for name in pairs(station_data[station_table] or {}) do
+        str_i = str_i + 1
+        str[str_i] = string.lower(dictionary[name])
       end
-
-      station_data.search_strings[data.player_index] = table.concat(str, " ")
-    end,
-    function(_, key)
-      return per_player_next(players, stations, key, function(player, station)
-        return {
-          station = stations[station],
-          player_index = player,
-          translations = players[player].dictionaries,
-        }
-      end)
     end
-  )
+
+    station_data.search_strings[data.player_index] = table.concat(str, " ")
+  end, function(_, key)
+    return per_player_next(players, stations, key, function(player, station)
+      return {
+        station = stations[station],
+        player_index = player,
+        translations = players[player].dictionaries,
+      }
+    end)
+  end)
 end
 
 local function sort_stations_by_name(working_data, iterations_per_tick)
@@ -755,12 +730,16 @@ local function update_history(working_data)
     -- if the train is returning to its depot or doesn't exist
     if not train or not train.to then
       -- check for `data`
-      if entry.use_working_data and not global.data then goto continue end
+      if entry.use_working_data and not global.data then
+        goto continue
+      end
       -- try other table
       trains = entry.use_working_data and global.data.trains or working_data.trains
       train = trains[entry.train_id] or trains[global.active_data.invalidated_trains[entry.train_id]]
       -- there's nothing we can do, so skip this one
-      if not train or not train.to then goto continue end
+      if not train or not train.to then
+        goto continue
+      end
     end
     -- sometimes LTN will forget to include `started`, in which case, skip this one
     if train.started then
@@ -771,11 +750,13 @@ local function update_history(working_data)
       entry.to_id = train.to_id
       entry.network_id = train.network_id
       entry.depot = train.depot
-      entry.route = train.from.." -> "..train.to
+      entry.route = train.from .. " -> " .. train.to
       entry.runtime = entry.finished - train.started
       entry.surface_index = train.main_locomotive.surface.index
       entry.search_strings = {}
-      entry.shipment_count = table.reduce(entry.shipment, function(acc, count) return acc + count end, 0)
+      entry.shipment_count = table.reduce(entry.shipment, function(acc, count)
+        return acc + count
+      end, 0)
       -- add to history
       queue.push_right(active_history, entry)
       -- limit to 50 entries
@@ -801,7 +782,7 @@ local function prepare_history_sort(working_data)
   -- add IDs to array
   local history_ids = {}
   for i in queue.iter_left(active_history) do
-    history_ids[#history_ids+1] = i
+    history_ids[#history_ids + 1] = i
   end
   -- copy to each table
   for key in pairs(sorted_history) do
@@ -813,46 +794,42 @@ local function generate_history_search_strings(working_data)
   local players = working_data.players
   local history = working_data.history
 
-  return table.for_n_of(
-    {},
-    working_data.key,
-    1,
-    function(data, key)
-      if key.obj == "first" or key.obj == "last" then return end
-
-      local history_data = data.history
-      local translations = data.translations
-
-      local str = {
-        string.lower(history_data.depot),
-        string.lower(history_data.from),
-        string.lower(history_data.to)
-      }
-      local str_i = 3
-      for name in pairs(history_data.shipment) do
-        str_i = str_i + 1
-        str[str_i] = string.lower(translations[name])
-      end
-
-      history_data.search_strings[data.player_index] = table.concat(str, " ")
-    end,
-    function(_, key)
-      return per_player_next(players, history, key, function(player, history_index)
-        return {
-          history = history[history_index],
-          player_index = player,
-          translations = players[player].dictionaries.materials,
-        }
-      end)
+  return table.for_n_of({}, working_data.key, 1, function(data, key)
+    if key.obj == "first" or key.obj == "last" then
+      return
     end
-  )
+
+    local history_data = data.history
+    local translations = data.translations
+
+    local str = {
+      string.lower(history_data.depot),
+      string.lower(history_data.from),
+      string.lower(history_data.to),
+    }
+    local str_i = 3
+    for name in pairs(history_data.shipment) do
+      str_i = str_i + 1
+      str[str_i] = string.lower(translations[name])
+    end
+
+    history_data.search_strings[data.player_index] = table.concat(str, " ")
+  end, function(_, key)
+    return per_player_next(players, history, key, function(player, history_index)
+      return {
+        history = history[history_index],
+        player_index = player,
+        translations = players[player].dictionaries.materials,
+      }
+    end)
+  end)
 end
 
 local function sort_history(working_data, iterations_per_tick)
   local history = working_data.history
   local sorted_history = working_data.sorted_history
 
-  local key = working_data.key or {sort = next(sorted_history)}
+  local key = working_data.key or { sort = next(sorted_history) }
   local sort = key.sort
 
   local next_index = table.partial_sort(
@@ -902,12 +879,16 @@ local function update_alerts(working_data)
     -- if the train is returning to its depot or doesn't exist
     if not train or not train.to then
       -- check for `data`
-      if alert_data.use_working_data and not global.data then goto continue end
+      if alert_data.use_working_data and not global.data then
+        goto continue
+      end
       -- try other table
       trains = alert_data.use_working_data and global.data.trains or working_data.trains
       train = trains[alert_data.train_id] or trains[global.active_data.invalidated_trains[alert_data.train_id]]
       -- there's nothing we can do, so skip this one
-      if not train or not train.to then goto continue end
+      if not train or not train.to then
+        goto continue
+      end
     end
     alert_data.search_strings = {}
     alert_data.train = {
@@ -919,7 +900,7 @@ local function update_alerts(working_data)
       pickup_done = train.pickupDone or false,
       to = train.to,
       to_id = train.to_id,
-      route = train.from.." -> "..train.to,
+      route = train.from .. " -> " .. train.to,
       surface_index = train.surface_index,
     }
     -- save to alerts table
@@ -937,44 +918,40 @@ local function generate_alerts_search_strings(working_data)
   local players = working_data.players
   local alerts = working_data.alerts
 
-  return table.for_n_of(
-    {},
-    working_data.key,
-    1,
-    function(data, key)
-      if key.obj == "first" or key.obj == "last" then return end
-
-      local alert_data = data.alert
-      local translations = data.translations
-
-      -- TODO: Search alert types
-      local str = {
-        alert_data.time,
-        alert_data.train_id,
-        string.lower(alert_data.train.from),
-        string.lower(alert_data.train.to),
-        alert_data.train.network_id,
-      }
-      local str_i = 5
-      for _, source in pairs{alert_data.planned_shipment or {}, alert_data.actual_shipment} do
-        for name in pairs(source) do
-          str_i = str_i + 1
-          str[str_i] = string.lower(translations[name])
-        end
-      end
-
-      alert_data.search_strings[data.player_index] = table.concat(str, " ")
-    end,
-    function(_, key)
-      return per_player_next(players, alerts, key, function(player, alerts_index)
-        return {
-          alert = alerts[alerts_index],
-          player_index = player,
-          translations = players[player].dictionaries.materials,
-        }
-      end)
+  return table.for_n_of({}, working_data.key, 1, function(data, key)
+    if key.obj == "first" or key.obj == "last" then
+      return
     end
-  )
+
+    local alert_data = data.alert
+    local translations = data.translations
+
+    -- TODO: Search alert types
+    local str = {
+      alert_data.time,
+      alert_data.train_id,
+      string.lower(alert_data.train.from),
+      string.lower(alert_data.train.to),
+      alert_data.train.network_id,
+    }
+    local str_i = 5
+    for _, source in pairs({ alert_data.planned_shipment or {}, alert_data.actual_shipment }) do
+      for name in pairs(source) do
+        str_i = str_i + 1
+        str[str_i] = string.lower(translations[name])
+      end
+    end
+
+    alert_data.search_strings[data.player_index] = table.concat(str, " ")
+  end, function(_, key)
+    return per_player_next(players, alerts, key, function(player, alerts_index)
+      return {
+        alert = alerts[alerts_index],
+        player_index = player,
+        translations = players[player].dictionaries.materials,
+      }
+    end)
+  end)
 end
 local function prepare_alerts_sort(working_data)
   local active_alerts = global.active_data.alerts
@@ -986,7 +963,7 @@ local function prepare_alerts_sort(working_data)
   -- add IDs to array
   local alert_ids = {}
   for i in queue.iter_left(active_alerts) do
-    alert_ids[#alert_ids+1] = i
+    alert_ids[#alert_ids + 1] = i
   end
   -- copy to each table
   for key in pairs(sorted_alerts) do
@@ -998,7 +975,7 @@ local function sort_alerts(working_data, iterations_per_tick)
   local alerts = working_data.alerts
   local sorted_alerts = working_data.sorted_alerts
 
-  local key = working_data.key or {sort = next(sorted_alerts)}
+  local key = working_data.key or { sort = next(sorted_alerts) }
   local sort = key.sort
 
   local next_index = table.partial_sort(
@@ -1027,8 +1004,8 @@ end
 
 local function process_surfaces(working_data)
   local surface_data = {
-    items = {{"gui.ltnm-all-paren"}},
-    selected_to_index = {-1}
+    items = { { "gui.ltnm-all-paren" } },
+    selected_to_index = { -1 },
   }
   local i = 1
   local surfaces = game.surfaces
@@ -1084,7 +1061,7 @@ function ltn_data.iterate()
     generate_alerts_search_strings,
     prepare_alerts_sort,
     sort_alerts,
-    process_surfaces
+    process_surfaces,
   }
 
   if processors[step] then
@@ -1129,12 +1106,16 @@ function ltn_data.iterate()
 end
 
 function ltn_data.on_stops_updated(e)
-  if global.flags.iterating_ltn_data or global.flags.updating_guis then return end
-  global.working_data = {stations = e.logistic_train_stops}
+  if global.flags.iterating_ltn_data or global.flags.updating_guis then
+    return
+  end
+  global.working_data = { stations = e.logistic_train_stops }
 end
 
 function ltn_data.on_dispatcher_updated(e)
-  if global.flags.iterating_ltn_data or global.flags.updating_guis then return end
+  if global.flags.iterating_ltn_data or global.flags.updating_guis then
+    return
+  end
   local working_data = global.working_data
   if not working_data then
     log("LTN event desync: did not receive stations in time! Skipping iteration.")
@@ -1149,7 +1130,7 @@ function ltn_data.on_dispatcher_updated(e)
   working_data.inventory = {
     provided = {},
     requested = {},
-    in_transit = {}
+    in_transit = {},
   }
   working_data.history = table.shallow_copy(global.active_data.history)
   working_data.alerts = table.shallow_copy(global.active_data.alerts)
@@ -1162,7 +1143,7 @@ function ltn_data.on_dispatcher_updated(e)
   working_data.surfaces = {}
   -- sorting tables
   working_data.sorted_trains = {
-    status ={},
+    status = {},
     composition = {},
     depot = {},
     shipment = {},
@@ -1209,16 +1190,18 @@ end
 
 function ltn_data.on_delivery_completed(e)
   local history_to_add = global.active_data.history_to_add
-  history_to_add[#history_to_add+1] = {
+  history_to_add[#history_to_add + 1] = {
     finished = game.tick,
     shipment = e.shipment,
     train_id = e.train_id,
-    use_working_data = global.flags.iterating_ltn_data or not global.data
+    use_working_data = global.flags.iterating_ltn_data or not global.data,
   }
 end
 
 function ltn_data.on_delivery_failed(e)
-  if not global.data then return end
+  if not global.data then
+    return
+  end
 
   local trains = global.data.trains
   local train = trains[e.train_id] or trains[global.active_data.invalidated_trains[e.train_id]]
@@ -1236,7 +1219,7 @@ local function migrate_train(e, data)
   local new_id = new_train.id
   -- migrate train IDs and information
   for i = 1, 2 do
-    local old_id = e["old_train_id_"..i]
+    local old_id = e["old_train_id_" .. i]
     if old_id then
       local train_data = trains[old_id] or trains[invalidated_trains[old_id]]
       if train_data then
@@ -1286,7 +1269,7 @@ function ltn_data.init()
     alerts = queue.new(),
     history_to_add = {},
     history = queue.new(),
-    invalidated_trains = {}
+    invalidated_trains = {},
   }
   global.flags.iterating_ltn_data = false
   global.flags.updating_guis = false

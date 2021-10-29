@@ -12,80 +12,50 @@ function history_tab.build(widths)
   return {
     tab = {
       type = "tab",
-      caption = {"gui.ltnm-history"},
-      ref = {"history", "tab"},
+      caption = { "gui.ltnm-history" },
+      ref = { "history", "tab" },
       actions = {
-        on_click = {gui = "main", action = "change_tab", tab = "history"},
+        on_click = { gui = "main", action = "change_tab", tab = "history" },
       },
     },
     content = {
       type = "frame",
       style = "ltnm_main_content_frame",
       direction = "vertical",
-      ref = {"history", "content_frame"},
-      {type = "frame", style = "ltnm_table_toolbar_frame", style_mods = {right_padding = 4},
-        templates.sort_checkbox(
-          widths,
-          "history",
-          "train_id",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "history",
-          "route",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "history",
-          "depot",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "history",
-          "network_id",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "history",
-          "runtime",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "history",
-          "finished",
-          true,
-          nil,
-          true
-        ),
-        templates.sort_checkbox(
-          nil,
-          "history",
-          "shipment",
-          false
-        ),
+      ref = { "history", "content_frame" },
+      {
+        type = "frame",
+        style = "ltnm_table_toolbar_frame",
+        style_mods = { right_padding = 4 },
+        templates.sort_checkbox(widths, "history", "train_id", false),
+        templates.sort_checkbox(widths, "history", "route", false),
+        templates.sort_checkbox(widths, "history", "depot", false),
+        templates.sort_checkbox(widths, "history", "network_id", false),
+        templates.sort_checkbox(widths, "history", "runtime", false),
+        templates.sort_checkbox(widths, "history", "finished", true, nil, true),
+        templates.sort_checkbox(nil, "history", "shipment", false),
         {
           type = "sprite-button",
           style = "tool_button_red",
           sprite = "utility/trash",
-          tooltip = {"gui.ltnm-clear-history"},
-          ref = {"history", "clear_button"},
+          tooltip = { "gui.ltnm-clear-history" },
+          ref = { "history", "clear_button" },
           actions = {
-            on_click = {gui = "main", action = "clear_history"},
+            on_click = { gui = "main", action = "clear_history" },
           },
         },
       },
-      {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"history", "scroll_pane"}},
-      {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"history", "warning_flow"},
+      { type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = { "history", "scroll_pane" } },
+      {
+        type = "flow",
+        style = "ltnm_warning_flow",
+        visible = false,
+        ref = { "history", "warning_flow" },
         {
           type = "label",
           style = "ltnm_semibold_label",
-          caption = {"gui.ltnm-no-history"},
-          ref = {"history", "warning_label"},
+          caption = { "gui.ltnm-no-history" },
+          ref = { "history", "warning_label" },
         },
       },
     },
@@ -141,78 +111,79 @@ function history_tab.update(self)
         local row = children[table_index]
         local color = table_index % 2 == 0 and "dark" or "light"
         if not row then
-          row = gui.add(scroll_pane,
-            {type = "frame", style = "ltnm_table_row_frame_"..color,
+          row = gui.add(
+            scroll_pane,
+            {
+              type = "frame",
+              style = "ltnm_table_row_frame_" .. color,
               {
                 type = "label",
                 style = "ltnm_clickable_semibold_label",
-                style_mods = {width = widths.history.train_id, horizontal_align = "center"},
-                tooltip = {"gui.ltnm-open-train-gui"},
+                style_mods = { width = widths.history.train_id, horizontal_align = "center" },
+                tooltip = { "gui.ltnm-open-train-gui" },
               },
               {
                 type = "flow",
-                style_mods = {vertical_spacing = 0},
+                style_mods = { vertical_spacing = 0 },
                 direction = "vertical",
                 {
                   type = "label",
                   style = "ltnm_clickable_semibold_label",
-                  style_mods = {width = widths.history.route},
-                  tooltip = {"gui.ltnm-open-station-gui"},
+                  style_mods = { width = widths.history.route },
+                  tooltip = { "gui.ltnm-open-station-gui" },
                 },
                 {
                   type = "label",
                   style = "ltnm_clickable_semibold_label",
-                  style_mods = {width = widths.history.route},
-                  tooltip = {"gui.ltnm-open-station-gui"},
+                  style_mods = { width = widths.history.route },
+                  tooltip = { "gui.ltnm-open-station-gui" },
                 },
               },
-              {type = "label", style_mods = {width = widths.history.depot}},
-              {type = "label", style_mods = {width = widths.history.network_id, horizontal_align = "center"}},
-              {type = "label", style_mods = {width = widths.history.finished, horizontal_align = "center"}},
-              {type = "label", style_mods = {width = widths.history.runtime, horizontal_align = "center"}},
+              { type = "label", style_mods = { width = widths.history.depot } },
+              { type = "label", style_mods = { width = widths.history.network_id, horizontal_align = "center" } },
+              { type = "label", style_mods = { width = widths.history.finished, horizontal_align = "center" } },
+              { type = "label", style_mods = { width = widths.history.runtime, horizontal_align = "center" } },
               {
                 type = "frame",
                 name = "shipment_frame",
-                style = "ltnm_small_slot_table_frame_"..color,
-                style_mods = {width = widths.history.shipment},
-                {type = "table", name = "shipment_table", style = "slot_table", column_count = 4},
+                style = "ltnm_small_slot_table_frame_" .. color,
+                style_mods = { width = widths.history.shipment },
+                { type = "table", name = "shipment_table", style = "slot_table", column_count = 4 },
               },
             }
           )
         end
 
-        gui.update(row,
+        gui.update(row, {
+          {
+            elem_mods = { caption = history_entry.train_id },
+            actions = {
+              on_click = { gui = "main", action = "open_train_gui", train_id = history_entry.train_id },
+            },
+          },
           {
             {
-              elem_mods = {caption = history_entry.train_id},
+              elem_mods = { caption = history_entry.from },
               actions = {
-                on_click = {gui = "main", action = "open_train_gui", train_id = history_entry.train_id},
+                on_click = { gui = "main", action = "open_station_gui", station_id = history_entry.from_id },
               },
             },
             {
-              {
-                elem_mods = {caption = history_entry.from},
-                actions = {
-                  on_click = {gui = "main", action = "open_station_gui", station_id = history_entry.from_id},
-                },
-              },
-              {
-                elem_mods = {caption = "[color="..constants.colors.caption.str.."]->[/color]  "..history_entry.to},
-                actions = {
-                  on_click = {gui = "main", action = "open_station_gui", station_id = history_entry.to_id},
-                },
+              elem_mods = { caption = "[color=" .. constants.colors.caption.str .. "]->[/color]  " .. history_entry.to },
+              actions = {
+                on_click = { gui = "main", action = "open_station_gui", station_id = history_entry.to_id },
               },
             },
-            {elem_mods = {caption = history_entry.depot}},
-            {elem_mods = {caption = history_entry.network_id}},
-            {elem_mods = {caption = misc.ticks_to_timestring(history_entry.runtime)}},
-            {elem_mods = {caption = misc.ticks_to_timestring(history_entry.finished)}},
-          }
-        )
+          },
+          { elem_mods = { caption = history_entry.depot } },
+          { elem_mods = { caption = history_entry.network_id } },
+          { elem_mods = { caption = misc.ticks_to_timestring(history_entry.runtime) } },
+          { elem_mods = { caption = misc.ticks_to_timestring(history_entry.finished) } },
+        })
 
         util.slot_table_update(
           row.shipment_frame.shipment_table,
-          {{color = "default", entries = history_entry.shipment, translations = dictionaries.materials}}
+          { { color = "default", entries = history_entry.shipment, translations = dictionaries.materials } }
         )
       end
     end

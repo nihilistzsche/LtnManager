@@ -8,7 +8,7 @@ function player_data.init(player, index)
     flags = {
       can_open_gui = false,
       translate_on_join = false,
-      translations_finished = false
+      translations_finished = false,
     },
     guis = {},
     language = nil,
@@ -38,7 +38,7 @@ end
 
 function player_data.set_setting(player_index, setting_name, setting_value)
   local player = game.get_player(player_index)
-  player.mod_settings["ltnm-"..setting_name] = {value = setting_value}
+  player.mod_settings["ltnm-" .. setting_name] = { value = setting_value }
 end
 
 return player_data

@@ -8,10 +8,10 @@ local actions = {}
 local function toggle_fab(elem, sprite, state)
   if state then
     elem.style = "flib_selected_frame_action_button"
-    elem.sprite = sprite.."_black"
+    elem.sprite = sprite .. "_black"
   else
     elem.style = "frame_action_button"
-    elem.sprite = sprite.."_white"
+    elem.sprite = sprite .. "_white"
   end
 end
 
@@ -57,7 +57,7 @@ function actions.update_text_search_query(Gui, _, e)
   else
     Gui.state.search_job = on_tick_n.add(
       game.tick + 30,
-      {gui = "main", action = "update", player_index = Gui.player.index}
+      { gui = "main", action = "update", player_index = Gui.player.index }
     )
   end
 end
@@ -72,7 +72,7 @@ function actions.open_train_gui(Gui, msg)
   local train_data = Gui.state.ltn_data.trains[train_id]
 
   if not train_data or not train_data.train.valid then
-    util.error_flying_text(Gui.player, {"message.ltnm-error-train-is-invalid"})
+    util.error_flying_text(Gui.player, { "message.ltnm-error-train-is-invalid" })
     return
   end
 
@@ -84,7 +84,7 @@ function actions.open_station_gui(Gui, msg)
   local station_data = Gui.state.ltn_data.stations[station_id]
 
   if not station_data or not station_data.entity.valid then
-    util.error_flying_text(Gui.player, {"message.ltnm-error-station-is-invalid"})
+    util.error_flying_text(Gui.player, { "message.ltnm-error-station-is-invalid" })
     return
   end
 
@@ -103,7 +103,7 @@ function actions.toggle_sort(Gui, msg, e)
     sorts._active = column
     e.element.state = sorts[column]
 
-    local old_checkbox = Gui.refs[tab].toolbar[active_column.."_checkbox"]
+    local old_checkbox = Gui.refs[tab].toolbar[active_column .. "_checkbox"]
     old_checkbox.style = "ltnm_sort_checkbox"
     old_checkbox.style.width = Gui.widths[tab][active_column]
     e.element.style = "ltnm_selected_sort_checkbox"

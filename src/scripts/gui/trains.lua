@@ -11,51 +11,37 @@ function trains_tab.build(widths)
   return {
     tab = {
       type = "tab",
-      caption = {"gui.ltnm-trains"},
-      ref = {"trains", "tab"},
+      caption = { "gui.ltnm-trains" },
+      ref = { "trains", "tab" },
       actions = {
-        on_click = {gui = "main", action = "change_tab", tab = "trains"},
+        on_click = { gui = "main", action = "change_tab", tab = "trains" },
       },
     },
     content = {
       type = "frame",
       style = "ltnm_main_content_frame",
       direction = "vertical",
-      ref = {"trains", "content_frame"},
-      {type = "frame", style = "ltnm_table_toolbar_frame",
-        {type = "empty-widget", style_mods = {width = widths.trains.minimap}},
-        templates.sort_checkbox(
-          widths,
-          "trains",
-          "status",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "trains",
-          "composition",
-          true
-        ),
-        templates.sort_checkbox(
-          widths,
-          "trains",
-          "depot",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "trains",
-          "shipment",
-          false
-        ),
+      ref = { "trains", "content_frame" },
+      {
+        type = "frame",
+        style = "ltnm_table_toolbar_frame",
+        { type = "empty-widget", style_mods = { width = widths.trains.minimap } },
+        templates.sort_checkbox(widths, "trains", "status", false),
+        templates.sort_checkbox(widths, "trains", "composition", true),
+        templates.sort_checkbox(widths, "trains", "depot", false),
+        templates.sort_checkbox(widths, "trains", "shipment", false),
       },
-      {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"trains", "scroll_pane"}},
-      {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"trains", "warning_flow"},
+      { type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = { "trains", "scroll_pane" } },
+      {
+        type = "flow",
+        style = "ltnm_warning_flow",
+        visible = false,
+        ref = { "trains", "warning_flow" },
         {
           type = "label",
           style = "ltnm_semibold_label",
-          caption = {"gui.ltnm-no-trains"},
-          ref = {"trains", "warning_label"},
+          caption = { "gui.ltnm-no-trains" },
+          ref = { "trains", "warning_label" },
         },
       },
     },
@@ -114,26 +100,33 @@ function trains_tab.update(self)
         local row = children[table_index]
         local color = table_index % 2 == 0 and "dark" or "light"
         if not row then
-          row = gui.add(scroll_pane,
-            {type = "frame", style = "ltnm_table_row_frame_"..color,
-              {type = "frame", style = "ltnm_table_inset_frame_"..color,
-                {type = "minimap", style = "ltnm_train_minimap",
-                  {type = "button", style = "ltnm_train_minimap_button", tooltip = {"gui.ltnm-open-train-gui"}},
+          row = gui.add(
+            scroll_pane,
+            {
+              type = "frame",
+              style = "ltnm_table_row_frame_" .. color,
+              {
+                type = "frame",
+                style = "ltnm_table_inset_frame_" .. color,
+                {
+                  type = "minimap",
+                  style = "ltnm_train_minimap",
+                  { type = "button", style = "ltnm_train_minimap_button", tooltip = { "gui.ltnm-open-train-gui" } },
                 },
               },
-              {type = "label", style = "ltnm_clickable_semibold_label"},
-              {type = "label", style_mods = {width = widths.trains.composition}},
-              {type = "label", style_mods = {width = widths.trains.depot}},
+              { type = "label", style = "ltnm_clickable_semibold_label" },
+              { type = "label", style_mods = { width = widths.trains.composition } },
+              { type = "label", style_mods = { width = widths.trains.depot } },
               {
                 type = "frame",
                 name = "shipment_frame",
-                style = "ltnm_small_slot_table_frame_"..color,
-                style_mods = {width = widths.trains.shipment},
+                style = "ltnm_small_slot_table_frame_" .. color,
+                style_mods = { width = widths.trains.shipment },
                 {
                   type = "table",
                   name = "shipment_table",
                   style = "slot_table",
-                  column_count = widths.trains.shipment_columns
+                  column_count = widths.trains.shipment_columns,
                 },
               },
             }
@@ -143,37 +136,36 @@ function trains_tab.update(self)
         local status = train_data.status[self.player.index]
         -- TODO: This shouldn't be needed any more
         if not status then
-          status = {color = constants.colors.red.tbl, string = "ERROR"}
+          status = { color = constants.colors.red.tbl, string = "ERROR" }
         end
-        local station_id = status.station and train_data[status.station.."_id"] or nil
+        local station_id = status.station and train_data[status.station .. "_id"] or nil
 
-        gui.update(row,
+        gui.update(row, {
           {
             {
-              {elem_mods = {entity = train_data.main_locomotive},
-                {actions = {
-                  on_click = {gui = "main", action = "open_train_gui", train_id = train_id},
-                }},
+              elem_mods = { entity = train_data.main_locomotive },
+              {
+                actions = {
+                  on_click = { gui = "main", action = "open_train_gui", train_id = train_id },
+                },
               },
             },
-            {
-              actions = {
-                on_click = station_id
-                  and {gui = "main", action = "open_station_gui", station_id = station_id}
-                  or false,
-              },
-              elem_mods = {caption = status.string, tooltip = station_id and {"gui.ltnm-open-station-gui"} or ""},
-              style = station_id and "ltnm_clickable_semibold_label" or "ltnm_semibold_label",
-              style_mods = {font_color = status.color or constants.colors.white.tbl, width = widths.trains.status},
+          },
+          {
+            actions = {
+              on_click = station_id and { gui = "main", action = "open_station_gui", station_id = station_id } or false,
             },
-            {elem_mods = {caption = train_data.composition}},
-            {elem_mods = {caption = train_data.depot}},
-          }
-        )
+            elem_mods = { caption = status.string, tooltip = station_id and { "gui.ltnm-open-station-gui" } or "" },
+            style = station_id and "ltnm_clickable_semibold_label" or "ltnm_semibold_label",
+            style_mods = { font_color = status.color or constants.colors.white.tbl, width = widths.trains.status },
+          },
+          { elem_mods = { caption = train_data.composition } },
+          { elem_mods = { caption = train_data.depot } },
+        })
 
         util.slot_table_update(
           row.shipment_frame.shipment_table,
-          {{color = "default", entries = train_data.shipment, translations = dictionaries.materials}}
+          { { color = "default", entries = train_data.shipment, translations = dictionaries.materials } }
         )
       end
     end

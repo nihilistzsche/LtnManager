@@ -42,5 +42,5 @@ return {
       flags.search_open = nil
       flags.toggling_search = nil
     end
-  end
+  end,
 }

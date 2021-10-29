@@ -8,17 +8,17 @@ function inventory_tab.build()
   return {
     tab = {
       type = "tab",
-      caption = {"gui.ltnm-inventory"},
-      ref = {"inventory", "tab"},
+      caption = { "gui.ltnm-inventory" },
+      ref = { "inventory", "tab" },
       actions = {
-        on_click = {gui = "main", action = "change_tab", tab = "inventory"},
+        on_click = { gui = "main", action = "change_tab", tab = "inventory" },
       },
     },
     content = {
       type = "flow",
-      style_mods = {horizontal_spacing = 12},
+      style_mods = { horizontal_spacing = 12 },
       direction = "horizontal",
-      ref = {"inventory", "content_frame"},
+      ref = { "inventory", "content_frame" },
       templates.inventory_slot_table("provided", 12),
       templates.inventory_slot_table("in_transit", 8),
       templates.inventory_slot_table("requested", 6),
@@ -59,16 +59,16 @@ local function update_table(self, name, color)
         i = i + 1
         local button = children[i]
         if not button then
-          button = table.add{type = "sprite-button", style = "flib_slot_button_"..color, enabled = false}
+          button = table.add({ type = "sprite-button", style = "flib_slot_button_" .. color, enabled = false })
         end
         button.sprite = string.gsub(name, ",", "/")
         button.number = running_count
         button.tooltip = "[img="
-          ..string.gsub(name, ",", "/")
-          .."]  [font=default-semibold]"
-          ..translations[name]
-          .."[/font]\n"
-          ..misc.delineate_number(running_count)
+          .. string.gsub(name, ",", "/")
+          .. "]  [font=default-semibold]"
+          .. translations[name]
+          .. "[/font]\n"
+          .. misc.delineate_number(running_count)
       end
     end
   end

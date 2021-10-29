@@ -1,4 +1,4 @@
-data:extend{
+data:extend({
   -- global
   {
     type = "int-setting",
@@ -6,6 +6,6 @@ data:extend{
     setting_type = "runtime-global",
     minimum_value = 1,
     default_value = 10,
-    order = "a"
-  }
-}
+    order = "a",
+  },
+})

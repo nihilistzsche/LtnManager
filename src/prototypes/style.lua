@@ -9,16 +9,16 @@ local styles = data.raw["gui-style"]["default"]
 -- BUTTON STYLES
 
 -- smaller flib slot buttons
-for _, color in ipairs{"default", "red", "green", "blue"} do
-  styles["ltnm_small_slot_button_"..color] = {
+for _, color in ipairs({ "default", "red", "green", "blue" }) do
+  styles["ltnm_small_slot_button_" .. color] = {
     type = "button_style",
-    parent = "flib_slot_button_"..color,
-    size = 36
+    parent = "flib_slot_button_" .. color,
+    size = 36,
   }
-  styles["ltnm_selected_small_slot_button_"..color] = {
+  styles["ltnm_selected_small_slot_button_" .. color] = {
     type = "button_style",
-    parent = "flib_selected_slot_button_"..color,
-    size = 36
+    parent = "flib_selected_slot_button_" .. color,
+    size = 36,
   }
 end
 
@@ -42,14 +42,14 @@ end
 -- }
 
 styles.ltnm_train_minimap_button = {
-	type = "button_style",
-	parent = "button",
-	size = 90,
-	default_graphical_set = {},
-	hovered_graphical_set = {
-		base = {position = {81, 80}, size = 1, opacity = 0.7},
-	},
-	clicked_graphical_set = {position = {70, 146}, size = 1, opacity = 0.7},
+  type = "button_style",
+  parent = "button",
+  size = 90,
+  default_graphical_set = {},
+  hovered_graphical_set = {
+    base = { position = { 81, 80 }, size = 1, opacity = 0.7 },
+  },
+  clicked_graphical_set = { position = { 70, 146 }, size = 1, opacity = 0.7 },
 }
 
 -- CHECKBOX STYLES
@@ -63,47 +63,47 @@ styles.ltnm_sort_checkbox = {
   padding = 0,
   default_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-down-white.png",
-    size = {16, 16},
-    scale = 0.5
+    size = { 16, 16 },
+    scale = 0.5,
   },
   hovered_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-down-hover.png",
-    size = {16, 16},
-    scale = 0.5
+    size = { 16, 16 },
+    scale = 0.5,
   },
   clicked_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-down-white.png",
-    size = {16, 16},
-    scale = 0.5
+    size = { 16, 16 },
+    scale = 0.5,
   },
   disabled_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-down-white.png",
-    size = {16, 16},
-    scale = 0.5
+    size = { 16, 16 },
+    scale = 0.5,
   },
   selected_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
-    size = {16, 16},
-    scale = 0.5
+    size = { 16, 16 },
+    scale = 0.5,
   },
   selected_hovered_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-up-hover.png",
-    size = {16, 16},
-    scale = 0.5
+    size = { 16, 16 },
+    scale = 0.5,
   },
   selected_clicked_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
-    size = {16, 16},
-    scale = 0.5
+    size = { 16, 16 },
+    scale = 0.5,
   },
   selected_disabled_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-up-white.png",
-    size = {16, 16},
-    scale = 0.5
+    size = { 16, 16 },
+    scale = 0.5,
   },
   checkmark = util.empty_checkmark,
   disabled_checkmark = util.empty_checkmark,
-  text_padding = 5
+  text_padding = 5,
 }
 
 -- selected is orange by default
@@ -113,13 +113,13 @@ styles.ltnm_selected_sort_checkbox = {
   -- font_color = bold_font_color,
   default_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-down-active.png",
-    size = {16, 16},
-    scale = 0.5
+    size = { 16, 16 },
+    scale = 0.5,
   },
   selected_graphical_set = {
     filename = "__core__/graphics/arrows/table-header-sort-arrow-up-active.png",
-    size = {16, 16},
-    scale = 0.5
+    size = { 16, 16 },
+    scale = 0.5,
   },
 }
 
@@ -178,16 +178,16 @@ styles.ltnm_small_slot_table_frame_light = {
   minimal_height = 36,
   background_graphical_set = {
     base = {
-      position = {282, 17},
+      position = { 282, 17 },
       corner_size = 8,
       overall_tiling_horizontal_padding = 4,
       overall_tiling_horizontal_size = 28,
       overall_tiling_horizontal_spacing = 8,
       overall_tiling_vertical_padding = 4,
       overall_tiling_vertical_size = 28,
-      overall_tiling_vertical_spacing = 8
-    }
-  }
+      overall_tiling_vertical_spacing = 8,
+    },
+  },
 }
 
 styles.ltnm_small_slot_table_frame_dark = {
@@ -196,16 +196,16 @@ styles.ltnm_small_slot_table_frame_dark = {
   minimal_height = 36,
   background_graphical_set = {
     base = {
-      position = {282, 17},
+      position = { 282, 17 },
       corner_size = 8,
       overall_tiling_horizontal_padding = 4,
       overall_tiling_horizontal_size = 28,
       overall_tiling_horizontal_spacing = 8,
       overall_tiling_vertical_padding = 4,
       overall_tiling_vertical_size = 28,
-      overall_tiling_vertical_spacing = 8
-    }
-  }
+      overall_tiling_vertical_spacing = 8,
+    },
+  },
 }
 
 styles.ltnm_table_inset_frame_light = {
@@ -217,12 +217,11 @@ styles.ltnm_table_inset_frame_dark = {
   type = "frame_style",
   parent = "deep_frame_in_shallow_frame",
   graphical_set = {
-    base =
-    {
-      position = {51, 0},
+    base = {
+      position = { 51, 0 },
       corner_size = 8,
-      center = {position = {42, 8}, size = {1, 1}},
-      draw_type = "outer"
+      center = { position = { 42, 8 }, size = { 1, 1 } },
+      draw_type = "outer",
     },
     shadow = default_inner_shadow,
   },
@@ -244,7 +243,7 @@ styles.ltnm_table_row_frame_light = {
   },
   graphical_set = {
     base = {
-      center = {position = {76, 8}, size = {1, 1}},
+      center = { position = { 76, 8 }, size = { 1, 1 } },
       -- bottom = {position = {8, 40}, size = {1, 8}},
     },
   },
@@ -268,8 +267,8 @@ styles.ltnm_table_toolbar_frame = {
   horizontal_flow_style = {
     type = "horizontal_flow_style",
     horizontal_spacing = 10,
-    vertical_align = "center"
-  }
+    vertical_align = "center",
+  },
 }
 
 styles.ltnm_main_warning_frame = {
@@ -278,12 +277,13 @@ styles.ltnm_main_warning_frame = {
   height = constants.gui_content_frame_height,
   graphical_set = {
     base = {
-      position = {85, 0}, corner_size = 8,
-      center = {position = {411, 25}, size = {1, 1}},
-      draw_type = "outer"
+      position = { 85, 0 },
+      corner_size = 8,
+      center = { position = { 411, 25 }, size = { 1, 1 } },
+      draw_type = "outer",
     },
-    shadow = default_inner_shadow
-  }
+    shadow = default_inner_shadow,
+  },
 }
 
 -- LABEL STYLES
@@ -303,7 +303,7 @@ styles.ltnm_main_warning_frame = {
 local hovered_label_color = {
   r = 0.5 * (1 + default_orange_color.r),
   g = 0.5 * (1 + default_orange_color.g),
-  b = 0.5 * (1 + default_orange_color.b)
+  b = 0.5 * (1 + default_orange_color.b),
 }
 
 styles.ltnm_semibold_label = {
@@ -321,19 +321,19 @@ styles.ltnm_clickable_semibold_label = {
 styles.ltnm_clickable_label = {
   type = "label_style",
   parent = "ltnm_clickable_semibold_label",
-  font = "default"
+  font = "default",
 }
 
 styles.ltnm_bold_green_label = {
   type = "label_style",
   parent = "bold_label",
-  font_color = constants.colors.green.tbl
+  font_color = constants.colors.green.tbl,
 }
 
 styles.ltnm_bold_red_label = {
   type = "label_style",
   parent = "bold_label",
-  font_color = constants.colors.red.tbl
+  font_color = constants.colors.red.tbl,
 }
 
 -- styles.ltnm_semibold_black_label = {
@@ -346,8 +346,8 @@ styles.ltnm_bold_red_label = {
 -- MINIMAP STYLES
 
 styles.ltnm_train_minimap = {
-	type = "minimap_style",
-	size = 90
+  type = "minimap_style",
+  size = 90,
 }
 
 -- SCROLL PANE STYLES
@@ -358,7 +358,7 @@ styles.ltnm_table_scroll_pane = {
   vertical_flow_style = {
     type = "vertical_flow_style",
     vertical_spacing = 0,
-  }
+  },
 }
 
 -- styles.ltnm_depot_select_scroll_pane = {
@@ -386,16 +386,16 @@ styles.ltnm_slot_table_scroll_pane = {
   horizontally_squashable = "off",
   background_graphical_set = {
     base = {
-      position = {282, 17},
+      position = { 282, 17 },
       corner_size = 8,
       overall_tiling_horizontal_padding = 4,
       overall_tiling_horizontal_size = 32,
       overall_tiling_horizontal_spacing = 8,
       overall_tiling_vertical_padding = 4,
       overall_tiling_vertical_size = 32,
-      overall_tiling_vertical_spacing = 8
-    }
-  }
+      overall_tiling_vertical_spacing = 8,
+    },
+  },
 }
 
 -- styles.ltnm_small_slot_table_scroll_pane = {
@@ -452,6 +452,6 @@ styles.ltnm_tabbed_pane = {
     parent = "tabbed_pane_frame",
     left_padding = 12,
     right_padding = 12,
-    bottom_padding = 8
-  }
+    bottom_padding = 8,
+  },
 }

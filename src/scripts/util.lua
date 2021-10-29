@@ -7,8 +7,8 @@ local util = {}
 --- @param player LuaPlayer
 --- @param message LocalisedString
 function util.error_flying_text(player, message)
-  player.create_local_flying_text{create_at_cursor = true, text = message}
-  player.play_sound{path = "utility/cannot_build"}
+  player.create_local_flying_text({ create_at_cursor = true, text = message })
+  player.play_sound({ path = "utility/cannot_build" })
 end
 
 function util.gui_list(parent, iterator, test, build, update, ...)
@@ -21,7 +21,7 @@ function util.gui_list(parent, iterator, test, build, update, ...)
       i = i + 1
       local child = children[i]
       if not child then
-        gui.build(parent, {build(...)})
+        gui.build(parent, { build(...) })
         child = parent.children[i]
       end
       gui.update(child, update(v, k, i, ...))
@@ -56,22 +56,22 @@ function util.slot_table_update(table, sources)
         i = i + 1
         local button = children[i]
         if not button then
-          button = gui.add(table, {type = "sprite-button", enabled = false})
+          button = gui.add(table, { type = "sprite-button", enabled = false })
         end
         local sprite
         if source_data.type then
-          sprite = source_data.type.."/"..name
+          sprite = source_data.type .. "/" .. name
         else
           sprite = string.gsub(name, ",", "/")
         end
-        button.style = "ltnm_small_slot_button_"..source_data.color
+        button.style = "ltnm_small_slot_button_" .. source_data.color
         button.sprite = sprite
         button.tooltip = "[img="
-          ..sprite
-          .."]  [font=default-semibold]"
-          ..source_data.translations[name]
-          .."[/font]\n"
-          ..misc.delineate_number(count)
+          .. sprite
+          .. "]  [font=default-semibold]"
+          .. source_data.translations[name]
+          .. "[/font]\n"
+          .. misc.delineate_number(count)
         button.number = count
       end
     end
@@ -86,15 +86,14 @@ function util.sorted_iterator(arr, src_tbl, sort_state)
   local step = sort_state and 1 or -1
   local i = sort_state and 1 or #arr
 
-  return
-    function()
-      local j = i + step
-      if arr[j] then
-        i = j
-        local arr_value = arr[j]
-        return arr_value, src_tbl[arr_value]
-      end
-    end,
+  return function()
+    local j = i + step
+    if arr[j] then
+      i = j
+      local arr_value = arr[j]
+      return arr_value, src_tbl[arr_value]
+    end
+  end,
     arr
 end
 

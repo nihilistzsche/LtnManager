@@ -10,64 +10,40 @@ function stations_tab.build(widths)
   return {
     tab = {
       type = "tab",
-      caption = {"gui.ltnm-stations"},
-      ref = {"stations", "tab"},
+      caption = { "gui.ltnm-stations" },
+      ref = { "stations", "tab" },
       actions = {
-        on_click = {gui = "main", action = "change_tab", tab = "stations"},
+        on_click = { gui = "main", action = "change_tab", tab = "stations" },
       },
     },
     content = {
       type = "frame",
       style = "ltnm_main_content_frame",
       direction = "vertical",
-      ref = {"stations", "content_frame"},
-      {type = "frame", style = "ltnm_table_toolbar_frame",
-        templates.sort_checkbox(
-          widths,
-          "stations",
-          "name",
-          true
-        ),
-        templates.sort_checkbox(
-          widths,
-          "stations",
-          "status",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "stations",
-          "network_id",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "stations",
-          "provided_requested",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "stations",
-          "shipments",
-          false
-        ),
-        templates.sort_checkbox(
-          widths,
-          "stations",
-          "control_signals",
-          false
-        ),
+      ref = { "stations", "content_frame" },
+      {
+        type = "frame",
+        style = "ltnm_table_toolbar_frame",
+        templates.sort_checkbox(widths, "stations", "name", true),
+        templates.sort_checkbox(widths, "stations", "status", false),
+        templates.sort_checkbox(widths, "stations", "network_id", false),
+        templates.sort_checkbox(widths, "stations", "provided_requested", false),
+        templates.sort_checkbox(widths, "stations", "shipments", false),
+        templates.sort_checkbox(widths, "stations", "control_signals", false),
       },
-      {type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = {"stations", "scroll_pane"}},
-      {type = "flow", style = "ltnm_warning_flow", visible = false, ref = {"stations", "warning_flow"},
+      { type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = { "stations", "scroll_pane" } },
+      {
+        type = "flow",
+        style = "ltnm_warning_flow",
+        visible = false,
+        ref = { "stations", "warning_flow" },
         {
           type = "label",
           style = "ltnm_semibold_label",
-          caption = {"gui.ltnm-no-stations"},
-          ref = {"stations", "warning_label"}
+          caption = { "gui.ltnm-no-stations" },
+          ref = { "stations", "warning_label" },
         },
-      }
+      },
     },
   }
 end
@@ -121,16 +97,19 @@ function stations_tab.update(self)
         local row = children[table_index]
         local color = table_index % 2 == 0 and "dark" or "light"
         if not row then
-          row = gui.add(scroll_pane,
-            {type = "frame", style = "ltnm_table_row_frame_"..color,
+          row = gui.add(
+            scroll_pane,
+            {
+              type = "frame",
+              style = "ltnm_table_row_frame_" .. color,
               {
                 type = "label",
                 style = "ltnm_clickable_semibold_label",
-                style_mods = {width = widths.name},
-                tooltip = {"gui.ltnm-open-station-gui"},
+                style_mods = { width = widths.name },
+                tooltip = { "gui.ltnm-open-station-gui" },
               },
               templates.status_indicator(widths.status),
-              {type = "label", style_mods = {width = widths.network_id, horizontal_align = "center"}},
+              { type = "label", style_mods = { width = widths.network_id, horizontal_align = "center" } },
               templates.small_slot_table(widths, color, "provided_requested"),
               templates.small_slot_table(widths, color, "shipments"),
               templates.small_slot_table(widths, color, "control_signals"),
@@ -138,47 +117,36 @@ function stations_tab.update(self)
           )
         end
 
-        gui.update(row,
+        gui.update(row, {
           {
-            {
-              elem_mods = {caption = station_data.name},
-              actions = {
-                on_click = {gui = "main", action = "open_station_gui", station_id = station_id},
-              },
+            elem_mods = { caption = station_data.name },
+            actions = {
+              on_click = { gui = "main", action = "open_station_gui", station_id = station_id },
             },
-            {
-              {elem_mods = {sprite = "flib_indicator_"..station_data.status.color}},
-              {elem_mods = {caption = station_data.status.count}},
-            },
-            {elem_mods = {caption = station_data.network_id}},
-          }
-        )
+          },
+          {
+            { elem_mods = { sprite = "flib_indicator_" .. station_data.status.color } },
+            { elem_mods = { caption = station_data.status.count } },
+          },
+          { elem_mods = { caption = station_data.network_id } },
+        })
 
-        util.slot_table_update(
-          row.provided_requested_frame.provided_requested_table,
+        util.slot_table_update(row.provided_requested_frame.provided_requested_table, {
+          { color = "green", entries = station_data.provided, translations = dictionaries.materials },
+          { color = "red", entries = station_data.requested, translations = dictionaries.materials },
+        })
+        util.slot_table_update(row.shipments_frame.shipments_table, {
+          { color = "green", entries = station_data.inbound, translations = dictionaries.materials },
+          { color = "blue", entries = station_data.outbound, translations = dictionaries.materials },
+        })
+        util.slot_table_update(row.control_signals_frame.control_signals_table, {
           {
-            {color = "green", entries = station_data.provided, translations = dictionaries.materials},
-            {color = "red", entries = station_data.requested, translations = dictionaries.materials},
-          }
-        )
-        util.slot_table_update(
-          row.shipments_frame.shipments_table,
-          {
-            {color = "green", entries = station_data.inbound, translations = dictionaries.materials},
-            {color = "blue", entries = station_data.outbound, translations = dictionaries.materials},
-          }
-        )
-        util.slot_table_update(
-          row.control_signals_frame.control_signals_table,
-          {
-            {
-              color = "default",
-              entries = station_data.control_signals,
-              translations = dictionaries.virtual_signals,
-              type = "virtual-signal",
-            }
-          }
-        )
+            color = "default",
+            entries = station_data.control_signals,
+            translations = dictionaries.virtual_signals,
+            type = "virtual-signal",
+          },
+        })
       end
     end
   end

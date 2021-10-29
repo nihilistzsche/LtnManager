@@ -20,10 +20,10 @@ function global_data.build_dictionaries()
 
   -- Materials
   local Materials = dictionary.new("materials", true)
-  for _, type in ipairs{"fluid", "item"} do
-    local prefix = type..","
-    for name, prototype in pairs(game[type.."_prototypes"]) do
-      Materials:add(prefix..name, prototype.localised_name)
+  for _, type in ipairs({ "fluid", "item" }) do
+    local prefix = type .. ","
+    for name, prototype in pairs(game[type .. "_prototypes"]) do
+      Materials:add(prefix .. name, prototype.localised_name)
     end
   end
 
