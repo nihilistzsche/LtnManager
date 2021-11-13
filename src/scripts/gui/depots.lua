@@ -1,8 +1,4 @@
 local gui = require("__flib__.gui")
-local misc = require("__flib__.misc")
-
-local constants = require("constants")
-local util = require("scripts.util")
 
 local templates = require("templates")
 
@@ -50,8 +46,6 @@ function depots_tab.build(widths)
 end
 
 function depots_tab.update(self)
-  local dictionaries = self.player_table.dictionaries
-
   local state = self.state
   local refs = self.refs.depots
   local widths = self.widths.depots
