@@ -25,9 +25,9 @@ function trains_tab.build(widths)
       {
         type = "frame",
         style = "ltnm_table_toolbar_frame",
-        { type = "empty-widget", style_mods = { width = widths.trains.minimap } },
+        templates.sort_checkbox(widths, "trains", "train_id", true),
         templates.sort_checkbox(widths, "trains", "status", false),
-        templates.sort_checkbox(widths, "trains", "composition", true, { "gui.ltnm-composition-description" }),
+        templates.sort_checkbox(widths, "trains", "composition", false, { "gui.ltnm-composition-description" }),
         templates.sort_checkbox(widths, "trains", "depot", false),
         templates.sort_checkbox(widths, "trains", "shipment", false),
       },
@@ -109,6 +109,7 @@ function trains_tab.update(self)
               {
                 type = "minimap",
                 style = "ltnm_train_minimap",
+                { type = "label", style = "ltnm_minimap_label" },
                 { type = "button", style = "ltnm_train_minimap_button", tooltip = { "gui.ltnm-open-train-gui" } },
               },
             },
@@ -141,6 +142,7 @@ function trains_tab.update(self)
           {
             {
               elem_mods = { entity = train_data.main_locomotive },
+              { elem_mods = { caption = train_id } },
               {
                 actions = {
                   on_click = { gui = "main", action = "open_train_gui", train_id = train_id },

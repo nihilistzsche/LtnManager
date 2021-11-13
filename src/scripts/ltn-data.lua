@@ -525,6 +525,10 @@ local function prepare_train_status_sort(working_data)
   working_data.sorted_trains.status = {}
 end
 
+local function sort_trains_by_train_id(working_data, iterations_per_tick)
+  return table.partial_sort(working_data.sorted_trains.train_id, working_data.key, math.ceil(iterations_per_tick / 2))
+end
+
 local function sort_trains_by_status(working_data)
   local players = working_data.players
   local trains = working_data.trains
@@ -1041,6 +1045,7 @@ function ltn_data.iterate()
     sort_depots_by_available_trains,
     generate_train_statuses,
     prepare_train_status_sort,
+    sort_trains_by_train_id,
     sort_trains_by_status,
     sort_trains_by_composition,
     sort_trains_by_depot,
@@ -1143,6 +1148,7 @@ function ltn_data.on_dispatcher_updated(e)
   working_data.surfaces = {}
   -- sorting tables
   working_data.sorted_trains = {
+    train_id = {},
     status = {},
     composition = {},
     depot = {},

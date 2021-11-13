@@ -254,7 +254,8 @@ function index.build(player, player_table)
       network_id = -1,
       sorts = {
         trains = {
-          _active = "composition",
+          _active = "train_id",
+          train_id = false,
           status = false,
           composition = false,
           depot = false,

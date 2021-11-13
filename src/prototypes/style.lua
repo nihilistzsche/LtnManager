@@ -343,6 +343,16 @@ styles.ltnm_bold_red_label = {
 --   font_color = button_default_font_color
 -- }
 
+styles.ltnm_minimap_label = {
+  type = "label_style",
+  font = "default-game",
+  font_color = default_font_color,
+  size = 90,
+  vertical_align = "bottom",
+  horizontal_align = "right",
+  right_padding = 4,
+}
+
 -- MINIMAP STYLES
 
 styles.ltnm_train_minimap = {
