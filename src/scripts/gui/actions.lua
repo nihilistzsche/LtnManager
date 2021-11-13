@@ -146,4 +146,11 @@ function actions.delete_all_alerts(Gui)
   Gui:schedule_update()
 end
 
+function actions.focus_search(Gui)
+  if not Gui.pinned then
+    Gui.refs.toolbar.text_search_field.select_all()
+    Gui.refs.toolbar.text_search_field.focus()
+  end
+end
+
 return actions

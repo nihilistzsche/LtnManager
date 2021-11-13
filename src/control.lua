@@ -67,9 +67,12 @@ end)
 
 local function handle_gui_event(msg, e)
   if msg.gui == "main" then
-    local Gui = global.players[e.player_index].guis.main
-    if Gui and Gui.refs.window.valid then
-      Gui:dispatch(msg, e)
+    local player_table = global.players[e.player_index]
+    if player_table.flags.can_open_gui then
+      local Gui = player_table.guis.main
+      if Gui and Gui.refs.window.valid then
+        Gui:dispatch(msg, e)
+      end
     end
   end
 end
@@ -79,6 +82,10 @@ gui.hook_events(function(e)
   if msg then
     handle_gui_event(msg, e)
   end
+end)
+
+event.register("ltnm-linked-focus-search", function(e)
+  handle_gui_event({ gui = "main", action = "focus_search" }, e)
 end)
 
 -- PLAYER

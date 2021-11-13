@@ -11,7 +11,7 @@ data:extend({
   },
   {
     type = "custom-input",
-    name = "ltnm-search",
+    name = "ltnm-linked-focus-search",
     key_sequence = "",
     linked_game_control = "focus-search",
   },
