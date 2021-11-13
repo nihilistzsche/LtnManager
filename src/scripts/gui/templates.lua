@@ -85,11 +85,11 @@ function templates.sort_checkbox(widths, tab, column, selected, tooltip, state)
   }
 end
 
-function templates.status_indicator(width)
+function templates.status_indicator(width, center)
   return {
     type = "flow",
     style = "flib_indicator_flow",
-    style_mods = { width = width },
+    style_mods = { horizontal_align = center and "center" or nil, width = width },
     { type = "sprite", style = "flib_indicator" },
     { type = "label" },
   }

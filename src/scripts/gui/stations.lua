@@ -25,7 +25,7 @@ function stations_tab.build(widths)
         type = "frame",
         style = "ltnm_table_toolbar_frame",
         templates.sort_checkbox(widths, "stations", "name", true),
-        templates.sort_checkbox(widths, "stations", "status", false),
+        templates.sort_checkbox(widths, "stations", "status", false, { "gui.ltnm-status-description" }),
         templates.sort_checkbox(widths, "stations", "network_id", false),
         templates.sort_checkbox(widths, "stations", "provided_requested", false),
         templates.sort_checkbox(widths, "stations", "shipments", false),
@@ -97,24 +97,21 @@ function stations_tab.update(self)
         local row = children[table_index]
         local color = table_index % 2 == 0 and "dark" or "light"
         if not row then
-          row = gui.add(
-            scroll_pane,
+          row = gui.add(scroll_pane, {
+            type = "frame",
+            style = "ltnm_table_row_frame_" .. color,
             {
-              type = "frame",
-              style = "ltnm_table_row_frame_" .. color,
-              {
-                type = "label",
-                style = "ltnm_clickable_semibold_label",
-                style_mods = { width = widths.name },
-                tooltip = { "gui.ltnm-open-station-gui" },
-              },
-              templates.status_indicator(widths.status),
-              { type = "label", style_mods = { width = widths.network_id, horizontal_align = "center" } },
-              templates.small_slot_table(widths, color, "provided_requested"),
-              templates.small_slot_table(widths, color, "shipments"),
-              templates.small_slot_table(widths, color, "control_signals"),
-            }
-          )
+              type = "label",
+              style = "ltnm_clickable_semibold_label",
+              style_mods = { width = widths.name },
+              tooltip = { "gui.ltnm-open-station-gui" },
+            },
+            templates.status_indicator(widths.status, true),
+            { type = "label", style_mods = { width = widths.network_id, horizontal_align = "center" } },
+            templates.small_slot_table(widths, color, "provided_requested"),
+            templates.small_slot_table(widths, color, "shipments"),
+            templates.small_slot_table(widths, color, "control_signals"),
+          })
         end
 
         gui.update(row, {

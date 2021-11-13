@@ -29,7 +29,7 @@ function depots_tab.build(widths)
         style_mods = { right_padding = 4 },
         templates.sort_checkbox(widths, "depots", "name", true, nil, true),
         templates.sort_checkbox(widths, "depots", "network_id", false),
-        templates.sort_checkbox(widths, "depots", "status", false),
+        templates.sort_checkbox(widths, "depots", "status", false, { "gui.ltnm-status-description" }),
         templates.sort_checkbox(widths, "depots", "trains", false),
       },
       { type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = { "depots", "scroll_pane" } },
@@ -95,17 +95,14 @@ function depots_tab.update(self)
       local row = children[table_index]
       local color = table_index % 2 == 0 and "dark" or "light"
       if not row then
-        row = gui.add(
-          scroll_pane,
-          {
-            type = "frame",
-            style = "ltnm_table_row_frame_" .. color,
-            { type = "label", style_mods = { width = widths.name } },
-            { type = "label", style_mods = { width = widths.network_id, horizontal_align = "center" } },
-            { type = "flow", name = "statuses_flow", style_mods = { width = widths.status } },
-            { type = "label", style_mods = { width = widths.trains } },
-          }
-        )
+        row = gui.add(scroll_pane, {
+          type = "frame",
+          style = "ltnm_table_row_frame_" .. color,
+          { type = "label", style_mods = { width = widths.name } },
+          { type = "label", style_mods = { width = widths.network_id, horizontal_align = "center" } },
+          { type = "flow", name = "statuses_flow", style_mods = { width = widths.status } },
+          { type = "label", style_mods = { width = widths.trains } },
+        })
       end
 
       gui.update(row, {
