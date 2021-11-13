@@ -27,8 +27,14 @@ function stations_tab.build(widths)
         templates.sort_checkbox(widths, "stations", "name", true),
         templates.sort_checkbox(widths, "stations", "status", false, { "gui.ltnm-status-description" }),
         templates.sort_checkbox(widths, "stations", "network_id", false),
-        templates.sort_checkbox(widths, "stations", "provided_requested", false),
-        templates.sort_checkbox(widths, "stations", "shipments", false),
+        templates.sort_checkbox(
+          widths,
+          "stations",
+          "provided_requested",
+          false,
+          { "gui.ltnm-provided-requested-description" }
+        ),
+        templates.sort_checkbox(widths, "stations", "shipments", false, { "gui.ltnm-shipments-description" }),
         templates.sort_checkbox(widths, "stations", "control_signals", false),
       },
       { type = "scroll-pane", style = "ltnm_table_scroll_pane", ref = { "stations", "scroll_pane" } },
