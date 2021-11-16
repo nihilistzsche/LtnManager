@@ -1,5 +1,11 @@
-local gui = require("__flib__.gui-beta")
+local dictionary = require("__flib__.dictionary")
+local gui = require("__flib__.gui")
+local on_tick_n = require("__flib__.on-tick-n")
 local translation = require("__flib__.translation")
+
+local global_data = require("scripts.global-data")
+local ltn_data = require("scripts.ltn-data")
+local player_data = require("scripts.player-data")
 
 return {
   ["0.2.0"] = function()
@@ -36,11 +42,22 @@ return {
     global.flags.deleted_alerts = nil
   end,
   ["0.4.0"] = function()
-    for _, player_table in pairs(global.players) do
-      local flags = player_table.flags
-      flags.gui_open = nil
-      flags.search_open = nil
-      flags.toggling_search = nil
+    -- Nuke everything
+    global = {}
+
+    -- Reinitialize
+    dictionary.init()
+    on_tick_n.init()
+
+    global_data.init()
+    global_data.build_dictionaries()
+
+    ltn_data.init()
+    ltn_data.connect()
+
+    for i, player in pairs(game.players) do
+      player_data.init(player, i)
+      player_data.refresh(player, global.players[i])
     end
   end,
 }
