@@ -6,14 +6,16 @@ Date: ????
     - Added trains tab with minimaps for each train
     - Added new search functionality - search will now cover everything on the page instead of just the name
       - For example, searching "transport belt" will not only show stations with that in their name, but will show stations with transport belts in their requests / shipments
+      - Search also waits until you stop typing before updating the results
     - Added total train, depot, station, history, and alert count badges
   Changes:
     - Completely rewrote the GUI from scratch
-    - In most places, the GUI will now update its contents instead of destroying and rebuilding it
     - Removed item locations from the inventory tab
       - This is no longer needed because you can now search for materials on the stations or trains tabs
     - Search is now universal across all tabs
     - Significantly increased the overall size of the GUI
+  Optimizations:
+    - The GUI now dynamically updates its content instead of destroying and recreating it every time
 
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.11
