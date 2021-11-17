@@ -1,7 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.2
 Date: ????
-  Changes:
+  Bugfixes:
+    - Fixed the GUI width changing when clicking history shipment or alert type headers
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.1
 Date: 2021-11-17

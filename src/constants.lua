@@ -67,6 +67,7 @@ constants.gui = {
       runtime = 68,
       finished = 68,
       shipment = (36 * 6),
+      shipment_checkbox_stretchy = true,
     },
     alerts = {
       time = 68,
@@ -74,6 +75,7 @@ constants.gui = {
       route = 326,
       network_id = 84,
       type = 230,
+      type_checkbox_stretchy = true,
       contents = 36 * 6,
     },
   },

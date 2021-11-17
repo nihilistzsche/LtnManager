@@ -127,11 +127,21 @@ function actions.toggle_sort(Gui, msg, e)
     sorts._active = column
     e.element.state = sorts[column]
 
+    local widths = Gui.widths[tab]
+
     local old_checkbox = Gui.refs[tab].toolbar[active_column .. "_checkbox"]
     old_checkbox.style = "ltnm_sort_checkbox"
-    old_checkbox.style.width = Gui.widths[tab][active_column]
+    if widths[active_column .. "_checkbox_stretchy"] then
+      old_checkbox.style.horizontally_stretchable = true
+    else
+      old_checkbox.style.width = widths[active_column]
+    end
     e.element.style = "ltnm_selected_sort_checkbox"
-    e.element.style.width = Gui.widths[tab][column]
+    if widths[column .. "_checkbox_stretchy"] then
+      e.element.style.horizontally_stretchable = true
+    else
+      e.element.style.width = widths[column]
+    end
   end
 
   Gui:schedule_update()
