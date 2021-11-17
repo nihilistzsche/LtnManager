@@ -2,6 +2,7 @@
 Version: 0.4.2
 Date: ????
   Bugfixes:
+    - Fixed a crash when upgrading from pre-0.4.0
     - Fixed the GUI width changing when clicking history shipment or alert type headers
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.1

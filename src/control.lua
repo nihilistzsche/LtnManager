@@ -50,7 +50,7 @@ event.on_load(function()
   ltn_data.connect()
 
   for _, player_table in pairs(global.players) do
-    if player_table.guis.main then
+    if player_table.guis and player_table.guis.main then
       main_gui.load(player_table.guis.main)
     end
   end
