@@ -3,6 +3,7 @@ Version: 0.4.1
 Date: ????
   Bugfixes:
     - Fixed a crash when a train returns to a depot with leftover materials (#150)
+    - Fixed a crash when LTN passes an item that does not actually exist
     - Fixed a crash when updating mods (#150)
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.0

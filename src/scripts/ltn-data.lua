@@ -628,7 +628,7 @@ local function generate_station_search_strings(working_data)
       local dictionary = translations[dictionary_name]
       for name in pairs(station_data[station_table] or {}) do
         str_i = str_i + 1
-        str[str_i] = string.lower(dictionary[name])
+        str[str_i] = string.lower(dictionary[name] or name)
       end
     end
 
