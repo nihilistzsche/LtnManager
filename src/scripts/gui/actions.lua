@@ -111,7 +111,7 @@ function actions.open_station_gui(Gui, msg, e)
       Gui:close()
     end
   else
-    Gui.player.opened = station_data.entity
+    player.opened = station_data.entity
   end
 end
 
