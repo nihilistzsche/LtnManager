@@ -304,13 +304,17 @@ function index.build(player, player_table)
     },
     widths = widths,
   }
-  -- TODO: Restore metatables on load
-  setmetatable(Gui, { __index = Index })
+
+  index.load(Gui)
 
   player_table.guis.main = Gui
 
   player_table.flags.can_open_gui = true
   player.set_shortcut_available("ltnm-toggle-gui", true)
+end
+
+function index.load(Gui)
+  setmetatable(Gui, { __index = Index })
 end
 
 function index.get(player_index)

@@ -48,6 +48,12 @@ end)
 event.on_load(function()
   dictionary.load()
   ltn_data.connect()
+
+  for _, player_table in pairs(global.players) do
+    if player_table.guis.main then
+      main_gui.load(player_table.guis.main)
+    end
+  end
 end)
 
 event.on_configuration_changed(function(e)
