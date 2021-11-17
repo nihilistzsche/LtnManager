@@ -87,6 +87,7 @@ constants.gui_translations = {
   fetching_from = { "gui.ltnm-fetching-from" },
   loading_at = { "gui.ltnm-loading-at" },
   not_available = { "gui.ltnm-not-available" },
+  parked_at_depot_with_residue = { "gui.ltnm-parked-at-depot-with-residue" },
   parked_at_depot = { "gui.ltnm-parked-at-depot" },
   returning_to_depot = { "gui.ltnm-returning-to-depot" },
   unloading_at = { "gui.ltnm-unloading-at" },
