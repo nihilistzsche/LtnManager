@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.1
-Date: ????
+Date: 2021-11-17
   Features:
     - Re-added the ability to open stations on the map
   Bugfixes:
