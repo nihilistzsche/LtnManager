@@ -1,6 +1,8 @@
 local train_util = require("__flib__.train")
 local on_tick_n = require("__flib__.on-tick-n")
 
+local constants = require("constants")
+
 local util = require("scripts.util")
 
 local actions = {}
@@ -79,7 +81,7 @@ function actions.open_train_gui(Gui, msg)
   train_util.open_gui(Gui.player.index, train_data.train)
 end
 
-function actions.open_station_gui(Gui, msg)
+function actions.open_station_gui(Gui, msg, e)
   local station_id = msg.station_id
   local station_data = Gui.state.ltn_data.stations[station_id]
 
@@ -88,7 +90,29 @@ function actions.open_station_gui(Gui, msg)
     return
   end
 
-  Gui.player.opened = station_data.entity
+  --- @type LuaPlayer
+  local player = Gui.player
+
+  if e.shift then
+    player.zoom_to_world(station_data.entity.position, 1)
+
+    rendering.draw_circle({
+      color = constants.colors.red.tbl,
+      target = station_data.entity.position,
+      surface = station_data.entity.surface,
+      radius = 0.5,
+      filled = false,
+      width = 5,
+      time_to_live = 60 * 3,
+      players = { player },
+    })
+
+    if not Gui.state.pinned then
+      Gui:close()
+    end
+  else
+    Gui.player.opened = station_data.entity
+  end
 end
 
 function actions.toggle_sort(Gui, msg, e)

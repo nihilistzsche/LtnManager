@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.1
 Date: ????
+  Features:
+    - Re-added the ability to open stations on the map
   Bugfixes:
     - Fixed a crash when a train returns to a depot with leftover materials (#150)
     - Fixed a crash when LTN passes an item that does not actually exist
