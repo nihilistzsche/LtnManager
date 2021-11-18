@@ -332,7 +332,8 @@ local function iterate_trains(working_data, iterations_per_tick)
     local train = train_data.train
 
     -- checks
-    if not train.valid or not train_data.main_locomotive or not train_data.main_locomotive.valid then
+    local main_locomotive = train.valid and train_util.get_main_locomotive(train)
+    if not train.valid or not main_locomotive or not main_locomotive.valid then
       if working_data.aborted_trains[train_id] then
         -- migrations didn't work, so delete this train and try again next cycle
         return nil, true
@@ -387,7 +388,7 @@ local function iterate_trains(working_data, iterations_per_tick)
     train_data.state = train_state
     train_data.depot = depot
     train_data.composition = train_util.get_composition_string(train)
-    train_data.main_locomotive = train_util.get_main_locomotive(train)
+    train_data.main_locomotive = main_locomotive
     train_data.search_strings = {}
     train_data.shipment_count = 0
     train_data.surface_index = train_data.main_locomotive.surface.index
