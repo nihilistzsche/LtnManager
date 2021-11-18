@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.3
-Date: ????
+Date: 2021-11-18
   Bugfixes:
     - Added missing locale for "no depots" warning (#154)
     - Fixed a crash when a train doesn't have a "main locomotive" as reported by LTN (#153)
