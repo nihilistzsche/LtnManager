@@ -113,52 +113,49 @@ function alerts_tab.update(self)
         local row = children[table_index]
         local color = table_index % 2 == 0 and "dark" or "light"
         if not row then
-          row = gui.add(
-            scroll_pane,
+          row = gui.add(scroll_pane, {
+            type = "frame",
+            style = "ltnm_table_row_frame_" .. color,
+            { type = "label", style_mods = { width = widths.alerts.time } },
             {
-              type = "frame",
-              style = "ltnm_table_row_frame_" .. color,
-              { type = "label", style_mods = { width = widths.alerts.time } },
+              type = "label",
+              style = "ltnm_clickable_semibold_label",
+              style_mods = { width = widths.alerts.train_id, horizontal_align = "center" },
+              tooltip = { "gui.ltnm-open-train-gui" },
+            },
+            {
+              type = "flow",
+              style_mods = { vertical_spacing = 0 },
+              direction = "vertical",
               {
                 type = "label",
                 style = "ltnm_clickable_semibold_label",
-                style_mods = { width = widths.alerts.train_id, horizontal_align = "center" },
-                tooltip = { "gui.ltnm-open-train-gui" },
+                style_mods = { width = widths.alerts.route },
+                tooltip = constants.open_station_gui_tooltip,
               },
               {
-                type = "flow",
-                style_mods = { vertical_spacing = 0 },
-                direction = "vertical",
-                {
-                  type = "label",
-                  style = "ltnm_clickable_semibold_label",
-                  style_mods = { width = widths.alerts.route },
-                  tooltip = { "gui.ltnm-open-station-gui" },
-                },
-                {
-                  type = "label",
-                  style = "ltnm_clickable_semibold_label",
-                  style_mods = { width = widths.alerts.route },
-                  tooltip = { "gui.ltnm-open-station-gui" },
-                },
+                type = "label",
+                style = "ltnm_clickable_semibold_label",
+                style_mods = { width = widths.alerts.route },
+                tooltip = constants.open_station_gui_tooltip,
               },
-              { type = "label", style_mods = { width = widths.alerts.network_id, horizontal_align = "center" } },
-              { type = "label", style_mods = { width = widths.alerts.type } },
-              {
-                type = "frame",
-                name = "contents_frame",
-                style = "ltnm_small_slot_table_frame_" .. color,
-                style_mods = { width = widths.alerts.contents },
-                { type = "table", name = "contents_table", style = "slot_table", column_count = 4 },
-              },
-              {
-                type = "sprite-button",
-                style = "tool_button_red",
-                sprite = "utility/trash",
-                tooltip = { "gui.ltnm-delete-alert" },
-              },
-            }
-          )
+            },
+            { type = "label", style_mods = { width = widths.alerts.network_id, horizontal_align = "center" } },
+            { type = "label", style_mods = { width = widths.alerts.type } },
+            {
+              type = "frame",
+              name = "contents_frame",
+              style = "ltnm_small_slot_table_frame_" .. color,
+              style_mods = { width = widths.alerts.contents },
+              { type = "table", name = "contents_table", style = "slot_table", column_count = 4 },
+            },
+            {
+              type = "sprite-button",
+              style = "tool_button_red",
+              sprite = "utility/trash",
+              tooltip = { "gui.ltnm-delete-alert" },
+            },
+          })
         end
 
         gui.update(row, {
@@ -177,10 +174,9 @@ function alerts_tab.update(self)
               },
             },
             {
-              elem_mods = { caption = "[color="
-                .. constants.colors.caption.str
-                .. "]->[/color]  "
-                .. alerts_entry.train.to },
+              elem_mods = {
+                caption = "[color=" .. constants.colors.caption.str .. "]->[/color]  " .. alerts_entry.train.to,
+              },
               actions = {
                 on_click = { gui = "main", action = "open_station_gui", station_id = alerts_entry.train.to_id },
               },

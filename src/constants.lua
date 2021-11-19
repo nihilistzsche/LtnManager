@@ -126,4 +126,12 @@ constants.ltn_event_names = {
   on_requester_unscheduled_cargo = true,
 }
 
+if script then
+  constants.open_station_gui_tooltip = {
+    "",
+    { "gui.ltnm-open-station-gui" },
+    script.active_mods["LTN_Combinator_Modernized"] and { "", "\n", { "gui.ltnm-open-ltn-combinator-gui" } } or nil,
+  }
+end
+
 return constants

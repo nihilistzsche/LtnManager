@@ -154,7 +154,7 @@ function trains_tab.update(self)
             actions = {
               on_click = station_id and { gui = "main", action = "open_station_gui", station_id = station_id } or false,
             },
-            elem_mods = { caption = status.string, tooltip = station_id and { "gui.ltnm-open-station-gui" } or "" },
+            elem_mods = { caption = status.string, tooltip = station_id and constants.open_station_gui_tooltip or "" },
             style = station_id and "ltnm_clickable_semibold_label" or "ltnm_semibold_label",
             style_mods = { font_color = status.color or constants.colors.white.tbl, width = widths.trains.status },
           },

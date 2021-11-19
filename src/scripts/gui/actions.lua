@@ -110,6 +110,10 @@ function actions.open_station_gui(Gui, msg, e)
     if not Gui.state.pinned then
       Gui:close()
     end
+  elseif e.control and remote.interfaces["ltn-combinator"] then
+    if not remote.call("ltn-combinator", "open_ltn_combinator", e.player_index, station_data.lamp_control, true) then
+      util.error_flying_text(player, { "message.ltnm-error-ltn-combinator-not-found" })
+    end
   else
     player.opened = station_data.entity
   end

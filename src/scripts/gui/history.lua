@@ -111,47 +111,44 @@ function history_tab.update(self)
         local row = children[table_index]
         local color = table_index % 2 == 0 and "dark" or "light"
         if not row then
-          row = gui.add(
-            scroll_pane,
+          row = gui.add(scroll_pane, {
+            type = "frame",
+            style = "ltnm_table_row_frame_" .. color,
             {
-              type = "frame",
-              style = "ltnm_table_row_frame_" .. color,
+              type = "label",
+              style = "ltnm_clickable_semibold_label",
+              style_mods = { width = widths.history.train_id, horizontal_align = "center" },
+              tooltip = constants.open_station_gui_tooltip,
+            },
+            {
+              type = "flow",
+              style_mods = { vertical_spacing = 0 },
+              direction = "vertical",
               {
                 type = "label",
                 style = "ltnm_clickable_semibold_label",
-                style_mods = { width = widths.history.train_id, horizontal_align = "center" },
-                tooltip = { "gui.ltnm-open-train-gui" },
+                style_mods = { width = widths.history.route },
+                tooltip = constants.open_station_gui_tooltip,
               },
               {
-                type = "flow",
-                style_mods = { vertical_spacing = 0 },
-                direction = "vertical",
-                {
-                  type = "label",
-                  style = "ltnm_clickable_semibold_label",
-                  style_mods = { width = widths.history.route },
-                  tooltip = { "gui.ltnm-open-station-gui" },
-                },
-                {
-                  type = "label",
-                  style = "ltnm_clickable_semibold_label",
-                  style_mods = { width = widths.history.route },
-                  tooltip = { "gui.ltnm-open-station-gui" },
-                },
+                type = "label",
+                style = "ltnm_clickable_semibold_label",
+                style_mods = { width = widths.history.route },
+                tooltip = constants.open_station_gui_tooltip,
               },
-              { type = "label", style_mods = { width = widths.history.depot } },
-              { type = "label", style_mods = { width = widths.history.network_id, horizontal_align = "center" } },
-              { type = "label", style_mods = { width = widths.history.finished, horizontal_align = "center" } },
-              { type = "label", style_mods = { width = widths.history.runtime, horizontal_align = "center" } },
-              {
-                type = "frame",
-                name = "shipment_frame",
-                style = "ltnm_small_slot_table_frame_" .. color,
-                style_mods = { width = widths.history.shipment },
-                { type = "table", name = "shipment_table", style = "slot_table", column_count = 4 },
-              },
-            }
-          )
+            },
+            { type = "label", style_mods = { width = widths.history.depot } },
+            { type = "label", style_mods = { width = widths.history.network_id, horizontal_align = "center" } },
+            { type = "label", style_mods = { width = widths.history.finished, horizontal_align = "center" } },
+            { type = "label", style_mods = { width = widths.history.runtime, horizontal_align = "center" } },
+            {
+              type = "frame",
+              name = "shipment_frame",
+              style = "ltnm_small_slot_table_frame_" .. color,
+              style_mods = { width = widths.history.shipment },
+              { type = "table", name = "shipment_table", style = "slot_table", column_count = 4 },
+            },
+          })
         end
 
         gui.update(row, {
@@ -169,7 +166,9 @@ function history_tab.update(self)
               },
             },
             {
-              elem_mods = { caption = "[color=" .. constants.colors.caption.str .. "]->[/color]  " .. history_entry.to },
+              elem_mods = {
+                caption = "[color=" .. constants.colors.caption.str .. "]->[/color]  " .. history_entry.to,
+              },
               actions = {
                 on_click = { gui = "main", action = "open_station_gui", station_id = history_entry.to_id },
               },

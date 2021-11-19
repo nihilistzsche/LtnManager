@@ -1,5 +1,7 @@
 local gui = require("__flib__.gui")
 
+local constants = require("constants")
+
 local util = require("scripts.util")
 
 local templates = require("templates")
@@ -110,7 +112,7 @@ function stations_tab.update(self)
               type = "label",
               style = "ltnm_clickable_semibold_label",
               style_mods = { width = widths.name },
-              tooltip = { "gui.ltnm-open-station-gui" },
+              tooltip = constants.open_station_gui_tooltip,
             },
             templates.status_indicator(widths.status, true),
             { type = "label", style_mods = { width = widths.network_id, horizontal_align = "center" } },
