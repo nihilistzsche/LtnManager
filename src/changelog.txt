@@ -3,6 +3,8 @@ Version: 0.4.5
 Date: ????
   Features:
     - Re-added support for LTN Combinator mods
+  Bugfixes:
+    - Fixed a crash when a station doesn't have a name (#155)
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.4
 Date: 2021-11-18

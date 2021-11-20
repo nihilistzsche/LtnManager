@@ -222,7 +222,7 @@ local function iterate_stations(working_data, iterations_per_tick)
     end
 
     local network_id = station_data.network_id
-    local station_name = station_data.entity.backer_name
+    local station_name = station_data.entity.backer_name or "UNNAMED"
     local surface = station_data.entity.surface
     local surface_name = surface.name
     local surface_index = surface.index
