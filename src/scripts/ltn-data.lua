@@ -106,7 +106,7 @@ local function parse_train_status(train_data, translations)
         }
       else
         local station = train.station
-        if station and station.backer_name == train_data.depot then
+        if station and (station.backer_name or "UNNAMED") == train_data.depot then
           return {
             color = constants.colors.yellow.tbl,
             msg = translations.leaving_depot,
@@ -218,6 +218,7 @@ local function iterate_stations(working_data, iterations_per_tick)
   return table.for_n_of(working_data.stations, working_data.key, iterations_per_tick, function(station_data, station_id)
     -- check station validity
     if not station_data.entity.valid or not station_data.input.valid or not station_data.output.valid then
+      station_data.name = "INVALID"
       return
     end
 
@@ -623,7 +624,7 @@ local function generate_station_search_strings(working_data)
     local station_data = data.station
     local translations = data.translations
 
-    local str = { string.lower(station_data.name) }
+    local str = { string.lower(station_data.name) or "" }
     local str_i = 1
     for station_table, dictionary_name in pairs(subtables) do
       local dictionary = translations[dictionary_name]
