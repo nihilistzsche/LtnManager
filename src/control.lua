@@ -91,7 +91,10 @@ gui.hook_events(function(e)
 end)
 
 event.register("ltnm-linked-focus-search", function(e)
-  handle_gui_event({ gui = "main", action = "focus_search" }, e)
+  local Gui = global.players[e.player_index].guis.main
+  if Gui and Gui.state.visible then
+    handle_gui_event({ gui = "main", action = "focus_search" }, e)
+  end
 end)
 
 -- PLAYER
