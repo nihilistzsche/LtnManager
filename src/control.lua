@@ -92,7 +92,7 @@ end)
 
 event.register("ltnm-linked-focus-search", function(e)
   local Gui = global.players[e.player_index].guis.main
-  if Gui and Gui.state.visible then
+  if Gui and Gui.state.visible and not Gui.state.pinned then
     handle_gui_event({ gui = "main", action = "focus_search" }, e)
   end
 end)

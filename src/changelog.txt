@@ -1,7 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.7
 Date: ????
-  Changes:
+  Bugfixes:
+    - Focus search with control + f now only works if the GUI is visible and not pinned (#161) (credit to duskwuff)
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.6
 Date: 2021-11-23
