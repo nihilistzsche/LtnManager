@@ -218,8 +218,7 @@ local function iterate_stations(working_data, iterations_per_tick)
   return table.for_n_of(working_data.stations, working_data.key, iterations_per_tick, function(station_data, station_id)
     -- check station validity
     if not station_data.entity.valid or not station_data.input.valid or not station_data.output.valid then
-      station_data.name = "INVALID"
-      return
+      return nil, true
     end
 
     local network_id = station_data.network_id
