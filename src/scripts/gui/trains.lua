@@ -88,7 +88,7 @@ function trains_tab.update(self)
     local train_id = sorted_trains[sorted_index]
     local train_data = ltn_trains[train_id]
 
-    if train_data.train.valid and train_data.main_locomotive.valid then
+    if train_data.train.valid and train_data.main_locomotive and train_data.main_locomotive.valid then
       if
         (search_surface == -1 or (train_data.surface_index == search_surface))
         and bit32.btest(train_data.network_id, search_network_id)

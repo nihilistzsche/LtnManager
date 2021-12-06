@@ -2,6 +2,7 @@
 Version: 0.4.8
 Date: ????
   Bugfixes:
+    - Fixed a crash when a processed train loses all of its locomotives and the GUI refreshes (#164)
     - Fixed a crash when using Lua patterns in the search string (regression) (#165)
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.7
