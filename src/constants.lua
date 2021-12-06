@@ -95,6 +95,21 @@ constants.gui_translations = {
   unloading_at = { "gui.ltnm-unloading-at" },
 }
 
+constants.input_sanitizers = {
+  ["%%"] = "%%%%",
+  ["%("] = "%%(",
+  ["%)"] = "%%)",
+  ["%.^[%*]"] = "%%.",
+  ["%+"] = "%%+",
+  ["%-"] = "%%-",
+  ["^[%.]%*"] = "%%*",
+  ["%?"] = "%%?",
+  ["%["] = "%%[",
+  ["%]"] = "%%]",
+  ["%^"] = "%%^",
+  ["%$"] = "%%$",
+}
+
 constants.ltn_control_signals = {
   ["ltn-depot"] = true,
   ["ltn-depot-priority"] = true,

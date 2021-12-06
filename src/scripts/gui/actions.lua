@@ -45,16 +45,18 @@ function actions.toggle_pinned(Gui)
 end
 
 function actions.update_text_search_query(Gui, _, e)
-  local text = e.element.text
-
-  -- TODO: Sanitization and other stuffs
-  Gui.state.search_query = text
+  local query = e.text
+  -- Input sanitization
+  for pattern, replacement in pairs(constants.input_sanitizers) do
+    query = string.gsub(query, pattern, replacement)
+  end
+  Gui.state.search_query = query
 
   if Gui.state.search_job then
     on_tick_n.remove(Gui.state.search_job)
   end
 
-  if #text == 0 then
+  if #query == 0 then
     Gui:schedule_update()
   else
     Gui.state.search_job = on_tick_n.add(
