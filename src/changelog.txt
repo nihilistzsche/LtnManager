@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.9
-Date: ????
+Date: 2022-01-23
   Features:
     - Added a map setting to adjust the history length (#127)
     - Re-added the dispatcher disabled warning (#122)
