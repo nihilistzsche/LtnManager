@@ -747,7 +747,8 @@ local function update_history(working_data)
       end
     end
     -- sometimes LTN will forget to include `started`, in which case, skip this one
-    if train.started then
+    -- Also check for an invalid or nonexistent main locomotive
+    if train.started and train.main_locomotive and train.main_locomotive.valid then
       -- add remaining info
       entry.from = train.from
       entry.to = train.to
