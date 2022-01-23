@@ -104,7 +104,7 @@ function alerts_tab.update(self)
         (search_surface == -1 or (alerts_entry.train.surface_index == search_surface))
         and bit32.btest(alerts_entry.train.network_id, search_network_id)
         and (#search_query == 0 or string.find(
-          alerts_entry.search_strings[self.player.index],
+          alerts_entry.search_strings[self.player.index] or "",
           string.lower(search_query)
         ))
         and not alerts_to_delete[alert_id]
