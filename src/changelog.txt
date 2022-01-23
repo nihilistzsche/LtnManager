@@ -2,6 +2,7 @@
 Version: 0.4.9
 Date: ????
   Features:
+    - Added a map setting to adjust the history length (#127)
     - Re-added the dispatcher disabled warning (#122)
   Bugfixes:
     - Fixed a crash when an alert somehow has no search string (#169)

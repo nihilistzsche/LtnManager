@@ -765,8 +765,8 @@ local function update_history(working_data)
       end, 0)
       -- add to history
       queue.push_right(active_history, entry)
-      -- limit to 50 entries
-      if queue.length(active_history) > 50 then
+      -- limit number of entries
+      for _ = 1, queue.length(active_history) - settings.global["ltnm-history-length"].value do
         queue.pop_left(active_history)
       end
     end
