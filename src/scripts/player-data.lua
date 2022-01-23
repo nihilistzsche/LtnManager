@@ -36,9 +36,4 @@ function player_data.refresh(player, player_table)
   end
 end
 
-function player_data.set_setting(player_index, setting_name, setting_value)
-  local player = game.get_player(player_index)
-  player.mod_settings["ltnm-" .. setting_name] = { value = setting_value }
-end
-
 return player_data

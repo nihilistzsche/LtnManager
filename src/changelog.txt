@@ -2,6 +2,7 @@
 Version: 0.4.9
 Date: ????
   Bugfixes:
+    - Fixed a crash when changing the iterations per tick setting (#173)
     - Fixed that alerts would be cleared permanently when using "clear all" (#167)
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.8

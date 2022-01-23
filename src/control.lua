@@ -145,16 +145,6 @@ event.register({ defines.events.on_lua_shortcut, "ltnm-toggle-gui" }, function(e
   end
 end)
 
--- SETTINGS
-
-event.on_runtime_mod_setting_changed(function(e)
-  if string.sub(e.setting, 1, 5) == "ltnm-" then
-    for i, p in pairs(game.players) do
-      player_data.update_settings(p, global.players[i])
-    end
-  end
-end)
-
 -- TICK
 
 event.on_tick(function(e)
