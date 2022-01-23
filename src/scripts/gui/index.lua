@@ -109,6 +109,9 @@ function Index:update()
 
   local ltn_data = self.state.ltn_data
 
+  -- Dispatcher status
+  refs.titlebar.dispatcher_status_label.visible = not settings.global["ltn-dispatcher-enabled"].value
+
   -- Surface dropdown
   local surface_dropdown = refs.toolbar.surface_dropdown
   surface_dropdown.items = ltn_data.surfaces.items
@@ -167,6 +170,15 @@ function index.build(player, player_table)
         },
         { type = "label", style = "frame_title", caption = { "mod-name.LtnManager" }, ignored_by_interaction = true },
         { type = "empty-widget", style = "flib_titlebar_drag_handle", ignored_by_interaction = true },
+        {
+          type = "label",
+          style = "bold_label",
+          style_mods = { font_color = constants.colors.red.tbl, left_margin = -4, top_margin = 1 },
+          caption = { "gui.ltnm-dispatcher-disabled" },
+          tooltip = { "gui.ltnm-dispatcher-disabled-description" },
+          ref = { "titlebar", "dispatcher_status_label" },
+          visible = false,
+        },
         templates.frame_action_button(
           "ltnm_pin",
           { "gui.ltnm-keep-open" },

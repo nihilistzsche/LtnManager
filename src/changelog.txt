@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.9
 Date: ????
+  Features:
+    - Re-added the dispatcher disabled warning (#122)
   Bugfixes:
     - Fixed a crash when an alert somehow has no search string (#169)
     - Fixed a crash when a train's main locomotive is invalid when being added to history (#168)
