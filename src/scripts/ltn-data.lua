@@ -870,6 +870,7 @@ local function update_alerts(working_data)
 
   -- delete alerts if necessary
   if flags.deleted_all_alerts then
+    flags.deleted_all_alerts = false
     active_data.alerts = queue.new()
     active_alerts = active_data.alerts
   else
