@@ -1020,7 +1020,6 @@ local function process_surfaces(working_data)
     if surfaces[surface_name] then
       i = i + 1
       surface_data.items[i] = surface_name
-      -- FIXME: This will crash if the surface gets deleted partway through iteration
       surface_data.selected_to_index[i] = surfaces[surface_name].index
     end
   end
