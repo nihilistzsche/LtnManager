@@ -200,6 +200,8 @@ function alerts_tab.update(self)
         util.slot_table_update(row.contents_frame.contents_table, {
           { color = "green", entries = alerts_entry.planned_shipment or {}, translations = dictionaries.materials },
           { color = "red", entries = alerts_entry.actual_shipment or {}, translations = dictionaries.materials },
+          { color = "red", entries = alerts_entry.unscheduled_load or {}, translations = dictionaries.materials },
+          { color = "red", entries = alerts_entry.remaining_load or {}, translations = dictionaries.materials },
         })
       end
     end
