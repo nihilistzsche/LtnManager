@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.10
-Date: ????
+Date: 2022-03-01
   Bugfixes:
     - Fixed unexpected load not showing in the alerts panel (credit to Gorfiend) (#176)
     - Fixed a crash when a surface is deleted while the LTN data iterator is working (#177)
