@@ -46,7 +46,7 @@ local function update_table(self, name, color)
   for name, count_by_network_id in pairs(ltn_inventory or {}) do
     if
       bit32.btest(count_by_network_id.combined_id, search_network_id)
-      and string.find(string.lower(translations[name]), search_query)
+      and string.find(string.lower(translations[name]), string.lower(search_query))
     then
       local running_count = 0
       for network_id, count in pairs(count_by_network_id) do
