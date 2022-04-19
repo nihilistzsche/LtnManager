@@ -23,6 +23,53 @@ commands.add_command("LtnManager", { "ltnm-message.command-help" }, function(e)
 end)
 
 -- -----------------------------------------------------------------------------
+-- INTERFACES
+
+remote.add_interface("LtnManager", {
+  --- Returns whether the LTN Manager GUI is open for the given player.
+  --- @param player_index number
+  --- @return boolean
+  is_gui_open = function(player_index)
+    if not player_index or type(player_index) ~= "number" then
+      error("Must provide a valid player_index")
+    end
+
+    if global.players then
+      local player_table = global.players[player_index]
+      if player_table then
+        local Gui = player_table.guis.main
+        if Gui then
+          return Gui.state.visible
+        end
+      end
+    end
+
+    return false
+  end,
+  --- Toggles the LTN Manager GUI for the given player, and returns its new state.
+  --- @param player_index number
+  --- @return boolean
+  toggle_gui = function(player_index)
+    if not player_index or type(player_index) ~= "number" then
+      error("Must provide a valid player_index")
+    end
+
+    if global.players then
+      local player_table = global.players[player_index]
+      if player_table then
+        local Gui = player_table.guis.main
+        if Gui and Gui.refs.window.valid then
+          Gui:toggle()
+          return Gui.state.visible
+        end
+      end
+    end
+
+    return false
+  end,
+})
+
+-- -----------------------------------------------------------------------------
 -- EVENT HANDLERS
 -- LTN data handlers are kept in `scripts.ltn-data`
 -- all other handlers are kept here
