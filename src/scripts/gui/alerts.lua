@@ -182,7 +182,7 @@ function alerts_tab.update(self)
               },
             },
           },
-          { elem_mods = { caption = alerts_entry.train.network_id } },
+          { elem_mods = { caption = util.signed_int32(alerts_entry.train.network_id) } },
           {
             elem_mods = {
               caption = { "gui.ltnm-alert-" .. string.gsub(alerts_entry.type, "_", "-") },

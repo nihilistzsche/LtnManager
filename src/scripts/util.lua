@@ -97,4 +97,9 @@ function util.sorted_iterator(arr, src_tbl, sort_state)
     arr
 end
 
+local MAX_INT = 2147483648 -- math.pow(2, 31)
+function util.signed_int32(val)
+  return (val >= MAX_INT and val - (2 * MAX_INT)) or val
+end
+
 return util
