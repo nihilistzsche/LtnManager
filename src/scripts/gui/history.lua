@@ -175,7 +175,7 @@ function history_tab.update(self)
             },
           },
           { elem_mods = { caption = history_entry.depot } },
-          { elem_mods = { caption = history_entry.network_id } },
+          { elem_mods = { caption = util.signed_int32(history_entry.network_id) } },
           { elem_mods = { caption = misc.ticks_to_timestring(history_entry.runtime) } },
           { elem_mods = { caption = misc.ticks_to_timestring(history_entry.finished) } },
         })
