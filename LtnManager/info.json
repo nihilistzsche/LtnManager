@@ -1,10 +1,10 @@
 {
   "name": "LtnManager",
-  "version": "0.4.13",
+  "version": "0.4.14",
   "title": "LTN Manager",
-  "author": "raiguard",
-  "contact": "Discord: raiguard#7402",
-  "homepage": "https://github.com/raiguard/Factorio-LtnManager",
+  "author": "nihilistzsche",
+  "contact": "Discord: nihilistzsche#0420",
+  "homepage": "https://github.com/nihilistzsche/Factorio-LtnManager",
   "description": "A GUI for managing your Logistic Train Network.",
   "factorio_version": "1.1",
   "dependencies": ["base >= 1.1.42", "LogisticTrainNetwork >= 1.16.3", "flib >= 0.9.2", "? LTN_Combinator_Modernized"]
