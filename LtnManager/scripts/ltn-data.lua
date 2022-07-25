@@ -414,7 +414,7 @@ local function iterate_in_transit(working_data, iterations_per_tick)
     iterations_per_tick,
     function(delivery_data, delivery_id)
       local train_data = working_data.trains[delivery_id]
-      if train_data then
+      if train_data and train_data.main_locomotive and train_data.main_locomotive.surface then
         local network_id = delivery_data.network_id
         local surface_index = train_data.main_locomotive.surface.index
         -- add to in transit inventory
@@ -944,8 +944,10 @@ local function generate_alerts_search_strings(working_data)
     local str_i = 5
     for _, source in pairs({ alert_data.planned_shipment or {}, alert_data.actual_shipment }) do
       for name in pairs(source) do
-        str_i = str_i + 1
-        str[str_i] = string.lower(translations[name])
+        if translations[name] then
+            str_i = str_i + 1
+            str[str_i] = string.lower(translations[name])
+        end
       end
     end
 
