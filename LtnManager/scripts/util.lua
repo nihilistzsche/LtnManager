@@ -53,26 +53,27 @@ function util.slot_table_update(table, sources)
   for _, source_data in pairs(sources) do
     if source_data.entries then
       for name, count in pairs(source_data.entries) do
-        i = i + 1
-        local button = children[i]
-        if not button then
-          button = gui.add(table, { type = "sprite-button", enabled = false })
-        end
         local sprite
         if source_data.type then
           sprite = source_data.type .. "/" .. name
         else
           sprite = string.gsub(name, ",", "/")
         end
-        button.style = "ltnm_small_slot_button_" .. source_data.color
-        button.sprite = sprite
-        button.tooltip = "[img="
-          .. sprite
-          .. "]  [font=default-semibold]"
-          .. source_data.translations[name]
-          .. "[/font]\n"
-          .. misc.delineate_number(count)
-        button.number = count
+        if gui.is_valid_sprite_path(sprite) then
+          i = i + 1
+          local button = children[i]
+          if not button then
+            button = gui.add(table, { type = "sprite-button", enabled = false })
+          end
+          button.sprite = sprite
+          button.tooltip = "[img="
+            .. sprite
+            .. "]  [font=default-semibold]"
+            .. source_data.translations[name]
+            .. "[/font]\n"
+            .. misc.delineate_number(count)
+          button.number = count
+        end
       end
     end
   end
