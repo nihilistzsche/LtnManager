@@ -59,12 +59,13 @@ function util.slot_table_update(table, sources)
         else
           sprite = string.gsub(name, ",", "/")
         end
-        if gui.is_valid_sprite_path(sprite) then
+        if game.is_valid_sprite_path(sprite) then
           i = i + 1
           local button = children[i]
           if not button then
             button = gui.add(table, { type = "sprite-button", enabled = false })
           end
+          button.style = "ltnm_small_slot_button_" .. source_data.color
           button.sprite = sprite
           button.tooltip = "[img="
             .. sprite
