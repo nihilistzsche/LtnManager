@@ -1,8 +1,16 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.15
+Date: 2022-07-28
+  Fixes:
+    - Fixes for a couple of mistakes in 0.4.14.
+---------------------------------------------------------------------------------------------------
 Version: 0.4.14
-Date: ??
+Date: 2022-07-26
   Misc:
     - Ownership changed from raiguard to nihilistzsche
+  Fixes:
+    - Fixed a couple of nil errors and a bug caused when upgrading from space
+      exploration 0.5 to 0.6.
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.13
 Date: 2022-06-23
