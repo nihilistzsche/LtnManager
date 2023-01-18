@@ -48,11 +48,13 @@ local function parse_train_status(train_data, translations)
   local state = train_data.state
   local def = defines.train_state
   if
-	train.valid
-    and (state == def.on_the_path
-    or state == def.arrive_signal
-    or state == def.wait_signal
-    or state == def.arrive_station)
+    train.valid
+    and (
+      state == def.on_the_path
+      or state == def.arrive_signal
+      or state == def.wait_signal
+      or state == def.arrive_station
+    )
   then
     if train_data.returning_to_depot then
       return {
@@ -395,12 +397,14 @@ local function iterate_trains(working_data, iterations_per_tick)
     train_data.surface_index = train_data.main_locomotive.surface.index
     train_data.status = {}
     trains[train_id] = train_data
-    for key, value in pairs(deliveries[train_id] or available_trains[train_id] or {
-      train = train,
-      network_id = depot_data.network_id,
-      force = depot_data.force,
-      returning_to_depot = true,
-    }) do
+    for key, value in
+      pairs(deliveries[train_id] or available_trains[train_id] or {
+        train = train,
+        network_id = depot_data.network_id,
+        force = depot_data.force,
+        returning_to_depot = true,
+      })
+    do
       train_data[key] = value
     end
   end)
@@ -946,8 +950,8 @@ local function generate_alerts_search_strings(working_data)
     for _, source in pairs({ alert_data.planned_shipment or {}, alert_data.actual_shipment }) do
       for name in pairs(source) do
         if translations[name] then
-            str_i = str_i + 1
-            str[str_i] = string.lower(translations[name])
+          str_i = str_i + 1
+          str[str_i] = string.lower(translations[name])
         end
       end
     end

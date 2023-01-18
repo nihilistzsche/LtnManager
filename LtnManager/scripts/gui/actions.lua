@@ -59,10 +59,8 @@ function actions.update_text_search_query(Gui, _, e)
   if #query == 0 then
     Gui:schedule_update()
   else
-    Gui.state.search_job = on_tick_n.add(
-      game.tick + 30,
-      { gui = "main", action = "update", player_index = Gui.player.index }
-    )
+    Gui.state.search_job =
+      on_tick_n.add(game.tick + 30, { gui = "main", action = "update", player_index = Gui.player.index })
   end
 end
 
