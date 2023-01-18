@@ -48,10 +48,11 @@ local function parse_train_status(train_data, translations)
   local state = train_data.state
   local def = defines.train_state
   if
-    state == def.on_the_path
+	train.valid
+    and (state == def.on_the_path
     or state == def.arrive_signal
     or state == def.wait_signal
-    or state == def.arrive_station
+    or state == def.arrive_station)
   then
     if train_data.returning_to_depot then
       return {
