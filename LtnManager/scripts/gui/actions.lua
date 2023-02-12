@@ -88,7 +88,7 @@ function actions.open_station_gui(Gui, msg, e)
     local player = Gui.player
 
     if e.shift then
-        player.zoom_to_world(station_data.entity.position, station_data.surface_index)
+        player.zoom_to_world(station_data.entity.position, 1, station_data.entity)
 
         rendering.draw_circle({
             color = constants.colors.red.tbl,
