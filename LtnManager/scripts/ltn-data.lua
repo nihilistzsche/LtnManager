@@ -418,7 +418,7 @@ local function iterate_in_transit(working_data, iterations_per_tick)
             local train_data = working_data.trains[delivery_id]
             if
                 train_data
-                and train_data.valid
+                and train_data.train.valid
                 and train_data.main_locomotive
                 and train_data.main_locomotive.surface
             then
