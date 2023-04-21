@@ -85,7 +85,7 @@ local function parse_train_status(train_data, translations)
                 end
             end
         end
-    elseif state == def.wait_station then
+    elseif train.valid and state == def.wait_station then
         if train_data.surface or train_data.returning_to_depot then
             if train_data.has_contents then
                 return {
