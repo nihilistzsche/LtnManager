@@ -8,7 +8,7 @@ Version: 0.4.17
 Date: 2023-02-11
   Fixes:
     - Shift-clicking a station should now zoom to the surface the entity is on.
-	- Should no longer error when iterating over invalid trains.
+    - Should no longer error when iterating over invalid trains.
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.16
 Date: 2023-01-19
