@@ -145,7 +145,7 @@ if script then
   constants.open_station_gui_tooltip = {
     "",
     { "gui.ltnm-open-station-gui" },
-    remote.interfaces["ltn-combinator"] and { "", "\n", { "gui.ltnm-open-ltn-combinator-gui" } } or nil,
+    script.active_mods["LTN_Combinator_Modernized"] and { "", "\n", { "gui.ltnm-open-ltn-combinator-gui" } } or nil,
   }
 end
 
