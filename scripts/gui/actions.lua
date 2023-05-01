@@ -88,7 +88,25 @@ function actions.open_station_gui(Gui, msg, e)
     local player = Gui.player
 
     if e.shift then
-        player.zoom_to_world(station_data.entity.position, 1, station_data.entity)
+        if remote.interfaces["space-exploration"] and station_data.index ~= 1 then
+            local surface = game.surfaces[station_data.surface_index]
+            if surface then
+                local surface_name = surface.name
+                remote.call(
+                    "space-exloration",
+                    "remote_view_start",
+                    {
+                        player = game.player,
+                        zone_name = surface_name,
+                        position = station_data.entity.position,
+                        location_name = station_data.name,
+                        freeze_history = true,
+                    }
+                )
+            end
+        else
+            player.zoom_to_world(station_data.entity.position, 1, station_data.entity)
+        end
 
         rendering.draw_circle({
             color = constants.colors.red.tbl,
