@@ -1,0 +1,12 @@
+on: push
+name: Publish
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+    - name: Publish Mod
+      uses: shanemadden/factorio-mod-portal-publish@stable
+      env:
+        FACTORIO_PASSWORD: ${{ secrets.FACTORIO_PASSWORD }}
+        FACTORIO_USER: ${{ secrets.FACTORIO_USER }}
