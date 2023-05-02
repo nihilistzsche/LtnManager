@@ -3,7 +3,7 @@ Version: 0.4.20
 Date: 2023-04-21
   Compatibility:
     - When Space Exploration is installed, and remote view unlocked you can now view a remote station on a different surface via remote view.
-	- If Space Exploration is not installed, attempting to view a station on a different surface will now show an error rather than crash the game.
+    - If Space Exploration is not installed, attempting to view a station on a different surface will now show an error rather than crash the game.
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.19
 Date: 2023-04-20
