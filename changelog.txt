@@ -1,6 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.21
+Date: 2023-05-02
+  Fixes:
+    - Fixed a typo in the Space Exploration optional dependency.  Oops.
+---------------------------------------------------------------------------------------------------
 Version: 0.4.20
-Date: 2023-04-21
+Date: 2023-05-01
   Compatibility:
     - When Space Exploration is installed, and remote view unlocked you can now view a remote station on a different surface via remote view.
     - If Space Exploration is not installed, attempting to view a station on a different surface will now show an error rather than crash the game.
