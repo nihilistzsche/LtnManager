@@ -96,7 +96,7 @@ function actions.open_station_gui(Gui, msg, e)
                 local surface = game.surfaces[station_data.surface_index]
                 if surface then
                     local surface_name = surface.name
-                    remote.call("space-exloration", "remote_view_start", {
+                    remote.call("space-exploration", "remote_view_start", {
                         player = player,
                         zone_name = surface_name,
                         position = station_data.entity.position,
