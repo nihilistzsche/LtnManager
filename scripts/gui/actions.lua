@@ -91,7 +91,7 @@ function actions.open_station_gui(Gui, msg, e)
         if station_data.surface_index ~= player.surface_index then
             if
                 remote.interfaces["space-exploration"]
-                and remote_call("space-exploration", "remote_view_is_unlocked", { player = player })
+                and remote.call("space-exploration", "remote_view_is_unlocked", { player = player })
             then
                 local surface = game.surfaces[station_data.surface_index]
                 if surface then
