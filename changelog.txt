@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.23
+Date: 2023-05-04
+  Fixes:
+    - Fixed zoom being set wrong. (thanks to maritz)
+    - Fixed bringing up the satellite view to view remote stations. (thanks to maritz)
+---------------------------------------------------------------------------------------------------
 Version: 0.4.22
   Fixes:
     - Fixed a typo causing a crash with the fix from 0.4.21.
