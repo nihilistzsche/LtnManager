@@ -93,16 +93,19 @@ function actions.open_station_gui(Gui, msg, e)
                 remote.interfaces["space-exploration"]
                 and remote.call("space-exploration", "remote_view_is_unlocked", { player = player })
             then
-                local surface = game.surfaces[station_data.surface_index]
-                if surface then
-                    local surface_name = surface.name
+                local zone = remote.call("space-exploration", "get_zone_from_surface_index",
+                    { surface_index = station_data.surface_index })
+                if zone then
                     remote.call("space-exploration", "remote_view_start", {
                         player = player,
-                        zone_name = surface_name,
+                        zone_name = zone.name,
                         position = station_data.entity.position,
                         location_name = station_data.name,
                         freeze_history = true,
                     })
+                else
+                    util.error_flying_text(player, { "message.ltnm-error-station-on-different-surface-unknown-zone" })
+                    return
                 end
             else
                 util.error_flying_text(player, { "message.ltnm-error-station-on-different-surface" })
