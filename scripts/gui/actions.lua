@@ -109,7 +109,7 @@ function actions.open_station_gui(Gui, msg, e)
                 return
             end
         else
-            player.zoom_to_world(station_data.entity.position, station_data.surface_index, station_data.entity)
+            player.zoom_to_world(station_data.entity.position, 1, station_data.entity)
         end
 
         rendering.draw_circle({
