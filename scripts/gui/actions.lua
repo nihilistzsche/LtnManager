@@ -105,7 +105,7 @@ function actions.open_station_gui(Gui, msg, e)
                     })
                 end
             else
-                util.error_flying_text(player({ "message.ltnm-error-station-on-different-surface" }))
+                util.error_flying_text(player, { "message.ltnm-error-station-on-different-surface" })
                 return
             end
         else
