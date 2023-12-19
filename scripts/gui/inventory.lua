@@ -40,8 +40,11 @@ local function update_table(self, name, color)
 
   local i = 0
 
+  local lua_table = table
   local table = refs[name].table
   local children = table.children
+
+  local items = {}
 
   for name, count_by_network_id in pairs(ltn_inventory or {}) do
     if
@@ -56,21 +59,33 @@ local function update_table(self, name, color)
       end
 
       if running_count > 0 then
-        i = i + 1
-        local button = children[i]
-        if not button then
-          button = table.add({ type = "sprite-button", style = "flib_slot_button_" .. color, enabled = false })
-        end
-        button.sprite = string.gsub(name, ",", "/")
-        button.number = running_count
-        button.tooltip = "[img="
-          .. string.gsub(name, ",", "/")
-          .. "]  [font=default-semibold]"
-          .. translations[name]
-          .. "[/font]\n"
-          .. misc.delineate_number(running_count)
+        lua_table.insert(items, {
+          name = name,
+          running_count = running_count
+        })
       end
     end
+  end
+
+  local function by_descending_count(item1, item2)
+    return item1.running_count > item2.running_count
+  end
+  lua_table.sort(items, by_descending_count)
+
+  for _, item in ipairs(items) do
+    i = i + 1
+    local button = children[i]
+    if not button then
+      button = table.add({ type = "sprite-button", style = "flib_slot_button_" .. color, enabled = false })
+    end
+    button.sprite = string.gsub(item.name, ",", "/")
+    button.number = item.running_count
+    button.tooltip = "[img="
+      .. string.gsub(item.name, ",", "/")
+      .. "]  [font=default-semibold]"
+      .. translations[item.name]
+      .. "[/font]\n"
+      .. misc.delineate_number(item.running_count)
   end
 
   for j = i + 1, #children do
