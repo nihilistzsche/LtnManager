@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.25
+Date: 2023-12-31
+  Changes:
+    - "Inventory tables are sorted by item count in descending order" (thanks to Atria1234)
+    - Added get_provided_inventory_for_surface remote call (thanks to uzere)
+---------------------------------------------------------------------------------------------------
 Version: 0.4.24
 Date: 2023-10-15
   Fixes:
