@@ -1,2 +1,2 @@
 indent_type = "Spaces"
-collapse_simple_statement = "Always"
+indent_width = 2
