@@ -67,6 +67,17 @@ remote.add_interface("LtnManager", {
 
     return false
   end,
+  get_provided_inventory_for_surface = function(surface_index)
+    if not surface_index or type(surface_index) ~= "number" then
+      error("Must provide a valid surface_index")
+    end
+
+    if not global.data or not global.data.inventory or not global.data.inventory.provided then
+      return nil
+    end
+
+    return global.data.inventory.provided[surface_index]
+  end,
 })
 
 -- -----------------------------------------------------------------------------
