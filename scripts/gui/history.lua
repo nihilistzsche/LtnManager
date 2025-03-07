@@ -1,5 +1,5 @@
-local gui = require("__flib__.gui")
-local misc = require("__flib__.misc")
+local gui = require("lib.gui")
+local format = require("__flib__.format")
 
 local constants = require("constants")
 local util = require("scripts.util")
@@ -95,7 +95,7 @@ function history_tab.update(self)
     step = 1
   end
 
-  if not global.flags.deleted_history then
+  if not storage.flags.deleted_history then
     for sorted_index = start, finish, step do
       local history_id = sorted_history[sorted_index]
       local history_entry = ltn_history[history_id]
@@ -176,8 +176,8 @@ function history_tab.update(self)
           },
           { elem_mods = { caption = history_entry.depot } },
           { elem_mods = { caption = util.signed_int32(history_entry.network_id) } },
-          { elem_mods = { caption = misc.ticks_to_timestring(history_entry.runtime) } },
-          { elem_mods = { caption = misc.ticks_to_timestring(history_entry.finished) } },
+          { elem_mods = { caption = format.time(history_entry.runtime) } },
+          { elem_mods = { caption = format.time(history_entry.finished) } },
         })
 
         util.slot_table_update(

@@ -1,4 +1,4 @@
-local dictionary = require("__flib__.dictionary")
+local dictionary = require("lib.dictionary")
 
 local player_data = {}
 
@@ -15,7 +15,7 @@ function player_data.init(player, index)
     last_update = game.tick,
   }
   player.set_shortcut_available("ltnm-toggle-gui", false)
-  global.players[index] = player_table
+  storage.players[index] = player_table
 end
 
 function player_data.refresh(player, player_table)

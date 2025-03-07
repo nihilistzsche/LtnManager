@@ -1,5 +1,5 @@
-local gui = require("__flib__.gui")
-local misc = require("__flib__.misc")
+local gui = require("lib.gui")
+local format = require("__flib__.format")
 
 local util = {}
 
@@ -57,22 +57,24 @@ function util.slot_table_update(table, sources)
         if source_data.type then
           sprite = source_data.type .. "/" .. name
         else
+          name = string.match(name, "^[^,]+,[^,]+") or name -- remove quality info
           sprite = string.gsub(name, ",", "/")
         end
-        if game.is_valid_sprite_path(sprite) then
+        if helpers.is_valid_sprite_path(sprite) then
           i = i + 1
           local button = children[i]
           if not button then
-            button = gui.add(table, { type = "sprite-button", enabled = false })
+            button = gui.add(table, { type = "sprite-button", enabled = true })
           end
           button.style = "ltnm_small_slot_button_" .. source_data.color
           button.sprite = sprite
+          local translations = source_data.translations or {}
           button.tooltip = "[img="
             .. sprite
             .. "]  [font=default-semibold]"
-            .. source_data.translations[name]
+            .. (translations[name] or name)
             .. "[/font]\n"
-            .. misc.delineate_number(count)
+            .. format.number(count)
           button.number = count
         end
       end

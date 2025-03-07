@@ -1,4 +1,4 @@
-local misc = require("__flib__.misc")
+local format = require("__flib__.format")
 
 local templates = require("templates")
 
@@ -49,7 +49,7 @@ local function update_table(self, name, color)
   for name, count_by_network_id in pairs(ltn_inventory or {}) do
     if
       bit32.btest(count_by_network_id.combined_id, search_network_id)
-      and string.find(string.lower(translations[name]), string.lower(search_query))
+      and string.find(string.lower(translations[name] or name), string.lower(search_query))
     then
       local running_count = 0
       for network_id, count in pairs(count_by_network_id) do
@@ -76,16 +76,20 @@ local function update_table(self, name, color)
     i = i + 1
     local button = children[i]
     if not button then
-      button = table.add({ type = "sprite-button", style = "flib_slot_button_" .. color, enabled = false })
+      button = table.add({ type = "sprite-button", style = "ltnm_slot_button_" .. color })
     end
-    button.sprite = string.gsub(item.name, ",", "/")
+
+    local item_name = string.match(item.name, "^[^,]+,[^,]+") or item.name -- remove quality info
+    local item_sprite = string.gsub(item_name, ",", "/")
+
+    button.sprite = item_sprite
     button.number = item.running_count
     button.tooltip = "[img="
-      .. string.gsub(item.name, ",", "/")
+      .. item_sprite
       .. "]  [font=default-semibold]"
-      .. translations[item.name]
+      .. (translations[item_name] or item_name)
       .. "[/font]\n"
-      .. misc.delineate_number(item.running_count)
+      .. format.number(item.running_count)
   end
 
   for j = i + 1, #children do

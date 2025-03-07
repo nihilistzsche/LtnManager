@@ -1,11 +1,22 @@
 local ltn_data = {}
 
-local event = require("__flib__.event")
 local queue = require("lib.queue")
 local table = require("__flib__.table")
 local train_util = require("__flib__.train")
 
 local constants = require("constants")
+
+local rgb_colors = {
+    [16711680] = "red",    red = 16711680,    -- RGB: (255, 0, 0)
+    [65280] = "green",     green = 65280,     -- RGB: (0, 255, 0)
+    [255] = "blue",        blue = 255,        -- RGB: (0, 0, 255)
+    [16776960] = "yellow", yellow = 16776960, -- RGB: (255, 255, 0)
+    [16761035] = "pink",   p761035,   -- RGB: (255, 192, 203)
+    [65535] = "cyan",      cyan = 65535,      -- RGB: (0, 255, 255)
+    [16777215] = "white",  white =  16777215, -- RGB: (255, 255, 255)
+    [8421504] = "grey",    grey = 8421504,    -- RGB: (128, 128, 128)
+    [0] = "black",         black = 0          -- RGB: (0, 0, 0)
+}
 
 -- -----------------------------------------------------------------------------
 -- HELPER FUNCTIONS
@@ -175,7 +186,7 @@ local function add_alert(e)
         time = game.tick,
         type = alert_type,
         train_id = train_id,
-        use_working_data = global.flags.iterating_ltn_data or not global.data,
+        use_working_data = storage.flags.iterating_ltn_data or not storage.data,
     }
 
     -- add unique data
@@ -192,7 +203,7 @@ local function add_alert(e)
     end
 
     -- add to temporary table
-    global.active_data.alerts_to_add[#global.active_data.alerts_to_add + 1] = alert_data
+    storage.active_data.alerts_to_add[#storage.active_data.alerts_to_add + 1] = alert_data
 end
 
 -- -----------------------------------------------------------------------------
@@ -200,7 +211,7 @@ end
 
 local function get_ready_players(working_data)
     local ready_players = {}
-    for i, player_table in pairs(global.players) do
+    for i, player_table in pairs(storage.players) do
         if player_table.flags.translations_finished then ready_players[i] = player_table end
     end
 
@@ -239,13 +250,22 @@ local function iterate_stations(working_data, iterations_per_tick)
             working_data.surfaces[surface_name] = true
 
             -- get status
-            local lamp_signal = station_data.lamp_control.get_control_behavior().get_signal(1)
-            local status_color = string.gsub(lamp_signal.signal.name, "signal%-", "")
+            local lamp_signal = station_data.lamp_control.get_control_behavior().get_section(1).get_slot(1)
+            local status_color = string.gsub(lamp_signal.value.name, "signal%-", "")
             station_data.status = {
                 color = status_color,
-                count = lamp_signal.count,
-                sort_key = status_color .. lamp_signal.count,
+                count = lamp_signal.min, --not correct if not eq 1, but who care, see next block
+                sort_key = status_color .. lamp_signal.min,
             }
+            -- now all signals are white with color in value... or not all?
+            if station_data.status.color == "white" and rgb_colors[station_data.status.count] then
+                status_color = rgb_colors[station_data.status.count]
+                station_data.status = {
+                    color = rgb_colors[station_data.status.count],
+                    count = 1,
+                    sort_key = status_color .. 1,
+                }
+            end
 
             -- process station materials
             local provided_requested_count = 0
@@ -268,7 +288,9 @@ local function iterate_stations(working_data, iterations_per_tick)
             -- process LTN control signals
             local signals = {}
             local signals_count = 0
-            for _, signal in ipairs(station_data.input.get_merged_signals()) do
+
+
+            for _, signal in ipairs(station_data.input.get_signals(defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green)) do
                 local id = signal.signal
                 if id.type == "virtual" and constants.ltn_control_signals[id.name] then
                     signals[id.name] = signal.count
@@ -596,7 +618,7 @@ local function generate_train_search_strings(working_data)
 
         local str = { string.lower(train_data.depot), string.lower(train_data.status[data.player_index].string) }
         for name in pairs(train_data.contents or {}) do
-            table.insert(str, string.lower(translations[name]))
+            table.insert(str, string.lower(translations[name] or name))
         end
 
         train_data.search_strings[data.player_index] = table.concat(str, " ")
@@ -609,7 +631,7 @@ local function generate_train_search_strings(working_data)
                 return {
                     train = trains[train],
                     player_index = player,
-                    translations = players[player].dictionaries.materials,
+                    translations = players[player].dictionaries.materials
                 }
             end
         )
@@ -630,12 +652,12 @@ local function generate_station_search_strings(working_data)
 
     return table.for_n_of({}, working_data.key, 1, function(data)
         local station_data = data.station
-        local translations = data.translations
+        local translations = data.translations or {}
 
         local str = { string.lower(station_data.name) or "" }
         local str_i = 1
         for station_table, dictionary_name in pairs(subtables) do
-            local dictionary = translations[dictionary_name]
+            local dictionary = translations[dictionary_name] or {}
             for name in pairs(station_data[station_table] or {}) do
                 str_i = str_i + 1
                 str[str_i] = string.lower(dictionary[name] or name)
@@ -720,27 +742,27 @@ local function sort_stations_by_control_signals(working_data, iterations_per_tic
 end
 
 local function update_history(working_data)
-    local active_data = global.active_data
+    local active_data = storage.active_data
     local active_history = active_data.history
     -- delete if necessary
-    if global.flags.deleted_history then
+    if storage.flags.deleted_history then
         active_data.history = queue.new()
         active_history = active_data.history
-        global.flags.deleted_history = false
+        storage.flags.deleted_history = false
         active_data.added_history = {}
     end
 
     -- add new entries
     for _, entry in pairs(active_data.history_to_add) do
-        local trains = entry.use_working_data and working_data.trains or global.data.trains
-        local train = trains[entry.train_id] or trains[global.active_data.invalidated_trains[entry.train_id]]
+        local trains = entry.use_working_data and working_data.trains or storage.data.trains
+        local train = trains[entry.train_id] or trains[storage.active_data.invalidated_trains[entry.train_id]]
         -- if the train is returning to its depot or doesn't exist
         if not train or not train.to then
             -- check for `data`
-            if entry.use_working_data and not global.data then goto continue end
+            if entry.use_working_data and not storage.data then goto continue end
             -- try other table
-            trains = entry.use_working_data and global.data.trains or working_data.trains
-            train = trains[entry.train_id] or trains[global.active_data.invalidated_trains[entry.train_id]]
+            trains = entry.use_working_data and storage.data.trains or working_data.trains
+            train = trains[entry.train_id] or trains[storage.active_data.invalidated_trains[entry.train_id]]
             -- there's nothing we can do, so skip this one
             if not train or not train.to then goto continue end
         end
@@ -773,7 +795,7 @@ local function update_history(working_data)
 end
 
 local function prepare_history_sort(working_data)
-    local active_data = global.active_data
+    local active_data = storage.active_data
     local active_history = active_data.history
 
     -- copy to working data
@@ -800,7 +822,7 @@ local function generate_history_search_strings(working_data)
         if key.obj == "first" or key.obj == "last" then return end
 
         local history_data = data.history
-        local translations = data.translations
+        local translations = data.translations or {}
 
         local str = {
             string.lower(history_data.depot),
@@ -810,7 +832,7 @@ local function generate_history_search_strings(working_data)
         local str_i = 3
         for name in pairs(history_data.shipment) do
             str_i = str_i + 1
-            str[str_i] = string.lower(translations[name])
+            str[str_i] = string.lower(translations[name] or name)
         end
 
         history_data.search_strings[data.player_index] = table.concat(str, " ")
@@ -823,7 +845,7 @@ local function generate_history_search_strings(working_data)
                 return {
                     history = history[history_index],
                     player_index = player,
-                    translations = players[player].dictionaries.materials,
+                    translations = players[player].dictionaries.materials
                 }
             end
         )
@@ -864,9 +886,9 @@ local function sort_history(working_data, iterations_per_tick)
 end
 
 local function update_alerts(working_data)
-    local active_data = global.active_data
+    local active_data = storage.active_data
     local active_alerts = active_data.alerts
-    local flags = global.flags
+    local flags = storage.flags
 
     -- delete alerts if necessary
     if flags.deleted_all_alerts then
@@ -880,15 +902,15 @@ local function update_alerts(working_data)
 
     -- add new alerts
     for _, alert_data in pairs(active_data.alerts_to_add) do
-        local trains = alert_data.use_working_data and working_data.trains or global.data.trains
-        local train = trains[alert_data.train_id] or trains[global.active_data.invalidated_trains[alert_data.train_id]]
+        local trains = alert_data.use_working_data and working_data.trains or storage.data.trains
+        local train = trains[alert_data.train_id] or trains[storage.active_data.invalidated_trains[alert_data.train_id]]
         -- if the train is returning to its depot or doesn't exist
         if not train or not train.to then
             -- check for `data`
-            if alert_data.use_working_data and not global.data then goto continue end
+            if alert_data.use_working_data and not storage.data then goto continue end
             -- try other table
-            trains = alert_data.use_working_data and global.data.trains or working_data.trains
-            train = trains[alert_data.train_id] or trains[global.active_data.invalidated_trains[alert_data.train_id]]
+            trains = alert_data.use_working_data and storage.data.trains or working_data.trains
+            train = trains[alert_data.train_id] or trains[storage.active_data.invalidated_trains[alert_data.train_id]]
             -- there's nothing we can do, so skip this one
             if not train or not train.to then goto continue end
         end
@@ -952,14 +974,14 @@ local function generate_alerts_search_strings(working_data)
                 return {
                     alert = alerts[alerts_index],
                     player_index = player,
-                    translations = players[player].dictionaries.materials,
+                    translations = players[player].dictionaries.materials
                 }
             end
         )
     end)
 end
 local function prepare_alerts_sort(working_data)
-    local active_alerts = global.active_data.alerts
+    local active_alerts = storage.active_data.alerts
     -- copy to working data
     working_data.alerts = table.shallow_copy(active_alerts)
 
@@ -1029,7 +1051,7 @@ end
 -- HANDLERS
 
 function ltn_data.iterate()
-    local working_data = global.working_data
+    local working_data = storage.working_data
     local step = working_data.step
 
     -- this value will be adjusted per step based on the performance impact
@@ -1077,7 +1099,7 @@ function ltn_data.iterate()
         if not end_key and (not is_for_n_of or for_n_of_finished) then working_data.step = step + 1 end
     else
         -- output data
-        global.data = {
+        storage.data = {
             -- bulk data
             depots = working_data.depots,
             stations = working_data.stations,
@@ -1096,33 +1118,33 @@ function ltn_data.iterate()
         }
 
         -- reset working data
-        global.working_data = nil
+        storage.working_data = nil
 
         -- reset invalidated trains list
-        global.active_data.invalidated_trains = {}
+        storage.active_data.invalidated_trains = {}
 
         -- start updating GUIs
-        global.flags.iterating_ltn_data = false
+        storage.flags.iterating_ltn_data = false
         if table_size(working_data.players) > 0 then
-            global.flags.updating_guis = true
-            global.next_update_index = next(working_data.players)
+            storage.flags.updating_guis = true
+            storage.next_update_index = next(working_data.players)
         end
     end
 end
 
 function ltn_data.on_stops_updated(e)
-    if global.flags.iterating_ltn_data or global.flags.updating_guis then return end
-    global.working_data = { stations = e.logistic_train_stops }
+    if storage.flags.iterating_ltn_data or storage.flags.updating_guis then return end
+    storage.working_data = { stations = e.logistic_train_stops }
 end
 
 function ltn_data.on_dispatcher_updated(e)
-    if global.flags.iterating_ltn_data or global.flags.updating_guis then return end
-    local working_data = global.working_data
+    if storage.flags.iterating_ltn_data or storage.flags.updating_guis then return end
+    local working_data = storage.working_data
     if not working_data then
         log("LTN event desync: did not receive stations in time! Skipping iteration.")
         return
     end
-    local stations = global.working_data.stations
+    local stations = storage.working_data.stations
 
     -- set up working data table
     working_data.depots = {}
@@ -1133,8 +1155,8 @@ function ltn_data.on_dispatcher_updated(e)
         requested = {},
         in_transit = {},
     }
-    working_data.history = table.shallow_copy(global.active_data.history)
-    working_data.alerts = table.shallow_copy(global.active_data.alerts)
+    working_data.history = table.shallow_copy(storage.active_data.history)
+    working_data.alerts = table.shallow_copy(storage.active_data.alerts)
     -- data tables
     working_data.provided_by_stop = e.provided_by_stop
     working_data.requested_by_stop = e.requests_by_stop
@@ -1187,24 +1209,24 @@ function ltn_data.on_dispatcher_updated(e)
     working_data.aborted_trains = {} -- trains that we aborted on during the iterate_trains step
 
     -- enable data iteration handler
-    global.flags.iterating_ltn_data = true
+    storage.flags.iterating_ltn_data = true
 end
 
 function ltn_data.on_delivery_completed(e)
-    local history_to_add = global.active_data.history_to_add
+    local history_to_add = storage.active_data.history_to_add
     history_to_add[#history_to_add + 1] = {
         finished = game.tick,
         shipment = e.shipment,
         train_id = e.train_id,
-        use_working_data = global.flags.iterating_ltn_data or not global.data,
+        use_working_data = storage.flags.iterating_ltn_data or not storage.data,
     }
 end
 
 function ltn_data.on_delivery_failed(e)
-    if not global.data then return end
+    if not storage.data then return end
 
-    local trains = global.data.trains
-    local train = trains[e.train_id] or trains[global.active_data.invalidated_trains[e.train_id]]
+    local trains = storage.data.trains
+    local train = trains[e.train_id] or trains[storage.active_data.invalidated_trains[e.train_id]]
 
     if train then
         e.planned_shipment = train.shipment
@@ -1214,7 +1236,7 @@ end
 
 local function migrate_train(e, data)
     local trains = data.trains
-    local invalidated_trains = global.active_data.invalidated_trains
+    local invalidated_trains = storage.active_data.invalidated_trains
     local new_train = e.train
     local new_id = new_train.id
     -- migrate train IDs and information
@@ -1235,8 +1257,8 @@ local function migrate_train(e, data)
 end
 
 function ltn_data.on_train_created(e)
-    local data = global.data
-    local working_data = global.working_data
+    local data = storage.data
+    local working_data = storage.working_data
     if data then migrate_train(e, data) end
     if working_data then migrate_train(e, working_data) end
 end
@@ -1257,9 +1279,9 @@ ltn_data.on_requester_unscheduled_cargo = add_alert
 ltn_data.alert_types = {}
 
 function ltn_data.init()
-    global.data = nil
-    global.working_data = nil
-    global.active_data = {
+    storage.data = nil
+    storage.working_data = nil
+    storage.active_data = {
         alerts_to_add = {},
         alerts_to_delete = {},
         alerts = queue.new(),
@@ -1267,8 +1289,8 @@ function ltn_data.init()
         history = queue.new(),
         invalidated_trains = {},
     }
-    global.flags.iterating_ltn_data = false
-    global.flags.updating_guis = false
+    storage.flags.iterating_ltn_data = false
+    storage.flags.updating_guis = false
 end
 
 function ltn_data.connect()
@@ -1276,9 +1298,9 @@ function ltn_data.connect()
     for event_name in pairs(constants.ltn_event_names) do
         local id = remote.call("logistic-train-network", event_name)
         ltn_data.alert_types[id] = string.gsub(event_name, "^on_", "")
-        event.register(id, ltn_data[event_name])
+        script.on_event(id, ltn_data[event_name])
     end
-    event.on_train_created(ltn_data.on_train_created)
+    script.on_event(defines.events.on_train_created, ltn_data.on_train_created)
 end
 
 return ltn_data

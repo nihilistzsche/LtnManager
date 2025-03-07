@@ -10,9 +10,19 @@ local styles = data.raw["gui-style"]["default"]
 
 -- smaller flib slot buttons
 for _, color in ipairs({ "default", "red", "green", "blue" }) do
+  -- fake disable button... 
+  styles["ltnm_slot_button_" .. color] = {
+    type = "button_style",
+    parent = "flib_slot_button_" .. color,
+    hovered_graphical_set = styles["flib_slot_button_" .. color].default_graphical_set,
+    clicked_graphical_set = styles["flib_slot_button_" .. color].default_graphical_set,
+  }
+
   styles["ltnm_small_slot_button_" .. color] = {
     type = "button_style",
     parent = "flib_slot_button_" .. color,
+    hovered_graphical_set = styles["flib_slot_button_" .. color].default_graphical_set,
+    clicked_graphical_set = styles["flib_slot_button_" .. color].default_graphical_set,
     size = 36,
   }
   styles["ltnm_selected_small_slot_button_" .. color] = {
@@ -192,7 +202,7 @@ styles.ltnm_table_inset_frame_dark = {
 
 styles.ltnm_table_row_frame_light = {
   type = "frame_style",
-  parent = "statistics_table_item_frame",
+  parent = "neutral_message_frame",
   top_padding = 8,
   bottom_padding = 8,
   left_padding = 8,
@@ -250,6 +260,12 @@ styles.ltnm_main_warning_frame = {
 }
 
 -- LABEL STYLES
+
+local default_orange_color = {
+	r = 255,
+	g = 128,
+	b = 0,
+}
 
 local hovered_label_color = {
   r = 0.5 * (1 + default_orange_color.r),

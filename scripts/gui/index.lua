@@ -1,5 +1,5 @@
-local gui = require("__flib__.gui")
-local misc = require("__flib__.misc")
+local gui = require("lib.gui")
+local format = require("__flib__.format")
 local queue = require("lib.queue")
 local table = require("__flib__.table")
 
@@ -30,7 +30,7 @@ function Index:destroy()
 end
 
 function Index:open()
-    self.state.ltn_data = global.data
+    self.state.ltn_data = storage.data
     self:update() -- TODO: Do we want to do this every time?
 
     self.refs.window.bring_to_front()
@@ -67,7 +67,7 @@ function Index:dispatch(msg, e)
         if e.shift then
             msg.action = "toggle_auto_refresh"
         else
-            self.state.ltn_data = global.data
+            self.state.ltn_data = storage.data
             self.do_update = true
         end
     elseif msg.transform == "handle_titlebar_click" then
@@ -114,11 +114,11 @@ function Index:update()
     end
     surface_dropdown.selected_index = selected_index
 
-    refs.trains.tab.badge_text = misc.delineate_number(#ltn_data.sorted_trains.composition)
-    refs.depots.tab.badge_text = misc.delineate_number(#ltn_data.sorted_depots.name)
-    refs.stations.tab.badge_text = misc.delineate_number(#ltn_data.sorted_stations.name)
-    refs.history.tab.badge_text = misc.delineate_number(queue.length(ltn_data.history))
-    refs.alerts.tab.badge_text = misc.delineate_number(queue.length(ltn_data.alerts))
+    refs.trains.tab.badge_text = format.number(#ltn_data.sorted_trains.composition)
+    refs.depots.tab.badge_text = format.number(#ltn_data.sorted_depots.name)
+    refs.stations.tab.badge_text = format.number(#ltn_data.sorted_stations.name)
+    refs.history.tab.badge_text = format.number(queue.length(ltn_data.history))
+    refs.alerts.tab.badge_text = format.number(queue.length(ltn_data.alerts))
 
     if state.active_tab == "trains" then
         trains_tab.update(self)
@@ -186,7 +186,7 @@ function index.build(player, player_table)
                     { "titlebar", "refresh_button" },
                     { gui = "main", transform = "handle_refresh_click" }
                 ),
-                templates.frame_action_button(
+                templates.frame_action_button1(
                     "utility/close",
                     { "gui.close-instruction" },
                     nil,
@@ -257,7 +257,7 @@ function index.build(player, player_table)
             active_tab = "trains",
             closing = false,
             do_update = false,
-            ltn_data = global.data,
+            ltn_data = storage.data,
             network_id = -1,
             sorts = {
                 trains = {
@@ -323,7 +323,7 @@ end
 function index.load(Gui) setmetatable(Gui, { __index = Index }) end
 
 function index.get(player_index)
-    local Gui = global.players[player_index].guis.main
+    local Gui = storage.players[player_index].guis.main
     if Gui and Gui.refs.window.valid then return setmetatable(Gui, { __index = Index }) end
 end
 

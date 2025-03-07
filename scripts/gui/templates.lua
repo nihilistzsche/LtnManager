@@ -21,6 +21,25 @@ function templates.frame_action_button(sprite, tooltip, ref, action)
   }
 end
 
+--- Creates a frame action button, automatically accounting for inverted sprites.
+--- @param sprite string|nil
+--- @param tooltip string|nil
+--- @param ref string[]|nil
+--- @param action table|nil
+function templates.frame_action_button1(sprite, tooltip, ref, action)
+  return {
+    type = "sprite-button",
+    style = "frame_action_button",
+    sprite = sprite,
+    hovered_sprite = sprite .. "_black",
+    clicked_sprite = sprite .. "_black",
+    mouse_button_filter = { "left" },
+    tooltip = tooltip,
+    ref = ref,
+    actions = { on_click = action },
+  }
+end
+
 --- Creates a full-sized scrollable slot table for the inventory tab.
 --- @param name string
 --- @param columns uint

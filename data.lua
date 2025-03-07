@@ -19,10 +19,17 @@ data:extend({
   {
     type = "shortcut",
     name = "ltnm-toggle-gui",
-    icon = data_util.build_sprite(nil, { 0, 0 }, util.paths.shortcut_icons, 32, 2),
-    disabled_icon = data_util.build_sprite(nil, { 48, 0 }, util.paths.shortcut_icons, 32, 2),
-    small_icon = data_util.build_sprite(nil, { 0, 32 }, util.paths.shortcut_icons, 24, 2),
-    disabled_small_icon = data_util.build_sprite(nil, { 36, 32 }, util.paths.shortcut_icons, 24, 2),
+    icon = util.paths.shortcut_icon,
+    icon_size = 32,
+    small_icon = util.paths.shortcut_icon_small,
+    small_icon_size = 24,
+
+
+
+    --icon = data_util.build_sprite(nil, { 0, 0 }, util.paths.shortcut_icons, 32),
+    --disabled_icon = data_util.build_sprite(nil, { 48, 0 }, util.paths.shortcut_icons, 32),
+    --small_icon = data_util.build_sprite(nil, { 0, 32 }, util.paths.shortcut_icons, 24),
+    --disabled_small_icon = data_util.build_sprite(nil, { 36, 32 }, util.paths.shortcut_icons, 24),
     toggleable = true,
     action = "lua",
     associated_control_input = "ltnm-toggle-gui",

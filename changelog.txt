@@ -1,8 +1,8 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.4.26
-Date: ????
-  Fixes:
-    - Removed duplicate info icon in the mod settings under map.
+Version: 0.5.0
+Date: 2025-03-06
+  Changes:
+    - Update for Factorio 2.0, using the code from LtnManagerUpdated by FoMaK as a base.
 ---------------------------------------------------------------------------------------------------
 Version: 0.4.25
 Date: 2023-12-31

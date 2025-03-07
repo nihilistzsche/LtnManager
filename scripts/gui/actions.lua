@@ -88,40 +88,19 @@ function actions.open_station_gui(Gui, msg, e)
     local player = Gui.player
 
     if e.shift then
-        if station_data.surface_index ~= player.surface_index then
-            if
-                remote.interfaces["space-exploration"]
-                and remote.call("space-exploration", "remote_view_is_unlocked", { player = player })
-            then
-                local zone = remote.call("space-exploration", "get_zone_from_surface_index",
-                    { surface_index = station_data.surface_index })
-                if zone then
-                    remote.call("space-exploration", "remote_view_start", {
-                        player = player,
-                        zone_name = zone.name,
-                        position = station_data.entity.position,
-                        location_name = station_data.name,
-                        freeze_history = true,
-                    })
-                else
-                    util.error_flying_text(player, { "message.ltnm-error-station-on-different-surface-unknown-zone" })
-                    return
-                end
-            else
-                util.error_flying_text(player, { "message.ltnm-error-station-on-different-surface" })
-                return
-            end
-        else
-            player.zoom_to_world(station_data.entity.position, 1, station_data.entity)
-        end
+        player.set_controller({
+            type = defines.controllers.remote,
+            position = station_data.entity.position,
+            surface = station_data.entity.surface,
+        })
 
         rendering.draw_circle({
             color = constants.colors.red.tbl,
             target = station_data.entity.position,
             surface = station_data.entity.surface,
-            radius = 0.5,
+            radius = 1.5,
             filled = false,
-            width = 5,
+            width = 10,
             time_to_live = 60 * 3,
             players = { player },
         })
@@ -187,17 +166,17 @@ function actions.change_surface(Gui, _, e)
 end
 
 function actions.clear_history(Gui)
-    global.flags.deleted_history = true
+    storage.flags.deleted_history = true
     Gui:schedule_update()
 end
 
 function actions.delete_alert(Gui, msg)
-    global.active_data.alerts_to_delete[msg.alert_id] = true
+    storage.active_data.alerts_to_delete[msg.alert_id] = true
     Gui:schedule_update()
 end
 
 function actions.delete_all_alerts(Gui)
-    global.flags.deleted_all_alerts = true
+    storage.flags.deleted_all_alerts = true
     Gui:schedule_update()
 end
 
