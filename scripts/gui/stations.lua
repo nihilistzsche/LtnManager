@@ -122,19 +122,23 @@ function stations_tab.update(self)
           })
         end
 
-        gui.update(row, {
-          {
-            elem_mods = { caption = station_data.name },
-            actions = {
-              on_click = { gui = "main", action = "open_station_gui", station_id = station_id },
+        -- Workaround for fuel stations showing grey indicator. flib does have a grey indicator sprite, so black is used instead.
+        local indicator_color = station_data.status.color == "grey" and "black" or station_data.status.color
+        gui.update(
+          row, {
+            {
+              elem_mods = { caption = station_data.name },
+              actions = {
+                on_click = { gui = "main", action = "open_station_gui", station_id = station_id }
+              }
             },
-          },
-          {
-            { elem_mods = { sprite = "flib_indicator_" .. station_data.status.color } },
-            { elem_mods = { caption = station_data.status.count } },
-          },
-          { elem_mods = { caption = station_data.network_id } },
-        })
+            {
+              { elem_mods = { sprite = "flib_indicator_" .. indicator_color } },
+              { elem_mods = { caption = station_data.status.count } }
+            },
+            { elem_mods = { caption = station_data.network_id } }
+          }
+        )
 
         util.slot_table_update(row.provided_requested_frame.provided_requested_table, {
           { color = "green", entries = station_data.provided, translations = dictionaries.materials },
