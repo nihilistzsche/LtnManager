@@ -7,4 +7,5 @@ data:extend({
   data_util.build_sprite("ltnm_pin_white", { 32, 32 }, util.paths.nav_icons, 32),
   data_util.build_sprite("ltnm_refresh_black", { 0, 0 }, util.paths.nav_icons, 32),
   data_util.build_sprite("ltnm_refresh_white", { 32, 0 }, util.paths.nav_icons, 32),
+  data_util.build_sprite("ltnm_indicator_grey", { 0, 0 }, "__LtnManager__/graphics/gui/indicator_grey.png", 32),
 })

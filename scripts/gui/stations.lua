@@ -122,6 +122,15 @@ function stations_tab.update(self)
           })
         end
 
+        if station_data.status.color == "grey" then
+          log(serpent.block(station_data))
+        end
+        local sprite
+        if station_data.status.color == "grey" then
+          sprite = "ltnm_indicator_grey"
+        else
+          sprite = "flib_indicator_" .. station_data.status.color
+        end
         gui.update(row, {
           {
             elem_mods = { caption = station_data.name },
@@ -130,7 +139,7 @@ function stations_tab.update(self)
             },
           },
           {
-            { elem_mods = { sprite = "flib_indicator_" .. station_data.status.color } },
+            { elem_mods = { sprite = sprite } },
             { elem_mods = { caption = station_data.status.count } },
           },
           { elem_mods = { caption = station_data.network_id } },

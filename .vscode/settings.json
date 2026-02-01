@@ -1,0 +1,13 @@
+{
+    "factorio.versions": [
+        {
+            "name": "2.0.73",
+            "factorioPath": "/home/nihilistzsche/.steam/steam/steamapps/common/Factorio/bin/x64/factorio",
+            "active": true
+        }
+    ],
+    "Lua.workspace.userThirdParty": [
+        "/home/nihilistzsche/.config/Code - Insiders/User/workspaceStorage/4fc77010ce2cbb74f37caf2229917bbc/justarandomgeek.factoriomod-debug/sumneko-3rd"
+    ],
+    "Lua.workspace.checkThirdParty": "ApplyInMemory"
+}
