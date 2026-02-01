@@ -122,9 +122,6 @@ function stations_tab.update(self)
           })
         end
 
-        if station_data.status.color == "grey" then
-          log(serpent.block(station_data))
-        end
         local sprite
         if station_data.status.color == "grey" then
           sprite = "ltnm_indicator_grey"
