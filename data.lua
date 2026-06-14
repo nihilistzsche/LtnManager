@@ -33,7 +33,7 @@ data:extend({
     toggleable = true,
     action = "lua",
     associated_control_input = "ltnm-toggle-gui",
-    technology_to_unlock = "logistic-train-network",
+    technology_to_unlock = mods["nullius"] and "nullius-logistic-train-network" or "logistic-train-network",
   },
 })
 
