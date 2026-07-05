@@ -298,11 +298,11 @@ local function iterate_stations(working_data, iterations_per_tick)
     local signals = {}
     local signals_count = 0
 
-    for _, signal in
-      ipairs(
-        station_data.input.get_signals(defines.wire_connector_id.circuit_red, defines.wire_connector_id.circuit_green)
-      )
-    do
+    local circuit_signals = station_data.input.get_signals(
+      defines.wire_connector_id.circuit_red,
+      defines.wire_connector_id.circuit_green
+    ) or {}
+    for _, signal in ipairs(circuit_signals) do
       local id = signal.signal
       if id.type == "virtual" and constants.ltn_control_signals[id.name] then
         signals[id.name] = signal.count
