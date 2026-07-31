@@ -1,6 +1,6 @@
 local dictionary = require("lib.dictionary")
 local gui = require("lib.gui")
-local migration = require("__flib__.migration")
+local migration = require("lib.migration")
 local on_tick_n = require("__flib__.on-tick-n")
 
 local global_data = require("scripts.storage-data")

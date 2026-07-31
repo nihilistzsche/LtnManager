@@ -1,7 +1,7 @@
 local ltn_data = {}
 
 local queue = require("lib.queue")
-local table = require("__flib__.table")
+local table = require("lib.table")
 local train_util = require("__flib__.train")
 
 local constants = require("constants")

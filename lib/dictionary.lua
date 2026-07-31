@@ -1,6 +1,6 @@
 local gui = require("__flib__.gui")
 local mod_gui = require("__core__.lualib.mod-gui")
-local table = require("__flib__.table")
+local table = require("lib.table")
 
 --- @diagnostic disable
 --- @deprecated Use 'dictionary-lite' instead.

@@ -1,7 +1,7 @@
 local gui = require("lib.gui")
 local format = require("__flib__.format")
 local queue = require("lib.queue")
-local table = require("__flib__.table")
+local table = require("lib.table")
 
 local constants = require("constants")
 
