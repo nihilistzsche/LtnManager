@@ -2,9 +2,9 @@ local dictionary = require("lib.dictionary")
 
 local constants = require("constants")
 
-local global_data = {}
+local storage_data = {}
 
-function global_data.init()
+function storage_data.init()
   storage.flags = {
     deleted_all_alerts = false,
     deleted_history = false,
@@ -14,7 +14,7 @@ function global_data.init()
   storage.players = {}
 end
 
-function global_data.build_dictionaries()
+function storage_data.build_dictionaries()
   -- GUI
   dictionary.new("gui", true, constants.gui_translations)
 
@@ -35,4 +35,4 @@ function global_data.build_dictionaries()
   end
 end
 
-return global_data
+return storage_data

@@ -3,7 +3,7 @@ local gui = require("lib.gui")
 local migration = require("lib.migration")
 local on_tick_n = require("__flib__.on-tick-n")
 
-local global_data = require("scripts.storage-data")
+local storage_data = require("scripts.storage-data")
 local ltn_data = require("scripts.ltn-data")
 local migrations = require("scripts.migrations")
 local player_data = require("scripts.player-data")
@@ -90,8 +90,8 @@ script.on_init(function()
   on_tick_n.init()
 
   dictionary.init()
-  global_data.init()
-  global_data.build_dictionaries()
+  storage_data.init()
+  storage_data.build_dictionaries()
 
   ltn_data.init()
   ltn_data.connect()
@@ -117,7 +117,7 @@ script.on_configuration_changed(function(e)
   if migration.on_config_changed(e, migrations) then
     dictionary.init()
 
-    global_data.build_dictionaries()
+    storage_data.build_dictionaries()
     ltn_data.init()
 
     for i, player in pairs(game.players) do
@@ -202,8 +202,8 @@ local function ltnm_toggle_gui(e)
   end
 end
 
-script.on_event(defines.events.on_lua_shortcut , ltnm_toggle_gui)
-script.on_event("ltnm-toggle-gui" , ltnm_toggle_gui)
+script.on_event(defines.events.on_lua_shortcut, ltnm_toggle_gui)
+script.on_event("ltnm-toggle-gui", ltnm_toggle_gui)
 
 -- TICK
 
