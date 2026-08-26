@@ -1,5 +1,3 @@
-local data_util = require("__flib__.data-util")
-
 local util = require("prototypes.util")
 
 data:extend({
@@ -23,8 +21,6 @@ data:extend({
     icon_size = 32,
     small_icon = util.paths.shortcut_icon_small,
     small_icon_size = 24,
-
-
 
     --icon = data_util.build_sprite(nil, { 0, 0 }, util.paths.shortcut_icons, 32),
     --disabled_icon = data_util.build_sprite(nil, { 48, 0 }, util.paths.shortcut_icons, 32),
