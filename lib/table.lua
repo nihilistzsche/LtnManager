@@ -1,5 +1,5 @@
 -- Vendored from flib <= 0.16.x. flib 0.17.0 split this module into
--- `flib_array` + `flib_table`, removed the stdlib re-exports, and deleted
+-- `flib_array` + `ltnm_table`, removed the stdlib re-exports, and deleted
 -- `for_n_of`/`partial_sort`/`filter`/`size` (with no replacement). This mod
 -- relies on those, so it carries its own copy (matching how `lib.dictionary`,
 -- `lib.gui`, and `lib.migration` are vendored). The upstream self-require guard
@@ -11,14 +11,14 @@
 --- which are tables with sequentially numbered keys. All table functions will work with arrays as well, but
 --- array functions **will not** work with tables.
 --- ```lua
---- local flib_table: = require("__flib__.table")
+--- local ltnm_table: = require("__flib__.table")
 --- ```
---- @class flib_table: tablelib
-local flib_table = {}
+--- @class ltnm_table: tablelib
+local ltnm_table = {}
 
 -- Import lua table functions
 for name, func in pairs(table) do
-  flib_table[name] = func
+  ltnm_table[name] = func
 end
 
 --- Shallow copy an array's values into a new array.
@@ -26,7 +26,7 @@ end
 --- This function is optimized specifically for arrays, and should be used in place of `table.shallow_copy` for arrays.
 --- @param arr flib.Array
 --- @return flib.Array
-function flib_table.array_copy(arr)
+function ltnm_table.array_copy(arr)
   local new_arr = {}
   for i = 1, #arr do
     new_arr[i] = arr[i]
@@ -37,7 +37,7 @@ end
 --- Merge all of the given arrays into a single array.
 --- @param arrays flib.Array An array of arrays to merge.
 --- @return flib.Array
-function flib_table.array_merge(arrays)
+function ltnm_table.array_merge(arrays)
   local output = {}
   local i = 0
   for j = 1, #arrays do
@@ -60,7 +60,7 @@ end
 --- ```lua
 --- local nums = {1, 3, 4, 8, 20, 69}
 --- local looking_for = 20
---- local i, match = flib_table.binary_search(nums, function(elem) return looking_for - elem end)
+--- local i, match = ltnm_table.binary_search(nums, function(elem) return looking_for - elem end)
 --- assert(i == 5)
 --- assert(match == looking_for)
 --- ```
@@ -69,7 +69,7 @@ end
 --- @param comparator fun(elem: T): integer
 --- @return integer? The index of the matched element.
 --- @return T? The matched element.
-function flib_table.binary_search(array, comparator)
+function ltnm_table.binary_search(array, comparator)
   local low, high = 1, #array
   assert(high, "Invalid array was passed to binary search.")
   while low < high do
@@ -93,13 +93,13 @@ end
 --- @param tbl1 table
 --- @param tbl2 table
 --- @return boolean
-function flib_table.deep_compare(tbl1, tbl2)
+function ltnm_table.deep_compare(tbl1, tbl2)
   if tbl1 == tbl2 then
     return true
   end
   for k, v in pairs(tbl1) do
     if type(v) == "table" and type(tbl2[k]) == "table" then
-      if not flib_table.deep_compare(v, tbl2[k]) then
+      if not ltnm_table.deep_compare(v, tbl2[k]) then
         return false
       end
     else
@@ -122,7 +122,7 @@ end
 --- @generic T
 --- @param tbl T The table to make a copy of.
 --- @return T
-function flib_table.deep_copy(tbl)
+function ltnm_table.deep_copy(tbl)
   local lookup_table = {}
   local function _copy(tbl)
     if type(tbl) ~= "table" then
@@ -159,15 +159,15 @@ end
 --- ```
 --- @param tables flib.Array An array of tables to merge.
 --- @return table
-function flib_table.deep_merge(tables)
+function ltnm_table.deep_merge(tables)
   local output = {}
   for _, tbl in ipairs(tables) do
     for k, v in pairs(tbl) do
       if type(v) == "table" then
         if type(output[k] or false) == "table" then
-          output[k] = flib_table.deep_merge({ output[k], v })
+          output[k] = ltnm_table.deep_merge({ output[k], v })
         else
-          output[k] = flib_table.deep_copy(v)
+          output[k] = ltnm_table.deep_copy(v)
         end
       else
         output[k] = v
@@ -190,7 +190,7 @@ end
 --- @param tbl table<K, V> The table to search.
 --- @param value V The value to match. Must have an `eq` metamethod set, otherwise will error.
 --- @return K? key The first key corresponding to `value`, if any.
-function flib_table.find(tbl, value)
+function ltnm_table.find(tbl, value)
   for k, v in pairs(tbl) do
     if v == value then
       return k
@@ -217,7 +217,7 @@ end
 --- @param tbl table<K, V>
 --- @param callback fun(value: V, key: K): boolean Receives `value` and `key` as parameters.
 --- @return boolean Whether the callback returned truthy for any one item, and thus halted iteration.
-function flib_table.for_each(tbl, callback)
+function ltnm_table.for_each(tbl, callback)
   for k, v in pairs(tbl) do
     if callback(v, k) then
       return true
@@ -266,7 +266,7 @@ end
 --- @return K? next_key Where the iteration ended. Can be any valid table key, or `nil`. Pass this as `from_k` in the next call to `for_n_of` for `tbl`.
 --- @return table<K, C> results The results compiled from the first return of `callback`.
 --- @return boolean reached_end Whether or not the end of the table was reached on this iteration.
-function flib_table.for_n_of(tbl, from_k, n, callback, _next)
+function ltnm_table.for_n_of(tbl, from_k, n, callback, _next)
   -- Bypass if a custom `next` function was provided
   if not _next then
     -- Verify start key exists, else start from scratch
@@ -334,7 +334,7 @@ end
 --- @param filter fun(value: V, key: K): boolean
 --- @param array_insert boolean? If true, the result will be constructed as an array of values that matched the filter. Key references will be lost.
 --- @return table<K, V>
-function flib_table.filter(tbl, filter, array_insert)
+function ltnm_table.filter(tbl, filter, array_insert)
   local output = {}
   local i = 0
   for k, v in pairs(tbl) do
@@ -356,7 +356,7 @@ end
 --- @param key K
 --- @param default_value V
 --- @return V
-function flib_table.get_or_insert(table, key, default_value)
+function ltnm_table.get_or_insert(table, key, default_value)
   local value = table[key]
   if not value then
     table[key] = default_value
@@ -378,7 +378,7 @@ end
 --- @generic K, V
 --- @param tbl table<K, V>
 --- @return table<V, K>
-function flib_table.invert(tbl)
+function ltnm_table.invert(tbl)
   local inverted = {}
   for k, v in pairs(tbl) do
     inverted[v] = k
@@ -400,7 +400,7 @@ end
 --- @param tbl table<K, V>
 --- @param mapper fun(value: V, key: V):N?
 --- @return table<K, N>
-function flib_table.map(tbl, mapper)
+function ltnm_table.map(tbl, mapper)
   local output = {}
   for k, v in pairs(tbl) do
     output[k] = mapper(v, k)
@@ -421,7 +421,7 @@ end
 --- @param iterations number The number of iterations to perform. Higher is more performance-heavy. This number should be adjusted based on the performance impact of the custom `comp` function (if any) and the size of the array.
 --- @param comp fun(a: V, b: V) A comparison function for sorting. Must return truthy if `a < b`.
 --- @return number? next_index The index to start the next iteration at, or `nil` if the end was reached.
-function flib_table.partial_sort(arr, from_index, iterations, comp)
+function ltnm_table.partial_sort(arr, from_index, iterations, comp)
   comp = comp or default_comp
   local start_index = (from_index and from_index > 2) and from_index or 2
   local end_index = start_index + (iterations - 1)
@@ -460,7 +460,7 @@ end
 --- @param reducer fun(acc: R, value: V, key: K):R
 --- @param initial_value R? The initial value for the accumulator. If not provided or is falsy, the first value in the table will be used as the initial `accumulator` value and skipped as `key`. Calling `reduce()` on an empty table without an `initial_value` will cause a crash.
 --- @return R
-function flib_table.reduce(tbl, reducer, initial_value)
+function ltnm_table.reduce(tbl, reducer, initial_value)
   local accumulator = initial_value
   for key, value in pairs(tbl) do
     if accumulator then
@@ -482,7 +482,7 @@ end
 --- @param tbl T
 --- @param use_rawset boolean? Use rawset to set the values (ignores metamethods).
 --- @return T The copied table.
-function flib_table.shallow_copy(tbl, use_rawset)
+function ltnm_table.shallow_copy(tbl, use_rawset)
   local output = {}
   for k, v in pairs(tbl) do
     if use_rawset then
@@ -498,7 +498,7 @@ end
 --- Unlike `table.deep_merge`, this will only combine the top level of the tables.
 --- @param tables table[]
 --- @return table
-function flib_table.shallow_merge(tables)
+function ltnm_table.shallow_merge(tables)
   local output = {}
   for _, tbl in pairs(tables) do
     for key, value in pairs(tbl) do
@@ -512,7 +512,7 @@ end
 ---
 --- Uses Factorio's built-in `table_size` function.
 --- @type fun(tbl: table):number
-flib_table.size = _ENV.table_size
+ltnm_table.size = _ENV.table_size
 
 --- Retrieve a shallow copy of a portion of an array, selected from `start` to `end` inclusive.
 ---
@@ -530,7 +530,7 @@ flib_table.size = _ENV.table_size
 --- @param start number? default: `1`
 --- @param stop number? Stop at this index. If zero or negative, will stop `n` items from the end of the array (default: `#arr`).
 --- @return flib.Array<V> A new array with the copied values.
-function flib_table.slice(arr, start, stop)
+function ltnm_table.slice(arr, start, stop)
   local output = {}
   local n = #arr
 
@@ -566,7 +566,7 @@ end
 --- @param start number default: `1`
 --- @param stop number? Stop at this index. If zero or negative, will stop `n` items from the end of the array (default: `#arr`).
 --- @return flib.Array<V> A new array with the extracted values.
-function flib_table.splice(arr, start, stop)
+function ltnm_table.splice(arr, start, stop)
   local output = {}
   local n = #arr
 
@@ -588,4 +588,4 @@ end
 
 --- @class flib.Array<T>: { [integer]: T }
 
-return flib_table
+return ltnm_table

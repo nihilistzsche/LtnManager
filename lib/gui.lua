@@ -1,4 +1,3 @@
-
 --- @diagnostic disable
 
 local mod_name = script.mod_name
@@ -12,19 +11,16 @@ for name, id in pairs(defines.events) do
   end
 end
 
---- @deprecated use `gui-lite` instead
-local flib_gui = {}
+local ltnm_gui = {}
 
---- @deprecated use `gui-lite` instead
-function flib_gui.hook_events(callback)
+function ltnm_gui.hook_events(callback)
   local on_event = script.on_event
   for _, id in pairs(gui_event_defines) do
     on_event(id, callback)
   end
 end
 
---- @deprecated use `gui-lite` instead
-function flib_gui.read_action(event_data)
+function ltnm_gui.read_action(event_data)
   local elem = event_data.element
   if not elem or not elem.valid then
     return
@@ -46,7 +42,6 @@ function flib_gui.read_action(event_data)
   return msg
 end
 
---- @deprecated use `gui-lite` instead
 local function recursive_build(parent, structure, refs)
   -- If the structure has no type, just ignore it
   -- This is to make it possible to pass unit types `{}` to represent "no element" without breaking things
@@ -144,8 +139,7 @@ local function recursive_build(parent, structure, refs)
   return elem
 end
 
---- @deprecated use `gui-lite` instead
-function flib_gui.build(parent, structures)
+function ltnm_gui.build(parent, structures)
   local refs = {}
   for i = 1, #structures do
     recursive_build(parent, structures[i], refs)
@@ -153,8 +147,7 @@ function flib_gui.build(parent, structures)
   return refs
 end
 
---- @deprecated use `gui-lite` instead
-function flib_gui.add(parent, structure)
+function ltnm_gui.add(parent, structure)
   -- Just in case they had a ref in the structure already, extract it
   local previous_ref = structure.ref
   -- Put in a known ref that we can use later
@@ -168,7 +161,6 @@ function flib_gui.add(parent, structure)
   return refs.FLIB_ADD_ROOT
 end
 
---- @deprecated use `gui-lite` instead
 local function recursive_update(elem, updates)
   if updates.cb then
     updates.cb(elem)
@@ -191,13 +183,13 @@ local function recursive_update(elem, updates)
   end
 
   if updates.tags then
-    flib_gui.update_tags(elem, updates.tags)
+    ltnm_gui.update_tags(elem, updates.tags)
   end
 
   -- TODO: This could be a lot better
   if updates.actions then
     for event_name, payload in pairs(updates.actions) do
-      flib_gui.set_action(elem, event_name, payload)
+      ltnm_gui.set_action(elem, event_name, payload)
     end
   end
 
@@ -247,32 +239,27 @@ local function recursive_update(elem, updates)
   end
 end
 
---- @deprecated use `gui-lite` instead
-function flib_gui.update(elem, updates)
+function ltnm_gui.update(elem, updates)
   recursive_update(elem, updates)
 end
 
---- @deprecated use `gui-lite` instead
-function flib_gui.get_tags(elem)
+function ltnm_gui.get_tags(elem)
   return elem.tags[mod_name] or {}
 end
 
---- @deprecated use `gui-lite` instead
-function flib_gui.set_tags(elem, tags)
+function ltnm_gui.set_tags(elem, tags)
   local elem_tags = elem.tags
   elem_tags[mod_name] = tags
   elem.tags = elem_tags
 end
 
---- @deprecated use `gui-lite` instead
-function flib_gui.delete_tags(elem)
+function ltnm_gui.delete_tags(elem)
   local elem_tags = elem.tags
   elem_tags[mod_name] = nil
   elem.tags = elem_tags
 end
 
---- @deprecated use `gui-lite` instead
-function flib_gui.update_tags(elem, updates)
+function ltnm_gui.update_tags(elem, updates)
   local elem_tags = elem.tags
   local existing = elem_tags[mod_name]
 
@@ -288,8 +275,7 @@ function flib_gui.update_tags(elem, updates)
   elem.tags = elem_tags
 end
 
---- @deprecated use `gui-lite` instead
-function flib_gui.set_action(elem, event_name, msg)
+function ltnm_gui.set_action(elem, event_name, msg)
   local elem_tags = elem.tags
   local existing = elem_tags[mod_name]
 
@@ -309,8 +295,7 @@ function flib_gui.set_action(elem, event_name, msg)
   elem.tags = elem_tags
 end
 
---- @deprecated use `gui-lite` instead
-function flib_gui.get_action(elem, event_name)
+function ltnm_gui.get_action(elem, event_name)
   local elem_tags = elem.tags
   local existing = elem_tags[mod_name]
 
@@ -326,4 +311,4 @@ function flib_gui.get_action(elem, event_name)
   return actions[event_name]
 end
 
-return flib_gui
+return ltnm_gui

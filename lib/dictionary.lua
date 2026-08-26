@@ -3,8 +3,7 @@ local mod_gui = require("__core__.lualib.mod-gui")
 local table = require("lib.table")
 
 --- @diagnostic disable
---- @deprecated Use 'dictionary-lite' instead.
-local flib_dictionary = {}
+local ltnm_dictionary = {}
 
 local inner_separator = "" -- U+E000
 local separator = "" -- U+E001
@@ -21,7 +20,6 @@ end
 
 local RawDictionary = {}
 
---- @deprecated Use 'dictionary-lite' instead.
 function RawDictionary:add(internal, translation)
   local to_add = { "", internal, inner_separator, { "?", translation, "FLIB_TRANSLATION_FAILED" }, separator }
 
@@ -45,7 +43,7 @@ function RawDictionary:add(internal, translation)
 end
 
 --- @class RawDictionary
-function flib_dictionary.new(name, keep_untranslated, initial_contents)
+function ltnm_dictionary.new(name, keep_untranslated, initial_contents)
   if raw[name] then
     error("Dictionary with the name `" .. name .. "` already exists.")
   end
@@ -75,8 +73,7 @@ function flib_dictionary.new(name, keep_untranslated, initial_contents)
   return self
 end
 
---- @deprecated Use 'dictionary-lite' instead.
-function flib_dictionary.init()
+function ltnm_dictionary.init()
   if not storage.__flib then
     storage.__flib = {}
   end
@@ -93,15 +90,13 @@ function flib_dictionary.init()
   end
 end
 
---- @deprecated Use 'dictionary-lite' instead.
-function flib_dictionary.load()
+function ltnm_dictionary.load()
   if not use_local_storage and storage.__flib and storage.__flib.dictionary then
     raw = storage.__flib.dictionary.raw
   end
 end
 
---- @deprecated Use 'dictionary-lite' instead.
-function flib_dictionary.translate(player)
+function ltnm_dictionary.translate(player)
   if not player.connected then
     error("Player must be connected to the game before this function can be called!")
   end
@@ -139,18 +134,17 @@ local function request_translation(player_data)
 
   player_data.player.request_translation({
     "",
-    key_value("FLIB_DICTIONARY_MOD", script.mod_name),
-    key_value("FLIB_DICTIONARY_NAME", player_data.dictionary),
-    key_value("FLIB_DICTIONARY_LANGUAGE", player_data.language),
-    key_value("FLIB_DICTIONARY_STRING_INDEX", player_data.i),
+    key_value("ltnm_dictionary_MOD", script.mod_name),
+    key_value("ltnm_dictionary_NAME", player_data.dictionary),
+    key_value("ltnm_dictionary_LANGUAGE", player_data.language),
+    key_value("ltnm_dictionary_STRING_INDEX", player_data.i),
     string,
   })
 
   player_data.requested_tick = game.tick
 end
 
---- @deprecated Use 'dictionary-lite' instead.
-function flib_dictionary.check_skipped()
+function ltnm_dictionary.check_skipped()
   local script_data = storage.__flib.dictionary
   local tick = game.tick
   for _, player_data in pairs(script_data.players) do
@@ -196,19 +190,18 @@ local function clean_gui(dict_lang)
   end
 end
 
-local dictionary_match_string = key_value("^FLIB_DICTIONARY_MOD", match_literal(script.mod_name))
-  .. key_value("FLIB_DICTIONARY_NAME", "(.-)")
-  .. key_value("FLIB_DICTIONARY_LANGUAGE", "(.-)")
-  .. key_value("FLIB_DICTIONARY_STRING_INDEX", "(%d-)")
+local dictionary_match_string = key_value("^ltnm_dictionary_MOD", match_literal(script.mod_name))
+  .. key_value("ltnm_dictionary_NAME", "(.-)")
+  .. key_value("ltnm_dictionary_LANGUAGE", "(.-)")
+  .. key_value("ltnm_dictionary_STRING_INDEX", "(%d-)")
   .. "(.*)$"
 
---- @deprecated Use 'dictionary-lite' instead.
-function flib_dictionary.process_translation(event_data)
+function ltnm_dictionary.process_translation(event_data)
   if not event_data.translated then
     return
   end
   local script_data = storage.__flib.dictionary
-  if string.find(event_data.result, "FLIB_DICTIONARY_NAME") then
+  if string.find(event_data.result, "ltnm_dictionary_NAME") then
     local _, _, dict_name, dict_lang, string_index, translation =
       string.find(event_data.result, dictionary_match_string)
 
@@ -366,8 +359,7 @@ function flib_dictionary.process_translation(event_data)
   end
 end
 
---- @deprecated Use 'dictionary-lite' instead.
-function flib_dictionary.cancel_translation(player_index)
+function ltnm_dictionary.cancel_translation(player_index)
   local script_data = storage.__flib.dictionary
   local player_data = script_data.players[player_index]
   if not player_data then
@@ -415,9 +407,8 @@ function flib_dictionary.cancel_translation(player_index)
   request_translation(next_player_data)
 end
 
---- @deprecated Use 'dictionary-lite' instead.
-function flib_dictionary.set_use_local_storage(value)
+function ltnm_dictionary.set_use_local_storage(value)
   use_local_storage = value
 end
 
-return flib_dictionary
+return ltnm_dictionary
